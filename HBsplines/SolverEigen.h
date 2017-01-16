@@ -3,9 +3,6 @@
 #define incl_SolverEigen_h
 
 
-//#include "petscksp.h"
-//#include "petscmat.h"
-
 #include "Solver.h"
 
 
@@ -15,11 +12,8 @@
 
 #include "myIncompleteLUT.h"
 
-using std::vector;
-
-//using namespace Eigen;
-
 using namespace myIterSolvers;
+
 
 
 class SolverEigen

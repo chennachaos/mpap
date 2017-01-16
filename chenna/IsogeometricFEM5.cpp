@@ -13,6 +13,8 @@
 #include "NurbsUtilitiesSOLID.h"
 #include "PlotVTK.h"
 
+#include "SolverPARDISO.h"
+
 #include <set>
 
 #include "util.h"
