@@ -5,12 +5,12 @@
 #include "HBSplineFEM.h"
 #include "HBSplineCutFEM.h"
 #include "StandardFEM.h"
-#include "Plot.h"
+//#include "Plot.h"
 //#include "HBScutFEMElasticity.h"
 
 
 extern DomainTree domain;
-extern Plot       plot;
+//extern Plot       plot;
 
 
 int macro207(Macro &macro)

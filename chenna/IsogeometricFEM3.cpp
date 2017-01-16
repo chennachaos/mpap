@@ -9,7 +9,7 @@
 #include "DataBlockTemplate.h"
 #include "PropertyTypeEnum.h"
 #include "MathGeom.h"
-#include "SolverMA41.h"
+#include "SolverMA41Eigen.h"
 //#include "SolverPARDISO.h"
 #include "NurbsShapeFns.h"
 #include "ComputerTime.h"
@@ -45,10 +45,10 @@ using namespace Eigen;
 
 //typedef SparseMatrix<double> SparseMatrixXd;
 
-extern Plot plot;
+//extern Plot plot;
 extern ComputerTime computerTime;
 extern MpapTime     mpapTime;
-extern Files        files;
+//extern Files        files;
 extern List<TimeFunction> timeFunction;
 
 
@@ -133,7 +133,7 @@ void IsogeometricFEM::ModalAnalysis()
     // STIFFNESS MATRIX
     /////////////////////////////////////////
 
-    solver->zeroMtx();
+    solverEigen->zeroMtx();
 
     for(e=0;e<totnumel;e++)
     {
@@ -145,14 +145,14 @@ void IsogeometricFEM::ModalAnalysis()
           exit(0);
        }
 
-       elem[e]->AssembleElementMatrix(1, ((SolverSparse*)solver)->mtx);
+       elem[e]->AssembleElementMatrix(1, solverEigen->mtx);
     }
 
-    ind2 = ((SolverSparse*)solver)->mtx.x.n;
+    ind2 = solverEigen->mtx.x.n;
 
-    rr   = &(((SolverSparse*)solver)->mtx.row[0]);
-    cc   = &(((SolverSparse*)solver)->mtx.col[0]);
-    val  = &(((SolverSparse*)solver)->mtx.x[0]);
+    rr   = &(solverEigen->mtx.row[0]);
+    cc   = &(solverEigen->mtx.col[0]);
+    val  = &(solverEigen->mtx.x[0]);
 
     for(ii=0;ii<ind2;ii++)
         globalK(rr[ii]-1,cc[ii]-1) = val[ii];
@@ -162,7 +162,7 @@ void IsogeometricFEM::ModalAnalysis()
     // MASS MATRIX
     /////////////////////////////////////////
 
-    solver->zeroMtx();
+    solverEigen->zeroMtx();
 
     for(e=0;e<totnumel;e++)
     {
@@ -174,14 +174,14 @@ void IsogeometricFEM::ModalAnalysis()
           exit(0);
        }
 
-       elem[e]->AssembleElementMatrix(2, ((SolverSparse*)solver)->mtx);
+       elem[e]->AssembleElementMatrix(2, solverEigen->mtx);
     }
 
-    ind2 = ((SolverSparse*)solver)->mtx.x.n;
+    ind2 = solverEigen->mtx.x.n;
 
-    rr   = &(((SolverSparse*)solver)->mtx.row[0]);
-    cc   = &(((SolverSparse*)solver)->mtx.col[0]);
-    val  = &(((SolverSparse*)solver)->mtx.x[0]);
+    rr   = &(solverEigen->mtx.row[0]);
+    cc   = &(solverEigen->mtx.col[0]);
+    val  = &(solverEigen->mtx.x[0]);
 
     for(ii=0;ii<ind2;ii++)
         globalM(rr[ii]-1,cc[ii]-1) = val[ii];
@@ -408,7 +408,7 @@ void IsogeometricFEM::plotModeShape(int Nmode, int flag)
 
     if(patchGrp[0].ndom == 1)
     {
-        plot.setColour(1);
+        //plot.setColour(1);
 
         CurveResult[0].Pw = CurveListFinal[0].Pw;
 
@@ -459,11 +459,11 @@ int IsogeometricFEM::calcAndAssyTangentMatrix(bool flag, double dt)
        if(intVarFlag)  copyElemInternalVariables();
 
        //flag is true by default
-       solver->rhsVec.setZero();
+       solverEigen->rhsVec.setZero();
        if(flag)  //calculate the new tangent matrix
        {
           //initialize the matrix
-          ((SolverSparse*)solver)->mtx.zero();
+          solverEigen->mtx.setZero();
 
           for(int e=0;e<totnumel;e++)
           {
@@ -487,8 +487,8 @@ int IsogeometricFEM::calcAndAssyTangentMatrix(bool flag, double dt)
               //if(e==0)
               // elem[e]->printStiffnessMatrix();   cout << endl;    cout << endl;
 
-              elem[e]->AssembleElementMatrix(1, ((SolverSparse*)solver)->mtx);
-              elem[e]->AssembleElementVector(firstIter, 0, &(solver->rhsVec[0]), &(reac[0]), 0, 0);
+              elem[e]->AssembleElementMatrix(1, solverEigen->mtx);
+              elem[e]->AssembleElementVector(firstIter, 0, &(solverEigen->rhsVec[0]), &(reac[0]), 0, 0);
           }
        }
 
@@ -505,7 +505,7 @@ int IsogeometricFEM::calcAndAssyInternalForceVector(double dt)
    if(intVarFlag)
      copyElemInternalVariables();
 
-   solver->rhsVec.setZero();
+   solverEigen->rhsVec.setZero();
    reac.zero();
 
    int start1,  start2;
@@ -545,7 +545,7 @@ int IsogeometricFEM::calcAndAssyInternalForceVector(double dt)
       
       //elem[e]->printForceVector();
 
-      elem[e]->AssembleElementVector(firstIter, 0, &(solver->rhsVec[0]), &(reac[0]), start1, start2);
+      elem[e]->AssembleElementVector(firstIter, 0, &(solverEigen->rhsVec[0]), &(reac[0]), start1, start2);
    }
    
    firstIter = false;
@@ -2286,7 +2286,7 @@ double  IsogeometricFEM::LineSearch(double old, double* residue_old, double* du,
      //gb = gtol;
      
      val_old = old;
-     val_new = solver->rhsVec.norm();
+     val_new = solverEigen->rhsVec.norm();
 
      temp = STOL*abs(gb);
 
@@ -2345,10 +2345,10 @@ double  IsogeometricFEM::LineSearch(double old, double* residue_old, double* du,
 
                   g = gamma1(du, 1.0);
                   
-                  dummy = solver->rhsVec.norm();
+                  dummy = solverEigen->rhsVec.norm();
                   
                   val_old = val_new;
-                  val_new = solver->rhsVec.norm();
+                  val_new = solverEigen->rhsVec.norm();
                   sb = sa;
                   sa = step;
 
@@ -2362,7 +2362,7 @@ double  IsogeometricFEM::LineSearch(double old, double* residue_old, double* du,
                         NurbsBaseSecondVar[iii]->Values[0] = secVarPrev_temp[iii];
                   }
 
-                  printf(" \t\t-> Iteration = %5d, Step Size = %12.6f, Norm = %12.5e,  g = %12.5e,  sa= %8.4f, sb=%8.4f\n", j, step, solver->rhsVec.norm(), g, sa, sb);
+                  printf(" \t\t-> Iteration = %5d, Step Size = %12.6f, Norm = %12.5e,  g = %12.5e,  sa= %8.4f, sb=%8.4f\n", j, step, solverEigen->rhsVec.norm(), g, sa, sb);
 
                   //   Update postions for next iteration
                   
@@ -2404,7 +2404,7 @@ double  IsogeometricFEM::gamma1(double* du, double step)
     calcAndAssyInternalForceVector(1.0);
 
     for(int kk=0;kk<ntoteqs;kk++)
-       val += (step * du[kk] * solver->rhsVec[kk]);
+       val += (step * du[kk] * solverEigen->rhsVec[kk]);
 
     return  val;
 }
@@ -2456,8 +2456,8 @@ int IsogeometricFEM::BFGSsolver(int nBFGS, bool LINE_SEARCH_FLAG, double STOL, d
     geom_temp.resize(ntotgbf1*ndf);
     geom_temp.setZero();
 
-    solver->currentStatus = ASSEMBLY_OK;
-    solver->factorise();
+    solverEigen->currentStatus = ASSEMBLY_OK;
+    solverEigen->factorise();
 
     step = 1.0;
     g0   = 0.0;
@@ -2471,23 +2471,23 @@ int IsogeometricFEM::BFGSsolver(int nBFGS, bool LINE_SEARCH_FLAG, double STOL, d
     
     cout << " AAAAAAAAAA " << endl;
 
-    //cout << " residue_new " << endl;        printVector(&(solver->rhsVec[0]), rhsVec.n);
+    //cout << " residue_new " << endl;        printVector(&(solverEigen->rhsVec[0]), rhsVec.n);
     
-    initNorm = solver->rhsVec.norm();
+    initNorm = solverEigen->rhsVec.norm();
     
     rNormPrev = rNorm = initNorm;
 
-    residue_new = solver->rhsVec;
+    residue_new = solverEigen->rhsVec;
     residue_old = residue_new;
     
     for(ii=0;ii<nBFGS;ii++)
     {
         //cout << " residue_new " << endl;      printVector(residue_new);
 
-        solver->solve();
+        solverEigen->solve();
 
         for(kk=0;kk<ntoteqs;kk++)
-           disp_incr[kk] = solver->soln[kk];
+           disp_incr[kk] = solverEigen->soln[kk];
 
         if(ii > 0)
         {
@@ -2533,13 +2533,13 @@ int IsogeometricFEM::BFGSsolver(int nBFGS, bool LINE_SEARCH_FLAG, double STOL, d
         calcAndAssyInternalForceVector(1.0);
         //calcStiffnessAndResidual();
         
-        //cout << " residue_new " << endl;        printVector(&(solver->rhsVec[0]), rhsVec.n);
+        //cout << " residue_new " << endl;        printVector(&(solverEigen->rhsVec[0]), rhsVec.n);
 
         residue_old = residue_new;
-        residue_new = solver->rhsVec;
+        residue_new = solverEigen->rhsVec;
 
         rNormPrev = rNorm;
-        rNorm     = solver->rhsVec.norm();
+        rNorm     = solverEigen->rhsVec.norm();
 
         COUT << domain.name(this); printf("%5d\t\t  %11.4e\n",ii, rNorm);
 
@@ -2569,9 +2569,9 @@ int IsogeometricFEM::BFGSsolver(int nBFGS, bool LINE_SEARCH_FLAG, double STOL, d
 
         for(jj=ii;jj>=0;jj--)
         {
-          coeff = dotProductVecs(&(w_vec[jj][0]), &(solver->rhsVec[0]), ntoteqs);
+          coeff = dotProductVecs(&(w_vec[jj][0]), &(solverEigen->rhsVec[0]), ntoteqs);
           for(kk=0;kk<ntoteqs;kk++)
-            solver->rhsVec[kk] += (coeff * v_vec[jj][kk] );
+            solverEigen->rhsVec[kk] += (coeff * v_vec[jj][kk] );
         }
    }
 

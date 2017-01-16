@@ -1,12 +1,12 @@
 
 #include "Debug.h"
-#include "Plot.h"
-#include "FunctionsElement.h"
+//#include "Plot.h"
+//#include "FunctionsElement.h"
 #include "NurbsElem1DEulerBeam.h"
 #include "NurbsShapeFunctions.h"
 using namespace std;
 
-extern Plot     plot;
+//extern Plot     plot;
 //extern MpapTime mpapTime;
 
 

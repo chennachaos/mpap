@@ -13,7 +13,7 @@
 #include "NurbsShapeFunctions.h"
 #include "FunctionsMaterial.h"
 #include "MpapTime.h"
-#include "FunctionsDeniz.h"
+//#include "FunctionsDeniz.h"
 #include "NurbsSOLID.h"
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
@@ -102,13 +102,15 @@ class NurbsElement: public ListItem
     virtual void  AssembleElementMatrix(int, SparseMatrixXd&, int, int)
     { cout << "   'AssembleElementMatrix' is not defined for this element!\n\n"; return; }
 
+    virtual void  AssembleElementMatrix(int, SparseMatrixXd&);
+
     virtual void AssembleElementMatrix(int, MatrixSparseArray<double>&);
 //      { cout << "   'AssembleElementMatrix' is not defined for this element!\n\n"; return; }
 
     virtual void AssembleElementMatrix2(int, MatrixXd&, MatrixXd& )
       { cout << "   'AssembleElementMatrix2' is not defined for this element!\n\n"; return; }
 
-    virtual void AssembleElementMatrix3(int, double, MatrixSparseArray<double>&);
+    virtual void AssembleElementMatrix3(int, double, SparseMatrixXd&);
 
     virtual void AssembleElementVector(bool, bool, double*, double*, int, int);
 

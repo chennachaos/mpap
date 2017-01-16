@@ -2,14 +2,14 @@
 #include "Debug.h"
 #include "FunctionsProgram.h"
 #include "PropertyTypeEnum.h"
-#include "Plot.h"
+//#include "Plot.h"
 #include "NurbsShapeFunctions.h"
 #include "NurbsElementSolid3D.h"
 #include <assert.h>
 
 using namespace std;
 
-extern Plot     plot;
+//extern Plot     plot;
 extern MpapTime mpapTime;
 
 

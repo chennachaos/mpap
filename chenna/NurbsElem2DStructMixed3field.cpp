@@ -1,8 +1,8 @@
 
 #include <math.h>
 #include "Debug.h"
-#include "Plot.h"
-#include "FunctionsElement.h"
+//#include "Plot.h"
+//#include "FunctionsElement.h"
 #include "MpapTime.h"
 #include "NurbsElem2DStructMixed3field.h"
 #include "NurbsShapeFunctions.h"
@@ -12,7 +12,7 @@
 
 using namespace std;
 
-extern Plot     plot;
+//extern Plot     plot;
 extern MpapTime mpapTime;
 extern ComputerTime       computerTime;
 
@@ -756,10 +756,10 @@ void NurbsElem2DStructMixed3field::discreteContourplot(int vartype, int varindex
           x4[0] = EP->x; x4[1] = EP->y;
 
           // contour plot for 1st triangle
-          plot.triangleContourPlot(x1, x2, x3, u1, u1, u1, umin, umax, nCol);
+          //plot.triangleContourPlot(x1, x2, x3, u1, u1, u1, umin, umax, nCol);
 
           // contour plot for 2nd triangle
-          plot.triangleContourPlot(x1, x3, x4, u1, u1, u1, umin, umax, nCol);
+          //plot.triangleContourPlot(x1, x3, x4, u1, u1, u1, umin, umax, nCol);
 
           count++;
       }

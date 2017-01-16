@@ -6,7 +6,7 @@
 #include <iostream>
 #include <iomanip>
 #include <stdio.h>
-//#include "Plot.h"
+////#include "Plot.h"
 #include "MpapTime.h"
 #include "NurbsShapeFunctions.h"
 #include "TimeFunction.h"
@@ -157,8 +157,9 @@ void NurbsElement::AssembleElementMatrix(int index, MatrixSparseArray<double>& m
 
 
 
-void NurbsElement::AssembleElementMatrix3(int index, double fact, MatrixSparseArray<double>& mtx)
+void NurbsElement::AssembleElementMatrix(int index, SparseMatrixXd& mtx)
 {
+   cout << " Need to be implemented " << endl;
    int nn=0, aa, bb;
      
    for(aa=0;aa<nsize;aa++)
@@ -167,7 +168,31 @@ void NurbsElement::AssembleElementMatrix3(int index, double fact, MatrixSparseAr
      {
        nn = forassembly[aa][bb];
        if(nn != -1)
-         mtx.x[nn-1] += (fact * stiffness_local[aa][bb]);
+       {
+         //mtx.coeffRef(aa,bb) += Klocal(aa,bb);
+       }
+     }
+   }
+
+   return;
+}
+
+
+
+
+void NurbsElement::AssembleElementMatrix3(int index, double fact, SparseMatrixXd& mtx)
+{
+  cout << " NurbsElement::AssembleElementMatrix3 ... need to correct this subroutine " << endl;
+
+   int nn=0, aa, bb;
+     
+   for(aa=0;aa<nsize;aa++)
+   {
+     for(bb=0;bb<nsize;bb++)
+     {
+       nn = forassembly[aa][bb];
+       if(nn != -1)
+         mtx.coeffRef(aa,bb) += (fact * stiffness_local[aa][bb]);
      }
    }
 

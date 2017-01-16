@@ -2,7 +2,7 @@
 #include <math.h>
 #include "Debug.h"
 #include "MpapTime.h"
-#include "Plot.h"
+//#include "Plot.h"
 #include "NurbsElem2DStructSolidLSFEM2dof.h"
 #include "NurbsShapeFunctions.h"
 #include <assert.h>
@@ -14,7 +14,7 @@ using namespace std;
 
 extern ComputerTime       computerTime;
 extern MpapTime mpapTime;
-extern Plot plot;
+//extern Plot plot;
 extern List<TimeFunction> timeFunction;
 
 
@@ -974,10 +974,10 @@ void NurbsElem2DStructSolidLSFEM2dof::discreteContourplot(int vartype, int varin
           x4[0] = EP->x; x4[1] = EP->y;
 
           // contour plot for 1st triangle
-          plot.triangleContourPlot(x1, x2, x3, u1, u1, u1, umin, umax, nCol);
+          //plot.triangleContourPlot(x1, x2, x3, u1, u1, u1, umin, umax, nCol);
 
           // contour plot for 2nd triangle
-          plot.triangleContourPlot(x1, x3, x4, u1, u1, u1, umin, umax, nCol);
+          //plot.triangleContourPlot(x1, x3, x4, u1, u1, u1, umin, umax, nCol);
 
           count++;
       }

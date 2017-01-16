@@ -4,11 +4,11 @@
 #include "IsogeometricFEM.h"
 #include "HBSplineCutFEM.h"
 #include "StandardFEM.h"
-#include "Plot.h"
+//#include "Plot.h"
 
 
 extern DomainTree domain;
-extern Plot       plot;
+//extern Plot       plot;
 
 int macro208(Macro &macro)
 {

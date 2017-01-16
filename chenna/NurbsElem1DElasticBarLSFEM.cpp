@@ -1,7 +1,7 @@
 
 #include "Debug.h"
-#include "Plot.h"
-#include "FunctionsElement.h"
+//#include "Plot.h"
+//#include "FunctionsElement.h"
 #include "NurbsElem1DElasticBarLSFEM.h"
 #include "NurbsShapeFunctions.h"
 #include "ComputerTime.h"
@@ -12,7 +12,7 @@ using namespace std;
 
 extern ComputerTime       computerTime;
 extern MpapTime mpapTime;
-extern Plot plot;
+//extern Plot plot;
 extern List<TimeFunction> timeFunction;
 
 

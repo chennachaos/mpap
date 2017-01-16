@@ -8,8 +8,8 @@
 #include "MathVector.h"
 #include "PropertyItem.h"
 #include "PatchGroup.h"
-#include "Plot.h"
-#include "Solver.h"
+//#include "Plot.h"
+#include "SolverEigen.h"
 #include "NurbsUtilitiesSURFACE.h"
 #include "NurbsSOLID.h"
 #include "NurbsElem2DStructSolid.h"
@@ -63,9 +63,7 @@ class IsogeometricFEM: public Domain
 
     ListArray<NurbsSOLID>  SolidListOriginal, SolidListFinal, SolidResult, solidSecondVar;
 
-    Solver *solverOld;
-
-    SolverEigen *solver;
+    SolverEigen *solverEigen;
 
 
     NurbsElement **elem;

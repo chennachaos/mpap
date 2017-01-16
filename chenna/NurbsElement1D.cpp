@@ -5,11 +5,11 @@
 #include "NurbsElement1D.h"
 #include <iostream>
 #include <iomanip>
-#include "Plot.h"
+//#include "Plot.h"
 #include "MpapTime.h"
 
 
-extern Plot plot;
+//extern Plot plot;
 extern MpapTime           mpapTime;
 
 using namespace std;

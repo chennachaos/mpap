@@ -4,7 +4,7 @@
 #include "IsogeometricFEM.h"
 #include "HBSplineFEM.h"
 #include "HBSplineCutFEM.h"
-#include "Plot.h"
+//#include "Plot.h"
 
 
 extern DomainTree domain;

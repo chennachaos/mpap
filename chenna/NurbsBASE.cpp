@@ -7,7 +7,7 @@
 
 #include "NurbsBASE.h"
 #include "DataBlockTemplate.h"
-#include "Plot.h"
+//#include "Plot.h"
 #include <iomanip>
 #include "MpapTime.h"
 
@@ -17,7 +17,7 @@ extern MpapTime           mpapTime;
 
 using namespace std;
 
-extern Plot plot;
+//extern Plot plot;
 
 
 

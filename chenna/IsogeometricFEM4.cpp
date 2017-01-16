@@ -13,10 +13,10 @@
 #include "NurbsMiscFunctions.h"
 #include "ComputerTime.h"
 #include "MpapTime.h"
-#include "Plot.h"
+//#include "Plot.h"
 #include <assert.h>
 #include "PlotVTK.h"
-#include "SolverMA41.h"
+#include "SolverMA41Eigen.h"
 
 #include <fstream>
 #include <string.h>
@@ -64,14 +64,16 @@
 #include "vtkContourFilter.h"
 #include <vtkQuad.h>
 
+#include "Files.h"
+
 //#include <Xm/PushB.h>
 //#include <Xm/Form.h>
 
-extern Plot plot;
+//extern Plot plot;
 extern PlotVTK  plotvtk;
 extern ComputerTime computerTime;
 extern MpapTime     mpapTime;
-
+extern Files     files;
 
 
 using namespace std;
@@ -347,10 +349,10 @@ void IsogeometricFEM::contourplot(int vartype, int varindex, bool extrapolateFla
                   x4[0] = EP4->x; x4[1] = EP4->y;
 
                   // contour plot for 1st triangle
-                  plot.triangleContourPlot(x1, x2, x4, u1, u2, u4, umin, umax, nCol);
+                  ////plot.triangleContourPlot(x1, x2, x4, u1, u2, u4, umin, umax, nCol);
 
                   // contour plot for 2nd triangle
-                  plot.triangleContourPlot(x1, x3, x4, u1, u3, u4, umin, umax, nCol);
+                  ////plot.triangleContourPlot(x1, x3, x4, u1, u3, u4, umin, umax, nCol);
                }
 	    }
         }
@@ -390,16 +392,16 @@ void IsogeometricFEM::contourplot(int vartype, int varindex, bool extrapolateFla
                   x4[0] = EP4->x; x4[1] = EP4->y;
 
                   // contour plot for 1st triangle
-                  plot.triangleContourPlot(x1, x2, x4, u1, u2, u4, umin, umax, nCol);
+                  ////plot.triangleContourPlot(x1, x2, x4, u1, u2, u4, umin, umax, nCol);
 
                   // contour plot for 2nd triangle
-                  plot.triangleContourPlot(x1, x4, x3, u1, u4, u3, umin, umax, nCol);
+                  ////plot.triangleContourPlot(x1, x4, x3, u1, u4, u3, umin, umax, nCol);
                }
 	    }
         }
     }
 
-    plot.contourPlotLegend(umin,umax,umn,umx,umnxflag,nCol);
+    //plot.contourPlotLegend(umin,umax,umn,umx,umnxflag,nCol);
 
   return;
 }
@@ -1101,8 +1103,8 @@ void IsogeometricFEM::discreteContourplot(int vartype, int varindex, int index, 
       elem[ee]->discreteContourplot(vartype, varindex, index, nCol, umin, umax);
    }
 
-   if(legdflag)
-      plot.contourPlotLegend(umin,umax,umin,umax,umnxflag,nCol);
+   //if(legdflag)
+      //plot.contourPlotLegend(umin,umax,umin,umax,umnxflag,nCol);
 
   return;
 }
@@ -1639,19 +1641,19 @@ void  IsogeometricFEM::ConvectionSolver(int Niter, double stol, double tol, doub
 
    for(iter=0;iter<Niter;iter++)
    {
-      solver->zeroMtx();
-      solver->rhsVec.setZero();
+      solverEigen->zeroMtx();
+      solverEigen->rhsVec.setZero();
       reac.zero();
 
       for(ee=0;ee<totnumel;ee++)
       {
          localStiffnessError = elem[ee]->calcStiffnessAndResidual();
       
-         elem[ee]->AssembleElementMatrix(1, ((SolverSparse*)solver)->mtx);
-         elem[ee]->AssembleElementVector(1, 0, &(solver->rhsVec[0]), &(reac[0]), start1, start2);
+         elem[ee]->AssembleElementMatrix(1, solverEigen->mtx);
+         elem[ee]->AssembleElementVector(1, 0, &(solverEigen->rhsVec[0]), &(reac[0]), start1, start2);
       }
 
-      rNorm  = solver->rhsVec.norm();
+      rNorm  = solverEigen->rhsVec.norm();
       
       if(iter == 0)
       {
@@ -1666,14 +1668,14 @@ void  IsogeometricFEM::ConvectionSolver(int Niter, double stol, double tol, doub
 
       COUT << domain.name(this); printf("  %11.4e\n",rNorm);
 
-      solver->currentStatus = ASSEMBLY_OK;
+      solverEigen->currentStatus = ASSEMBLY_OK;
 
-      solver->factoriseAndSolve();
+      solverEigen->factoriseAndSolve();
 
       //cout << " result " << endl;        printVector(du, ntoteqs);
 
       for(kk=0;kk<ntoteqs1;kk++)
-        soln[assy4r[kk]] = solver->soln[kk];
+        soln[assy4r[kk]] = solverEigen->soln[kk];
 
       for(kk=0;kk<ntotgbf;kk++)
         NurbsBaseResult[0]->Values[0][kk]  = soln[kk];
@@ -1713,16 +1715,16 @@ void  IsogeometricFEM::LMSolver(int Niter, double stol, double tol, double tol2)
 
    for(iter=0;iter<Niter;iter++)
    {
-      solver->zeroMtx();
-      solver->rhsVec.setZero();
+      solverEigen->zeroMtx();
+      solverEigen->rhsVec.setZero();
       reac.zero();
 
       for(e=0;e<totnumel;e++)
       {
          localStiffnessError = elem[e]->calcStiffnessAndResidual();
       
-         elem[e]->AssembleElementMatrix(1, ((SolverSparse*)solver)->mtx);
-         elem[e]->AssembleElementVector(firstIter, 0, &(solver->rhsVec[0]), &(reac[0]), start1, start2);
+         elem[e]->AssembleElementMatrix(1, solverEigen->mtx);
+         elem[e]->AssembleElementVector(firstIter, 0, &(solverEigen->rhsVec[0]), &(reac[0]), start1, start2);
       }
 
       for(e=0;e<totnumel;e++)  // loop over all the elements
@@ -1730,15 +1732,15 @@ void  IsogeometricFEM::LMSolver(int Niter, double stol, double tol, double tol2)
         if(elem[e]->tracflag)
         {
            temp = elem[e]->calcLoadVector();
-           elem[e]->AssembleElementMatrix(1, ((SolverSparse*)solver)->mtx);
-           elem[e]->AssembleElementVector(firstIter, 0, &(solver->rhsVec[0]), &(reac[0]), 0, 0);
+           elem[e]->AssembleElementMatrix(1, solverEigen->mtx);
+           elem[e]->AssembleElementVector(firstIter, 0, &(solverEigen->rhsVec[0]), &(reac[0]), 0, 0);
         }
       }
 
       //cout << " rhsVec " << endl;        printVector(&(rhsVec[0]), rhsVec.n);
 
       rNormPrev = rNorm;
-      rNorm     = solver->rhsVec.norm();
+      rNorm     = solverEigen->rhsVec.norm();
       
       COUT << domain.name(this); printf("  %12.6f \t %11.4e \t %11.4e\n", fact, rNormPrev, rNorm);
 
@@ -1746,14 +1748,14 @@ void  IsogeometricFEM::LMSolver(int Niter, double stol, double tol, double tol2)
         break;
 
       for(e=0;e<totnumel;e++)
-        elem[e]->AssembleElementMatrix3(1, fact, ((SolverSparse*)solver)->mtx);
+        elem[e]->AssembleElementMatrix3(1, fact, solverEigen->mtx);
 
-      solver->currentStatus = ASSEMBLY_OK;
+      solverEigen->currentStatus = ASSEMBLY_OK;
 
-      solver->factoriseAndSolve();
+      solverEigen->factoriseAndSolve();
 
       for(kk=0;kk<ntoteqs1;kk++)
-        soln[assy4r[kk]]  = solver->soln[kk];
+        soln[assy4r[kk]]  = solverEigen->soln[kk];
 
       for(kk=0;kk<ntotgbf;kk++)
       {
@@ -1768,7 +1770,7 @@ void  IsogeometricFEM::LMSolver(int Niter, double stol, double tol, double tol2)
       calcAndAssyInternalForceVector(1.0);
 
       rNormPrev = rNorm;
-      rNorm     = solver->rhsVec.norm();
+      rNorm     = solverEigen->rhsVec.norm();
       
       printf("\t%12.6e\t%12.6e\n",rNormPrev, rNorm);
 
@@ -1781,21 +1783,21 @@ void  IsogeometricFEM::LMSolver(int Niter, double stol, double tol, double tol2)
            NurbsBaseResult[0]->Values[kk] = Values[kk];
 
          //for(e=0;e<totnumel;e++)
-           //elem[e]->AssembleElementMatrix3(1, -fact, ((SolverSparse*)solver)->mtx);
+           //elem[e]->AssembleElementMatrix3(1, -fact, solverEigen->mtx);
 
          fact *= 10.0;
 
          for(e=0;e<totnumel;e++)
-           elem[e]->AssembleElementMatrix3(1, fact, ((SolverSparse*)solver)->mtx);
+           elem[e]->AssembleElementMatrix3(1, fact, solverEigen->mtx);
 
          //calcAndAssyInternalForceVector(1.0);
 
-         solver->currentStatus = ASSEMBLY_OK;
+         solverEigen->currentStatus = ASSEMBLY_OK;
 
-         solver->factoriseAndSolve();
+         solverEigen->factoriseAndSolve();
 
          for(kk=0;kk<ntoteqs1;kk++)
-           soln[assy4r[kk]]  = solver->soln[kk];
+           soln[assy4r[kk]]  = solverEigen->soln[kk];
 
          for(kk=0;kk<ntotgbf;kk++)
          {
@@ -1809,7 +1811,7 @@ void  IsogeometricFEM::LMSolver(int Niter, double stol, double tol, double tol2)
 
          calcAndAssyInternalForceVector(1.0);
 
-         rNorm  = solver->rhsVec.norm();
+         rNorm  = solverEigen->rhsVec.norm();
 
          //printf(" \t \t \t %11.4e\n",rNorm);
          printf("  %12.6f \t %11.4e\n", fact, rNorm);

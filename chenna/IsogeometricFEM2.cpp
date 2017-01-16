@@ -6,13 +6,13 @@
 #include "DataBlockTemplate.h"
 #include "PropertyTypeEnum.h"
 #include "MathGeom.h"
-#include "SolverMA41.h"
+#include "SolverMA41Eigen.h"
 //#include "SolverPARDISO.h"
 #include "NurbsShapeFns.h"
 #include "NurbsMiscFunctions.h"
 #include "ComputerTime.h"
 #include "MpapTime.h"
-#include "Plot.h"
+//#include "Plot.h"
 #include <assert.h>
 #include "UnixGUI.h"
 #include "PlotVTK.h"
@@ -31,7 +31,7 @@ using namespace std;
 #include <Xm/PushB.h>
 #include <Xm/Form.h>
 
-extern Plot plot;
+//extern Plot plot;
 extern PlotVTK  plotvtk;
 extern ComputerTime computerTime;
 extern MpapTime     mpapTime;
@@ -261,13 +261,7 @@ void IsogeometricFEM::checkInputData2()
 void IsogeometricFEM::plotGeom(int val1, bool flag2, int col, bool PLOT_KNOT_LINES, int* resln)
 {
   if(!plotvtk.ActiveFlag && patchGrp[0].ndom == 3)
-  {
-     plotvtk.set();
-  }
-  else
-    plot.setColour(col);
-
-  char fct[] = "IsogeometricFEM::plotgeometry";
+    plotvtk.set();
 
   cout << "     ISOGEOMETRICFEM: plotgeometry ...\n\n";
   
@@ -327,7 +321,8 @@ void IsogeometricFEM::plotGeom(int val1, bool flag2, int col, bool PLOT_KNOT_LIN
 
 void IsogeometricFEM::plotSolverMatrixPattern(char *fileName)
 {
-  if (solver != NULL) ((SolverSparse*)solver)->mtx.plotPattern(fileName);
+  //if(solverEigen != NULL)
+    //solverEigen->mtx.plotPattern(fileName);
 
   return;
 }
@@ -593,7 +588,7 @@ void IsogeometricFEM::printData(int index, int patchnum)
          printf("\n\n");
          printf("      rhsVec and ForceVec Vectors ...:  \n");
          for(ii=0;ii<ForceVec.n;ii++)
-            printf("\t%5d\t%14.12f\t%14.12f\n", ii, solver->rhsVec[ii], ForceVec[ii]);
+            printf("\t%5d\t%14.12f\t%14.12f\n", ii, solverEigen->rhsVec[ii], ForceVec[ii]);
          printf("\n\n");
      }
 
@@ -616,7 +611,7 @@ void IsogeometricFEM::printData(int index, int patchnum)
 
              //ostream  os(fout5)
 
-             ((SolverSparse*)solver)->mtx.print(fout1);
+             solverEigen->mtx.print(fout1);
              
              fout1.close();
 */
@@ -626,7 +621,7 @@ void IsogeometricFEM::printData(int index, int patchnum)
 
              cout << endl;
 
-             ((SolverSparse*)solver)->mtx.print();
+             //solverEigen->mtx.print();
              cout << endl;
              cout << endl;
      }
@@ -834,6 +829,7 @@ void IsogeometricFEM::printData(int index, int patchnum)
 */
      if(index == 9) // write matrix pattern to an output file 
      {
+         /*
          int ind2, *rr, *cc;
 
          ofstream fout("matrix-pattern.dat");
@@ -847,18 +843,17 @@ void IsogeometricFEM::printData(int index, int patchnum)
 	 fout.setf(ios::fixed);
 	 fout.precision(1);
 
-         fout << ((SolverSparse*)solver)->mtx.nRow << setw(10) << ((SolverSparse*)solver)->mtx.nCol << endl;
+         fout << solverEigen->mtx.nRow << setw(10) << solverEigen->mtx.nCol << endl;
 
-         ind2 = ((SolverSparse*)solver)->mtx.x.n;
+         ind2 = solverEigen->mtx.x.n;
 
-         rr   = &(((SolverSparse*)solver)->mtx.row[0]);
-         cc   = &(((SolverSparse*)solver)->mtx.col[0]);
+         rr   = &(solverEigen->mtx.row[0]);
+         cc   = &(solverEigen->mtx.col[0]);
 
          for(ii=0;ii<ind2;ii++)
             fout << rr[ii]-1 << setw(10) << cc[ii]-1 << endl;
-
-
          fout.close();
+         */
      }
      
      if(index == 10)
@@ -1758,8 +1753,8 @@ void IsogeometricFEM::GenerateConnectivityArraysCurve()
    for(iii=0;iii<CurveListFinal.n;iii++)
      CurveListFinal[iii].GenerateConnectivityArrays1(ntoteqs1);
 
-   solver->rhsVec.resize(ntoteqs1);
-   solver->rhsVec.setZero();
+   solverEigen->rhsVec.resize(ntoteqs1);
+   solverEigen->rhsVec.setZero();
 
    ForceVec.setDim(ntoteqs1);
    ForceVec.zero();

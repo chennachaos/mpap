@@ -2,7 +2,7 @@
 #include "Macro.h"
 #include "DomainTree.h"
 #include "IsogeometricFEM.h"
-#include "Plot.h"
+//#include "Plot.h"
 
 
 extern DomainTree domain;
