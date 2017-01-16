@@ -1,13 +1,13 @@
 
 #include "Macro.h"
 #include "Definitions.h"
-#include "Plot.h"
+//#include "Plot.h"
 #include "DomainTree.h"
-#include "Mesh.h"
+//#include "Mesh.h"
 
 
 extern DomainTree domain;
-extern Plot       plot;
+////extern Plot       plot;
 
 
 using namespace std;
@@ -15,6 +15,7 @@ using namespace std;
 
 int macro20(Macro &macro)
 {
+/*
   if (!macro) 
   { 
     macro.name = "fill";
@@ -65,7 +66,7 @@ int macro20(Macro &macro)
   }
   
   domain(type,id).paintElemGrp(grp,def);
-
+*/
 //--------------------------------------------------------------------------------------------------
   return 0;  
 }

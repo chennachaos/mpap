@@ -1,4 +1,4 @@
-#include "Plot.h"
+//#include "Plot.h"
 #include "PlotVTK.h"
 #include "UnixGUI.h"
 #include "Files.h"
@@ -42,7 +42,7 @@
 
 extern Files    files;
 extern UnixGUI    unixGUI;
-extern Plot plot;
+//extern Plot plot;
 
 using namespace std;
 
@@ -89,7 +89,7 @@ void PlotVTK::reset()
 
     renIntr->Disable();
   
-    plot.wipe();
+    //plot.wipe();
 
   return;
 }

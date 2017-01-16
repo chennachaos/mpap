@@ -1,6 +1,6 @@
 
 #include "Macro.h"
-#include "Mesh.h"
+//#include "Mesh.h"
 #include "DomainTree.h"
 #include "RunControl.h"
 
@@ -12,6 +12,7 @@ extern RunControl runCtrl;
 
 int macro71(Macro &macro)
 {
+/*
   if (!macro) 
   { 
     macro.name = "s2dm";
@@ -85,7 +86,7 @@ int macro71(Macro &macro)
   }
 
   if (runCtrl.mode == NOPROJ) { runCtrl.newMode(PRE); runCtrl.newStatus(INTERACTIVE); }
-
+*/
 //--------------------------------------------------------------------------------------------------
   return 0;  
 }

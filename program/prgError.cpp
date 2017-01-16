@@ -14,7 +14,6 @@ void prgError(int id, char* fname, char* msg)
 
 
 
-
 void prgerror_(int *id, char* fname, char* msg)
 {
   std::cout << " ERROR (" << *id << ") in " << fname << ": " << msg << "\n\n";

@@ -1,7 +1,7 @@
 
 #include "Macro.h"
 #include "RunControl.h"
-#include "Mesh.h"
+//#include "Mesh.h"
 #include "DomainTree.h"
 
 
@@ -12,6 +12,7 @@ extern void *macro2mousePtr;
 
 int macro65(Macro &macro)
 {
+/*
   if (!macro) 
   { 
     macro.name = "ins";
@@ -51,7 +52,7 @@ int macro65(Macro &macro)
   essGrpSetSensAllButDrawingArea(false);
    
   runCtrl.fixStatus(SELECTNODE);
-
+*/
 //--------------------------------------------------------------------------------------------------
   return 0;  
 }

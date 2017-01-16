@@ -1,13 +1,14 @@
 
 #include "Macro.h"
-#include "Plot.h"
+//#include "Plot.h"
 
 
-extern Plot plot;
+////extern Plot plot;
 
 
 int macro50(Macro &macro)
 {
+/*
   if (!macro) 
   { 
     macro.name = "fram";
@@ -23,7 +24,7 @@ int macro50(Macro &macro)
 //--------------------------------------------------------------------------------------------------
 
     plot.drawDesFrame();
-
+*/
 //--------------------------------------------------------------------------------------------------
   return 0;  
 }

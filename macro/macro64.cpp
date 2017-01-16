@@ -41,7 +41,7 @@ int macro64(Macro &macro)
     if (runCtrl.mode == BATCH) 
       { COUT << "mouse input not admissible in 'batch' mode!\n\n"; return 0; }
 
-    essGrpSetSensAllButDrawingArea(false);
+    //essGrpSetSensAllButDrawingArea(false);
    
     switch (isw)
     {
@@ -54,14 +54,9 @@ int macro64(Macro &macro)
   }
   else if (isw == 3)
   {
+    //i = essGrpWasMouseButtonPressed(&x,&y,&inDrawingArea);
 
-    i = essGrpWasMouseButtonPressed(&x,&y,&inDrawingArea);
-
-    if (i != 0)  cout << "   " << i << " -> " << x << "," << y << "; " << inDrawingArea << "\n";
-
-
-
-
+    //if (i != 0)  cout << "   " << i << " -> " << x << "," << y << "; " << inDrawingArea << "\n";
 
   }
 //--------------------------------------------------------------------------------------------------

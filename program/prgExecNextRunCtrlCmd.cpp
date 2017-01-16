@@ -9,10 +9,12 @@
 #include "MacroQueue.h"
 
 
+
 extern MacroQueue macroQueue;
 extern RunControl runCtrl;
 extern MacroList  macro;
 extern bool       noGUI;
+
 
 
 void prgExecNextRunCtrlCmd(void)

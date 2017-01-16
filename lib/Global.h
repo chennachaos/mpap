@@ -9,7 +9,7 @@
 #include "RunControl.h"
 #include "MpapTime.h"
 #include "MacroQueue.h"
-#include "Plot.h"
+////#include "Plot.h"
 #include "WorkSpace.h"
 #include "SolverWorkSpace.h"
 #include "List.h"
@@ -18,7 +18,6 @@
 #include "Counter.h"
 #include "SolverTime.h"
 #include "PlotVTK.h"
-
 
 DomainTree domain;
 
@@ -39,7 +38,7 @@ MacroQueue macroQueue;
 
 MpapTime mpapTime;
 
-Plot plot;
+//Plot plot;
 
 PlotVTK plotvtk;
 
@@ -75,10 +74,6 @@ bool vtkFlag=false;
 int  nObj = 0;
 int  nVector = 0;
 bool printThisRubbish = false;
-
-
-
-
 
 #endif
 

@@ -1,16 +1,17 @@
 
 #include "Macro.h"
 #include "DomainTree.h"
-#include "Plot.h"
-#include "BeamBending.h"
+//#include "Plot.h"
+//#include "BeamBending.h"
 
 
 extern DomainTree domain;
-extern Plot plot;
+////extern Plot plot;
 
 
 int macro56(Macro &macro)
 {
+/*
   if (!macro) 
   { 
     macro.name = "bend";
@@ -86,7 +87,7 @@ int macro56(Macro &macro)
   }
 
   domain(type,id).doForBending(syst,defl,rota,bmom,shfo,XZ,XY,label,n);
-
+*/
 //--------------------------------------------------------------------------------------------------
   return 0;  
 }

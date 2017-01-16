@@ -56,6 +56,7 @@ int macro27(Macro &macro)
     PetscPrintf(MPI_COMM_WORLD, "continue with left mouse button or\n");
     PetscPrintf(MPI_COMM_WORLD, "stop with  any other mouse button!\n\n");
 
+    /*
     essGrpSetSensAllButDrawingArea(false);
     runCtrl.fixStatus(PRESSMOUSE);
 
@@ -71,6 +72,7 @@ int macro27(Macro &macro)
       runCtrl.freeFixedStatus();
       return 0;
     }
+    */
   }
   
   computerTime.sleep(macro.p[0]);

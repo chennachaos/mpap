@@ -1,18 +1,20 @@
 
-#include "Plot.h"
-#include "DAWindow.h"
+////#include "Plot.h"
+//#include "DAWindow.h"
 
 
-extern Plot plot;
+////extern Plot plot;
 
+#include "MathMatrix.h"
 
-
+//using namespace MatricesWulf;
 
 
 void prgPlotMatrixPattern(int nRow, int nCol, 
                           VectorBase<int> &row, VectorBase<int> &col,
                           char *fileName)
 {
+/*
   DAWindow mtxPlot;
 
   double rdc = double(nRow)/double(nCol), r0, c0, dr, dc;
@@ -51,7 +53,7 @@ void prgPlotMatrixPattern(int nRow, int nCol,
   COUT << nRow << " x " << nCol << " matrix pattern plotted.\n";
   COUT << "matrix fill in: " << row.n << " / " << nRow * nCol 
        << " = " << double(row.n)/double(nRow*nCol)*100. << "%\n\n";
-
+*/
   return;
 }
 

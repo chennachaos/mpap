@@ -1,8 +1,8 @@
 
 #include "Macro.h"
 #include "DomainTree.h"
-#include "SolverSparse.h"
-#include "FiniteElementBVP.h"
+//#include "SolverSparse.h"
+//#include "FiniteElementBVP.h"
 
 
 extern DomainTree domain;
@@ -10,6 +10,7 @@ extern DomainTree domain;
 
 int macro78(Macro &macro)
 {
+/*
   if (!macro) 
   { 
     macro.name = "matx";
@@ -37,7 +38,7 @@ int macro78(Macro &macro)
   if (!!macro.strg) fileName = macro.strg.asCharArray(); else fileName = NULL;
 
   domain(type,id).plotSolverMatrixPattern(fileName);
-
+*/
 //--------------------------------------------------------------------------------------------------
   return 0;  
 }

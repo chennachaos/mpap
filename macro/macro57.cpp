@@ -1,8 +1,8 @@
 
 #include "Macro.h"
 #include "DomainTree.h"
-#include "Solid.h"
-#include "Fluid.h"
+//#include "Solid.h"
+//#include "Fluid.h"
 
 
 extern DomainTree domain;
@@ -10,6 +10,7 @@ extern DomainTree domain;
 
 int macro57(Macro &macro)
 {
+/*
   if (!macro) 
   { 
     macro.name = "dom";
@@ -58,7 +59,7 @@ int macro57(Macro &macro)
   }
 
   domain(type,id).eliminateDiffTest(maxU,maxX,ddd,dig,dig2,gfrmt);
-
+*/
 //--------------------------------------------------------------------------------------------------
   return 0;  
 }

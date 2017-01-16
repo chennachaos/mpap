@@ -21,6 +21,8 @@ using std::vector;
 
 using namespace myIterSolvers;
 
+enum { PARDISO_STRUCT_SYM, PARDISO_UNSYM };
+
 
 class SolverEigen
 {

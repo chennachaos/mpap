@@ -1,16 +1,17 @@
 
 #include "Macro.h"
 #include "DomainTree.h"
-#include "Plot.h"
-#include "BeamSection.h"
+//#include "Plot.h"
+//#include "BeamSection.h"
 
 
 extern DomainTree domain;
-extern Plot plot;
+////extern Plot plot;
 
 
 int macro55(Macro &macro)
 {
+/*
   if (!macro) 
   { 
     macro.name = "sect";
@@ -100,7 +101,7 @@ int macro55(Macro &macro)
   }
 
   domain(type,id).doForSection(section,CA,CS,bOnly,geom,SinA,MinCA,labels,distr,scl,n);
-
+*/
 //--------------------------------------------------------------------------------------------------
   return 0;  
 }

@@ -1,10 +1,10 @@
 
 #include "Macro.h"
-#include "Plot.h"
+//#include "Plot.h"
 #include "FunctionsEssGrp.h"
 
 
-extern Plot plot;
+////extern Plot plot;
 
 
 int macro31(Macro &macro)
@@ -21,7 +21,7 @@ int macro31(Macro &macro)
   }
 //--------------------------------------------------------------------------------------------------
 
-   essGrpCopyPixmap(); 
+   //essGrpCopyPixmap();
 
 //--------------------------------------------------------------------------------------------------
   return 0;  

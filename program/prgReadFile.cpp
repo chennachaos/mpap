@@ -9,32 +9,14 @@
 #include "MyString.h"
 #include "Debug.h"
 #include "RunControl.h"
-#include "Plot.h"
+////#include "Plot.h"
 // include all domain types
 #include "Domain.h"
-#include "Mesh.h"
-#include "FiniteElementBVP.h"
-#include "Fluid.h"
-#include "Solid.h"
-#include "MicroCellWulf.h"
-#include "MicroCell.h"
-#include "Fem1D.h"
-#include "BeamSection.h"
-#include "BeamBending.h"
-#include "RigidBody.h"
-#include "Aeroplane.h"
-#include "InterfaceN.h"
-#include "FreeSurface.h"
-#include "InterfaceGS.h"
-//#include "InterfacePB.h"
-#include "VortexSheet.h"
-#include "LiftingLine.h"
-#include "FlexibleWing.h"
-#include "IsogeometricFEM.h"
+//#include "IsogeometricFEM.h"
 #include "HBSplineFEM.h"
 #include "HBSplineCutFEM.h"
 #include "StandardFEM.h"
-//#include "HBScutFEMElasticity.h"
+
 
 using namespace std;
 
@@ -43,7 +25,7 @@ extern Files      files;
 extern DomainTree domain;
 extern bool       keep;
 extern RunControl runCtrl;
-extern Plot       plot;
+////extern Plot       plot;
 
 
 bool prgReadFile(void)
@@ -143,198 +125,6 @@ bool prgReadFile(void)
 		 runControlFlag = true; 
 		 
 		 break;
-		 
-          case MESH: domain.newDom(new Mesh);  
-		      
-		 n = domain[MESH].dom.n;
-		      
-                 cout << "   loading MESH " << n << " ...\n\n"; 
-		      
-                 domain(MESH,n-1).readFile(*Ifile); 
-		 
-		 break;
-    
-          case FINITEELEMENTBVP: domain.newDom(new FiniteElementBVP);  
-		      
-		 n = domain[FINITEELEMENTBVP].dom.n;
-		      
-                 cout << "   loading FINITEELEMENTBVP " << n << " ...\n\n"; 
-		      
-                 domain(FINITEELEMENTBVP,n-1).readFile(*Ifile); 
-		 
-		 break;
-    
-          case FLUID: domain.newDom(new Fluid);  
-
-		 n = domain[FLUID].dom.n;
-		      
-                 cout << "   loading FLUID " << n << " ...\n\n"; 
-		      
-                 domain(FLUID,n-1).readFile(*Ifile); 
-		 
-		 break;
-    
-          case SOLID: domain.newDom(new Solid);
-	    
-		 n = domain[SOLID].dom.n;
-		      
-                 cout << "   loading SOLID " << n << " ...\n\n"; 
-
-		 domain(SOLID,n-1).readFile(*Ifile);
-    
-                 break;
-	    
-          case MICROCELLWULF: domain.newDom(new MicroCellWulf);
-			  
-		 n = domain[MICROCELLWULF].dom.n;
-	    
-                 cout << "   loading MICROCELLWULF " << n << " ...\n\n"; 
-	    
-		 domain(MICROCELLWULF,n-1).readFile(*Ifile);
-
-                 break;
-	    
-          case MICROCELL: domain.newDom(new MicroCell);
-			  
-		 n = domain[MICROCELL].dom.n;
-	    
-                 cout << "   loading MICROCELL " << n << " ...\n\n"; 
-	    
-		 domain(MICROCELL,n-1).readFile(*Ifile);
-
-                 break;
-	    
-          case FEM1D: domain.newDom(new Fem1D);
-
-		 n = domain[FEM1D].dom.n;
-	    
-                 cout << "   loading FEM1D " << n << " ...\n\n"; 
-	    
-		 domain(FEM1D,n-1).readFile(*Ifile);
-
-                 break;
-	    
-          case BEAMSECTION: domain.newDom(new BeamSection);
-		
-		 n = domain[BEAMSECTION].dom.n;
-	    
-                 cout << "   loading BEAMSECTION " << n << " ...\n\n"; 
-	    
-		 domain(BEAMSECTION,n-1).readFile(*Ifile);
-
-                 break;
-	    
-          case BEAMBENDING: domain.newDom(new BeamBending);
-		
-		 n = domain[BEAMBENDING].dom.n;
-	    
-                 cout << "   loading BEAMBENDING " << n << " ...\n\n"; 
-	    
-		 domain(BEAMBENDING,n-1).readFile(*Ifile);
-
-                 break;
-	    
-          case RIGIDBODY: domain.newDom(new RigidBody);
-		
-		 n = domain[RIGIDBODY].dom.n;
-	    
-                 cout << "   loading RIGIDBODY " << n << " ...\n\n"; 
-	    
-		 domain(RIGIDBODY,n-1).readFile(*Ifile);
-
-                 break;
-	    
-          case AEROPLANE: domain.newDom(new Aeroplane);
-		
-		 n = domain[AEROPLANE].dom.n;
-	    
-                 cout << "   loading AEROPLANE " << n << " ...\n\n"; 
-	    
-		 domain(AEROPLANE,n-1).readFile(*Ifile);
-
-                 break;
-	    
-          case INTERFACEN: domain.newDom(new InterfaceN);
-	    
-		 n = domain[INTERFACEN].dom.n;
-			  
-                 cout << "   loading INTERFACEN " << n << " ...\n\n"; 
-	    
-		 domain(INTERFACEN,n-1).readFile(*Ifile);
-		 
-                 break;
-	    
-          case FREESURFACE: domain.newDom(new FreeSurface);
-	    
-		 n = domain[FREESURFACE].dom.n;
-			  
-                 cout << "   loading FREESURFACE " << n << " ...\n\n"; 
-	    
-		 domain(FREESURFACE,n-1).readFile(*Ifile);
-		 
-                 break;
-	    
-        case INTERFACEGS: domain.newDom(new InterfaceGS);
-	    
-		 n = domain[INTERFACEGS].dom.n;
-			  
-                 cout << "   loading INTERFACEGS " << n << " ...\n\n"; 
-	    
-		 domain(INTERFACEGS,n-1).readFile(*Ifile);
-		 
-                 break;
-	    
-/*          case INTERFACEPB: domain.newDom(new InterfacePB);
-	    
-		 n = domain[INTERFACEPB].dom.n;
-			  
-                 cout << "   loading INTERFACEPB " << n << " ...\n\n"; 
-	    
-		 domain(INTERFACEPB,n-1).readFile(*Ifile);
-		 
-                 break;
-	    */
-          case VORTEXSHEET: domain.newDom(new VortexSheet);
-	    
-		 n = domain[VORTEXSHEET].dom.n;
-			  
-                 cout << "   loading VORTEXSHEET " << n << " ...\n\n"; 
-	    
-		 domain(VORTEXSHEET,n-1).readFile(*Ifile);
-		 
-                 break;
-	    
-          case LIFTINGLINE: domain.newDom(new LiftingLine);
-	    
-		 n = domain[LIFTINGLINE].dom.n;
-			  
-                 cout << "   loading LIFTINGLINE " << n << " ...\n\n"; 
-	    
-		 domain(LIFTINGLINE,n-1).readFile(*Ifile);
-		 
-                 break;
-	    
-          case FLEXIBLEWING: domain.newDom(new FlexibleWing);
-	    
-		 n = domain[FLEXIBLEWING].dom.n;
-			  
-                 cout << "   loading FLEXIBLEWING " << n << " ...\n\n"; 
-	    
-		 domain(FLEXIBLEWING,n-1).readFile(*Ifile);
-		 
-                 break;
-	    
-          case ISOGEOMETRICFEM:
-
-                 domain.newDom(new IsogeometricFEM);
-
-                n = domain[ISOGEOMETRICFEM].dom.n;
-
-                cout << "   loading ISOGEOMETRICFEM " << n << " ...\n\n"; 
-
-                domain(ISOGEOMETRICFEM,n-1).readFile(*Ifile);
-
-                break;
 
           case  HBSPLINEFEM:
 
@@ -368,32 +158,15 @@ bool prgReadFile(void)
 
                 domain.newDom(new StandardFEM);
 
-                //cout << " AAAAAAAAAAAAAAA  " << StandardFEM << endl;
+          //cout << " AAAAAAAAAAAAAAA  " << StandardFEM << endl;
 
-                n = domain[STANDARDFEM].dom.n;
+		 n = domain[STANDARDFEM].dom.n;
 
-                cout << "   loading STANDARDFEM " << n << " ...\n\n"; 
-
-                domain(STANDARDFEM,n-1).readFile(*Ifile);
-
-                break;
-
-          /*
-
-          case  HBSCUTFEMELASTICITY:
-
-                domain.newDom(new HBScutFEMElasticity);
-
-                //cout << " AAAAAAAAAAAAAAA  " << HBSPLINEFEM << endl;
-
-                n = domain[HBSCUTFEMELASTICITY].dom.n;
-
-                cout << "   loading HBSCUTFEMELASTICITY " << n << " ...\n\n"; 
-
-                domain(HBSCUTFEMELASTICITY,n-1).readFile(*Ifile);
-
-                break;
-          */
+                 cout << "   loading STANDARDFEM " << n << " ...\n\n"; 
+	    
+		 domain(STANDARDFEM,n-1).readFile(*Ifile);
+		 
+                 break;
 
 	  // case OTHERS: .....
 
@@ -424,13 +197,13 @@ bool prgReadFile(void)
 
     domain(i).prepareInteractions();
 
-    if (domain(i).ndm > plot.dim) plot.dim = domain(i).ndm;
+    //if (domain(i).ndm > plot.dim) plot.dim = domain(i).ndm;
   }
 
   for (i=0; i<domain.ndom; i++) domain(i).startComputerTime(); 
 
   // print info and finish ........................................................................
-  
+
   if (domain.ndom > 0)
   {
     cout << "\n   inheritance of domain types loaded:\n\n";  domain.print(); 

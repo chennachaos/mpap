@@ -7,13 +7,13 @@
 
 #include "NurbsSURFACE.h"
 #include "DataBlockTemplate.h"
-#include "Plot.h"
+//#include "Plot.h"
 #include <iomanip>
 #include "QuadratureUtil.h"
 
 using namespace std;
 
-extern Plot plot;
+//extern Plot plot;
 extern MpapTime mpapTime;
 
 
@@ -1044,7 +1044,7 @@ void NurbsSURFACE::PlotControlPoints(int col)
 
            x1d[0] = PP1->x; x1d[1] = PP1->y; x1d[2] = PP1->z;
 
-           plot.point(x1d);
+           //plot.point(x1d);
         }
     }
 

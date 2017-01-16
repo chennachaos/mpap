@@ -1,10 +1,10 @@
 
 #include "Macro.h"
-#include "Plot.h"
+//#include "Plot.h"
 #include "FunctionsEssGrp.h"
 
 
-extern Plot plot;
+////extern Plot plot;
 
 
 int macro17(Macro &macro)
@@ -26,9 +26,9 @@ int macro17(Macro &macro)
   }
 //--------------------------------------------------------------------------------------------------
 
-  if (roundToInt(macro.p[0]) == 1) plot.resetCoor();
+  //if (roundToInt(macro.p[0]) == 1) plot.resetCoor();
 
-  essGrpWipe();
+  //essGrpWipe();
   
 //--------------------------------------------------------------------------------------------------
   return 0;  

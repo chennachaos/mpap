@@ -1,6 +1,6 @@
 
 #include "Macro.h"
-#include "Mesh.h"
+//#include "Mesh.h"
 #include "DomainTree.h"
 
 
@@ -9,6 +9,7 @@ extern DomainTree domain;
 
 int macro68(Macro &macro)
 {
+/*
   if (!macro) 
   { 
     macro.name = "empt";
@@ -30,7 +31,7 @@ int macro68(Macro &macro)
   id  = roundToInt(macro.p[1]) - 1;
 
   mesh(domain(typ,id)).selectNode.nodeList.free();
-
+*/
 //--------------------------------------------------------------------------------------------------
   return 0;  
 }

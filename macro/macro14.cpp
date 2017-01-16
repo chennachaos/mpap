@@ -1,14 +1,14 @@
 
 #include "Macro.h"
 #include "Definitions.h"
-#include "Plot.h"
+//#include "Plot.h"
 #include "DomainTree.h"
-#include "Mesh.h"
+//#include "Mesh.h"
 //#include "IsogeometricFEM.h"
 
 
 extern DomainTree domain;
-extern Plot       plot;
+////extern Plot       plot;
 
 
 using namespace std;
@@ -59,16 +59,16 @@ int macro14(Macro &macro)
 
   Domain &dom = domain(type,id);
 
-  plot.setColour(col-1);
+  //plot.setColour(col-1);
   
-  if (!plot) 
-  {
-     dom.findMinMaxX(xmn,xmx,defm);
+  //if (!plot) 
+  //{
+     //dom.findMinMaxX(xmn,xmx,defm);
 
-     plot.fit(xmn,xmx,dom.ndm);
-  }
+    // plot.fit(xmn,xmx,dom.ndm);
+  //}
   
-  dom.plotMesh(defm,flag);
+  //dom.plotMesh(defm,flag);
 
 //--------------------------------------------------------------------------------------------------
   return 0;  

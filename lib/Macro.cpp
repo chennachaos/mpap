@@ -54,7 +54,8 @@ Macro::~Macro()
 int Macro::exec(void)
 {
   switch (id)
-  { case   1: return macro1(*this); 
+  {
+    case   1: return macro1(*this); 
     case   2: return macro2(*this); 
     case   3: return macro3(*this); 
     case   4: return macro4(*this); 
@@ -134,6 +135,7 @@ int Macro::exec(void)
     case  78: return macro78(*this); 
     case  79: return macro79(*this); 
     case  80: return macro80(*this); 
+    /*
     case  81: return macro81(*this); 
     case  82: return macro82(*this); 
     case  83: return macro83(*this); 
@@ -254,6 +256,7 @@ int Macro::exec(void)
     case 198: return macro198(*this); 
     case 199: return macro199(*this);
     case 200: return macro200(*this);
+    */
     case 201: return macro201(*this); 
     case 202: return macro202(*this); 
     case 203: return macro203(*this); 

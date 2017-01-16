@@ -5,7 +5,7 @@
 #include "Definitions.h"
 #include "FunctionsProgram.h"
 #include "MyString.h"
-#include "FunctionsEssGrp.h"
+//#include "FunctionsEssGrp.h"
 
 
 extern bool noGUI;
@@ -113,8 +113,9 @@ void prgCompareTwoSimpleMatrices(double *mtx1, double *mtx2,
 	input = tmp;
 	while (action < 0) 
 	{	
-          if (!essGrpInquire("input row and column numbers!","OK","Exit",&input)) action = 0;
-	  else
+          //if (!essGrpInquire("input row and column numbers!","OK","Exit",&input))
+	    //action = 0;
+	  //else
 	  {
 	    nw = input.split(&word);
             if (nw == 2) if (word[0].toInt(&row0,false) && word[1].toInt(&col0,false)) 

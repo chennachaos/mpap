@@ -1,13 +1,14 @@
 
 #include "Macro.h"
-#include "Plot.h"
+//#include "Plot.h"
 
 
-extern Plot plot;
+////extern Plot plot;
 
 
 int macro43(Macro &macro)
 {
+/*
   if (!macro) 
   { 
     macro.name = "post";
@@ -34,7 +35,7 @@ int macro43(Macro &macro)
     
     plot.psOpen = false;
   }
-
+*/
 //--------------------------------------------------------------------------------------------------
   return 0;  
 }

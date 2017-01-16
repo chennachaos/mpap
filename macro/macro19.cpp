@@ -1,19 +1,20 @@
 
 #include "Macro.h"
-#include "Plot.h"
+//#include "Plot.h"
 #include "RunControl.h"
 #include "FunctionsEssGrp.h"
 #include "DomainTree.h"
-#include "Mesh.h"
+//#include "Mesh.h"
 
 
 extern DomainTree domain;
-extern Plot       plot;
+////extern Plot       plot;
 extern RunControl runCtrl;
 
 
 int macro19(Macro &macro)
 {
+/*
   if (!macro) 
   { 
     macro.name = "pers";
@@ -130,7 +131,7 @@ int macro19(Macro &macro)
     plot.adjustToNewSize();
     essGrpWipe();
   }
-
+*/
 //--------------------------------------------------------------------------------------------------
   return 0;  
 }

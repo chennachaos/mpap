@@ -6,7 +6,7 @@
 #include "FunctionsEssGrp.h"
 #include "RunControl.h"
 #include "MpapTime.h"
-#include "MicroCell.h"
+//#include "MicroCell.h"
 
 
 
@@ -75,11 +75,11 @@ int macro5(Macro &macro)
                COUT << "'if,user':   left mouse button -> true\n";
                COUT << "        any other mouse button -> false\n\n";
           	  
-               essGrpSetSensAllButDrawingArea(false);
+               //essGrpSetSensAllButDrawingArea(false);
                runCtrl.fixStatus(PRESSMOUSE);
 
-               if (essGrpWaitForMouseButtonPressed() == 1) cond = true; 
-               essGrpSetSensAllButDrawingArea(true);
+               //if (essGrpWaitForMouseButtonPressed() == 1) cond = true; 
+               //essGrpSetSensAllButDrawingArea(true);
                runCtrl.freeFixedStatus();
              }
 	     break;
@@ -104,8 +104,8 @@ int macro5(Macro &macro)
 	     
     case  4: // mous
 
-	     cond = (essGrpWasMouseButtonPressed() != 0);
-	     
+	     //cond = (essGrpWasMouseButtonPressed() != 0);
+
 	     break;
 	     
     case  5: // cinc
@@ -123,17 +123,17 @@ int macro5(Macro &macro)
              cond = (!domain(type,id).elemSizeRatioOK(tol));
  
 	     break;
-	     
+
     case  7: // merr
 
-             for (i=0; i<domain.nDomainOfType(MICROCELL); i++)
+             //for (i=0; i<domain.nDomainOfType(MICROCELL); i++)
 
-             { if(domain(MICROCELL,i).microError()==1) substepped++; }
-	
-             cond =(intDiv(substepped*100,i)>roundToInt(macro.p[3]));
+             //{ if(domain(MICROCELL,i).microError()==1) substepped++; }
+
+             //cond =(intDiv(substepped*100,i)>roundToInt(macro.p[3]));
      
-	     break;
-	     
+	     //break;
+
     default: // error
 	     
 	     COUT << "unknown condition! (->TRUE)\n\n";

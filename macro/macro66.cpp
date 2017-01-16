@@ -1,6 +1,6 @@
 
 #include "Macro.h"
-#include "Mesh.h"
+//#include "Mesh.h"
 #include "DomainTree.h"
 
 
@@ -9,6 +9,7 @@ extern DomainTree domain;
 
 int macro66(Macro &macro)
 {
+/*
   if (!macro) 
   { 
     macro.name = "sns";
@@ -56,7 +57,7 @@ int macro66(Macro &macro)
   for (int i=0; i<7; i++) selectNode.x[i] = macro.p[6+i];
 
   mesh(domain(typ,id)).simpleNodeSelection();
-
+*/
 //--------------------------------------------------------------------------------------------------
   return 0;  
 }

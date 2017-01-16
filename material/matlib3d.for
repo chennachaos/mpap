@@ -147,7 +147,7 @@ c...............................................................................
 
       if (isw.ne.3) return
 
-      call multiscaleMaterial3D(matData, F,stre,cc,finite,gp,err,ELM)
+c      call multiscaleMaterial3D(matData, F,stre,cc,finite,gp,err,ELM)
 
       return
 
@@ -160,8 +160,8 @@ c...............................................................................
 
       if (isw.eq.1) return
 
-      call sf_vonmises_isotropic_elastoplasticity
-     * (matData,F,stre,cc,iv1,iv2,finite,isw, err)
+c      call sf_vonmises_isotropic_elastoplasticity
+c     * (matData,F,stre,cc,iv1,iv2,finite,isw, err)
 
     
       return
@@ -177,8 +177,8 @@ c...............................................................................
 
       if (isw.eq.1) return
 
-      call s_hill_anisotropic_elastoplasticity
-     * (matData,F,stre,cc,iv1,iv2,finite,isw, err)
+c      call s_hill_anisotropic_elastoplasticity
+c     * (matData,F,stre,cc,iv1,iv2,finite,isw, err)
 
       return
 

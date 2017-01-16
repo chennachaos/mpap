@@ -4,6 +4,7 @@
 #include "MathBasic.h"
 
 
+
 void prgPrintSimpleMatrixSecDiff(double* c1, double* c2, int nrow, int ncol, 
                                  int row0, int col0, int dd, 
 		                 int dig, int dig2, bool gfrmt, 

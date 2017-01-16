@@ -2,7 +2,7 @@
 #include <math.h>
 #include "Debug.h"
 #include "MpapTime.h"
-#include "Plot.h"
+//#include "Plot.h"
 #include "NurbsElemKirchhoffPlate.h"
 #include "NurbsShapeFunctions.h"
 #include <assert.h>
@@ -12,7 +12,7 @@ using namespace std;
 
 extern ComputerTime       computerTime;
 extern MpapTime mpapTime;
-extern Plot plot;
+//extern Plot plot;
 
 
 NurbsElemKirchhoffPlate::NurbsElemKirchhoffPlate()

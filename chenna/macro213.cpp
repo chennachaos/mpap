@@ -2,11 +2,11 @@
 #include "Macro.h"
 #include "DomainTree.h"
 #include "IsogeometricFEM.h"
-#include "Plot.h"
+//#include "Plot.h"
 
 
 extern DomainTree domain;
-extern Plot       plot;
+//extern Plot       plot;
 
 
 int macro213(Macro &macro)

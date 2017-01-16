@@ -1,7 +1,6 @@
 
 #include <iostream>
 
-#include "SolverPARDISO.h"
 #include "SolverPardisoEigen.h"
 #include "FunctionsSolver.h"
 #include "FunctionsProgram.h"

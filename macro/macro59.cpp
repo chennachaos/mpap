@@ -1,7 +1,7 @@
 
 #include "Macro.h"
 #include "DomainTree.h"
-#include "Aeroplane.h"
+//#include "Aeroplane.h"
 
 
 extern DomainTree domain;
@@ -9,6 +9,7 @@ extern DomainTree domain;
 
 int macro59(Macro &macro)
 {
+/*
   if (!macro) 
   { 
     macro.name = "dspl";
@@ -39,7 +40,7 @@ int macro59(Macro &macro)
   if (!isAeroplane(domain(type,id))) return 0; 
 
   domain(type,id).initFlightSimulatorDisplay(NULL);
-
+*/
 //--------------------------------------------------------------------------------------------------
   return 0;  
 }

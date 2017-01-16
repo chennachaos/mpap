@@ -1,12 +1,12 @@
 
 #include "Macro.h"
 #include "DomainTree.h"
-#include "Plot.h"
+//#include "Plot.h"
 
 
 
 extern DomainTree domain;
-extern Plot       plot;
+////extern Plot       plot;
 
 
 static const unsigned int pow2[8] = {1,2,4,8,16,32,64,128};
@@ -15,6 +15,7 @@ static const unsigned int pow2[8] = {1,2,4,8,16,32,64,128};
 
 int macro51(Macro &macro)
 {
+/*
   if (!macro) 
   { 
     macro.name = "geom";
@@ -69,7 +70,7 @@ int macro51(Macro &macro)
   }
   
   domain(type,id).plotGeometry(bitFlag);
- 
+*/ 
 //--------------------------------------------------------------------------------------------------
   return 0;  
 }

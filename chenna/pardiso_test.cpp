@@ -4,7 +4,7 @@
 
 #include "MathVector.h"
 #include "Solver.h"
-#include "SolverMA41.h"
+#include "SolverMA41Eigen.h"
 //#include "SolverPARDISO.h"
 #include "DataBlockTemplate.h"
 #include "List.h"

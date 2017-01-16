@@ -1,6 +1,6 @@
 
 #include "Macro.h"
-#include "Mesh.h"
+//#include "Mesh.h"
 #include "DomainTree.h"
 
 
@@ -9,6 +9,7 @@ extern DomainTree domain;
 
 int macro67(Macro &macro)
 {
+/*
   if (!macro) 
   { 
     macro.name = "sbc";
@@ -40,7 +41,7 @@ int macro67(Macro &macro)
   for (int i=0; i<6; i++) fix[i] = (roundToInt(macro.p[2+i]) == 1);
 
   mesh(domain(typ,id)).setBoundaryConditions(fix);
-
+*/
 //--------------------------------------------------------------------------------------------------
   return 0;  
 }

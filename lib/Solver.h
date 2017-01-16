@@ -4,10 +4,8 @@
 
 #include <iostream>
 
-#include "Element.h"
 #include "MathVector.h"
 #include "MathMatrix.h"
-#include "DependentDoF.h"
 #include "List.h"
 #include "Domain.h"
 
@@ -41,11 +39,11 @@ class Solver
     virtual void zeroMtx(void)
       { cout << "  'zeroMtx' is not available for this solver!\n\n"; return; }
 
-    virtual int assembleElemMtx(Element*)
-      { cout << "  'assembleElemMtx' is not available for this solver!\n\n"; return -1; } 
+    //virtual int assembleElemMtx(Element*)
+      //{ cout << "  'assembleElemMtx' is not available for this solver!\n\n"; return -1; } 
     
-    virtual int assembleElemVec(Element*, bool)
-      { cout << "  'assembleElemVec' is not available for this solver!\n\n"; return -1; } 
+    //virtual int assembleElemVec(Element*, bool)
+      //{ cout << "  'assembleElemVec' is not available for this solver!\n\n"; return -1; } 
     
     virtual int  factorise(void)
       { cout << "  'factorise' is not available for this solver!\n\n"; return -1; } 

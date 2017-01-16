@@ -4,6 +4,7 @@
 #include "MathBasic.h"
 
 
+
 void prgPrintSimpleMatrix(double* c, int nrow, int ncol, int dig, int dig2, bool gfrmt, 
 		          int indent, bool numbers)
 {

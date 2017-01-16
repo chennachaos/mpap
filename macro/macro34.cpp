@@ -1,7 +1,7 @@
 
 #include "Macro.h"
 #include "DomainTree.h"
-#include "Mesh.h"
+//#include "Mesh.h"
 
 
 extern DomainTree domain;
@@ -9,6 +9,7 @@ extern DomainTree domain;
 
 int macro34(Macro &macro)
 {
+/*
   if (!macro) 
   { 
     macro.name = "proc";
@@ -52,7 +53,7 @@ int macro34(Macro &macro)
       default: break;
     }
   }
-  
+*/  
 //--------------------------------------------------------------------------------------------------
   return 0;  
 }

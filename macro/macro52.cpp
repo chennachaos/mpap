@@ -1,7 +1,7 @@
 
 #include "Macro.h"
 #include "DomainTree.h"
-#include "Mesh.h"
+//#include "Mesh.h"
 
 
 extern DomainTree domain;
@@ -10,6 +10,7 @@ extern DomainTree domain;
 
 int macro52(Macro &macro)
 {
+/*
   if (!macro) 
   { 
     macro.name = "gmsh";
@@ -45,7 +46,7 @@ int macro52(Macro &macro)
     { COUT << "use 'elsz' to set parameters for remeshing first!\n\n"; return 0; }
 
   dom.remeshElemGroups(showFlg);
-  
+*/  
 //--------------------------------------------------------------------------------------------------
   return 0;  
 }

@@ -4,10 +4,11 @@
 
 
 
+
 char prgUpdateDisplay(bool wait)
 {
-  essGrpCopyPixmap();
-  essGrpUpdateDisplay();
+//  essGrpCopyPixmap();
+//  essGrpUpdateDisplay();
 
   if (!wait) return '\n';
 

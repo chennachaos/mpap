@@ -2,7 +2,7 @@
 #include <math.h>
 #include "Debug.h"
 #include "MpapTime.h"
-#include "Plot.h"
+//#include "Plot.h"
 #include "NurbsElem2DStructSolidLSFEM2dof.h"
 #include "NurbsShapeFunctions.h"
 #include <assert.h>
@@ -14,7 +14,7 @@ using namespace std;
 
 extern ComputerTime       computerTime;
 extern MpapTime mpapTime;
-extern Plot plot;
+//extern Plot plot;
 extern List<TimeFunction> timeFunction;
 
 

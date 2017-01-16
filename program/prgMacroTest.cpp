@@ -1,14 +1,13 @@
 
 #include "MathVector.h"
-#include "Plot.h"
+////#include "Plot.h"
 #include "DomainTree.h"
 #include "FunctionsEssGrp.h"
 #include "MacroQueue.h"
 
 
-
 extern DomainTree domain;
-extern Plot       plot;
+////extern Plot       plot;
 extern MacroQueue macroQueue;
 
 
@@ -25,6 +24,7 @@ void prgMacroTest(double xPos, double yPos)
 
              double x[2];
 
+             /*
              x[0] =  xPos            / plot.wFactAct + plot.x0Act[0];
              x[1] = (plot.hPix-yPos) / plot.hFactAct + plot.x0Act[1];
 
@@ -32,6 +32,7 @@ void prgMacroTest(double xPos, double yPos)
              plot.point(x);
 
              essGrpCopyPixmap();
+             */
 
              domain(type,id).transferNodalDataTest(x);
 

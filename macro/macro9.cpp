@@ -1,14 +1,15 @@
 
 #include "Macro.h"
 #include "DomainTree.h"
-#include "Plot.h"
+//#include "Plot.h"
 
 
-extern Plot plot;
+////extern Plot plot;
 
 
 int macro9(Macro &macro)
 {
+/*
   if (!macro) 
   { 
     macro.name = "cont";
@@ -69,7 +70,7 @@ int macro9(Macro &macro)
     }
     
     domain(type,id).contourPlot(var,i,nCol,umnx,umn,umx,legd);
-    
+*/    
 //--------------------------------------------------------------------------------------------------
   return 0;  
 }

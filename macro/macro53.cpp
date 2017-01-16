@@ -1,6 +1,6 @@
 
 #include "Macro.h"
-#include "Mesh.h"
+//#include "Mesh.h"
 #include "DomainTree.h"
 #include "MathVector.h"
 
@@ -8,6 +8,7 @@
 
 int macro53(Macro &macro)
 {
+/*
   if (!macro) 
   { 
     macro.name = "elsz";
@@ -93,7 +94,7 @@ int macro53(Macro &macro)
   else dom.getInputElemSizeOpt();
 
   dom.smoothElemSizeOptDist(nCircle,nAcross,maxGrad,hmin);
-  
+*/  
 //--------------------------------------------------------------------------------------------------
   return 0;  
 }

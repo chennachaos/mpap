@@ -2,7 +2,7 @@
 #include "Debug.h"
 #include "FunctionsProgram.h"
 #include "PropertyTypeEnum.h"
-#include "Plot.h"
+//#include "Plot.h"
 #include "NurbsShapeFunctions.h"
 #include "NurbsElementSolid.h"
 #include <assert.h>
@@ -11,7 +11,7 @@
 
 using namespace std;
 
-extern Plot     plot;
+//extern Plot     plot;
 extern MpapTime mpapTime;
 
 
@@ -361,7 +361,8 @@ void NurbsElementSolid::plotGaussPoints(int num, bool defFlg)
    int ind1 = startindex[0]+surf0->p, ind2 = ind1+1;
    int ind3 = startindex[1]+surf0->q, ind4 = ind3+1;
 
-   double d = (plot.dAct[0] + plot.dAct[1]) * .0025, X[2] = {0.0, 0.0};
+   //double d = (plot.dAct[0] + plot.dAct[1]) * .0025, X[2] = {0.0, 0.0};
+   double d = 0.0025, X[2] = {0.0, 0.0};
    int index;
    EPOINT EP;
 
@@ -377,7 +378,7 @@ void NurbsElementSolid::plotGaussPoints(int num, bool defFlg)
          X[0] = EP.x;
          X[1] = EP.y;
 
-         plot.point(X,d);
+         //plot.point(X,d);
    }
 
 return;

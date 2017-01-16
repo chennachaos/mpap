@@ -1,18 +1,19 @@
 
 #include "Macro.h"
 #include "DomainTree.h"
-#include "Mesh.h"
+//#include "Mesh.h"
 
 
 extern DomainTree domain;
 
 
-static Vector<double> circ, diff;
+//static Vector<double> circ, diff;
 
 
 
 int macro77(Macro &macro)
 {
+/*
   if (!macro) 
   { 
     macro.name = "circ";
@@ -88,7 +89,7 @@ int macro77(Macro &macro)
     if (uDep[i].master.n == 1) uDep[i].ucBase = circ.lastCoeff();
 
   if (roundToInt(macro.p[4]) == 1) COUT << "new circulation = " << circ.lastCoeff() << "\n\n";
-
+*/
 //--------------------------------------------------------------------------------------------------
   return 0;  
 }

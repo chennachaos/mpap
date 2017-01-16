@@ -6,12 +6,12 @@
 #include "List.h"
 #include "RunModeEnum.h"
 #include "MyStatusEnum.h"
-#include "FunctionsEssGrp.h"
+//#include "FunctionsEssGrp.h"
 #include "MathVector.h"
-#include "Plot.h"
+////#include "Plot.h"
 
 
-extern Plot plot;
+////extern Plot plot;
 
 
 struct RunControl
@@ -44,33 +44,67 @@ struct RunControl
 	             fixedStatus = UNDEF; 
 		     return; }
   
-  void newMode(RunMode rm)    { mode = rm;  
-	                        if (mode == BATCH) 
-				  plot.suppressCopyPixmap = true;
-				else 
-				{ 
-			          plot.suppressCopyPixmap = false;
-			          essGrpCopyPixmap(); 
-				}
-	                        essGrpSetMacroSens();
-                                if (rm == PRE) essGrpWriteProject("pre-processor");
-				return; }
+  void newMode(RunMode rm)
+  {
+    mode = rm;
+    if (mode == BATCH) 
+      int tt=2;
+        //plot.suppressCopyPixmap = true;
+    else 
+    { 
+        //plot.suppressCopyPixmap = false;
+        //essGrpCopyPixmap();
+    }
+    //essGrpSetMacroSens();
+    //if (rm == PRE)
+    //essGrpWriteProject("pre-processor");
 
-  void newStatus(MyStatus st) { status = st; essGrpWriteStatus(); return; }
+    return;
+  }
 
-  void fixStatus(MyStatus st) { fixedStatus = st; essGrpWriteStatus(); return; }
+  void newStatus(MyStatus st)
+  {
+    status = st;
+    //essGrpWriteStatus();
+    return; 
+  }
+
+  void fixStatus(MyStatus st)
+  {
+    fixedStatus = st;
+    //essGrpWriteStatus();
+    return;
+  }
   
-  void freeFixedStatus() { fixedStatus = UNDEF; essGrpWriteStatus(); return; }
+  void freeFixedStatus()
+  {
+    fixedStatus = UNDEF;
+    //essGrpWriteStatus();
+    return;
+  }
   
-  void busy(void)    { essGrpSetCursor(true);
-	               if (fixedStatus != UNDEF) return;
-	               if (mode == INTER) newStatus(INTERACTIVEBUSY); return; }
+  void busy(void)
+  {
+    //essGrpSetCursor(true);
+    if (fixedStatus != UNDEF)
+      return;
+    if (mode == INTER)
+      newStatus(INTERACTIVEBUSY);
+    return;
+  }
 
-  void notBusy(void) { essGrpSetCursor(false);
-	               if (fixedStatus != UNDEF) return;
-	               if (mode == PRE || mode == INTER) newStatus(INTERACTIVE); 
-	               if (mode == NOPROJ) newStatus(NOPROJECT); 
-                       return; }
+  void notBusy(void)
+  {
+    //essGrpSetCursor(false);
+    if (fixedStatus != UNDEF)
+      return;
+    if (mode == PRE || mode == INTER)
+      newStatus(INTERACTIVE); 
+    if (mode == NOPROJ)
+      newStatus(NOPROJECT); 
+
+    return; 
+  }
 
 };
 

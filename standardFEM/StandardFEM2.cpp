@@ -1,6 +1,5 @@
 
 
-#include "SolverPARDISO.h"
 #include "SolverPardisoEigen.h"
 #include "SolverMA41Eigen.h"
 
@@ -368,7 +367,8 @@ int StandardFEM::prepareMatrixPattern()
         locally_owned_nodes_total[npart[ee]].push_back(ee);
       }
 
-      locally_owned_nodes = locally_owned_nodes_total[this_mpi_proc];
+      locally_owned_nodes = locally_owned_nodes_total[this_mpi_proc];
+
 
       nNode_local = locally_owned_nodes.size();
 

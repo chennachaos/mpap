@@ -1,7 +1,7 @@
 
 #include "Macro.h"
 #include "DomainTree.h"
-#include "Mesh.h"
+//#include "Mesh.h"
 
 
 extern DomainTree domain;
@@ -9,6 +9,7 @@ extern DomainTree domain;
 
 int macro76(Macro &macro)
 {
+/*
   if (!macro) 
   { 
     macro.name = "spds";
@@ -69,7 +70,7 @@ int macro76(Macro &macro)
   mesh(domain(typ,id)).setBoundaryConditions(fix);
 
   mesh(domain(typ,id)).setTmpPresDisp(flag,val,xp,rad);
-
+*/
 //--------------------------------------------------------------------------------------------------
   return 0;  
 }

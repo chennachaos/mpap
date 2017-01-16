@@ -63,7 +63,7 @@ c...............................................................................
 
       if (isw.ne.3) return
       
-      call multiscaleMaterial2D(matData,F,stre,cc,finite,gp,err,ELM)
+c      call multiscaleMaterial2D(matData,F,stre,cc,finite,gp,err,ELM)
 
       return
 
@@ -92,8 +92,8 @@ c...............................................................................
 
       if (isw.eq.1) return
 
-      call hyplasMaterial(matData,F,F33,stre,cc,iv1,iv2,
-     *                    matId,finite,sss,isw,err,ELM)
+c      call hyplasMaterial(matData,F,F33,stre,cc,iv1,iv2,
+c     *                    matId,finite,sss,isw,err,ELM)
      
     
 

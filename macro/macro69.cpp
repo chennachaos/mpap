@@ -1,6 +1,6 @@
 
 #include "Macro.h"
-#include "Mesh.h"
+//#include "Mesh.h"
 #include "DomainTree.h"
 #include "Definitions.h"
 
@@ -10,6 +10,7 @@ extern DomainTree domain;
 
 int macro69(Macro &macro)
 {
+/*
   char *domTypeName[] = DOMAIN_TYPE_NAMES;
 
   if (!macro) 
@@ -47,7 +48,7 @@ int macro69(Macro &macro)
                                       (roundToInt(macro.p[3]) == 1),
                                       (roundToInt(macro.p[4]) == 1),
                                       (roundToInt(macro.p[5]) == 1));
-
+*/
 //--------------------------------------------------------------------------------------------------
   return 0;  
 }

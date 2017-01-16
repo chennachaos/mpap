@@ -60,7 +60,7 @@ int macro13(Macro &macro)
       return 0;
     }
   }
-  essGrpWriteTime();  
+  //essGrpWriteTime();
 
   for(int i=0; i<timeFunction.n; i++)
     timeFunction[i].update();

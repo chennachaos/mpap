@@ -4,6 +4,7 @@
 #include "MathBasic.h"
 
 
+
 void prgPrintSimpleMatrixSec(double* c1, int nrow, int ncol, int row0, int col0, int dd, 
 		             int dig, int dig2, bool gfrmt, 
 	                     int indent, bool numbers)

@@ -1,6 +1,5 @@
 
 #include "HBSplineBase.h"
-#include "SolverPARDISO.h"
 #include "SolverPardisoEigen.h"
 #include "SolverMA41Eigen.h"
 #include "SolverEigen.h"

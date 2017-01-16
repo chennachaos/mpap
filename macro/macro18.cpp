@@ -1,16 +1,17 @@
 
 #include "Macro.h"
-#include "Plot.h"
+//#include "Plot.h"
 #include "RunControl.h"
 #include "FunctionsEssGrp.h"
 
 
-extern Plot       plot;
+////extern Plot       plot;
 extern RunControl runCtrl;
 
 
 int macro18(Macro &macro)
 {
+/*
   if (!macro) 
   { 
     macro.name = "zoom";
@@ -70,7 +71,7 @@ int macro18(Macro &macro)
    
     plot.adjustToNewSize(); 
   }
-
+*/
 //--------------------------------------------------------------------------------------------------
   return 0;  
 }

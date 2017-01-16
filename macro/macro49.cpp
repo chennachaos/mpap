@@ -1,17 +1,18 @@
 
 #include "Macro.h"
 #include "DomainTree.h"
-#include "Plot.h"
-#include "Fluid.h"
-#include "Solid.h"
+//#include "Plot.h"
+//#include "Fluid.h"
+//#include "Solid.h"
 
 
 extern DomainTree domain;
-extern Plot       plot;
+//extern Plot       plot;
 
 
 int macro49(Macro &macro)
 {
+/*
   if (!macro) 
   { 
     macro.name = "tran";
@@ -43,7 +44,7 @@ int macro49(Macro &macro)
   if (what == 1) domain(type,id).getDisplacements();
  
   else           domain(type,id).transferForces();
-
+*/
 //--------------------------------------------------------------------------------------------------
   return 0;  
 }

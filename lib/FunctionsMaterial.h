@@ -2,10 +2,11 @@
 #ifndef incl_FunctionsMaterial_h
 #define incl_FunctionsMaterial_h
 
+#include <cstddef>
 
-#include "Element.h"
+//#include "Element.h"
 
-
+class Element;
 // functions in material
 
 

@@ -1,6 +1,6 @@
 
 #include "Macro.h"
-#include "Mesh.h"
+//#include "Mesh.h"
 #include "DomainTree.h"
 
 
@@ -10,6 +10,7 @@ extern DomainTree domain;
 
 int macro72(Macro &macro)
 {
+/*
   if (!macro) 
   { 
     macro.name = "extr";
@@ -81,7 +82,7 @@ int macro72(Macro &macro)
     return 0;
   }
   else domain.delDom(&dom);
-
+*/
 //--------------------------------------------------------------------------------------------------
   return 0;  
 }

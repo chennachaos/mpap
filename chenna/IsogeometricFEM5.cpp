@@ -4,8 +4,7 @@
 #include "DataBlockTemplate.h"
 #include "PropertyTypeEnum.h"
 #include "MathGeom.h"
-#include "SolverMA41.h"
-#include "SolverPARDISO.h"
+#include "SolverMA41Eigen.h"
 #include "SolverPardisoEigen.h"
 #include "NurbsShapeFns.h"
 #include "ComputerTime.h"
@@ -18,7 +17,6 @@
 
 #include "util.h"
 
-extern Plot               plot;
 extern DomainTree         domain;
 extern List<TimeFunction> timeFunction;
 extern MpapTime           mpapTime;
@@ -31,9 +29,9 @@ using namespace std;
 
 void IsogeometricFEM::setSolver(int slv, int *parm, bool cIO)
 {
-   if(solver != NULL)
-     delete solver;
-   solver = NULL;
+   if(solverEigen != NULL)
+     delete solverEigen;
+   solverEigen = NULL;
 
     char fct[] = "HBSplineFEM::setSolver";
     
@@ -45,7 +43,7 @@ void IsogeometricFEM::setSolver(int slv, int *parm, bool cIO)
     {
       case  4: // SolverEigen ..........................
 
-             solver = (SolverEigen*) new SolverEigen;
+             solverEigen = new SolverEigen;
 
              comprMtxFlg = false;
 
@@ -54,65 +52,49 @@ void IsogeometricFEM::setSolver(int slv, int *parm, bool cIO)
              prepareMatrixPattern();
 
              cout << " kkkkkkkkkk " << endl;
-             if(solver->initialise(0, 0, ntoteqs) != 0)
+             if(solverEigen->initialise(0, 0, ntoteqs) != 0)
                 return;
 
-             //solver->SetSolverAndParameters();
-             solver->setAlgorithmType(parm[0]);
+             //solverEigen->SetSolverAndParameters();
+             solverEigen->setAlgorithmType(parm[0]);
 
-             solver->printInfo();
-
-             break;
-
-      case  5: // PARDISO(sym) with Eigen
-
-             if (parm != NULL) numProc = parm[0]; else numProc = 1;
-
-             numProc = min(MAX_PROCESSORS,numProc);
-             
-             cout << " numProc " <<  numProc << endl;
-
-             solver = (SolverEigen*) new SolverPardisoEigen;
-
-             comprMtxFlg = true;
-
-             printInfo();
-
-             prepareMatrixPattern();
-
-             cout << " numProc " <<  numProc << endl;
-
-             if (solver->initialise(numProc, PARDISO_STRUCT_SYM, ntoteqs) != 0)
-              return;
-
-             solver->printInfo();
+             solverEigen->printInfo();
 
              break;
 
-      case  6: // PARDISO(unsym) with Eigen
+        case  5: // PARDISO(sym) with Eigen
+        case  6: // PARDISO(unsym) with Eigen
 
-             if (parm != NULL) numProc = parm[0]; else numProc = 1;
+            //SOLVER_TYPE = SOLVER_TYPE_EIGEN;
 
-             numProc = min(MAX_PROCESSORS,numProc);
-             
-             cout << " numProc " <<  numProc << endl;
+            solverEigen = (SolverEigen*) new SolverPardisoEigen;
 
-             solver = (SolverEigen*) new SolverPardisoEigen;
+            if (parm != NULL) numProc = parm[0]; else numProc = 1;
 
-             comprMtxFlg = true;
+            numProc = min(MAX_PROCESSORS,numProc);
 
-             printInfo();
+            //cout << " numProc " <<  numProc << endl;
 
-             prepareMatrixPattern();
+            solverEigen->STABILISED = true;
 
-             cout << " numProc " <<  numProc << endl;
+            //printInfo();
+            //cout << " numProc " <<  numProc << endl;
+            prepareMatrixPattern();
 
-             if (solver->initialise(numProc, PARDISO_UNSYM, ntoteqs) != 0)
-              return;
+            if(slv == 5)
+            {
+              if(solverEigen->initialise(numProc, PARDISO_STRUCT_SYM, ntoteqs) != 0)
+                return;
+            }
+            if(slv == 6)
+            {
+              if(solverEigen->initialise(numProc, PARDISO_UNSYM, ntoteqs) != 0)
+                return;
+            }
 
-             solver->printInfo();
+            solverEigen->printInfo();
 
-             break;
+        break;
 
 
     default: // invalid slv ...................
@@ -126,8 +108,8 @@ void IsogeometricFEM::setSolver(int slv, int *parm, bool cIO)
     
     //cout << " cIO " << cIO << endl;
 
-    if(solver != NULL)
-      solver->checkIO = cIO;
+    if(solverEigen != NULL)
+      solverEigen->checkIO = cIO;
 
     //if(tis > 0)
       //setInitialConditions();
@@ -209,8 +191,8 @@ void IsogeometricFEM::prepareMatrixPattern1()
     cout << " ntotgbf1, ntotgbf2 and ntotgbf....: " << ntotgbf1  << '\t' << ntotgbf2 << '\t' << ntotgbf << endl;
     cout << endl;
 
-    solver->rhsVec.resize(ntoteqs);
-    solver->rhsVec.setZero();
+    solverEigen->rhsVec.resize(ntoteqs);
+    solverEigen->rhsVec.setZero();
 
     ForceVec.setDim(ntoteqs);
     ForceVec.zero();
@@ -616,9 +598,9 @@ void IsogeometricFEM::prepareMatrixPatternPetsc()
     */
     cout << " AAAAAAAAAA " << endl;
     //MatCreateSeqAIJ(PETSC_COMM_WORLD, nRow, nRow, 500, nnzVec, &(((SolverEigen*)solver)->mtx));
-    solver->mtx.resize(ntoteqs, ntoteqs);
-    solver->mtx.reserve(nnz);
-    solver->mtx.reserve(nnzVec);
+    solverEigen->mtx.resize(ntoteqs, ntoteqs);
+    solverEigen->mtx.reserve(nnz);
+    solverEigen->mtx.reserve(nnzVec);
     cout << " AAAAAAAAAA " << endl;
 
     for(ii=0;ii<ntoteqs;ii++)
@@ -627,17 +609,17 @@ void IsogeometricFEM::prepareMatrixPatternPetsc()
       {
         //cout << ii << '\t' << DDconn[ii][jj] << endl;
         //ierr = MatSetValues(((SolverEigen*)solver)->mtx, 1, &ii, 1 , &DDconn[ii][jj], &val, ADD_VALUES);
-        solver->mtx.coeffRef(ii, DDconn[ii][jj]) = 0.0;
+        solverEigen->mtx.coeffRef(ii, DDconn[ii][jj]) = 0.0;
       }
     }
 
-    solver->mtx.makeCompressed();
+    solverEigen->mtx.makeCompressed();
 
   //((SolverEigen*)solver)->printMatrix();
 
   cout << " BBBBBBBBBBBBB " << endl;
 
-  solver->currentStatus = PATTERN_OK;
+  solverEigen->currentStatus = PATTERN_OK;
 
   //printf("\n     HBSplineFEM::prepareMatrixPattern()  .... FINISHED ...\n\n");
 
@@ -1690,7 +1672,7 @@ cout << " AAAAAAAAAAA " << endl;
      if(jj != matxtemp.nRow)
         prgError(200,fct,"fatal error!");
 
-      ((SolverSparse*)solver)->compr = compr1;
+      //solverEigen->compr = compr1;
 
       compr1.free();
 
@@ -1763,15 +1745,15 @@ cout << " AAAAAAAAAAA " << endl;
 
    if (ntoteqs1 < 30) matxtemp.printPattern();
 
-   MatrixSparseArray<double> &mtx2 = ((SolverSparse*)solver)->mtx;
-   mtx2 = matxtemp;
+   //MatrixSparseArray<double> &mtx2 = solverEigen->mtx;
+   //mtx2 = matxtemp;
 
    // if(massMatrixflag)     M_global = matxtemp;
 
    matxtemp.free();
 
   // finalise
-  ((SolverSparse*)solver)->currentStatus = PATTERN_OK;
+  solverEigen->currentStatus = PATTERN_OK;
 
 //  computerTime.stopAndPrint(fct);
 

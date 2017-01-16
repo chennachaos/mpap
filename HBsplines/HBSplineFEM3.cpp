@@ -2,7 +2,6 @@
 
 #include "HBSplineFEM.h"
 #include "DataBlockTemplate.h"
-#include "SolverPARDISO.h"
 #include "SolverPardisoEigen.h"
 #include "SolverMA41Eigen.h"
 #include "MpapTime.h"

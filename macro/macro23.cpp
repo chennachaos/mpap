@@ -1,13 +1,13 @@
 
 #include "Macro.h"
 #include "Definitions.h"
-#include "Plot.h"
+//#include "Plot.h"
 #include "DomainTree.h"
-#include "Mesh.h"
+//#include "Mesh.h"
 
 
 extern DomainTree domain;
-extern Plot       plot;
+////extern Plot       plot;
 
 
 using namespace std;
@@ -15,6 +15,7 @@ using namespace std;
 
 int macro23(Macro &macro)
 {
+/*
   if (!macro) 
   { 
     macro.name = "elem";
@@ -56,7 +57,7 @@ int macro23(Macro &macro)
   }
   
   domain(type,id).plotElemNum(def);
-
+*/
 //--------------------------------------------------------------------------------------------------
   return 0;  
 }

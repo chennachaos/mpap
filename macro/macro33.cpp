@@ -1,15 +1,16 @@
 
 #include "Macro.h"
 #include "DomainTree.h"
-#include "Plot.h"
+//#include "Plot.h"
 
 
 extern DomainTree domain;
-extern Plot       plot;
+////extern Plot       plot;
 
 
 int macro33(Macro &macro)
 {
+/*
   if (!macro) 
   { 
     macro.name = "1d";
@@ -129,7 +130,7 @@ int macro33(Macro &macro)
   }
 
   domain(type,id).plotU1D(indx);
-  
+*/  
 //--------------------------------------------------------------------------------------------------
   return 0;  
 }

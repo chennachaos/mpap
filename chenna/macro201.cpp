@@ -5,11 +5,11 @@
 #include "HBSplineFEM.h"
 #include "HBSplineCutFEM.h"
 #include "StandardFEM.h"
-#include "Plot.h"
+//#include "Plot.h"
 //#include "HBScutFEMElasticity.h"
 
 extern DomainTree domain;
-extern Plot       plot;
+//extern Plot       plot;
 
 int macro201(Macro &macro)
 {
@@ -72,7 +72,7 @@ int macro201(Macro &macro)
   resln[1] = roundToInt(macro.p[7]) ;	// resolution to plot displacement in 2nd parameter direction
   resln[2] = roundToInt(macro.p[8]) ;	// resolution to plot displacement in 3rd parameter direction
 
-  plot.setColour(col-1);
+  //plot.setColour(col-1);
 
 /*
   if(!plot)
@@ -88,15 +88,15 @@ int macro201(Macro &macro)
   isogeometricFEM(domain(type,id)).plotGeom(val1, flag2, col-1, flag3, resln);
 */
 
-  if(!plot)
-  {
+  //if(!plot)
+  //{
      if(val1 == 1 || val1 == 2)
        domain(type,id).findMinMaxX(xmn,xmx,defm);
      //else
        //domain(type,id).findMinMaxResult(xmn,xmx,defm);
 
-     plot.fit(xmn,xmx,domain(type,id).ndm);
-  }
+     //plot.fit(xmn,xmx,domain(type,id).ndm);
+  //}
   
     domain(type,id).plotGeom(val1, flag2, col-1, flag3, resln);
 

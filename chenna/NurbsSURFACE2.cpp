@@ -1,7 +1,7 @@
 #include <Eigen/Dense>
 #include "NurbsSURFACE.h"
 #include "DataBlockTemplate.h"
-#include "Plot.h"
+//#include "Plot.h"
 #include "PlotVTK.h"
 #include <iomanip>
 
@@ -33,7 +33,7 @@
 using namespace std;
 using namespace Eigen;
 
-extern Plot plot;
+//extern Plot plot;
 extern PlotVTK plotvtk;
 extern MpapTime mpapTime;
 
@@ -1167,7 +1167,7 @@ void NurbsSURFACE::PlotElements(int col, bool PLOT_KNOT_LINES, int* resln)
             x1d[0] = PP1->x; x1d[1] = PP1->y; x1d[2] = PP1->z;
             x2d[0] = PP2->x; x2d[1] = PP2->y; x2d[2] = PP2->z;
 
-            plot.line(x1d,x2d);
+            //plot.line(x1d,x2d);
           }
         }
       }
@@ -1185,7 +1185,7 @@ void NurbsSURFACE::PlotElements(int col, bool PLOT_KNOT_LINES, int* resln)
             x1d[0] = PP1->x; x1d[1] = PP1->y; x1d[2] = PP1->z;
             x2d[0] = PP2->x; x2d[1] = PP2->y; x2d[2] = PP2->z;
 
-            plot.line(x1d,x2d);
+            //plot.line(x1d,x2d);
           }
         }
       }

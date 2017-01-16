@@ -6,8 +6,7 @@
 #include "DataBlockTemplate.h"
 #include "PropertyTypeEnum.h"
 #include "MathGeom.h"
-#include "SolverMA41.h"
-#include "SolverPARDISO.h"
+#include "SolverMA41Eigen.h"
 #include "SolverPardisoEigen.h"
 #include "NurbsShapeFns.h"
 #include "ComputerTime.h"
@@ -44,7 +43,7 @@
 
 #include "DistFunctions3D.h"
 
-extern Plot               plot;
+//extern Plot               plot;
 extern DomainTree         domain;
 extern List<TimeFunction> timeFunction;
 extern MpapTime           mpapTime;
@@ -69,7 +68,7 @@ IsogeometricFEM::IsogeometricFEM(void)
 
   tol = -2.0;
 
-  solver = NULL;
+  solverEigen = NULL;
   elem = NULL;
 
   NurbsBaseOriginal  = NULL;
@@ -130,7 +129,7 @@ IsogeometricFEM::~IsogeometricFEM(void)
 {
    cout << "     ISOGEOMETRICFEM: destructor ...\n\n";
 
-   if(solver != NULL) delete solver;     solver = NULL;
+   if(solverEigen != NULL) delete solverEigen;     solverEigen = NULL;
 
    if (elem != NULL)
    {
@@ -2145,7 +2144,7 @@ int IsogeometricFEM::calcStiffnessAndResidual(int printRes, bool zeroMtx, bool z
      copyElemInternalVariables();
 
    //cout << " PPPPPPPPPPPP " << endl;
-   solver->zeroMtx();
+   solverEigen->zeroMtx();
 
    if(firstIter) rNorm = -1.0;
 
@@ -2181,9 +2180,9 @@ int IsogeometricFEM::calcStiffnessAndResidual(int printRes, bool zeroMtx, bool z
 
       //cout << " AAAAAAAAAA " << endl;
       if(SOLVER_TYPE >= 4)
-        elem[ee]->AssembleElementMatrix(1, ((SolverEigen*)solver)->mtx, start1, start2);
+        elem[ee]->AssembleElementMatrix(1, solverEigen->mtx, start1, start2);
       else
-        elem[ee]->AssembleElementMatrix(1, ((SolverSparse*)solver)->mtx);
+        elem[ee]->AssembleElementMatrix(1, solverEigen->mtx);
       
       //cout << " AAAAAAAAAA " << endl;
       //((SolverEigen*)solver)->printMatrix(1,1,1,1,1);
@@ -2210,11 +2209,11 @@ int IsogeometricFEM::calcStiffnessAndResidual(int printRes, bool zeroMtx, bool z
       if(elem[ee]->tracflag)
       {
          temp = elem[ee]->calcLoadVector();
-         //elem[e]->AssembleElementMatrix(1, ((SolverSparse*)solver)->mtx);
+         //elem[e]->AssembleElementMatrix(1, solverEigen->mtx);
          elem[ee]->AssembleElementVector(1, 0, &(rhsVec[0]), &(reac[0]), 0, 0);
 
          //temp = elem[e]->applyDirichletBCs();
-         //elem[e]->AssembleElementMatrix(1, ((SolverSparse*)solver)->mtx);
+         //elem[e]->AssembleElementMatrix(1, solverEigen->mtx);
          //elem[e]->AssembleElementVector(firstIter, 0, &(rhsVec[0]), &(reac[0]), 0, 0);
       }
     }
@@ -2265,7 +2264,7 @@ int IsogeometricFEM::calcStiffnessAndResidual(int printRes, bool zeroMtx, bool z
 
   if (printRes > 1) { COUT << domain.name(this); printf("  %11.4e\n",rNorm);}
 
-  solver->currentStatus = ASSEMBLY_OK;
+  solverEigen->currentStatus = ASSEMBLY_OK;
 
   ctimCalcStiffRes += computerTime.stop(fct);
 
@@ -2305,7 +2304,7 @@ int IsogeometricFEM::calcStiffnessAndResidual(int printRes, bool zeroMtx, bool z
      copyElemInternalVariables();
 
    //cout << " PPPPPPPPPPPP " << endl;
-   solver->zeroMtx();
+   solverEigen->zeroMtx();
 
   if(firstIter)
   {
@@ -2333,7 +2332,7 @@ int IsogeometricFEM::calcStiffnessAndResidual(int printRes, bool zeroMtx, bool z
 
    if(firstIter) rNorm = -1.0;
 
-   solver->rhsVec.setZero();
+   solverEigen->rhsVec.setZero();
    reac.zero();
 
    int start1,  start2;
@@ -2348,7 +2347,7 @@ int IsogeometricFEM::calcStiffnessAndResidual(int printRes, bool zeroMtx, bool z
       start2 = ntoteqs1 + ntoteqs2;
    }
 
-   //cout << " rhsVec " << endl;        printVector(&(solver->rhsVec[0]), solver->rhsVec.rows());
+   //cout << " rhsVec " << endl;        printVector(&(solverEigen->rhsVec[0]), solverEigen->rhsVec.rows());
 
    //cout << " reacc " << endl;        printVector(&(reac[0]), reac.n);
 
@@ -2372,16 +2371,16 @@ int IsogeometricFEM::calcStiffnessAndResidual(int printRes, bool zeroMtx, bool z
 
       //cout << " AAAAAAAAAA " << endl;
       if(SOLVER_TYPE >= 4)
-        elem[ee]->AssembleElementMatrix(1, solver->mtx, start1, start2);
+        elem[ee]->AssembleElementMatrix(1, solverEigen->mtx, start1, start2);
       else
-        elem[ee]->AssembleElementMatrix(1, ((SolverSparse*)solver)->mtx);
+        elem[ee]->AssembleElementMatrix(1, solverEigen->mtx);
       
       //cout << " AAAAAAAAAA " << endl;
       //((SolverEigen*)solver)->printMatrix(1,1,1,1,1);
       
       //cout << " bbbbbbbbbbbbb " << endl;
 
-      elem[ee]->AssembleElementVector(firstIter, 0, &(solver->rhsVec[0]), &(reac[0]), start1, start2);
+      elem[ee]->AssembleElementVector(firstIter, 0, &(solverEigen->rhsVec[0]), &(reac[0]), start1, start2);
       //printData(3,0);
       //cout << " AAAAAAAAAA " << endl;
    }
@@ -2391,7 +2390,7 @@ int IsogeometricFEM::calcStiffnessAndResidual(int printRes, bool zeroMtx, bool z
    //printData(4,0);
    //printData(3,0);
 
-   printf("\n rhsVec norm = %12.6E \n", solver->rhsVec.norm());
+   printf("\n rhsVec norm = %12.6E \n", solverEigen->rhsVec.norm());
 
    int  elemtype = patchGrp[0].eltype;
 
@@ -2403,11 +2402,11 @@ int IsogeometricFEM::calcStiffnessAndResidual(int printRes, bool zeroMtx, bool z
       if(elem[ee]->tracflag)
       {
          temp = elem[ee]->calcLoadVector();
-         //elem[e]->AssembleElementMatrix(1, ((SolverSparse*)solver)->mtx);
-         elem[ee]->AssembleElementVector(1, 0, &(solver->rhsVec[0]), &(reac[0]), 0, 0);
+         //elem[e]->AssembleElementMatrix(1, solverEigen->mtx);
+         elem[ee]->AssembleElementVector(1, 0, &(solverEigen->rhsVec[0]), &(reac[0]), 0, 0);
 
          //temp = elem[e]->applyDirichletBCs();
-         //elem[e]->AssembleElementMatrix(1, ((SolverSparse*)solver)->mtx);
+         //elem[e]->AssembleElementMatrix(1, solverEigen->mtx);
          //elem[e]->AssembleElementVector(firstIter, 0, &(rhsVec[0]), &(reac[0]), 0, 0);
       }
     }
@@ -2422,19 +2421,19 @@ int IsogeometricFEM::calcStiffnessAndResidual(int printRes, bool zeroMtx, bool z
 
   //cout << " rhsVec " << endl;        printVector(&(rhsVec[0]), rhsVec.n);
 
-  //cout << solver->mtx << endl;
+  //cout << solverEigen->mtx << endl;
   
-  printf("\n rhsVec norm = %12.6E \n", solver->rhsVec.norm());
+  printf("\n rhsVec norm = %12.6E \n", solverEigen->rhsVec.norm());
 
   //cout << " kkkkkkkkkkkk " << endl;
 
   firstIter = false;
   rNormPrev = rNorm;
-  rNorm     = solver->rhsVec.norm();
+  rNorm     = solverEigen->rhsVec.norm();
 
   if (printRes > 1) { COUT << domain.name(this); printf("  %11.4e\n",rNorm);}
 
-  solver->currentStatus = ASSEMBLY_OK;
+  solverEigen->currentStatus = ASSEMBLY_OK;
 
   ctimCalcStiffRes += computerTime.stop(fct);
 
@@ -2457,13 +2456,13 @@ int IsogeometricFEM::factoriseSolveAndUpdate()
   int  elemtype = patchGrp[0].eltype;
 
   //cout << " residue_new " << endl;        printVector(&(rhsVec[0]), rhsVec.n);
-  //cout << " rhsVec " << endl;        printVector(&(solver->rhsVec[0]), solver->rhsVec.rows());
+  //cout << " rhsVec " << endl;        printVector(&(solverEigen->rhsVec[0]), solverEigen->rhsVec.rows());
 
   time_t tstart, tend;
 
   tstart = time(0);
 
-  solver->factoriseAndSolve();
+  solverEigen->factoriseAndSolve();
 
   tend = time(0); 
   printf("It took %8.4f second(s) \n ", difftime(tend, tstart) );
@@ -2471,7 +2470,7 @@ int IsogeometricFEM::factoriseSolveAndUpdate()
   soln.zero();
   // update solution vector
   for(kk=0;kk<ntoteqs1;kk++)
-    soln[assy4r[kk]]  = solver->soln[kk];
+    soln[assy4r[kk]]  = solverEigen->soln[kk];
 
   //for(kk=0;kk<soln.n;kk++)
   //{
@@ -2518,7 +2517,7 @@ int IsogeometricFEM::factoriseSolveAndUpdate()
   if(mixedSolverFlag == 7 || mixedSolverFlag == 12)
   {
     for(iii=0;iii<Npatch;iii++)
-      NurbsBaseSecondVar[iii]->updateValues(1, &solver->soln[ntoteqs1]);
+      NurbsBaseSecondVar[iii]->updateValues(1, &solverEigen->soln[ntoteqs1]);
   }
 
   if(mixedSolverFlag == 8)
@@ -2527,8 +2526,8 @@ int IsogeometricFEM::factoriseSolveAndUpdate()
 
     for(iii=0;iii<Npatch;iii++)
     {
-      NurbsBaseSecondVar[iii]->updateValues(1, &solver->soln[ntoteqs1]);
-      NurbsBaseSecondVar[iii]->updateValues(2, &solver->soln[ind]);
+      NurbsBaseSecondVar[iii]->updateValues(1, &solverEigen->soln[ntoteqs1]);
+      NurbsBaseSecondVar[iii]->updateValues(2, &solverEigen->soln[ind]);
     }
   }
   //du = NULL;
@@ -2586,10 +2585,10 @@ void IsogeometricFEM::addExternalForces()
 
   cout << "       fact .... : " << fact << endl;
 
-   for(int kk=0;kk<solver->rhsVec.rows();kk++)
+   for(int kk=0;kk<solverEigen->rhsVec.rows();kk++)
    {
       fact1 = fact * ForceVec[kk];
-      solver->rhsVec[kk] += fact1;
+      solverEigen->rhsVec[kk] += fact1;
       reac[assy4r[kk]] += fact1 ;
    }
 

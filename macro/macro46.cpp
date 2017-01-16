@@ -1,13 +1,13 @@
 
 #include "Macro.h"
 #include "Definitions.h"
-#include "Plot.h"
+//#include "Plot.h"
 #include "DomainTree.h"
-#include "Mesh.h"
+//#include "Mesh.h"
 
 
 extern DomainTree domain;
-extern Plot       plot;
+////extern Plot       plot;
 
 
 using namespace std;
@@ -15,6 +15,7 @@ using namespace std;
 
 int macro46(Macro &macro)
 {
+/*
   if (!macro) 
   { 
     macro.name = "mupd";
@@ -40,7 +41,7 @@ int macro46(Macro &macro)
   cutType = roundToInt(macro.p[2]);
  
   domain(type,id).updateMesh(cutType);
-
+*/
 //--------------------------------------------------------------------------------------------------
   return 0;  
 }

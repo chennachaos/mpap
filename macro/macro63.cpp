@@ -1,7 +1,7 @@
 
 #include "Macro.h"
 #include "DomainTree.h"
-#include "Mesh.h"
+//#include "Mesh.h"
 #include "RunControl.h"
 
 
@@ -11,6 +11,7 @@ extern RunControl runCtrl;
 
 int macro63(Macro &macro)
 {
+/*
   if (!macro) 
   { 
     macro.name = "imsh";
@@ -64,7 +65,7 @@ int macro63(Macro &macro)
   }
 
   if (runCtrl.mode == NOPROJ) { runCtrl.newMode(PRE); runCtrl.newStatus(INTERACTIVE); }
-
+*/
 //--------------------------------------------------------------------------------------------------
   return 0;  
 }

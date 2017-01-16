@@ -213,7 +213,7 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
 
       //printVector(&(SolnData.var1(0)), 100);
 
-      /*
+      //
       for(ii=0;ii<activeElements.size();ii++)
       {
         node *nd = elems[activeElements[ii]];
@@ -243,13 +243,13 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
           //cout << " DDDDDDDDDDDDDDDDD " << endl;
           nd->applyNeumannBCsCutFEMFluid(Klocal, Flocal, domTemp);
           //cout << " BBBBBBBBBBBBBBBBB " << endl;
-          solverPetsc->AssembleMatrixAndVectorCutFEM(start, start, nd->forAssyVec, forAssyCutFEM, Klocal, Flocal);
+          solverEigen->AssembleMatrixAndVectorCutFEM(start, start, nd->forAssyVec, forAssyCutFEM, Klocal, Flocal);
           //cout << " CCCCCCCCCCCCCCCC " << endl;
         }
       }
-      */
-
       //
+
+      /*
       for(ii=0;ii<activeElements.size();ii++)
       {
         node *nd = elems[activeElements[ii]];
@@ -286,7 +286,7 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
           }
         }
       }
-      //
+      */
 
     //cout << " AAAAAAAAAAAAAAAAA " << endl;
     //printVector(pointBCs[0]);

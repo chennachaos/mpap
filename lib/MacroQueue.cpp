@@ -4,26 +4,26 @@
 #include "MacroList.h"
 #include "MathBasic.h"
 #include "RunControl.h"
-#include "FunctionsEssGrp.h"
+//#include "FunctionsEssGrp.h"
 #include "FunctionsProgram.h"
-#include "Plot.h"
+////#include "Plot.h"
 #include "Files.h"
 
 
 extern bool       noGUI;
 extern MacroList  macro;
 extern RunControl runCtrl;
-extern Plot       plot;
+////extern Plot       plot;
 extern Files      files;
 
 
 using namespace std;
 
 
-MacroQueue::MacroQueue(void)
+MacroQueue::MacroQueue()
 {
    reset();
-       	
+
    return;
 }
 
@@ -230,10 +230,10 @@ void MacroQueue::append(MacroCommand &mC)
    
     for(i=0; i<macCmd[act].p.n; i++) macro[ii].p[i] = macCmd[act].p[i].evaluate(act);
    
-    essGrpUpdateDisplay();
+    //essGrpUpdateDisplay();
 
-    if (macro[ii].type == "plot" && plot.psOpen) 
-      files.Pout << "\n%% **** " << macro[ii].name << " ****\n";
+    //if (macro[ii].type == "plot" && plot.psOpen) 
+      //files.Pout << "\n%% **** " << macro[ii].name << " ****\n";
 
     rtrn = macro[ii].exec();  
     
@@ -245,11 +245,11 @@ void MacroQueue::append(MacroCommand &mC)
 
     if (rtrn > 0) act = rtrn - 1; else act++;
   
-    essGrpCheckForResizeEvents();
+    //essGrpCheckForResizeEvents();
 
-    essGrpUpdateDisplay();
+    //essGrpUpdateDisplay();
     
-    if (!plot.suppressCopyPixmap) essGrpCopyPixmap();
+    //if (!plot.suppressCopyPixmap) essGrpCopyPixmap();
 
     macro[ii].strg.free();
     macro[ii].p.free();
