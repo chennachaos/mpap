@@ -19,7 +19,10 @@ using std::endl;
 using namespace myGeom;
 
 class  ImmersedIntegrationElement;
-//class  myPoly;
+
+
+enum  {BC_ENFORCE_TYPE_LAGRANGE=0, BC_ENFORCE_TYPE_PENALTY};
+
 
 
 class ImmersedSolid
@@ -30,11 +33,11 @@ class ImmersedSolid
 
         int  id, DIM, type, localStiffnessError, filecount, iterCount, tis, ndof, solverOK ;
         int  nElem, nImmInt, totalDOF, npElem, nNode, nsize;
-        int  matId, elemId;
+        int  matId, elemId, BC_ENFORCE_TYPE;
 
         double  rNorm, rNormPrev, tol, dt, rho, beta, ctimCalcStiffRes, ctimFactSolvUpdt, PENALTY, NitscheFact;
 
-        bool firstIter, STAGGERED, LAGRANGE_OR_PENALTY, isNitsche, PRESC_MOTION;
+        bool firstIter, STAGGERED, isNitsche, PRESC_MOTION;
 
         vector<int>  assy4r, PrescMotionTimeFuncs;
 
@@ -72,9 +75,6 @@ class ImmersedSolid
 
         int GetID()
         {  return id; }
-
-        //static int  GetCount()
-        //{ return count; }
 
         void  SetDimension(int dd)
         { DIM = dd; }
@@ -158,16 +158,17 @@ class ImmersedSolid
         {  return  SolnData.forceCur[ind*ndof+dir]; }
 
         void  SetBoundaryConditionType(int tt)
-        {  LAGRANGE_OR_PENALTY = (tt == 1); }
+        {
+          if(tt)
+            BC_ENFORCE_TYPE = BC_ENFORCE_TYPE_LAGRANGE;
+          else
+            BC_ENFORCE_TYPE = BC_ENFORCE_TYPE_PENALTY;
+        }
 
         bool IsBoundaryConditionTypeLagrange()
-        { return LAGRANGE_OR_PENALTY; }
-
-        //double GetPositionOrig(int ind, int dir)
-        //{ return IBpoints[ind]->GetPositionOrig(dir); }
-
-        //double GetPositionCur(int ind, int dir)
-        //{ return IBpoints[ind]->GetPositionCur(dir); }
+        {
+          return (BC_ENFORCE_TYPE == BC_ENFORCE_TYPE_LAGRANGE);
+        }
 
         void  SetMaterialID(int tt)
         { matId = tt; }

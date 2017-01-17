@@ -6,7 +6,6 @@
 #include "Functions.h"
 #include "Files.h"
 #include "MyString.h"
-
 #include "headersVTK.h"
 #include "myGeomUtilities.h"
 #include "NurbsUtilities.h"

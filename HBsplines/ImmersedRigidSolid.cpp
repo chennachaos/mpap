@@ -27,8 +27,8 @@ ImmersedRigidSolid::ImmersedRigidSolid(int dd)
   
   size = 3*(DIM-1);
   
-  cout << " DIM  = " << DIM  << endl;
-  cout << " size = " << size << endl;
+  //cout << " DIM  = " << DIM  << endl;
+  //cout << " size = " << size << endl;
 
   matM.resize(size, size);
   matM.setZero();
@@ -1710,7 +1710,7 @@ void ImmersedRigidSolid::calcCouplingMatrices()
 
     for(aa=0;aa<ImmIntgElems.size();aa++)
     {
-      nlb = ImmIntgElems[aa]->pointNumsLocal.size();
+      nlb = ImmIntgElems[aa]->pointNums.size();
 
       //cout << " aa = " << aa << endl;
       ImmIntgElems[aa]->computeKhorzKvertRigid(Ktemp, Ktemp2);
@@ -1723,7 +1723,7 @@ void ImmersedRigidSolid::calcCouplingMatrices()
       {
         for(jj=0;jj<nlb;jj++)
         {
-          ind1 = ImmIntgElems[aa]->pointNumsLocal[jj] * DIM;
+          ind1 = ImmIntgElems[aa]->pointNums[jj] * DIM;
           ind2 = jj*DIM;
 
           for(kk=0;kk<DIM;kk++)
@@ -1897,7 +1897,7 @@ void ImmersedRigidSolid::AssembleElementVector(int ind, bool flag, double* rhs)
 
 void ImmersedRigidSolid::writeOutput()
 {
-    if(!LAGRANGE_OR_PENALTY)
+    if(BC_ENFORCE_TYPE == BC_ENFORCE_TYPE_PENALTY)
     {
       cout << " can't print the output data when PENALTY method is used for Immersed Bodies " << endl;
       return;

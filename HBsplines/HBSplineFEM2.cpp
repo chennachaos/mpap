@@ -1,12 +1,7 @@
 
 #include "HBSplineFEM.h"
-
 #include "MpapTime.h"
-
 #include "ImmersedIntegrationElement.h"
-//#include "ImmersedFlexibleSolid.h"
-//#include "ImmersedRigidSolid.h"
-//#include "ImmersedSolid.h"
 #include "myDataIntegrateCutFEM.h"
 #include "QuadratureUtil.h"
 #include "BasisFunctionsLagrange.h"
@@ -511,13 +506,11 @@ void  HBSplineFEM::applyInterfaceTerms2D()
       bool axsy = (GeomData.FluidProps[2] == 1);
       double  rho = GeomData.FluidProps[3];
       double  mu = GeomData.FluidProps[4];
-      double  gamm = GeomData.FluidProps[12];
-      //axsy = 0;
-      //cout << " axsy " << axsy << '\t' << PI << endl;
+
 
       for(bb=0;bb<ImmersedBodyObjects.size();bb++)
       {
-        nlb = ImmersedBodyObjects[0]->ImmIntgElems[0]->pointNumsGlobal.size();
+        nlb = ImmersedBodyObjects[0]->ImmIntgElems[0]->pointNums.size();
 
         Nb.resize(nlb);
         dNb.resize(nlb);
@@ -534,11 +527,11 @@ void  HBSplineFEM::applyInterfaceTerms2D()
 
             for(ii=0;ii<nlb;ii++)
             {
-              xx[ii] = lme->GeomDataLag->NodePosCur[lme->pointNumsLocal[ii]][0];
-              yy[ii] = lme->GeomDataLag->NodePosCur[lme->pointNumsLocal[ii]][1];
+              xx[ii] = lme->GeomDataLag->NodePosCur[lme->pointNums[ii]][0];
+              yy[ii] = lme->GeomDataLag->NodePosCur[lme->pointNums[ii]][1];
               
-              specValx[ii] = lme->GeomDataLag->specValCur[lme->pointNumsLocal[ii]][0];
-              specValy[ii] = lme->GeomDataLag->specValCur[lme->pointNumsLocal[ii]][1];
+              specValx[ii] = lme->GeomDataLag->specValCur[lme->pointNums[ii]][0];
+              specValy[ii] = lme->GeomDataLag->specValCur[lme->pointNums[ii]][1];
             }
 
             //cout << specValx[0] << '\t' << specValy[0] << endl;
@@ -564,8 +557,8 @@ void  HBSplineFEM::applyInterfaceTerms2D()
                 vel2[0]     += Nb[ii] * specValx[ii];
                 vel2[1]     += Nb[ii] * specValy[ii];
 
-                lagmults[0] += Nb[ii] * SolnData.var3Cur(lme->pointNumsGlobal[ii]*DIM);
-                lagmults[1] += Nb[ii] * SolnData.var3Cur(lme->pointNumsGlobal[ii]*DIM+1);
+                lagmults[0] += Nb[ii] * SolnData.var3Cur(lme->pointNums[ii]*DIM);
+                lagmults[1] += Nb[ii] * SolnData.var3Cur(lme->pointNums[ii]*DIM+1);
               }
 
               if(axsy)
@@ -581,8 +574,6 @@ void  HBSplineFEM::applyInterfaceTerms2D()
               //printf("vel2[0] = %12.6f, vel2[1] = %12.6f \n", vel2[0], vel2[1]);
               //printf("lagmults[0] = %12.6f, lagmults[1] = %12.6f \n", lagmults[0], lagmults[1]);
               //printf("detJ = %12.6f, gw = %5d \n", detJ, lme->gaussweights[gp]);
-
-              //lme->computePointAtGP(gp, geom);
 
               nd = elems[findCellNumber(geom)];
 
@@ -612,7 +603,7 @@ void  HBSplineFEM::applyInterfaceTerms2D()
               //printVector(Nf);
               //printf("\n\n");
 
-              ind1 = lme->pointNumsLocal.size();
+              ind1 = lme->pointNums.size();
               ind2 = nd->GlobalBasisFuncs.size();
 
               Khorz.resize(ind1*DIM, ind2*ndof);    Khorz.setZero();
@@ -709,8 +700,8 @@ void  HBSplineFEM::applyInterfaceTerms2D()
 
             for(ii=0;ii<nlb;ii++)
             {
-              xx[ii] = lme->GeomDataLag->NodePosCur[lme->pointNumsLocal[ii]][0];
-              yy[ii] = lme->GeomDataLag->NodePosCur[lme->pointNumsLocal[ii]][1];
+              xx[ii] = lme->GeomDataLag->NodePosCur[lme->pointNums[ii]][0];
+              yy[ii] = lme->GeomDataLag->NodePosCur[lme->pointNums[ii]][1];
             }
 
             for(gp=0;gp<lme->gausspoints.size();gp++)
@@ -818,7 +809,7 @@ void  HBSplineFEM::applyInterfaceTerms3D()
 
       for(bb=0;bb<ImmersedBodyObjects.size();bb++)
       {
-        nlb = ImmersedBodyObjects[0]->ImmIntgElems[0]->pointNumsGlobal.size();
+        nlb = ImmersedBodyObjects[0]->ImmIntgElems[0]->pointNums.size();
 
         Nb.resize(nlb);
         dNb.resize(nlb);
@@ -837,13 +828,13 @@ void  HBSplineFEM::applyInterfaceTerms3D()
 
             for(ii=0;ii<nlb;ii++)
             {
-              xx[ii] = lme->GeomDataLag->NodePosCur[lme->pointNumsLocal[ii]][0];
-              yy[ii] = lme->GeomDataLag->NodePosCur[lme->pointNumsLocal[ii]][1];
-              zz[ii] = lme->GeomDataLag->NodePosCur[lme->pointNumsLocal[ii]][2];
+              xx[ii] = lme->GeomDataLag->NodePosCur[lme->pointNums[ii]][0];
+              yy[ii] = lme->GeomDataLag->NodePosCur[lme->pointNums[ii]][1];
+              zz[ii] = lme->GeomDataLag->NodePosCur[lme->pointNums[ii]][2];
               
-              specValx[ii] = lme->GeomDataLag->specValCur[lme->pointNumsLocal[ii]][0];
-              specValy[ii] = lme->GeomDataLag->specValCur[lme->pointNumsLocal[ii]][1];
-              specValz[ii] = lme->GeomDataLag->specValCur[lme->pointNumsLocal[ii]][2];
+              specValx[ii] = lme->GeomDataLag->specValCur[lme->pointNums[ii]][0];
+              specValy[ii] = lme->GeomDataLag->specValCur[lme->pointNums[ii]][1];
+              specValz[ii] = lme->GeomDataLag->specValCur[lme->pointNums[ii]][2];
             }
 
             //cout << " uuuuuuuuuuu " << endl;
@@ -872,9 +863,9 @@ void  HBSplineFEM::applyInterfaceTerms3D()
                 vel2[1]     += Nb[ii] * specValy[ii];
                 vel2[2]     += Nb[ii] * specValz[ii];
 
-                lagmults[0] += Nb[ii] * SolnData.var3Cur(lme->pointNumsGlobal[ii]*DIM);
-                lagmults[1] += Nb[ii] * SolnData.var3Cur(lme->pointNumsGlobal[ii]*DIM+1);
-                lagmults[2] += Nb[ii] * SolnData.var3Cur(lme->pointNumsGlobal[ii]*DIM+2);
+                lagmults[0] += Nb[ii] * SolnData.var3Cur(lme->pointNums[ii]*DIM);
+                lagmults[1] += Nb[ii] * SolnData.var3Cur(lme->pointNums[ii]*DIM+1);
+                lagmults[2] += Nb[ii] * SolnData.var3Cur(lme->pointNums[ii]*DIM+2);
               }
 
               //if(geom[0] == 0.0 || geom[0] == 2.0)
@@ -918,7 +909,7 @@ void  HBSplineFEM::applyInterfaceTerms3D()
               //printVector(Nf);
               //printf("\n\n");
 
-              ind1 = lme->pointNumsLocal.size();
+              ind1 = lme->pointNums.size();
               ind2 = nd->GlobalBasisFuncs.size();
 
               //cout << " ind1 = " << ind1 << endl;
@@ -1028,9 +1019,9 @@ void  HBSplineFEM::applyInterfaceTerms3D()
 
             for(ii=0;ii<nlb;ii++)
             {
-              xx[ii] = lme->GeomDataLag->NodePosCur[lme->pointNumsLocal[ii]][0];
-              yy[ii] = lme->GeomDataLag->NodePosCur[lme->pointNumsLocal[ii]][1];
-              zz[ii] = lme->GeomDataLag->NodePosCur[lme->pointNumsLocal[ii]][2];
+              xx[ii] = lme->GeomDataLag->NodePosCur[lme->pointNums[ii]][0];
+              yy[ii] = lme->GeomDataLag->NodePosCur[lme->pointNums[ii]][1];
+              zz[ii] = lme->GeomDataLag->NodePosCur[lme->pointNums[ii]][2];
             }
 
             for(gp=0;gp<lme->gausspoints.size();gp++)

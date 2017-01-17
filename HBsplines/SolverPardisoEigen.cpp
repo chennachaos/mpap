@@ -43,8 +43,6 @@ using namespace std;
 
 SolverPardisoEigen::SolverPardisoEigen()
 {
-  comprMtxFlg = true;
-
   return;
 }
 
@@ -69,7 +67,7 @@ SolverPardisoEigen::~SolverPardisoEigen()
 
 int SolverPardisoEigen::initialise(int numProc, int matrixType, int nr)
 {
-  char fct[] = "SolverPARDISO::initialise";
+  char fct[] = "SolverPardisoEigen::initialise";
 
   nRow = nCol = nr;
 
@@ -169,17 +167,6 @@ int SolverPardisoEigen::initialise(int numProc, int matrixType, int nr)
     if (error == -12) prgError(3,fct,"wrong username or hostname.");
   }
 
-  //COUT << "\n\n PARDISO license check was successful.\n\n";
-
-  //ierr = MatGetRowIJ(mtx, 1, PETSC_FALSE, PETSC_FALSE, &nRow, &csr, &col, &flag);
-
-  //cout << " llllllllll " << endl;
-
-  //ierr = MatSeqAIJGetArray(mtx, &array);
-  //ierr = MatGetArray(mtx, &array);
-  
-  //cout << mtx << endl;
-  
   int  *c1, *c2, ii;
   
   csr.resize(nRow+1);
@@ -195,16 +182,6 @@ int SolverPardisoEigen::initialise(int numProc, int matrixType, int nr)
   for(ii=0;ii<mtx.nonZeros();ii++)
     col[ii] = c2[ii] + 1;
 
-  /*
-  for(ii=0;ii<=nrow;ii++)
-    cout << csr[ii] << '\t' ;
-  cout << endl;
-
-  for(ii=0;ii<mtx.nonZeros();ii++)
-    cout << col[ii] << '\t' ;
-  cout << endl;
-  */
-  
   array = mtx.valuePtr();
 
   //cout << " hhhhhhhhhhhhhhhhh " << endl;
@@ -352,22 +329,18 @@ int SolverPardisoEigen::factoriseAndSolve()
 
   int phase = 23, error = 0;
 
-  //cout << " rhsVec - pardiso " << endl;        printVector(rhsVec);
-  
   computerTime.go(fct);
   soln.setZero();
 
   pardiso_(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
            &nRow, array, &csr[0], &col[0], &perm[0], &NRHS,
            IPARM, &MSGLVL, &rhsVec[0], &soln[0], &error, DPARM);
-
+  
   solverTime.total             -= solverTime.factoriseAndSolve;
   solverTime.factoriseAndSolve += computerTime.stop(fct);
   solverTime.total             += solverTime.factoriseAndSolve;
 
   currentStatus = FACTORISE_OK;
-
-  //cout << " soln - pardiso " << endl;        printVector(rhsVec);
 
   return 0;
 }

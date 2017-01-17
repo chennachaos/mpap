@@ -20,7 +20,7 @@ ImmersedSolid::ImmersedSolid()
 
   nImmInt = 0;
   PENALTY = 1.0e2;
-  LAGRANGE_OR_PENALTY = true;
+  BC_ENFORCE_TYPE = BC_ENFORCE_TYPE_PENALTY;
   
   isNitsche = false;
   NitscheFact = 1.0;
@@ -169,7 +169,7 @@ void  ImmersedSolid::SetImmersedIntegrationElements(vector<vector<int> >& datate
       for(jj=0; jj<kk; jj++)
       {
         ind = datatemp[ii][1+jj] ;
-        lme->pointNumsGlobal.push_back(ind);
+        lme->pointNums.push_back(ind);
       }
 
       lme->initialiseDOFvalues();

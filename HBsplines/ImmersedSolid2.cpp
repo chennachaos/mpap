@@ -2,15 +2,10 @@
 
 #include "SolutionData.h"
 #include "GeomDataLagrange.h"
-
 #include "ImmersedIntegrationElement.h"
-//#include "FunctionsProgram.h"
-
 #include "myLine.h"
 #include "myTria.h"
-
 #include "Files.h"
-
 #include "util.h"
 
 extern Files files;
@@ -97,24 +92,17 @@ void  ImmersedSolid::SetImmersedFaces()
 
     for(ii=0; ii<nImmInt; ii++)
     {
-      //pt1 = GeomData.NodePosOrig[ImmIntgElems[ii]->pointNumsLocal[0]];
-      //pt2 = GeomData.NodePosOrig[ImmIntgElems[ii]->pointNumsLocal[1]];
+      pt1 = GeomData.NodePosOrig[ImmIntgElems[ii]->pointNums[0]];
+      pt2 = GeomData.NodePosOrig[ImmIntgElems[ii]->pointNums[1]];
 
-      pt1 = GeomData.NodePosOrig[ImmIntgElems[ii]->pointNumsGlobal[0]];
-      pt2 = GeomData.NodePosOrig[ImmIntgElems[ii]->pointNumsGlobal[1]];
-
-      //cout << " ii = " << ii << '\t' << ImmIntgElems[ii]->pointNumsGlobal[0] << '\t' << ImmIntgElems[ii]->pointNumsGlobal[1] << endl;
-      //cout << " ii = " << ii << '\t' << ImmIntgElems[ii]->pointNumsLocal[0] << '\t' << ImmIntgElems[ii]->pointNumsLocal[1] << endl;
+      //cout << " ii = " << ii << '\t' << ImmIntgElems[ii]->pointNums[0] << '\t' << ImmIntgElems[ii]->pointNums[1] << endl;
 
       poly = new myLine(pt1, pt2);
 
       ImmersedFaces.push_back(poly);
 
-      //lineVTK->GetPointIds()->SetId(0, ImmIntgElems[ii]->pointNumsLocal[0]);
-      //lineVTK->GetPointIds()->SetId(1, ImmIntgElems[ii]->pointNumsLocal[1]);
-
-      lineVTK->GetPointIds()->SetId(0, ImmIntgElems[ii]->pointNumsGlobal[0]);
-      lineVTK->GetPointIds()->SetId(1, ImmIntgElems[ii]->pointNumsGlobal[1]);
+      lineVTK->GetPointIds()->SetId(0, ImmIntgElems[ii]->pointNums[0]);
+      lineVTK->GetPointIds()->SetId(1, ImmIntgElems[ii]->pointNums[1]);
 
       polyList->InsertNextCell(lineVTK);
       
@@ -168,17 +156,17 @@ void  ImmersedSolid::SetImmersedFaces()
 
     for(ii=0; ii<nImmInt; ii++)
     {
-      pt1 = GeomData.NodePosOrig[ImmIntgElems[ii]->pointNumsLocal[0]];
-      pt2 = GeomData.NodePosOrig[ImmIntgElems[ii]->pointNumsLocal[1]];
-      pt3 = GeomData.NodePosOrig[ImmIntgElems[ii]->pointNumsLocal[2]];
+      pt1 = GeomData.NodePosOrig[ImmIntgElems[ii]->pointNums[0]];
+      pt2 = GeomData.NodePosOrig[ImmIntgElems[ii]->pointNums[1]];
+      pt3 = GeomData.NodePosOrig[ImmIntgElems[ii]->pointNums[2]];
 
       poly = new myTria(pt1, pt2, pt3);
 
       ImmersedFaces.push_back(poly);
 
-      triaVTK->GetPointIds()->SetId(0, ImmIntgElems[ii]->pointNumsLocal[0]);
-      triaVTK->GetPointIds()->SetId(1, ImmIntgElems[ii]->pointNumsLocal[1]);
-      triaVTK->GetPointIds()->SetId(2, ImmIntgElems[ii]->pointNumsLocal[2]);
+      triaVTK->GetPointIds()->SetId(0, ImmIntgElems[ii]->pointNums[0]);
+      triaVTK->GetPointIds()->SetId(1, ImmIntgElems[ii]->pointNums[1]);
+      triaVTK->GetPointIds()->SetId(2, ImmIntgElems[ii]->pointNums[2]);
 
       polyList->InsertNextCell(triaVTK);
       
@@ -265,7 +253,7 @@ void ImmersedSolid::UpdateImmersedFaces()
     for(ii=0; ii<nImmInt; ii++)
     {
       for(jj=0; jj<DIM; jj++)
-        ImmersedFaces[ii]->updatePoint(jj, GeomData.NodePosCur[ImmIntgElems[ii]->pointNumsGlobal[jj]] );
+        ImmersedFaces[ii]->updatePoint(jj, GeomData.NodePosCur[ImmIntgElems[ii]->pointNums[jj]] );
 
       ImmersedFaces[ii]->computeNormal();
       ImmersedFaces[ii]->computeAABB();

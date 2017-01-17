@@ -6,13 +6,13 @@
 #include "Functions.h"
 #include "Files.h"
 #include "MyString.h"
-
 #include "headersVTK.h"
 #include "myGeomUtilities.h"
 #include "NurbsUtilities.h"
 #include "myTria.h"
 #include "DistFunctions.h"
 #include "AABB.h"
+
 
 extern PlotVTK  plotvtk;
 extern ComputerTime       computerTime;

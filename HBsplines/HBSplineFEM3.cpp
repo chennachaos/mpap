@@ -1,7 +1,6 @@
 
 
 #include "HBSplineFEM.h"
-#include "DataBlockTemplate.h"
 #include "SolverPardisoEigen.h"
 #include "SolverMA41Eigen.h"
 #include "MpapTime.h"
@@ -9,22 +8,22 @@
 
 
 extern MpapTime           mpapTime;
-//extern ComputerTime       computerTime;
 
-using namespace std;
+
+//using namespace std;
 
 
 
 void HBSplineFEM::setTimeParam()
 {
-  //cout << " HBSplineBase::setTimeParam() " << endl;
+  //cout << " HBSplineBase::setTimeParam() ... STARTED " << endl;
 
   SolnData.setTimeParam();
 
   for(int bb=0;bb<ImmersedBodyObjects.size();bb++)
     ImmersedBodyObjects[bb]->setTimeParam();
 
-  //cout << " HBSplineBase::setTimeParam() " << endl;
+  //cout << " HBSplineBase::setTimeParam() ... FINISHED " << endl;
 
   return;
 }
@@ -33,7 +32,7 @@ void HBSplineFEM::setTimeParam()
 
 void HBSplineFEM::timeUpdate()
 {
-  cout << " HBSplineBase::timeUpdate() " << endl;
+  //cout << " HBSplineBase::timeUpdate() ... STARTED " << endl;
 
   IB_MOVED = false;
 
@@ -52,7 +51,7 @@ void HBSplineFEM::timeUpdate()
 
   SolnData.timeUpdate();
 
-  cout << " zzzzzzzzzzzzzz " << endl;
+  //cout << " zzzzzzzzzzzzzz " << endl;
   //if(LSFEM_FLAG)
     //ImmersedBoundaryBodyForceLSFEM();
   //else
@@ -70,7 +69,7 @@ void HBSplineFEM::timeUpdate()
 
   updateIterStep();
 
-  cout << " HBSplineBase::timeUpdate() " << endl;
+  //cout << " HBSplineBase::timeUpdate() ... FINISHED " << endl;
 
   return;
 }
@@ -86,12 +85,7 @@ void HBSplineFEM::updateIterStep()
   //cout << " kkkkkkkkkkk " << endl;
 
   for(bb=0;bb<ImmersedBodyObjects.size();bb++)
-  {
-    //if( ImmersedBodyObjects[bb]->IsRigidBody() )
-      ImmersedBodyObjects[bb]->updateForce();
-    //else
-      //ImmersedBodyObjects[bb]->updateForce(&(SolnData.var3(0)));
-  }
+    ImmersedBodyObjects[bb]->updateForce();
 
   //cout << " qqqqqqqqqqq " << endl;
 
@@ -116,66 +110,35 @@ void HBSplineFEM::updateIterStep()
   {
       solverEigen->free();
 
-      switch(SOLVER_TYPE)
+      prepareMatrixPattern();
+
+      switch(slv_type)
       {
           case  1: // MA41 ..........................
-
-            solverEigen->STABILISED = true;
-
-            //printInfo();
-
-            prepareMatrixPattern();
+          case  4: // SolverEigen ..........................
 
             if(solverEigen->initialise(0,0,totalDOF) != 0)
               return;
-
-            //solver->printInfo();
-          
-          break;
-
-          case  4: // SolverEigen ..........................
-
-            solverEigen->STABILISED = true;
-
-            //printInfo();
-
-            prepareMatrixPattern();
-
-            if(solverEigen->initialise(0, 0, totalDOF) != 0)
-              return;
-
-            //solver->printInfo();
 
           break;
 
           case  5: // PARDISO(sym) with Eigen
           case  6: // PARDISO(unsym) with Eigen
 
-            numProc = min(MAX_PROCESSORS,numProc);
-            //cout << " numProc " <<  numProc << '\t' << FluidSolnData.ElemProp.data << endl;
-
-            solverEigen->STABILISED = true;
-
-            //printInfo();
-
-            prepareMatrixPattern();
-
-            if(SOLVER_TYPE == 5)
+            if(slv_type == 5)
             {
               if(solverEigen->initialise(numProc, PARDISO_STRUCT_SYM, totalDOF) != 0)
                 return;
             }
-            if(SOLVER_TYPE == 6)
+            if(slv_type == 6)
             {
               if(solverEigen->initialise(numProc, PARDISO_UNSYM, totalDOF) != 0)
                 return;
             }
 
-            solverEigen->printInfo();
-
           break;
 
-          default: // invalid SOLVER_TYPE ...................
+          default: // invalid slv_type ...................
 
             cout << " this solver has not been implemented yet!\n\n";
 
@@ -482,3 +445,7 @@ void  HBSplineFEM::writeReadResult(int index, MyString &fileName)
       Ifile.close();
    }
 }
+
+
+
+

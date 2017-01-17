@@ -3,21 +3,10 @@
 #define incl_SolverEigen_h
 
 
-//#include "petscksp.h"
-//#include "petscmat.h"
-
 #include "Solver.h"
-
-
 #include "headersEigen.h"
-
 #include <vector>
-
 #include "myIncompleteLUT.h"
-
-using std::vector;
-
-//using namespace Eigen;
 
 using namespace myIterSolvers;
 
@@ -35,7 +24,7 @@ class SolverEigen
 
     int nRow, nCol, nnz, currentStatus, algoType, nU, nP, nL, nS, update_precond;
 
-    bool comprMtxFlg, checkIO, STABILISED;
+    bool checkIO, STABILISED;
 
     double normPrev, normCur, normRef; // norm of solution error
 

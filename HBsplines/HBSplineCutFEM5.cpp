@@ -1,12 +1,9 @@
 
 #include "HBSplineCutFEM.h"
-
-#include "DataBlockTemplate.h"
 #include "SolverEigen.h"
 #include "ComputerTime.h"
 #include "MpapTime.h"
-#include "NurbsUtilities.h"
-
+//#include "NurbsUtilities.h"
 #include "BasisFunctionsLagrange.h"
 #include "myDataIntegrateCutFEM.h"
 #include "ImmersedIntegrationElement.h"
@@ -81,7 +78,7 @@ void  HBSplineCutFEM::applyInterfaceTerms2D()
         isNitsche   = ImmersedBodyObjects[bb]->GetNitscheFlag();
         NitscheFact = ImmersedBodyObjects[bb]->GetNitscheFact();
 
-        nlb = ImmersedBodyObjects[bb]->ImmIntgElems[0]->pointNumsGlobal.size();
+        nlb = ImmersedBodyObjects[bb]->ImmIntgElems[0]->pointNums.size();
 
         nGauss = (int) cutFEMparams[1];
 
@@ -463,7 +460,7 @@ void  HBSplineCutFEM::applyInterfaceTerms3D()
         isNitsche   = ImmersedBodyObjects[bb]->GetNitscheFlag();
         NitscheFact = ImmersedBodyObjects[bb]->GetNitscheFact();
 
-        nlb = ImmersedBodyObjects[bb]->ImmIntgElems[0]->pointNumsGlobal.size();
+        nlb = ImmersedBodyObjects[bb]->ImmIntgElems[0]->pointNums.size();
 
         nGauss = (int) cutFEMparams[1];
 

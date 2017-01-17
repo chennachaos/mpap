@@ -1,30 +1,22 @@
 
 #include "HBSplineCutFEM.h"
-
-//#include "headersBasic.h"
-
 #include "MathBasic.h"
 #include "DataBlockTemplate.h"
 #include "ComputerTime.h"
 #include "MpapTime.h"
 #include "TimeFunction.h"
-#include "PlotVTK.h"
 #include "PropertyTypeEnum.h"
-
 #include "ImmersedFlexibleSolid.h"
 #include "ImmersedRigidSolid.h"
 #include "ImmersedSolid.h"
 #include "ContactElementPointToPoint2D.h"
-#include "NurbsUtilities.h"
-
-
 #include <omp.h>
+
 
 extern DomainTree         domain;
 extern List<TimeFunction> timeFunction;
 extern MpapTime           mpapTime;
 extern ComputerTime       computerTime;
-extern PlotVTK  plotvtk;
 
 
 using namespace std;

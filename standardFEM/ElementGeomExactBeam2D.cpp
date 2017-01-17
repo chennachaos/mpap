@@ -17,7 +17,6 @@ extern MpapTime mpapTime;
 ElementGeomExactBeam2D::ElementGeomExactBeam2D()
 {
   ndof   = 3;
-  //cout << " ElementGeomExactBeam2D .... ndof = " << ndof << endl;
   ndim   = 2;
   npElem = 2;
   nlbf   = npElem;

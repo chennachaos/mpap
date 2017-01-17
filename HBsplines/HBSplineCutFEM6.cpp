@@ -1,20 +1,9 @@
 
 #include "HBSplineCutFEM.h"
-
-#include "DataBlockTemplate.h"
-#include "SolverEigen.h"
 #include "ComputerTime.h"
 #include "MpapTime.h"
-#include "NurbsUtilities.h"
-
-#include "BasisFunctionsLagrange.h"
-#include "myDataIntegrateCutFEM.h"
 #include "ImmersedIntegrationElement.h"
 #include "QuadratureUtil.h"
-#include "typedefs.h"
-
-
-#include <omp.h>
 
 
 extern MpapTime           mpapTime;
@@ -1414,7 +1403,7 @@ void  HBSplineCutFEM::computeTotalForce2D(int bb)
 
           PENALTY = ImmersedBodyObjects[bb]->GetPenaltyParameter();
 
-          nlb = ImmersedBodyObjects[bb]->ImmIntgElems[0]->pointNumsGlobal.size();
+          nlb = ImmersedBodyObjects[bb]->ImmIntgElems[0]->pointNums.size();
 
           nGauss = (int) cutFEMparams[1];
 
@@ -1516,8 +1505,8 @@ void  HBSplineCutFEM::computeTotalForce2D(int bb)
               //trac[0] -= rhoSolid*FluidAcce[0];
               //trac[1] -= rhoSolid*FluidAcce[1];
 
-              //cout << aa << '\t' << ImmersedBodyObjects[bb]->ImmIntgElems[aa]->pointNumsGlobal[0] ;
-              //cout << '\t' << ImmersedBodyObjects[bb]->ImmIntgElems[aa]->pointNumsGlobal[1] << endl;
+              //cout << aa << '\t' << ImmersedBodyObjects[bb]->ImmIntgElems[aa]->pointNums0] ;
+              //cout << '\t' << ImmersedBodyObjects[bb]->ImmIntgElems[aa]->pointNums[1] << endl;
 
               trac *= dvol;
 
@@ -1537,7 +1526,7 @@ void  HBSplineCutFEM::computeTotalForce2D(int bb)
               {
                 for(ii=0;ii<nlb;ii++)
                 {
-                  jj = ImmersedBodyObjects[bb]->ImmIntgElems[aa]->pointNumsGlobal[ii];
+                  jj = ImmersedBodyObjects[bb]->ImmIntgElems[aa]->pointNums[ii];
 
                   totalForce[2*jj]   += (Nb[ii]*trac[0]);
                   totalForce[2*jj+1] += (Nb[ii]*trac[1]);
@@ -1598,7 +1587,7 @@ void  HBSplineCutFEM::computeTotalForce3D(int bb)
 
           PENALTY = ImmersedBodyObjects[bb]->GetPenaltyParameter();
 
-          nlb = ImmersedBodyObjects[bb]->ImmIntgElems[0]->pointNumsGlobal.size();
+          nlb = ImmersedBodyObjects[bb]->ImmIntgElems[0]->pointNums.size();
 
           Nb.resize(nlb);
 
