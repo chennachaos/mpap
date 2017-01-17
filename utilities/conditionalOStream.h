@@ -7,9 +7,10 @@
 #ifndef conditional_ostream_h
 #define conditional_ostream_h
 
-//#include <deal.II/base/config.h>
-
 #include <ostream>
+
+//#include "petscksp.h"
+//#include "petscmat.h"
 
 
 /**
