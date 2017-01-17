@@ -96,8 +96,8 @@ int SolverMA41Eigen::initialise(int numProc, int matrixType, int nr)
   col.resize(NE);
   array.resize(NE);
   
-  cout << nRow << '\t' << NE << endl;
-  
+  //cout << nRow << '\t' << NE << endl;
+
   count = 0;
   for(k=0; k<mtx.outerSize(); ++k)
   {

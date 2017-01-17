@@ -1,17 +1,10 @@
 
 
 #include "HBSplineFEM.h"
-
-#include "DataBlockTemplate.h"
-#include "SolverEigen.h"
 #include "ComputerTime.h"
 #include "MpapTime.h"
-
-#include "BasisFunctionsLagrange.h"
 #include "myDataIntegrateCutFEM.h"
 #include "ContactElementPointToPoint2D.h"
-#include "ImmersedIntegrationElement.h"
-#include "myConstants.h"
 #include "QuadratureUtil.h"
 
 #include <omp.h>
@@ -308,7 +301,7 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
     time_t tstart, tend;
     
     IterNum   = (iterCount == 1);
-    
+
     //cout << " IterNum " << IterNum << endl;
 
     if(firstIter)
@@ -332,32 +325,32 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
     //#pragma omp parallel for
     for(ii=0;ii<activeElements.size();ii++)
     {
-       //cout << ii << '\t' << omp_get_thread_num() << '\t' << omp_get_num_threads() << '\t' << omp_get_max_threads() << endl;
-       node *nd = elems[activeElements[ii]];
-       //cout << " nd->GetID() " <<  nd->GetID() << '\t' <<  nd->GetLevel() << endl;
+      //cout << ii << '\t' << omp_get_thread_num() << '\t' << omp_get_num_threads() << '\t' << omp_get_max_threads() << endl;
+      node *nd = elems[activeElements[ii]];
+      //cout << " nd->GetID() " <<  nd->GetID() << '\t' <<  nd->GetLevel() << endl;
 
-       //printVector(nd->forAssyVec);
-       //printVector(nd->forAssyVec2);
-       
-       int nr = nd->forAssyVec.size();
+      //printVector(nd->forAssyVec);
+      //printVector(nd->forAssyVec2);
 
-       //cout << nr << '\t' << nc << endl;
-       MatrixXd  Klocal;
-       VectorXd  Flocal;
+      int nr = nd->forAssyVec.size();
 
-       Klocal = MatrixXd::Zero(nr, nr);
-       Flocal = VectorXd::Zero(nr);
+      //cout << nr << '\t' << nc << endl;
+      MatrixXd  Klocal;
+      VectorXd  Flocal;
 
-       //cout << " AAAAAAAAAAAAAAAAA " << endl;
-       nd->calcStiffnessAndResidualGFEM(Klocal, Flocal);
-       //cout << " AAAAAAAAAAAAAAAAA " << endl;
-       //printMatrix(Klocal);
-       //printf("\n\n");
-       //printVector(Flocal);
-       nd->applyDirichletBCsGFEM(Klocal, Flocal);
-       //cout << " BBBBBBBBBBBBBBBBB " << endl;
-       nd->applyNeumannBCsGFEM(Klocal, Flocal);
-       //cout << " BBBBBBBBBBBBBBBBB " << endl;
+      Klocal = MatrixXd::Zero(nr, nr);
+      Flocal = VectorXd::Zero(nr);
+
+      //cout << " AAAAAAAAAAAAAAAAA " << endl;
+      nd->calcStiffnessAndResidualGFEM(Klocal, Flocal);
+      //cout << " AAAAAAAAAAAAAAAAA " << endl;
+      //printMatrix(Klocal);
+      //printf("\n\n");
+      //printVector(Flocal);
+      nd->applyDirichletBCsGFEM(Klocal, Flocal);
+      //cout << " BBBBBBBBBBBBBBBBB " << endl;
+      nd->applyNeumannBCsGFEM(Klocal, Flocal);
+      //cout << " BBBBBBBBBBBBBBBBB " << endl;
        //printMatrix(Klocal);
        //printf("\n\n");
        //printVector(Flocal);
@@ -377,10 +370,10 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
        //if(IterNum)
        //cout << " AAAAAAAAAAAAAAAAA " << endl;
       //#pragma omp critical
-        solverEigen->AssembleMatrixAndVector(velDOF, 0, nd->forAssyVec, Klocal, Flocal);
-       //else
-         //solverEigen->AssembleVector(velDOF, 0, nd->forAssyVec, Flocal);
-       //cout << " AAAAAAAAAAAAAAAAA " << endl;
+        solverEigen->AssembleMatrixAndVector(0, 0, nd->forAssyVec, Klocal, Flocal);
+      //else
+        //solverEigen->AssembleVector(velDOF, 0, nd->forAssyVec, Flocal);
+      //cout << " AAAAAAAAAAAAAAAAA " << endl;
     }
 
     //
@@ -565,14 +558,14 @@ int HBSplineFEM::factoriseSolveAndUpdate()
 
    int ii, kk, ee;
 
-   //cout << " rhsVec " << endl;        printVector(&(solverEigen->rhsVec(0)), totalDOF);
-   //cout << " rhsVec " << endl;
-   //for(int ii=fluidDOF-10;ii<totalDOF;ii++)
-     //printf("%5d \t %12.8f \n", ii, rhsVec(ii));
+  //cout << " rhsVec " << endl;        printVector(&(solverEigen->rhsVec(0)), totalDOF);
+  //cout << " rhsVec " << endl;
+  //for(int ii=fluidDOF-10;ii<totalDOF;ii++)
+    //printf("%5d \t %12.8f \n", ii, solverEigen->rhsVec(ii));
 
-   tstart = time(0);
+  tstart = time(0);
 
-   solverEigen->factoriseAndSolve();
+  solverEigen->factoriseAndSolve();
 
    /*
    if(IterNum)
@@ -587,7 +580,10 @@ int HBSplineFEM::factoriseSolveAndUpdate()
    tend = time(0);
    //printf("HBSplineFEM::factoriseSolveAndUpdate() took %8.4f second(s) \n ", difftime(tend, tstart) );
 
-   //cout << " result " << endl;        printVector(&(solver->soln(0)), totalDOF);
+  //cout << " result " << endl;
+  //for(int ii=fluidDOF;ii<totalDOF;ii++)
+    //printf("%5d \t %12.8f \n", ii, solverEigen->soln(ii));
+
    
    double  *sln = &(solverEigen->soln[0]);
 

@@ -306,7 +306,7 @@ void ImmersedFlexibleSolid::computeInitialAcceleration()
 {
   // compute initial accelerations
 
-  cout << " ImmersedFlexibleSolid::computeInitialAcceleration() " << endl;
+  //cout << " ImmersedFlexibleSolid::computeInitialAcceleration() " << endl;
 
   return;
 }
@@ -315,7 +315,7 @@ void ImmersedFlexibleSolid::computeInitialAcceleration()
 
 void ImmersedFlexibleSolid::writeOutput()
 {
-  if(!LAGRANGE_OR_PENALTY)
+  if(BC_ENFORCE_TYPE == BC_ENFORCE_TYPE_PENALTY)
   {
     cout << " can't print the output data when PENALTY method is used for Immersed Bodies " << endl;
     return;
@@ -584,7 +584,7 @@ void ImmersedFlexibleSolid::updateForce()
       }
     }
 
-   //printf("\n\n");    printVector(tempVec);
+   //printf("\n\n");    printVector(SolnData.forceTemp);
 
    SolnData.interpolateForce();
 

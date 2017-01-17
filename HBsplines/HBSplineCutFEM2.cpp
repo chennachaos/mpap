@@ -2,43 +2,26 @@
 #include "HBSplineCutFEM.h"
 #include "ComputerTime.h"
 #include "MpapTime.h"
-#include "PlotVTK.h"
-#include "Functions.h"
 #include "Files.h"
 #include "MyString.h"
-
 #include "headersVTK.h"
 #include "myGeomUtilities.h"
-#include "NurbsUtilities.h"
 #include "myTria.h"
 #include "myTet.h"
-#include "DistFunctions.h"
-#include "AABB.h"
+
 
 //#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 //#include <CGAL/Triangulation_3.h>
 //#include <CGAL/Delaunay_triangulation_3.h>
 //#include <CGAL/Triangulation_vertex_base_with_info_3.h>
 
-#include <iostream>
-#include <fstream>
-#include <cassert>
-#include <list>
-#include <vector>
-
 #include <omp.h>
 
-extern PlotVTK  plotvtk;
 extern ComputerTime       computerTime;
 extern MpapTime mpapTime;
-//extern List<TimeFunction> timeFunction;
-
 extern Files files;
 
 using namespace myGeom;
-
-//using namespace  CGAL;
-
 
 
 void  HBSplineCutFEM::prepareCutElements()

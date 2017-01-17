@@ -1,18 +1,8 @@
 
 
 #include "HBSplineFEM.h"
-
-#include "SolverPARDISO.h"
-#include "SolverPardisoEigen.h"
-#include "SolverMA41Eigen.h"
 #include "SolverEigen.h"
-#include "ComputerTime.h"
-#include "MpapTime.h"
 #include "ImmersedIntegrationElement.h"
-
-
-extern ComputerTime       computerTime;
-extern MpapTime           mpapTime;
 
 
 
@@ -134,7 +124,7 @@ int  HBSplineFEM::prepareMatrixPattern()
 
     tend = time(0);
 
-    cout << "It took "<< difftime(tend, tstart) <<" second(s)."<< endl;
+    //cout << "It took "<< difftime(tend, tstart) <<" second(s)."<< endl;
 
     ///////////////////////////////////////////////////////
     //
@@ -238,11 +228,11 @@ int  HBSplineFEM::prepareMatrixPattern()
 
     GRID_CHANGED = IB_MOVED = false;
 
-    printf("\n     HBSplineFEM::prepareMatrixPattern()  .... FINISHED ...\n\n");
+    //printf("\n     HBSplineFEM::prepareMatrixPattern()  .... FINISHED ...\n\n");
 
     return 1;
 }
-//
+
 
 
 
@@ -322,6 +312,8 @@ void HBSplineFEM::prepareMatrixPatternFluid()
     
     return;
 }
+
+
 
 void  HBSplineFEM::prepareMatrixPatternPostProcess()
 {

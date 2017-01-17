@@ -24,17 +24,12 @@
 
 
 using namespace std;
-//using namespace Eigen;
 
 
 class ContactElementPointToPoint2D;
 class SolutionData;
 class GeomDataHBSplines;
-//class SolverEigen;
-//class SolverPetsc;
-//class ImmersedSolid;
-//class ImmersedRigidSolid;
-//class ImmersedFlexibleSolid;
+
 
 
 #define HBS_ELEMENT_TYPE_NAMES {"HBSplineElem1DAdvectionDiffusion",  \

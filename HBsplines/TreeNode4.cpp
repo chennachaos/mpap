@@ -674,7 +674,7 @@ void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
 
 
 
-/*
+//
 template<>
 void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
 {
@@ -713,8 +713,6 @@ void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
           param[0]   = 0.5*(knots[0][2] * GeomData->gausspoints1[gp1] + knots[0][3]);
           dvol = GeomData->gaussweights1[gp1] * Jac;
 
-          //GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy, d2NN_dx2, d2NN_dy2);
-          
           GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy);
 
           if(parent == NULL)
@@ -861,7 +859,7 @@ void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
     
     return;
 }
-*/
+//
 
 
 
@@ -1333,7 +1331,7 @@ double TreeNode<2>::getJacBoundary(int side)
 }
 
 
-/*
+//
 template<>
 void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
 {
@@ -1348,8 +1346,6 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
     myPoint  param, geom, normal, trac;
     VectorXd  N(totnlbf), dN_dx(totnlbf), dN_dy(totnlbf);
     VectorXd  NN(totnlbf), dNN_dx(totnlbf), dNN_dy(totnlbf);
-    VectorXd  d3N_dx3(totnlbf), d3N_dy3(totnlbf), d3N_dxdy2(totnlbf), d3N_dx2dy(totnlbf);
-    VectorXd  dDN_dx(totnlbf), dDN_dy(totnlbf);
     vector<double>  boundaryGPs1, boundaryGWs1, boundaryGPs2, boundaryGWs2;
 
 
@@ -1427,12 +1423,6 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
 
             GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy );
 
-            //GeomData->computeBasisFunctions2D(knots[0][0], knots[1][0], knots[0][2], knots[1][2], uu, vv,
-              //                &d3N_dx3(0), &d3N_dy3(0), &d3N_dxdy2(0), &d3N_dx2dy(0));
-
-            //dDN_dx = d3N_dx3 + d3N_dxdy2;
-            //dDN_dy = d3N_dy3 + d3N_dx2dy;
-            
             if(parent == NULL)
             {
               N = NN;
@@ -1481,6 +1471,7 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
               {
                 //specVal = DirichletData[aa][2]*(6.0/y1/y1)*(y1-geom[1])*(geom[1]-y0);
                 specVal = DirichletData[aa][2]*(y1-geom[1])*(geom[1]-y0);
+                //cout << " specVal =  " << specVal << endl;
                 
                 //if(geom[1] <= 0.5)
                   //specVal = DirichletData[aa][2]*(1.0-geom[1]*geom[1]/y1/y1);
@@ -1489,7 +1480,7 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
               }
             }
             //
-            //
+            /*
             if(side == 3)
             {
               if(dir == 0)
@@ -1501,9 +1492,9 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
                   specVal = -tanh(20.0*(uu-1.0));
               }
             }
-            //
+            */
 
-            //
+            /*
             if(side == 0 || side == 11)
             {
               if(dir == 0)
@@ -1519,8 +1510,8 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
                   //specVal = 3600.0*(1.0-yy*yy/R/R);
               }
             }
-            //
-            //
+            */
+            /*
             R = 0.5;
             if(side == 2)
             {
@@ -1534,7 +1525,7 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
               }
             }
             //
-            //}
+            */
 
             //specVal = analy.computeValue(dir, xx, yy);
             //cout << side << '\t' << dir << '\t' << specVal << endl;
@@ -1664,7 +1655,7 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
 
   return;
 }
-*/
+//
 
 
 

@@ -1,15 +1,11 @@
 
 
 #include "HBSplineCutFEM.h"
-
-#include "SolverPARDISO.h"
 #include "SolverPardisoEigen.h"
 #include "SolverMA41Eigen.h"
 #include "SolverEigen.h"
 #include "ComputerTime.h"
 #include "MpapTime.h"
-
-
 #include "conditionalOStream.h"
 #include "mpi.h"
 #include "my_types.h"
@@ -112,13 +108,14 @@ void HBSplineCutFEM::updateIterStep()
   {
       solverEigen->free();
 
+      prepareMatrixPattern();
+
       switch(slv_type)
       {
           case  1: // MA41 ..........................
+          case  4: // SolverEigen ..........................
 
             //printInfo();
-
-            prepareMatrixPattern();
 
             if(solverEigen->initialise(0,0,totalDOF) != 0)
               return;
@@ -127,24 +124,8 @@ void HBSplineCutFEM::updateIterStep()
 
           break;
 
-          case  4: // SolverEigen ..........................
-
-            prepareMatrixPattern();
-
-            if(solverEigen->initialise(0, 0, totalDOF) != 0)
-              return;
-
-            //solverEigen->printInfo();
-
-          break;
-
           case  5: // PARDISO(sym) with Eigen
           case  6: // PARDISO(unsym) with Eigen
-
-            numProc = min(MAX_PROCESSORS,numProc);
-            //cout << " numProc " <<  numProc << '\t' << FluidSolnData.ElemProp.data << endl;
-
-            prepareMatrixPattern();
 
             if(slv_type == 5)
             {
@@ -160,12 +141,6 @@ void HBSplineCutFEM::updateIterStep()
           break;
 
         case  8: // SolverPetsc ..........................
-
-            //SOLVER_TYPE = SOLVER_TYPE_PETSC;
-
-            solverPetsc = (SolverPetsc*) new SolverPetsc;
-
-            prepareMatrixPattern();
 
             if(solverPetsc->initialise(0, 0, totalDOF) != 0)
               return;

@@ -1,21 +1,11 @@
 
 
 #include "HBSplineCutFEM.h"
-
-#include "DataBlockTemplate.h"
 #include "SolverEigen.h"
 #include "ComputerTime.h"
 #include "MpapTime.h"
-#include "NurbsUtilities.h"
-
-#include "BasisFunctionsLagrange.h"
 #include "myDataIntegrateCutFEM.h"
 #include "ImmersedIntegrationElement.h"
-#include "QuadratureUtil.h"
-#include "typedefs.h"
-
-#include <cmath>
-#include <omp.h>
 
 
 extern ComputerTime       computerTime;
@@ -44,16 +34,6 @@ void HBSplineCutFEM::setInitialConditions()
     solverEigen->currentStatus = ASSEMBLY_OK;
 
     factoriseSolveAndUpdate();
-
-    //rhsVec = rhsVec * (1.0/rhsVec.maxCoeff());
-    //
-
-    //
-    int resln1[3]; resln1[0] = resln1[1] = 5;
-
-    //postProcess2D(1, 1, 10, 1, 0.0, 1.0, resln1);
-    //postProcess1D(1, 1, 10, 1, 0.0, 1.0, resln1);
-    //
 
     solnInit = soln;
     SolnData.var1 = solnInit;
@@ -213,7 +193,7 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
 
       //printVector(&(SolnData.var1(0)), 100);
 
-      /*
+      //
       for(ii=0;ii<activeElements.size();ii++)
       {
         node *nd = elems[activeElements[ii]];
@@ -243,13 +223,13 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
           //cout << " DDDDDDDDDDDDDDDDD " << endl;
           nd->applyNeumannBCsCutFEMFluid(Klocal, Flocal, domTemp);
           //cout << " BBBBBBBBBBBBBBBBB " << endl;
-          solverPetsc->AssembleMatrixAndVectorCutFEM(start, start, nd->forAssyVec, forAssyCutFEM, Klocal, Flocal);
+          solverEigen->AssembleMatrixAndVectorCutFEM(start, start, nd->forAssyVec, forAssyCutFEM, Klocal, Flocal);
           //cout << " CCCCCCCCCCCCCCCC " << endl;
         }
       }
-      */
-
       //
+
+      /*
       for(ii=0;ii<activeElements.size();ii++)
       {
         node *nd = elems[activeElements[ii]];
@@ -286,7 +266,7 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
           }
         }
       }
-      //
+      */
 
     //cout << " AAAAAAAAAAAAAAAAA " << endl;
     //printVector(pointBCs[0]);

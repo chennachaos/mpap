@@ -1,6 +1,5 @@
 
 #include "HBSplineBase.h"
-#include "SolverPARDISO.h"
 #include "SolverPardisoEigen.h"
 #include "SolverMA41Eigen.h"
 #include "SolverEigen.h"
@@ -231,6 +230,8 @@ void HBSplineBase::computeConditionNumber()
 void HBSplineBase::setSolver(int slv, int *parm, bool cIO)
 {
     slv_type = slv;
+    
+    cout << " slv_type = " << slv << '\t' << slv_type << endl;
 
     //Eigen::initParallel();
     Eigen::setNbThreads(0);
@@ -245,8 +246,6 @@ void HBSplineBase::setSolver(int slv, int *parm, bool cIO)
       delete solverPetsc;
     solverPetsc = NULL;
 
-    //cout << " SOLVER_TYPE = " << slv << endl;
-
     switch(slv)
     {
         case  1: // MA41 ..........................
@@ -255,14 +254,11 @@ void HBSplineBase::setSolver(int slv, int *parm, bool cIO)
 
             solverEigen = (SolverEigen*) new SolverMA41Eigen;
 
-            //solverEigen->STABILISED = (FluidSolnData.FluidProps[6] == 1);
             solverEigen->STABILISED = true;
 
             //printInfo();
 
             prepareMatrixPattern();
-
-            //cout << " matrix pattern prepared " << endl;
 
             if(solverEigen->initialise(0,0,totalDOF) != 0)
               return;
@@ -302,7 +298,10 @@ void HBSplineBase::setSolver(int slv, int *parm, bool cIO)
 
             solverEigen = (SolverEigen*) new SolverPardisoEigen;
 
-            if (parm != NULL) numProc = parm[0]; else numProc = 1;
+            if(parm != NULL)
+              numProc = parm[0];
+            else
+              numProc = 1;
 
             numProc = min(MAX_PROCESSORS,numProc);
 
@@ -310,8 +309,6 @@ void HBSplineBase::setSolver(int slv, int *parm, bool cIO)
 
             solverEigen->STABILISED = true;
 
-            //printInfo();
-            //cout << " numProc " <<  numProc << endl;
             prepareMatrixPattern();
 
             if(slv == 5)
@@ -341,9 +338,8 @@ void HBSplineBase::setSolver(int slv, int *parm, bool cIO)
               return;
 
             solverPetsc->SetSolverAndParameters();
-            //cout << " kkkkkkkkkk " << endl;
-            solverPetsc->printInfo();
-            //cout << " aaaaaaaaa " << endl;
+
+            //solverPetsc->printInfo();
 
         break;
 
@@ -355,8 +351,6 @@ void HBSplineBase::setSolver(int slv, int *parm, bool cIO)
     }
 
     solverOK = true;
-
-    //cout << " cIO " << cIO << endl;
 
     if(solverEigen != NULL)
       solverEigen->checkIO = cIO;

@@ -2,15 +2,7 @@
 #define incl_ImmersedIntegrationElement_h
 
 
-//#include "headersBasic.h"
-
 #include "util.h"
-
-//#include "SolutionDataFluid.h"
-//#include "SolutionDataSolid.h"
-//#include "GeomDataLagrange.h"
-//#include "GeomDataHBSplines.h"
-//#include "SolutionData.h"
 
 #include "TreeNode.h"
 
@@ -36,7 +28,7 @@ class ImmersedIntegrationElement
 
     public:
 
-        vector<int>  pointNumsLocal, pointNumsGlobal, posIndices, elemNums;
+        vector<int>  pointNums, posIndices, elemNums;
         vector<double>  gausspoints, gaussweights;
 
         //double  positionOrig[ndim], positionCur[ndim], positionOld[ndim], param[ndim];

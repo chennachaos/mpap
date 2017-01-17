@@ -331,7 +331,7 @@ void SolutionData::updateIterStep()
   if( PHYSICS_TYPE == PHYSICS_TYPE_SOLID )
   {
     // displacement as the primary variable
-    cout << "  SOLID SOLID SOLID " << endl;
+    //cout << "  SOLID SOLID SOLID " << endl;
 
     var1Dot     = td[10]*var1 + td[11]*var1Prev + td[12]*var1DotPrev + td[13]*var1DotDotPrev + td[14]*dDotPrev;
     var1DotDot  = td[15]*var1 + td[16]*var1Prev + td[17]*var1DotPrev + td[18]*var1DotDotPrev + td[19]*dDotPrev;

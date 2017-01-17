@@ -44,17 +44,12 @@ void ImmersedFlexibleSolid::setSolver(int slv, int *parm, bool cIO)
 
             solver = (SolverEigen*) new SolverMA41Eigen;
 
-            cout << " kkkkkkkkkkkkkkk " << endl;
             prepareMatrixPattern();
 
-            solver->printInfo();
-
-            cout << " kkkkkkkkkkkkkkk " << endl;
+            //solver->printInfo();
 
             if(solver->initialise(0,0,totalDOF) != 0)
               return;
-
-            cout << " kkkkkkkkkkkkkkk " << endl;
 
         break;
 
@@ -82,14 +77,12 @@ void ImmersedFlexibleSolid::setSolver(int slv, int *parm, bool cIO)
 
     solverOK = true;
     
-    cout << " cIO " << cIO << endl;
-
     if(solver != NULL)
       solver->checkIO = cIO;
 
     //if(tis > 0)
       //setInitialConditions();
-      
+
     for(int ii=0;ii<nElem;ii++)
     {
       elems[ii]->prepareElemData();
@@ -360,16 +353,12 @@ void ImmersedFlexibleSolid::SolveTimeStep()
   printf("\n Solving Immersed Flexible Solid \n");
   //printf("\n External force norm = %12.6E \n", forceCur.norm());
 
-  double  val, res;
-
   int  ii, ee;
 
   //printVector(SolnData.forceCur);
 
-  for(ii=0;ii<20;ii++)
+  for(ii=0;ii<10;ii++)
   {
-    cout << " ii = " << ii << endl;
-
     calcStiffnessAndResidual(1, 1, 1);
 
     printf("\t %5d \t %12.6E\n", ii, rNorm);
@@ -526,11 +515,9 @@ int ImmersedFlexibleSolid::factoriseSolveAndUpdate()
   SolnData.var1 += soln;
   //SolnData.var1Dot += soln;
 
-  //GeomData.updateNodePositions(&SolnData.var1(0));
-  //printVector(SolnData.var1);
   //printf("\n\n\n");
 
-  //cout << " result " << endl;        printVector(&(solver->soln[0]), totalDOF);
+  //cout << " result " << endl;        printVector(&(SolnData.var1[0]), totalDOF);
 
   //ctimFactSolvUpdt += computerTime.stop(fct);
 
@@ -560,7 +547,7 @@ void ImmersedFlexibleSolid::calcCouplingMatrices()
 
     for(aa=0;aa<ImmIntgElems.size();aa++)
     {
-      nlbL = ImmIntgElems[aa]->pointNumsLocal.size();
+      nlbL = ImmIntgElems[aa]->pointNums.size();
       nlbS = elems[aa]->nodeNums.size();
 
       //cout << " aa = " << aa << endl;
@@ -580,7 +567,7 @@ void ImmersedFlexibleSolid::calcCouplingMatrices()
 
         for(jj=0; jj<nlbL; jj++)
         {
-          TJ   = ImmIntgElems[aa]->pointNumsLocal[jj] * DIM;
+          TJ   = ImmIntgElems[aa]->pointNums[jj] * DIM;
           TJp1 = TJ+1;
           
           ind2 = jj*DIM;

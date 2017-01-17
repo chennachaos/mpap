@@ -2917,22 +2917,22 @@ void TreeNode<2>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
               }
             }
              */
-              /*
+              //
               if(side == 0 )
               {
                 if(dir == 0)
                 {
-                  //specVal = DirichletData[aa][2]*(6.0/y1/y1)*(y1-geom[1])*(geom[1]-y0); // Turek beam
+                  specVal = DirichletData[aa][2]*(6.0/y1/y1)*(y1-geom[1])*(geom[1]-y0); // Turek beam
                   //specVal = DirichletData[aa][2]*(y1*y1-geom[1]*geom[1])/0.5625;
                   //specVal = DirichletData[aa][2]*0.06*(y1-geom[1])*(geom[1]-y0);
                   //if(geom[1] >= y0 && geom[1] <= y1)
                     //specVal = DirichletData[aa][2]*(y1-geom[1])*(geom[1]-y0);
                   //else
                     //specVal = 0.0;
-                    specVal = DirichletData[aa][2]*(1.0-geom[1]*geom[1]);
+                    //specVal = DirichletData[aa][2]*(1.0-geom[1]*geom[1]);
                 }
               }
-              */
+              //
 
               /*
               if(side == 3)

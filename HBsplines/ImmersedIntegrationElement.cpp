@@ -42,9 +42,7 @@ void ImmersedIntegrationElement::initialiseDOFvalues()
 {
   int  ii, jj, ind1;
   
-  pointNumsLocal = pointNumsGlobal;
-
-  ind1 = pointNumsGlobal.size();
+  ind1 = pointNums.size();
   elemNums.resize(ind1);
   
   //cout << " ind1 " << ind1 << '\t' << DIM << endl;
@@ -54,7 +52,7 @@ void ImmersedIntegrationElement::initialiseDOFvalues()
   for(ii=0;ii<ind1;ii++)
   {
     for(jj=0;jj<DIM;jj++)
-      posIndices.push_back(pointNumsGlobal[ii]*DIM+jj);
+      posIndices.push_back(pointNums[ii]*DIM+jj);
   }
   
   //printVector(posIndices);
@@ -111,7 +109,7 @@ void ImmersedIntegrationElement::AssembleMatrixAndVector(int start, SparseMatrix
 void ImmersedIntegrationElement::computePointAtGP(int ind, myPoint& pt)
 {
   int  ii, jj, nlb;
-  nlb = pointNumsGlobal.size();
+  nlb = pointNums.size();
   vector<double>  N(nlb);
 
   Lagrange_BasisFuns1D(nlb-1, gausspoints[ind], &N[0]);
@@ -121,7 +119,7 @@ void ImmersedIntegrationElement::computePointAtGP(int ind, myPoint& pt)
   {
     //cout << ii << '\t' << pointNumsLocal[ii] << endl;
     for(jj=0;jj<DIM;jj++)
-      pt[jj] += (GeomDataLag->NodePosCur[pointNumsGlobal[ii]][jj] * N[ii] );
+      pt[jj] += (GeomDataLag->NodePosCur[pointNums[ii]][jj] * N[ii] );
   }
 
   return;
@@ -130,14 +128,14 @@ void ImmersedIntegrationElement::computePointAtGP(int ind, myPoint& pt)
 
 void ImmersedIntegrationElement::computeVelocity(const VectorXd& NN, myPoint&  velSpec)
 {
-  assert(NN.rows() == pointNumsGlobal.size());
+  assert(NN.rows() == pointNums.size());
 
   int  ii, jj;
   velSpec.setZero();
-  for(ii=0;ii<pointNumsGlobal.size();ii++)
+  for(ii=0;ii<pointNums.size();ii++)
   {
     for(jj=0; jj<DIM; jj++)
-      velSpec[jj] += (GeomDataLag->specValNew[pointNumsGlobal[ii]][jj] * NN[ii] );
+      velSpec[jj] += (GeomDataLag->specValNew[pointNums[ii]][jj] * NN[ii] );
   }
 
   return;
@@ -148,17 +146,16 @@ void ImmersedIntegrationElement::computeVelocity(const VectorXd& NN, myPoint&  v
 
 void ImmersedIntegrationElement::computeVelocityCur(const VectorXd& NN, myPoint&  velSpec)
 {
-  assert(NN.rows() == pointNumsGlobal.size());
+  assert(NN.rows() == pointNums.size());
 
-  //cout << " pointNumsLocal ...  " << pointNumsLocal[0] << '\t' << pointNumsLocal[1] << endl;
-  //cout << " pointNumsGlobal ...  " << pointNumsGlobal[0] << '\t' << pointNumsGlobal[1] << endl;
+  //cout << " pointNums ...  " << pointNums[0] << '\t' << pointNums[1] << endl;
 
   int  ii, jj;
   velSpec.setZero();
-  for(ii=0;ii<pointNumsGlobal.size();ii++)
+  for(ii=0;ii<pointNums.size();ii++)
   {
     for(jj=0; jj<DIM; jj++)
-      velSpec[jj] += (GeomDataLag->specValCur[pointNumsGlobal[ii]][jj] * NN[ii] );
+      velSpec[jj] += (GeomDataLag->specValCur[pointNums[ii]][jj] * NN[ii] );
   }
 
   return;
@@ -171,7 +168,7 @@ void ImmersedIntegrationElement::IntegrateForceAndMoment(VectorXd& vectemp, myPo
 {
   // to compute total force on the immersed rigid solid
   
-  int  gp, ii, jj, kk, nlb = pointNumsGlobal.size();
+  int  gp, ii, jj, kk, nlb = pointNums.size();
   double  dvol, detJ;
   vector<double>  N(nlb), dN(nlb), dN_dx(nlb), xx(nlb), yy(nlb), zz(nlb);
   double  lamLoc[3]={0.0, 0.0, 0.0}, rad, fact;
@@ -181,8 +178,8 @@ void ImmersedIntegrationElement::IntegrateForceAndMoment(VectorXd& vectemp, myPo
 
   for(ii=0;ii<nlb;ii++)
   {
-    xx[ii] = GeomDataLag->NodePosCur[pointNumsLocal[ii]][0];
-    yy[ii] = GeomDataLag->NodePosCur[pointNumsLocal[ii]][1];
+    xx[ii] = GeomDataLag->NodePosCur[pointNums[ii]][0];
+    yy[ii] = GeomDataLag->NodePosCur[pointNums[ii]][1];
     zz[ii] = 0.0;
   }
 
@@ -191,7 +188,7 @@ void ImmersedIntegrationElement::IntegrateForceAndMoment(VectorXd& vectemp, myPo
   if(DIM == 3)
   {
     for(ii=0;ii<nlb;ii++)
-      zz[ii] = GeomDataLag->NodePosCur[pointNumsLocal[ii]][2];
+      zz[ii] = GeomDataLag->NodePosCur[pointNums[ii]][2];
 
     axsy = false;
   }
@@ -216,7 +213,7 @@ void ImmersedIntegrationElement::IntegrateForceAndMoment(VectorXd& vectemp, myPo
     for(ii=0;ii<nlb;ii++)
     {
       //cout << ii << '\t' << N[ii] << '\t' << dvol << endl;
-      kk = pointNumsGlobal[ii]*DIM;
+      kk = pointNums[ii]*DIM;
 
       for(jj=0;jj<DIM;jj++)
         lamLoc[jj] = SolnData->var3(kk+jj) ;
@@ -245,14 +242,14 @@ void ImmersedIntegrationElement::computeKhorzKvertRigid(MatrixXd& Kh, MatrixXd& 
 {
   int  gp, ii, nlb, size, kk;
   double  dvol, detJ, dvol1, dvol2, fact;
-  nlb = pointNumsLocal.size();
+  nlb = pointNums.size();
   vector<double>  N(nlb), dN(nlb), dN_dx(nlb), xx(nlb), yy(nlb);
   double  dx, dy, xc, yc;
 
   for(ii=0;ii<nlb;ii++)
   {
-    xx[ii] = GeomDataLag->NodePosCur[pointNumsLocal[ii]][0];
-    yy[ii] = GeomDataLag->NodePosCur[pointNumsLocal[ii]][1];
+    xx[ii] = GeomDataLag->NodePosCur[pointNums[ii]][0];
+    yy[ii] = GeomDataLag->NodePosCur[pointNums[ii]][1];
   }
 
   bool axsy = (GeomDataHBS->FluidProps[2] == 1);
@@ -327,7 +324,7 @@ void ImmersedIntegrationElement::IntegrateForceFlexible(int ind1, int ind2, Vect
   // to compute force vector on the immersed flexible solid
 
   int  gp, ii, kk;
-  int  nlbL = pointNumsLocal.size();
+  int  nlbL = pointNums.size();
   int  nlbS = nlbL;
 
   vector<double>  N(nlbL), dN(nlbL), dN_dx(nlbL), xNode(nlbL), yNode(nlbL);
@@ -335,10 +332,10 @@ void ImmersedIntegrationElement::IntegrateForceFlexible(int ind1, int ind2, Vect
 
   for(ii=0;ii<nlbL;ii++)
   {
-    xNode[ii] = GeomDataLag->NodePosCur[pointNumsLocal[ii]][0];
-    yNode[ii] = GeomDataLag->NodePosCur[pointNumsLocal[ii]][1];
+    xNode[ii] = GeomDataLag->NodePosCur[pointNums[ii]][0];
+    yNode[ii] = GeomDataLag->NodePosCur[pointNums[ii]][1];
   }
-  
+
   bool axsy = (GeomDataHBS->FluidProps[2] == 1);
 
   for(gp=0;gp<gausspoints.size();gp++)
@@ -364,7 +361,7 @@ void ImmersedIntegrationElement::IntegrateForceFlexible(int ind1, int ind2, Vect
     for(ii=0; ii<nlbL; ii++)
     {
       //cout << ii << '\t' << N[ii] << endl;
-      kk = pointNumsGlobal[ii]*DIM;
+      kk = pointNums[ii]*DIM;
 
       lamX  += SolnData->var3(kk)   * N[ii] ;
       lamY  += SolnData->var3(kk+1) * N[ii] ;
@@ -374,12 +371,11 @@ void ImmersedIntegrationElement::IntegrateForceFlexible(int ind1, int ind2, Vect
     {
       fact = N[ii]*dvol;
 
-      kk = pointNumsGlobal[ii]*3;
+      kk = pointNums[ii]*3;
 
       vectemp[kk]   += ( fact * lamX); // force in X-direction
       vectemp[kk+1] += ( fact * lamY); // force in Y-direction
     }
-
   }
 
   return;
@@ -394,7 +390,7 @@ void ImmersedIntegrationElement::computeKhorzKvertFlexible(int ind1, int ind2, M
 {
   int  gp, ii, jj, TI, TIp1, TIp2, TJ, TJp1;
 
-  int  nlbL = pointNumsLocal.size();
+  int  nlbL = pointNums.size();
   int  nlbS = nlbL;
 
   vector<double>  NL(nlbL), dN(nlbL), dN_dx(nlbL), xNode(nlbL), yNode(nlbL), NS(nlbS);
@@ -402,8 +398,8 @@ void ImmersedIntegrationElement::computeKhorzKvertFlexible(int ind1, int ind2, M
 
   for(ii=0;ii<nlbL;ii++)
   {
-    xNode[ii] = GeomDataLag->NodePosCur[pointNumsLocal[ii]][0];
-    yNode[ii] = GeomDataLag->NodePosCur[pointNumsLocal[ii]][1];
+    xNode[ii] = GeomDataLag->NodePosCur[pointNums[ii]][0];
+    yNode[ii] = GeomDataLag->NodePosCur[pointNums[ii]][1];
   }
 
   bool axsy = (GeomDataHBS->FluidProps[2] == 1);
