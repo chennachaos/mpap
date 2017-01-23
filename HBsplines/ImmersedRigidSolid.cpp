@@ -44,6 +44,8 @@ ImmersedRigidSolid::ImmersedRigidSolid(int dd)
   
   PRESC_MOTION = false;
   //PRESC_MOTION = true;
+  
+  PrescMotionTimeFuncs.resize(size, -1);
 }
 
 
@@ -573,8 +575,8 @@ void  ImmersedRigidSolid::updatePointPositions2D()
       }
     }
 
-      A = PI/4.0;
-      A = 0.2;
+      A = 80.0*PI/180.0;
+      //A = 0.2;
       B = 5.0;
       F = 0.1666*1.1;
       //F = 1.1;
@@ -582,8 +584,9 @@ void  ImmersedRigidSolid::updatePointPositions2D()
     t0 = 1.0/F;
     //t0 = 2.0*t0;
     t0 = 0.0;
+    wn = 1.0;
 
-  //cout << " PRESC_MOTION = " << PRESC_MOTION << endl;
+    cout << " PRESC_MOTION = " << PRESC_MOTION << endl;
 
     //if(PRESC_MOTION && (mpapTime.cur > t0)  && ( (id==0) || (id==1)) )
     if(PRESC_MOTION && (mpapTime.cur > t0)  && ( id==0) )
@@ -673,7 +676,6 @@ void  ImmersedRigidSolid::updatePointPositions2D()
       vCentNew[0] = 0.0;
       vCentNew[1] = 0.0;
       omegaNew    = A*wn*cos(wn*(tNew-t0));
-      //omegaNew    = 0.0;
 
       dCentCur[0] = 0.0;
       dCentCur[1] = 0.0;
@@ -682,8 +684,9 @@ void  ImmersedRigidSolid::updatePointPositions2D()
       vCentCur[0] = 0.0;
       vCentCur[1] = 0.0;
       omegaCur    = A*wn*cos(wn*(tCur-t0));
-      //omegaCur    = 0.0;
 
+
+      // from Fehmi's paper
       /*
       double  aa=0.2;
       double  d0=0.0;
@@ -691,7 +694,6 @@ void  ImmersedRigidSolid::updatePointPositions2D()
       double  ti=0.0;
 
       double  d1=0.5*aa*ti*ti + v0*ti + d0;
-      
 
       if( tNew < ti)
       {
@@ -1449,7 +1451,7 @@ int ImmersedRigidSolid::calcStiffnessAndResidual(int solver_type, bool zeroMtx, 
   int ii, jj, ind;
   double  y1, y2, fact, tol=1.e-12, lamn, gn, af, cn, g0, disp, beta=1.0;
   
-  double F0=9.0;
+  double F0=3.0;
   //double F0=0.0035;
 
   Kglobal.setZero();
@@ -1468,7 +1470,7 @@ int ImmersedRigidSolid::calcStiffnessAndResidual(int solver_type, bool zeroMtx, 
   //Kglobal(0,0) = SolnData.td[5]*matM(2,2) + SolnData.td[6]*matC(2,2) + SolnData.td[7]*matK(2,2);
   //rhsVec(0)    = SolnData.forceCur(0) - matM(2,2)*SolnData.var1DotDotCur[0] - matC(2,2)*SolnData.var1DotCur[0] - matK(2,2)*SolnData.var1Cur[0];
 
-  F0 = 1.2*0.196349540849362*981.0;
+  //F0 = 1.2*0.196349540849362*981.0;
 
   //F0 = 0.0072*1.7671e+03*9.81*0.001;
 
@@ -1541,7 +1543,7 @@ if(totalDOF > 1)
 
   //gn = disp-5.0;
   //gn = disp-1.55;
-  gn = disp-0.4;
+  gn = disp-20.4;
   //gn = disp-80.0*PI/180.0;
 
   double lamn2 = SolnData.var1Cur[2];

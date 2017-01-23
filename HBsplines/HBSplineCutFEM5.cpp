@@ -771,7 +771,7 @@ void  HBSplineCutFEM::applyGhostPenalty2D()
         //if( nd1->IsLeftBoundary() || nd1->IsRightBoundary() )
         if( nd1->IsBoundary() )
         {
-          gammGP[0]  = 0.0;
+          //gammGP[0]  = 0.0;
           //gammGP[0]  = cutFEMparams[6] *mu* h1*h1*h1;
           //gammGP[0]  = cutFEMparams[6] *mu*h1/rho;
           gammGP[0]  = cutFEMparams[6] *mu*h1;

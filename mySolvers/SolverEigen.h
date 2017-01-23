@@ -8,9 +8,11 @@
 #include <vector>
 #include "myIncompleteLUT.h"
 
+#include "SolverPARDISO.h"
+
 using namespace myIterSolvers;
 
-enum { PARDISO_STRUCT_SYM, PARDISO_UNSYM };
+//enum { PARDISO_STRUCT_SYM, PARDISO_UNSYM };
 
 
 class SolverEigen

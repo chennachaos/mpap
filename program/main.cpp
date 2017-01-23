@@ -78,7 +78,7 @@ int main(int argc, char **argv)
   // noGUI is made as default option in order 
   // to be able to run the code in parallel
   
-  noGUI = true;
+  //noGUI = true;
 
   // start application loop
 

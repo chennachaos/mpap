@@ -225,7 +225,7 @@ void  SolutionData::timeUpdate()
     //cout << " predType = " << predType << endl;
     
     VectorXd  tempForce(force.rows());
-    
+
     tempForce.setZero();
 
     //if( var1[0] < 1.0e-10 )
