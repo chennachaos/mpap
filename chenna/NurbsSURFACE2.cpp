@@ -1095,8 +1095,11 @@ void NurbsSURFACE::PlotValues(int  index)
 
     plotvtk.uGrid->GetPointData()->SetScalars(scalars);
 
+#if VTK_MAJOR_VERSION == 5
     mapper1->SetInputConnection(plotvtk.uGrid->GetProducerPort());
-    //mapper1->SetInputData(plotvtk.uGrid);
+#else
+    mapper1->SetInputData(plotvtk.uGrid);
+#endif
 
     actor1->SetMapper(mapper1);
 
@@ -1261,9 +1264,12 @@ void NurbsSURFACE::PlotElementsVTK(int col, bool PLOT_KNOT_LINES, int* resln)
 
     getColorValue(col, color);
 
+#if VTK_MAJOR_VERSION == 5
     mapper1->SetInputConnection(uGrid->GetProducerPort());
-    //mapper1->SetInputData(uGrid);
-    
+#else
+    mapper1->SetInputData(uGrid);
+#endif
+
     actor1->SetMapper(mapper1);
     actor1->GetProperty()->SetColor(color[0], color[1], color[2]);
     actor1->GetProperty()->SetEdgeColor(0.0, 0.0, 0.0);
@@ -1316,8 +1322,11 @@ void NurbsSURFACE::PlotElementsVTK(int col, bool PLOT_KNOT_LINES, int* resln)
            }
         }
 
+#if VTK_MAJOR_VERSION == 5
         mapper2->SetInputConnection(uGrid2->GetProducerPort());
-        //mapper2->SetInputData(uGrid2);
+#else
+        mapper2->SetInputData(uGrid2);
+#endif
 
         actor2->SetMapper(mapper2);
 

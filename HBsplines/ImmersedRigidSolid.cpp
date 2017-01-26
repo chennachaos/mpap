@@ -1827,8 +1827,13 @@ void ImmersedRigidSolid::postProcess(int index)
   sprintf(fname1,"%s%d%s", "immersedpoly-", id,".vtp");
 
   writerPolyData->SetFileName(fname1);
-  //writerPolyData->SetInputData(polyDataVTK);
-  writerPolyData->SetInput(polyDataVTK);
+
+#if VTK_MAJOR_VERSION == 5
+    writerPolyData->SetInput(polyDataVTK);
+#else
+    writerPolyData->SetInputData(polyDataVTK);
+#endif
+
   writerPolyData->Write();
 
   return;

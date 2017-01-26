@@ -198,15 +198,18 @@ void PlotVTK::clearWindow()
 
 void  PlotVTK::write2file(MyString &fileName)
 {
-
     vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer =  vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
     writer->SetFileName(fileName.asCharArray());
-    //writer->SetInputData(uGrid);
+
+#if VTK_MAJOR_VERSION == 5
     writer->SetInput(uGrid);
+#else
+    writer->SetInputData(uGrid);
+#endif
+
     writer->Write();
 
-
-   return;
+    return;
 }
 
 
@@ -285,8 +288,12 @@ void  PlotVTK::writeImages(MyString &filename, int index)
        filename.append(".ps");
    }
 
-   //imageWriter->SetInputData(ImageFilter->GetOutput());
+#if VTK_MAJOR_VERSION == 5
    imageWriter->SetInput(ImageFilter->GetOutput());
+#else
+   imageWriter->SetInputData(ImageFilter->GetOutput());
+#endif
+
    imageWriter->SetFileName(filename.asCharArray());
    imageWriter->Write();
 
@@ -361,17 +368,22 @@ void PlotVTK::VtkReflect(int index)
     {
        nextActor = actorCollection->GetNextActor();
 
+#if VTK_MAJOR_VERSION == 5
        reflectionFilter->SetInputConnection(nextActor->GetMapper()->GetInput()->GetProducerPort());
-       //reflectionFilter->SetInputData(nextActor->GetMapper()->GetInput());
-       
+#else
+       reflectionFilter->SetInputData(nextActor->GetMapper()->GetInput());
+#endif
        reflectionFilter->CopyInputOn();
 
        reflectionFilter->SetPlane(index);
 
        reflectionFilter->Update();
 
+#if VTK_MAJOR_VERSION == 5
        reflectionMapper->SetInputConnection(reflectionFilter->GetOutputPort());
-
+#else
+       //reflectionMapper->SetInputData(reflectionFilter->GetOutputPort());
+#endif
     }
 
     reflectionActor->SetMapper(reflectionMapper);

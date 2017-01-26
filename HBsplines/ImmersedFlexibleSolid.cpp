@@ -497,8 +497,13 @@ void ImmersedFlexibleSolid::postProcess(int index)
     sprintf(fname,"%s%s%02d%s%06d%s", files.Ofile.asCharArray(),"-FB",id,"-", index, ".vtu");
 
     writerUGridVTK->SetFileName(fname);
-    //writerUGridVTK->SetInputData(uGridVTK);
+
+#if VTK_MAJOR_VERSION == 5
     writerUGridVTK->SetInput(uGridVTK);
+#else
+    writerUGridVTK->SetInputData(uGridVTK);
+#endif
+
     writerUGridVTK->Write();
 
   return;
@@ -507,8 +512,6 @@ void ImmersedFlexibleSolid::postProcess(int index)
 
 int ImmersedFlexibleSolid::updatePointPositions()
 {
-  //cout << " 3333333333333 " << endl;
-
   if(DIM == 1)
     updatePointPositions1D();
   else if(DIM == 2)

@@ -607,8 +607,11 @@ void NurbsElem3DStructSolid::discreteContourplot(int vartype, int varindex, int 
 
     uGrid->GetPointData()->SetScalars(scalars);
 
+#if VTK_MAJOR_VERSION == 5
     mapper1->SetInputConnection(uGrid->GetProducerPort());
-    //mapper1->SetInputData(uGrid);
+#else
+    mapper1->SetInputData(uGrid);
+#endif
 
     actor1->SetMapper(mapper1);
     

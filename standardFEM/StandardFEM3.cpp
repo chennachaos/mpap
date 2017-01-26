@@ -19,12 +19,6 @@ extern Files files;
 
 void StandardFEM::plotGeom(int a1, bool b1, int c1, bool d1, int* ffff)
 {
-    //if(!plotvtk.ActiveFlag)
-      //plotvtk.set();
-
-    //cout << " BBBBBBBBBBBB " << endl;
-    //plotvtk.clearWindow();
-
     int  dd, ii, jj, kk, ll, nlocal, index, ind1, ind2, e, ee, count, gcount, ind;
     double xx, yy, zz;
 
@@ -139,26 +133,15 @@ void StandardFEM::plotGeom(int a1, bool b1, int c1, bool d1, int* ffff)
     //sprintf(fname,"%s%s%06d%s", VTKfilename, "-", filecount, ".vtu");
 
     writerUGridVTK->SetFileName(fname);
-    //writerUGridVTK->SetInputData(uGridVTK);
+
+#if VTK_MAJOR_VERSION == 5
     writerUGridVTK->SetInput(uGridVTK);
+#else
+    writerUGridVTK->SetInputData(uGridVTK);
+#endif
+
     writerUGridVTK->Write();
-    
-    // a file Bspline.vtu will be created which can be directly read into paraview
 
-    mapperVTK->SetInputConnection(uGridVTK->GetProducerPort());
-    //mapperVTK->SetInputData(uGridVTK);
-
-    actorVTK->SetMapper(mapperVTK);
-    actorVTK->GetProperty()->EdgeVisibilityOff();
-    actorVTK->GetProperty()->SetEdgeColor(0,0,0);
-    actorVTK->GetProperty()->SetPointSize(5.0);
-    actorVTK->GetProperty()->SetLineWidth(2.0);
-    //actorVTK->GetProperty()->SetColor(0,0,1);
-
-    //plotvtk.rendr->AddActor(actorVTK);
-    //plotvtk.rendr->ResetCamera();
-    //plotvtk.renWindow->Render();
-    
     //cout << " AAAAAAAAAAA " << endl;
 
   return;
@@ -171,21 +154,13 @@ void  StandardFEM::postProcess(int vartype, int vardir, int nCol, bool umnxflag,
 {
     //cout << " StandardFEM::postProcess " << endl;
 
-    PetscMPIInt  n_mpi_procs, this_mpi_proc;
-
-    MPI_Comm_size(MPI_COMM_WORLD, &n_mpi_procs);
+    PetscMPIInt  this_mpi_proc;
 
     MPI_Comm_rank(MPI_COMM_WORLD, &this_mpi_proc);
 
     if(this_mpi_proc != 0)
       return;
 
-
-    //if(!plotvtk.ActiveFlag)
-      //plotvtk.set();
-
-    //cout << " BBBBBBBBBBBB " << endl;
-    //plotvtk.clearWindow();
 
     int  dd, ii, jj, kk, ll, nlocal, index, ind1, ind2, e, ee, count, gcount, ind;
     double vec[3], vec2[3], xx, yy, zz;
@@ -217,14 +192,10 @@ void  StandardFEM::postProcess(int vartype, int vardir, int nCol, bool umnxflag,
 
     count = GeomData.NodePosOrig.size();
 
-    //cout << " jjjjjjjjjjjjjjjjjj " << endl;
-
     procIdVTK->SetName("procIde");
     procIdVTK->SetNumberOfTuples(nElem);
 
     scaVTK->SetNumberOfTuples(count);
-
-    //cout << " jjjjjjjjjjjjjjjjjj " << endl;
 
     //if(ndof > 1)
     //{
@@ -240,8 +211,6 @@ void  StandardFEM::postProcess(int vartype, int vardir, int nCol, bool umnxflag,
   if(PHYSICS_TYPE == PHYSICS_TYPE_SOLID)
   {
     // subroutine for solid problem
-
-    //cout << " BBBBBBBBBBBB " << endl;
 
     vecVTK->SetName("force");
     vecVTK2->SetName("disp");
@@ -588,26 +557,15 @@ else
     //sprintf(fname,"%s%s%06d%s", VTKfilename, "-", filecount, ".vtu");
 
     writerUGridVTK->SetFileName(fname);
-    //writerUGridVTK->SetInputData(uGridVTK);
+
+#if VTK_MAJOR_VERSION == 5
     writerUGridVTK->SetInput(uGridVTK);
+#else
+    writerUGridVTK->SetInputData(uGridVTK);
+#endif
+
     writerUGridVTK->Write();
-    
-    // a file Bspline.vtu will be created which can be directly read into paraview
 
-    mapperVTK->SetInputConnection(uGridVTK->GetProducerPort());
-    //mapperVTK->SetInputData(uGridVTK);
-
-    actorVTK->SetMapper(mapperVTK);
-    actorVTK->GetProperty()->EdgeVisibilityOff();
-    actorVTK->GetProperty()->SetEdgeColor(0,0,0);
-    actorVTK->GetProperty()->SetPointSize(5.0);
-    actorVTK->GetProperty()->SetLineWidth(2.0);
-    //actorVTK->GetProperty()->SetColor(0,0,1);
-
-    //plotvtk.rendr->AddActor(actorVTK);
-    //plotvtk.rendr->ResetCamera();
-    //plotvtk.renWindow->Render();
-    
     //cout << " AAAAAAAAAAA " << endl;
 
   return;

@@ -123,8 +123,12 @@ int TreeNode<2>::prepareCutCell(vector<double>& cutFEMparams)
       //delaunay->SetAlpha(0.0);
       delaunay->SetOffset(1000.0);
 
-      //delaunay->SetInputData(polyDataLoc);
+#if VTK_MAJOR_VERSION == 5
       delaunay->SetInput(polyDataLoc);
+#else
+      delaunay->SetInputData(polyDataLoc);
+#endif
+
       delaunay->Update();
 
       polyDataLoc2 = delaunay->GetOutput();

@@ -575,8 +575,11 @@ void NurbsSOLID::PlotControlPoints(int col)
 
     vtkSmartPointer<vtkDataSetMapper>  mapper1  =  vtkSmartPointer<vtkDataSetMapper>::New();
 
-    //mapper1->SetInputData(polydata);
+#if VTK_MAJOR_VERSION == 5
     mapper1->SetInput(polydata);
+#else
+    mapper1->SetInputData(polydata);
+#endif
 
     actor1->SetMapper(mapper1);
 

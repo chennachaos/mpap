@@ -101,8 +101,13 @@ void HBSplineCutFEM::plotGeom(int val1, bool flag2, int col, bool PLOT_KNOT_LINE
     sprintf(fname,"%s%s", files.Ofile.asCharArray(),"-geom.vtu");
 
     writerUGridVTK->SetFileName(fname);
-    //writerUGridVTK->SetInputData(uGridVTK);
+
+#if VTK_MAJOR_VERSION == 5
     writerUGridVTK->SetInput(uGridVTK);
+#else
+    writerUGridVTK->SetInputData(uGridVTK);
+#endif
+
     writerUGridVTK->Write();
 
     plotGaussPointsElement();
@@ -392,8 +397,12 @@ void  HBSplineCutFEM::postProcessFlow(int vartype, int vardir, int nCol, bool um
     //cout << " ddddddddddddddddd " << endl;
 
     writerUGridVTK->SetFileName(fname);
-    //writerUGridVTK->SetInputData(uGridVTK);
+#if VTK_MAJOR_VERSION == 5
     writerUGridVTK->SetInput(uGridVTK);
+#else
+    writerUGridVTK->SetInputData(uGridVTK);
+#endif
+
     writerUGridVTK->Write();
 
     //cout << " jjjjjjjjjjjjjjjjjj " << endl;
@@ -1199,8 +1208,13 @@ void HBSplineCutFEM::plotGaussPointsElement()
     sprintf(fname,"%s%s", files.Ofile.asCharArray(),"-GPs.vtu");
 
     writerUGridVTK->SetFileName(fname);
-    //writerUGridVTK->SetInputData(uGridVTK2);
+
+#if VTK_MAJOR_VERSION == 5
     writerUGridVTK->SetInput(uGridVTK2);
+#else
+    writerUGridVTK->SetInputData(uGridVTK2);
+#endif
+
     writerUGridVTK->Write();
 
     return;
@@ -1295,8 +1309,13 @@ void HBSplineCutFEM::plotGaussPointsDirichletBoundary()
     sprintf(fname,"%s%s", files.Ofile.asCharArray(),"-GPs-DirichletBoundary.vtu");
 
     writerUGridVTK->SetFileName(fname);
-    //writerUGridVTK->SetInputData(uGridVTK2);
+
+#if VTK_MAJOR_VERSION == 5
     writerUGridVTK->SetInput(uGridVTK2);
+#else
+    writerUGridVTK->SetInputData(uGridVTK2);
+#endif
+
     writerUGridVTK->Write();
 
     return;
@@ -1389,8 +1408,13 @@ void HBSplineCutFEM::plotGaussPointsNeumannBoundary()
     sprintf(fname,"%s%s", files.Ofile.asCharArray(),"-GPs-NeumannBoundary.vtu");
 
     writerUGridVTK->SetFileName(fname);
-    //writerUGridVTK->SetInputData(uGridVTK2);
+
+#if VTK_MAJOR_VERSION == 5
     writerUGridVTK->SetInput(uGridVTK2);
+#else
+    writerUGridVTK->SetInputData(uGridVTK2);
+#endif
+
     writerUGridVTK->Write();
 
     return;

@@ -870,8 +870,11 @@ void NurbsElem3DStructMixed2fieldStabilised::discreteContourplot(int vartype, in
 
     uGrid->GetPointData()->SetScalars(scalars);
 
+#if VTK_MAJOR_VERSION == 5
     mapper1->SetInputConnection(uGrid->GetProducerPort());
-    //mapper1->SetInputData(uGrid);
+#else
+    mapper1->SetInputData(uGrid);
+#endif
 
     actor1->SetMapper(mapper1);
     
