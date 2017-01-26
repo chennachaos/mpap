@@ -207,7 +207,7 @@ int  HBSplineCutFEM::setCoveringUncovering()
 
 
 
-//
+/*
 int  HBSplineCutFEM::prepareMatrixPattern()
 {
     time_t tstart, tend; 
@@ -814,13 +814,13 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
   return 1;
 }
-//
+*/
 
 
 
 
 
-/*
+
 int HBSplineCutFEM::prepareMatrixPattern()
 {
     // subroutine for Eigen based solver
@@ -834,6 +834,48 @@ int HBSplineCutFEM::prepareMatrixPattern()
     int  *tt1, *tt2, val1, val2, nnz, n1, n2, kk, e1, a, b, ll, pp, aa, bb;
     int  side, NUM_NEIGHBOURS=2*DIM, start1, start2, nr1, nr2;
 
+    nElem = activeElements.size();
+    nNode = gridBF1;
+
+    elem_start = 0;
+    elem_end   = nElem-1;
+
+    nElem_local = nElem;
+
+    totalDOF = nNode*ndof;
+
+    row_start = 0;
+    row_end   = totalDOF-1;
+
+    ndofs_local = totalDOF;
+
+    node_map_new_to_old.resize(nNode, 0);
+    node_map_old_to_new.resize(nNode, 0);
+
+    dof_map_new_to_old.resize(totalDOF, 0);
+    dof_map_old_to_new.resize(totalDOF, 0);
+
+    kk=0;
+    for(ii=0; ii<nNode; ii++)
+    {
+      node_map_new_to_old[ii] = ii;
+      node_map_old_to_new[ii] = ii;
+
+      for(jj=0; jj<ndof; jj++)
+      {
+        dof_map_new_to_old[kk] = kk;
+        dof_map_old_to_new[kk] = kk;
+        kk++;
+      }
+    }
+
+    SolnData.node_map_new_to_old = node_map_new_to_old;
+    SolnData.node_map_old_to_new = node_map_old_to_new;
+
+    GeomData.node_map_new_to_old = node_map_new_to_old;
+    GeomData.node_map_old_to_new = node_map_old_to_new;
+
+
     printf("\n Finding Global positions \n\n");
 
     vector<vector<int> >  DDconnLoc;
@@ -842,7 +884,7 @@ int HBSplineCutFEM::prepareMatrixPattern()
 
     DDconnLoc.resize(tempDOF);
 
-    cout << " activeElements.size() " << activeElements.size() << '\t' << tempDOF << endl;
+    //cout << " activeElements.size() " << activeElements.size() << '\t' << tempDOF << endl;
 
     node  *nd1, *nd2;
 
@@ -853,13 +895,14 @@ int HBSplineCutFEM::prepareMatrixPattern()
     tend = time(0);
     printf("HBSplineCutFEM::prepareCutElements() took %8.4f second(s) \n ", difftime(tend, tstart) );
 
-    //cout << " jjjjjjjjjjjjjjjj " << endl;
+    for(e=0; e<activeElements.size(); e++)
+    {
+      elems[activeElements[e]]->initialiseDOFvalues();
+    }
 
     for(e=0; e<activeElements.size(); e++)
     {
         nd1 = elems[activeElements[e]];
-
-        nd1->initialiseDOFvalues();
 
         val1 =  nd1->GetNsize();
         tt1  =  &(nd1->forAssyVec[0]);
@@ -878,7 +921,6 @@ int HBSplineCutFEM::prepareMatrixPattern()
           }
         }
 
-      //cout << " hhhhhhhhhhhhhhhhhhhh " << nd1->IsCutElement() << endl;
       // connectivity for ghost-penalty terms
       //
       if( nd1->IsCutElement() )
@@ -967,10 +1009,6 @@ int HBSplineCutFEM::prepareMatrixPattern()
     // hardcoded for a single DOF rigid body
     // 
     solidDOF=0;
-    if(!STAGGERED)
-    {
-      solidDOF += 1;
-    }
 
     totalDOF = fluidDOF + solidDOF;
 
@@ -1106,9 +1144,9 @@ int HBSplineCutFEM::prepareMatrixPattern()
     soln.setZero();
     solnInit = soln;
 
-    cout << solverEigen->mtx.rows() << endl;
-    cout << solverEigen->mtx.cols() << endl;
-    cout << solverEigen->mtx.nonZeros() << endl;
+    //cout << solverEigen->mtx.rows() << endl;
+    //cout << solverEigen->mtx.cols() << endl;
+    //cout << solverEigen->mtx.nonZeros() << endl;
 
     solverEigen->currentStatus = PATTERN_OK;
 
@@ -1118,7 +1156,7 @@ int HBSplineCutFEM::prepareMatrixPattern()
 
   return 1;
 }
-8/
+//
 
 
 

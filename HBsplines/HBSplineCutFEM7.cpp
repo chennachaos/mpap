@@ -92,8 +92,8 @@ void HBSplineCutFEM::plotGeom(int val1, bool flag2, int col, bool PLOT_KNOT_LINE
     cellDataVTK->SetName("ElemType");
     cellDataVTK2->SetName("SubdomId");
 
-    uGridVTK->GetCellData()->SetScalars(cellDataVTK);
-    uGridVTK->GetCellData()->AddArray(cellDataVTK2);
+    //uGridVTK->GetCellData()->SetScalars(cellDataVTK);
+    //uGridVTK->GetCellData()->AddArray(cellDataVTK2);
 
 
     char fname[50];

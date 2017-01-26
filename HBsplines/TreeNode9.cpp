@@ -726,7 +726,7 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
 
 
-//
+/*
 template<>
 void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
 {
@@ -1142,7 +1142,7 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
     return;
 }
-//
+*/
 
 
 
@@ -1561,7 +1561,7 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
 
 
-/*
+//
 template<>
 void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
 {
@@ -1977,7 +1977,7 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
     return;
 }
-&/
+//
 
 
 
@@ -2835,7 +2835,7 @@ void TreeNode<2>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
         if(domNums.size() > 1)
         {
           //TreeNode<2>::computeGaussPointsAdapIntegrationBoundary(side, 0, 0, 0, 0);
-          
+
           nGauss = BoundaryQuadrature[side].gausspoints.size() ;
 
           gps = &(BoundaryQuadrature[side].gausspoints[0]);
