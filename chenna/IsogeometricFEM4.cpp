@@ -888,8 +888,11 @@ void IsogeometricFEM::dispContourplotVTK(int index, int nCol, bool umnxflag, dou
     plotvtk.uGrid->SetPoints(points);
     plotvtk.uGrid->GetPointData()->SetScalars(scalars);
 
+#if VTK_MAJOR_VERSION == 5
     mapper1->SetInputConnection(plotvtk.uGrid->GetProducerPort());
-    //mapper1->SetInputData(plotvtk.uGrid);
+#else
+    mapper1->SetInputData(plotvtk.uGrid);
+#endif
 
     actor1->SetMapper(mapper1);
 
@@ -1052,9 +1055,12 @@ void IsogeometricFEM::contourplotVTK(int vartype, int varindex, bool extrapolate
 
     plotvtk.uGrid->GetPointData()->SetScalars(scalars);
 
+#if VTK_MAJOR_VERSION == 5
     mapper1->SetInputConnection(plotvtk.uGrid->GetProducerPort());
-    //mapper1->SetInputData(plotvtk.uGrid);
-    
+#else
+    mapper1->SetInputData(plotvtk.uGrid);
+#endif
+
 //    mapper1->ScalarVisibilityOn();
 //    mapper1->SetScalarModeToUsePointData();
 //    mapper1->SetColorModeToMapScalars();
@@ -1403,14 +1409,16 @@ void IsogeometricFEM::contourplotVTK2(int vartype, int varindex, bool extrapolat
     sprintf(fname,"%s%s%06d%s", files.Ofile.asCharArray(),"-",filecount, ".vtu");
 
     writerUGridVTK->SetFileName(fname);
-    //writerUGridVTK->SetInputData(plotvtk.uGrid);
-    writerUGridVTK->SetInput(plotvtk.uGrid);
-    writerUGridVTK->Write();
-    
-    cout << " llllllllllll " << endl;
 
+#if VTK_MAJOR_VERSION == 5
+    writerUGridVTK->SetInput(plotvtk.uGrid);
     mapper1->SetInputConnection(plotvtk.uGrid->GetProducerPort());
-    //mapper1->SetInputData(plotvtk.uGrid);
+#else
+    writerUGridVTK->SetInputData(plotvtk.uGrid);
+    mapper1->SetInputData(plotvtk.uGrid);
+#endif
+
+    writerUGridVTK->Write();
 
     actor1->SetMapper(mapper1);
 
@@ -1418,7 +1426,6 @@ void IsogeometricFEM::contourplotVTK2(int vartype, int varindex, bool extrapolat
     plotvtk.rendr->AddActor2D(scalarBar);
     plotvtk.rendr->ResetCamera();
     plotvtk.renWindow->Render();
-
 
   return;
 }
@@ -1593,15 +1600,16 @@ void  IsogeometricFEM::postProcessFlow(int vartype, int vardir, int nCol, bool u
 
     vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer =  vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
     writer->SetFileName("Bspline.vtu");
-    //writer->SetInputData(uGrid);
+
+#if VTK_MAJOR_VERSION == 5
     writer->SetInput(uGrid);
+    mapper->SetInputConnection(uGrid->GetProducerPort());
+#else
+    writer->SetInputData(uGrid);
+    mapper->SetInputData(plotvtk.uGrid);
+#endif
 
     writer->Write();
-    
-    // a file Bspline.vtu will be created which can be directly read into paraview
-
-    mapper->SetInputConnection(uGrid->GetProducerPort());
-    //mapper->SetInputData(plotvtk.uGrid);
 
     actor->SetMapper(mapper);
     actor->GetProperty()->EdgeVisibilityOff();

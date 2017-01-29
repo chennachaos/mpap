@@ -8,7 +8,6 @@
 #include "MyString.h"
 #include "headersVTK.h"
 #include "myGeomUtilities.h"
-#include "NurbsUtilities.h"
 #include "myTria.h"
 #include "DistFunctions.h"
 #include "AABB.h"
@@ -32,14 +31,6 @@ void HBSplineCutFEM::plotGeom(int val1, bool flag2, int col, bool PLOT_KNOT_LINE
 
     PetscPrintf(MPI_COMM_WORLD, "     HBSplineCutFEM: plotgeometry ...\n\n");
 
-    //if(!plotvtk.ActiveFlag)
-      //plotvtk.set();
-
-    //plotvtk.clearWindow();
-
-    //lineVTK->Reset();
-    //quadVTK->Reset();
-    //actorVTK->Reset();
     //writerUGridVTK->Reset();
 
     uGridVTK->Reset();
@@ -51,9 +42,9 @@ void HBSplineCutFEM::plotGeom(int val1, bool flag2, int col, bool PLOT_KNOT_LINE
     vecVTK->Reset();
     vecVTK2->Reset();
 
-    cellDataVTK->Reset();
-    cellDataVTK2->Reset();
-    
+    //cellDataVTK->Reset();
+    //cellDataVTK2->Reset();
+
     //cout << "uGridVTK->GetPointData()->GetNumberOfArrays() = " << '\t' << uGridVTK->GetPointData()->GetNumberOfArrays() << endl;
     //cout << "uGridVTK->GetCellData()->GetNumberOfArrays() = " << '\t' << uGridVTK->GetCellData()->GetNumberOfArrays() << endl;
 
@@ -67,6 +58,12 @@ void HBSplineCutFEM::plotGeom(int val1, bool flag2, int col, bool PLOT_KNOT_LINE
 
     //cout << "uGridVTK->GetPointData()->GetNumberOfArrays() = " << '\t' << uGridVTK->GetPointData()->GetNumberOfArrays() << endl;
     //cout << "uGridVTK->GetCellData()->GetNumberOfArrays() = " << '\t' << uGridVTK->GetCellData()->GetNumberOfArrays() << endl;
+
+  cout << " CUTCELL_INTEGRATION_TYPE = " << CUTCELL_INTEGRATION_TYPE << endl;
+
+    cellDataVTK->SetNumberOfComponents(1);
+    cellDataVTK2->SetNumberOfComponents(1);
+    //vecVTK->SetNumberOfTuples(count);
 
   if(CUTCELL_INTEGRATION_TYPE == 1)
   {
@@ -101,35 +98,18 @@ void HBSplineCutFEM::plotGeom(int val1, bool flag2, int col, bool PLOT_KNOT_LINE
     sprintf(fname,"%s%s", files.Ofile.asCharArray(),"-geom.vtu");
 
     writerUGridVTK->SetFileName(fname);
-    //writerUGridVTK->SetInputData(uGridVTK);
+
+#if VTK_MAJOR_VERSION == 5
     writerUGridVTK->SetInput(uGridVTK);
+#else
+    writerUGridVTK->SetInputData(uGridVTK);
+#endif
+
     writerUGridVTK->Write();
 
     plotGaussPointsElement();
     //plotGaussPointsDirichletBoundary();
     //plotGaussPointsNeumannBoundary();
-
-    //mapperVTK->SetInputData(uGridVTKfluid);
-    //mapperVTK->SetInputData(uGridVTK);
-    //mapperVTK->SetInput(uGridVTK);
-
-    //actorVTK->SetMapper(mapperVTK);
-    //actorVTK->GetProperty()->EdgeVisibilityOn();
-    //actorVTK->GetProperty()->SetEdgeColor(0,0,0);
-    //actorVTK->GetProperty()->SetPointSize(5.0);
-    //actorVTK->GetProperty()->SetLineWidth(2.0);
-
-    double  color[3];
-    getColorValue(col, color);
-
-    //actorVTK->GetProperty()->SetColor(color[0], color[1], color[2]);
-    //actorVTK->SetMapper(mapperVTK);
-
-    //plotvtk.rendr->AddActor(actorVTK);
-    //plotvtk.rendr->ResetCamera();
-    //plotvtk.renWindow->Render();
-
-    //    cout << "   Number of pointsVTK in uGridVTK " << uGridVTK->GetNumberOfPoints()  << endl;
 
     return;
 }
@@ -149,7 +129,6 @@ void HBSplineCutFEM::plotGeomSubTrias1D(int val1, bool flag2, int col, bool PLOT
       if( elems[ii]->IsActive() )
       {
           //cout << " Node # " << elems[ii]->GetID() << '\t' << elems[ii]->IsLeaf() << '\t' << elems[ii]->IsGhost() << endl;
-
           tmp = elems[ii]->GetKnots(0);
 
           param[0] = tmp[0];
@@ -172,8 +151,6 @@ void HBSplineCutFEM::plotGeomSubTrias1D(int val1, bool flag2, int col, bool PLOT
        }
     }
 
-    uGridVTK->SetPoints(pointsVTK);
-
     return;
 }
 
@@ -190,17 +167,13 @@ void HBSplineCutFEM::plotGeomSubTrias2D(int val1, bool flag2, int col, bool PLOT
     
     AABB  bbTemp;
 
-
     for(ee=0;ee<activeElements.size();ee++)
     {
         ndTemp = elems[activeElements[ee]];
 
-        //if( nd1->GetDomainNumber() < 5 )
         if( !ndTemp->IsCutElement() )
         {
           bbTemp = ndTemp->GetAABB();
-
-          //cout << tmp1[0] << '\t' << tmp1[1] << '\t' << tmp2[0] << '\t' << tmp2[1] << endl;
 
           ptIds[0] = pointsVTK->InsertNextPoint(bbTemp.minBB[0], bbTemp.minBB[1], 0.0);
           ptIds[1] = pointsVTK->InsertNextPoint(bbTemp.maxBB[0], bbTemp.minBB[1], 0.0);
@@ -209,6 +182,8 @@ void HBSplineCutFEM::plotGeomSubTrias2D(int val1, bool flag2, int col, bool PLOT
 
           for(ll=0;ll<4;ll++)
             quadVTK->GetPointIds()->SetId(ll, ptIds[ll]);
+
+          //cout << ndTemp->IsCutElement() << '\t' << ndTemp->get_subdomain_id() << endl;
 
           cellDataVTK->InsertNextValue(ndTemp->GetDomainNumber());
           cellDataVTK2->InsertNextValue(ndTemp->get_subdomain_id());
@@ -247,7 +222,7 @@ void HBSplineCutFEM::plotGeomSubTrias2D(int val1, bool flag2, int col, bool PLOT
         } //else
     } // for(ee=0;ee<elems.size();ee++)
 
-    printf("\n Total number of Gauss points in cut cells = %d \n\n", totalNGP );
+    //printf("\n Total number of Gauss points in cut cells = %d \n\n", totalNGP );
 
   return;
 }
@@ -337,10 +312,7 @@ void  HBSplineCutFEM::postProcessFlow(int vartype, int vardir, int nCol, bool um
   if(this_mpi_proc != 0)
     return;
 
-    //plotvtk.clearWindow();
-
     uGridVTK->Reset();
-
     pointsVTK->Reset();
 
     scaVTK->Reset();
@@ -392,8 +364,12 @@ void  HBSplineCutFEM::postProcessFlow(int vartype, int vardir, int nCol, bool um
     //cout << " ddddddddddddddddd " << endl;
 
     writerUGridVTK->SetFileName(fname);
-    //writerUGridVTK->SetInputData(uGridVTK);
+#if VTK_MAJOR_VERSION == 5
     writerUGridVTK->SetInput(uGridVTK);
+#else
+    writerUGridVTK->SetInputData(uGridVTK);
+#endif
+
     writerUGridVTK->Write();
 
     //cout << " jjjjjjjjjjjjjjjjjj " << endl;
@@ -434,8 +410,6 @@ void  HBSplineCutFEM::postProcessSubTrias1D(int vartype, int vardir, int nCol, b
 
 void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, bool umnxflag, double umin, double umax, int* resln)
 {
-    //cout << " jjjjjjjjjjjjjjjjjj " << endl;
-
     int  dd, ii, jj, kk, ll, count, nlocal, index, ind1, ind2, e, ee, gcount, ind, domTemp;
     vtkIdType pt[50], cellId;
 
@@ -450,7 +424,6 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
     vector<double>  uu, vv;
 
     node* ndTemp;
-
 
   if(ndf == 1)
   {
@@ -521,8 +494,10 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
           quadVTK->GetPointIds()->SetId(2, pt[3]);
           quadVTK->GetPointIds()->SetId(3, pt[2]);
 
+          //cout << ndTemp->GetID() << '\t' << ndTemp->get_subdomain_id() << endl;
+
           uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
-          //cellDataVTK->InsertNextValue(0);
+          cellDataVTK->InsertNextValue(0);
           cellDataVTK2->InsertNextValue(ndTemp->get_subdomain_id());
 	  }
         } //if( !nd->IsCutElement() )
@@ -585,7 +560,7 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
     uGridVTK->GetPointData()->AddArray(scaVTK2);
 
     uGridVTK->GetCellData()->SetScalars(cellDataVTK2);
-    
+
   }
   else // for Stokes and Navier-Stokes
   {
@@ -1199,8 +1174,13 @@ void HBSplineCutFEM::plotGaussPointsElement()
     sprintf(fname,"%s%s", files.Ofile.asCharArray(),"-GPs.vtu");
 
     writerUGridVTK->SetFileName(fname);
-    //writerUGridVTK->SetInputData(uGridVTK2);
+
+#if VTK_MAJOR_VERSION == 5
     writerUGridVTK->SetInput(uGridVTK2);
+#else
+    writerUGridVTK->SetInputData(uGridVTK2);
+#endif
+
     writerUGridVTK->Write();
 
     return;
@@ -1295,8 +1275,13 @@ void HBSplineCutFEM::plotGaussPointsDirichletBoundary()
     sprintf(fname,"%s%s", files.Ofile.asCharArray(),"-GPs-DirichletBoundary.vtu");
 
     writerUGridVTK->SetFileName(fname);
-    //writerUGridVTK->SetInputData(uGridVTK2);
+
+#if VTK_MAJOR_VERSION == 5
     writerUGridVTK->SetInput(uGridVTK2);
+#else
+    writerUGridVTK->SetInputData(uGridVTK2);
+#endif
+
     writerUGridVTK->Write();
 
     return;
@@ -1389,8 +1374,13 @@ void HBSplineCutFEM::plotGaussPointsNeumannBoundary()
     sprintf(fname,"%s%s", files.Ofile.asCharArray(),"-GPs-NeumannBoundary.vtu");
 
     writerUGridVTK->SetFileName(fname);
-    //writerUGridVTK->SetInputData(uGridVTK2);
+
+#if VTK_MAJOR_VERSION == 5
     writerUGridVTK->SetInput(uGridVTK2);
+#else
+    writerUGridVTK->SetInputData(uGridVTK2);
+#endif
+
     writerUGridVTK->Write();
 
     return;

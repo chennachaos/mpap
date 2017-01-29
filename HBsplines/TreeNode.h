@@ -4,33 +4,20 @@
 
 #include "headersEigen.h"
 
-//#include "GaussQuadrature.h"
-//#include "SolverEigen.h"
 #include "AdaptiveOctree.h"
 #include "AdaptiveBinarytree.h"
-//#include "myDataIntegrateCutFEM.h"
 #include "GeomDataHBSplines.h"
 #include "SolutionData.h"
-//#include "myGeomUtilities.h"
-//#include "myTria.h"
-//#include "petscmat.h"
-//#include "petscksp.h"
-
 #include "AABB.h"
 
 #include <vector>
 
-using std::vector;
-
-//class  GeomDataHBSplines;
-//class  SolutionData;
 class  myDataIntegrateCutFEM;
-//class  myGeom::myPoly;
-//template<int DIM> class GaussQuadrature;
 class GaussQuadrature;
 
 
 using namespace myGeom;
+using std::vector;
 
 
 template <int DIM>

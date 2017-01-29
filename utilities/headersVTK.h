@@ -1,9 +1,8 @@
 #ifndef incl_headersVTK_h
 #define incl_headersVTK_h
 
-
- #define vtkRenderingCore_AUTOINIT 4(vtkInteractionStyle,vtkRenderingFreeType,vtkRenderingFreeTypeOpenGL,vtkRenderingOpenGL)
- #define vtkRenderingVolume_AUTOINIT 1(vtkRenderingVolumeOpenGL)
+#define vtkRenderingCore_AUTOINIT 4(vtkInteractionStyle,vtkRenderingFreeType,vtkRenderingFreeTypeOpenGL,vtkRenderingOpenGL)
+#define vtkRenderingVolume_AUTOINIT 1(vtkRenderingVolumeOpenGL)
 
 #include <vtkCell.h>
 #include <vtkGenericCell.h>

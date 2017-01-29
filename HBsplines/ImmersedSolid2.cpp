@@ -17,8 +17,6 @@ using namespace myGeom;
 
 void ImmersedSolid::adjustBoundaryPoints(double* minVal, double* maxVal)
 {
-  //cout << " nImmInt = " << nImmInt << endl;
-  
   int ii, jj;
   double  tol1=1.0e-8, tol2=1.0e-6;
 
@@ -121,8 +119,13 @@ void  ImmersedSolid::SetImmersedFaces()
     vtkSmartPointer<vtkXMLUnstructuredGridWriter>  writerUGridVTK = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
 
     writerUGridVTK->SetFileName(fname);
-    //writerUGridVTK->SetInputData(uGridVTK2);
+
+#if VTK_MAJOR_VERSION == 5
     writerUGridVTK->SetInput(uGridVTK2);
+#else
+    writerUGridVTK->SetInputData(uGridVTK2);
+#endif
+
     writerUGridVTK->Write();
 
     // The area of a convex polygon is 
@@ -191,26 +194,29 @@ void  ImmersedSolid::SetImmersedFaces()
     polyDataVTK->GetCellData()->SetVectors(triaNormal);
 
     vtkSmartPointer<vtkXMLPolyDataWriter>  writerPolyData =     vtkSmartPointer<vtkXMLPolyDataWriter>::New();
+    vtkSmartPointer<vtkMassProperties>  massProp =     vtkSmartPointer<vtkMassProperties>::New();
+
 
     char fname1[200];
     sprintf(fname1,"%s%s%d%s", files.Ofile.asCharArray(), "-immersedsolid-", id,".vtp");
 
     writerPolyData->SetFileName(fname1);
-    //writerPolyData->SetInputData(polyData);
+
+#if VTK_MAJOR_VERSION == 5
     writerPolyData->SetInput(polyDataVTK);
+    selectEnclosedPoints->SetSurface(polyDataVTK);
+    massProp->SetInput(polyDataVTK);
+#else
+    writerPolyData->SetInputData(polyDataVTK);
+    selectEnclosedPoints->SetSurfaceData(polyDataVTK);
+    massProp->SetInputData(polyDataVTK);
+#endif
+
     writerPolyData->Write();
 
-
-    //selectEnclosedPoints->SetSurfaceData(polyData);
-    selectEnclosedPoints->SetSurface(polyDataVTK);
     //selectEnclosedPoints->Update();
-
     selectEnclosedPoints->Initialize(polyDataVTK);
 
-    vtkSmartPointer<vtkMassProperties>  massProp =     vtkSmartPointer<vtkMassProperties>::New();
-
-    //massProp->SetInputData(polyDataVTK);
-    massProp->SetInput(polyDataVTK);
     massProp->Update();
   
     printf("\n Polyhedron # %d volume = %12.8f \n\n", id, massProp->GetVolume() );

@@ -16,7 +16,7 @@
 #include "DistFunctions.h"
 #include "myConstants.h"
 #include "NurbsUtilities.h"
-#include "StandardFEM.h"
+#include "mpi.h"
 
 
 
@@ -63,6 +63,10 @@ HBSplineBase::HBSplineBase()
 {
     //cout << "  HBSplineBase::HBSplineBase() ... constructor " << endl;
 
+    MPI_Comm_size(MPI_COMM_WORLD, &n_mpi_procs);
+    MPI_Comm_rank(MPI_COMM_WORLD, &this_mpi_proc);
+
+
     root = NULL;
 
     for(int ii=0;ii<3;ii++)
@@ -95,8 +99,6 @@ HBSplineBase::HBSplineBase()
     GRID_CHANGED = IB_MOVED = STABILISED = true;
 
     NodeNumsAtLevel.resize(10);
-
-    tol = -2.0;
 
     solverEigen = NULL;
     solverPetsc = NULL;

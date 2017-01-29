@@ -789,8 +789,11 @@ void NurbsElem3DStructMixed2field::discreteContourplot(int vartype, int varindex
 
     uGrid->GetPointData()->SetScalars(scalars);
 
+#if VTK_MAJOR_VERSION == 5
     mapper1->SetInputConnection(uGrid->GetProducerPort());
-    //mapper1->SetInputData(uGrid);
+#else
+    mapper1->SetInputData(uGrid);
+#endif
 
     actor1->SetMapper(mapper1);
     
@@ -806,14 +809,10 @@ void NurbsElem3DStructMixed2field::discreteContourplot(int vartype, int varindex
     mapper1->SetLookupTable(hueLut);
     scalars->SetLookupTable(hueLut);
 
-    
 //    actor1->GetProperty()->SetLineWidth(2.0);
-    
 //    actor1->GetProperty()->EdgeVisibilityOn();
 
     plotvtk.rendr->AddActor(actor1);
-
-
 
   return;
 }

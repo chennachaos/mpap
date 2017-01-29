@@ -5,8 +5,6 @@
 #include "SolverEigen.h"
 
 
-
-
 int  HBSplineBase::findCellNumber(const myPoint& geom)
 {
   int  ii, ind[3]={0,0,0}, nn[3]={0,0,0}, num;

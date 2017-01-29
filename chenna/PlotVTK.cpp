@@ -192,21 +192,24 @@ void PlotVTK::clearWindow()
 
 //     renIntr->Enable();
 
-   return;
+    return;
 }
 
 
 void  PlotVTK::write2file(MyString &fileName)
 {
-
     vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer =  vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
     writer->SetFileName(fileName.asCharArray());
-    //writer->SetInputData(uGrid);
+
+#if VTK_MAJOR_VERSION == 5
     writer->SetInput(uGrid);
+#else
+    writer->SetInputData(uGrid);
+#endif
+
     writer->Write();
 
-
-   return;
+    return;
 }
 
 
@@ -285,12 +288,16 @@ void  PlotVTK::writeImages(MyString &filename, int index)
        filename.append(".ps");
    }
 
-   //imageWriter->SetInputData(ImageFilter->GetOutput());
-   imageWriter->SetInput(ImageFilter->GetOutput());
-   imageWriter->SetFileName(filename.asCharArray());
-   imageWriter->Write();
+#if VTK_MAJOR_VERSION == 5
+    imageWriter->SetInput(ImageFilter->GetOutput());
+#else
+    imageWriter->SetInputData(ImageFilter->GetOutput());
+#endif
 
-   return;
+    imageWriter->SetFileName(filename.asCharArray());
+    imageWriter->Write();
+
+    return;
 }
 
 
@@ -300,19 +307,18 @@ void  PlotVTK::writeImages(MyString &filename, int index)
 
 void PlotVTK::addAxes(double val1, double val2, double val3)
 {
-   axes->SetTotalLength(val1,val2,val3);
-   rendr->AddActor(axes);
+  axes->SetTotalLength(val1,val2,val3);
+  rendr->AddActor(axes);
 
-   return;
+  return;
 }
 
 
 void PlotVTK::removeAxes()
 {
+  rendr->RemoveActor(axes);
 
-   rendr->RemoveActor(axes);
-
-   return;
+  return;
 }
 
 
@@ -359,19 +365,18 @@ void PlotVTK::VtkReflect(int index)
 
     for(ii=0;ii<nn;ii++)
     {
-       nextActor = actorCollection->GetNextActor();
+      nextActor = actorCollection->GetNextActor();
 
-       reflectionFilter->SetInputConnection(nextActor->GetMapper()->GetInput()->GetProducerPort());
-       //reflectionFilter->SetInputData(nextActor->GetMapper()->GetInput());
-       
-       reflectionFilter->CopyInputOn();
+      //reflectionFilter->SetInputConnection(nextActor->GetMapper()->GetInput()->GetProducerPort());
+      //reflectionFilter->SetInputData(nextActor->GetMapper()->GetInput());
 
-       reflectionFilter->SetPlane(index);
+      reflectionFilter->CopyInputOn();
 
-       reflectionFilter->Update();
+      reflectionFilter->SetPlane(index);
 
-       reflectionMapper->SetInputConnection(reflectionFilter->GetOutputPort());
+      reflectionFilter->Update();
 
+      //reflectionMapper->SetInputConnection(reflectionFilter->GetOutputPort());
     }
 
     reflectionActor->SetMapper(reflectionMapper);

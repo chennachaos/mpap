@@ -674,7 +674,7 @@ void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
 
 
 
-//
+/*
 template<>
 void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
 {
@@ -859,7 +859,7 @@ void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
     
     return;
 }
-//
+*/
 
 
 
@@ -1331,7 +1331,7 @@ double TreeNode<2>::getJacBoundary(int side)
 }
 
 
-//
+/*
 template<>
 void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
 {
@@ -1480,7 +1480,7 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
               }
             }
             //
-            /*
+            //
             if(side == 3)
             {
               if(dir == 0)
@@ -1492,9 +1492,8 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
                   specVal = -tanh(20.0*(uu-1.0));
               }
             }
-            */
-
-            /*
+            //
+            //
             if(side == 0 || side == 11)
             {
               if(dir == 0)
@@ -1510,8 +1509,8 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
                   //specVal = 3600.0*(1.0-yy*yy/R/R);
               }
             }
-            */
-            /*
+            //
+            //
             R = 0.5;
             if(side == 2)
             {
@@ -1525,7 +1524,7 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
               }
             }
             //
-            */
+            //
 
             //specVal = analy.computeValue(dir, xx, yy);
             //cout << side << '\t' << dir << '\t' << specVal << endl;
@@ -1655,7 +1654,7 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
 
   return;
 }
-//
+*/
 
 
 

@@ -3,7 +3,6 @@
 #include "SolverEigen.h"
 #include "ComputerTime.h"
 #include "MpapTime.h"
-//#include "NurbsUtilities.h"
 #include "BasisFunctionsLagrange.h"
 #include "myDataIntegrateCutFEM.h"
 #include "ImmersedIntegrationElement.h"
@@ -12,9 +11,6 @@
 
 
 extern MpapTime           mpapTime;
-
-using namespace std;
-
 
 
 
@@ -767,25 +763,20 @@ void  HBSplineCutFEM::applyGhostPenalty2D()
 
         //cout << " nd1->IsRightBoundary() = " << nd1->IsRightBoundary() << endl;
 
-        //
-        //if( nd1->IsLeftBoundary() || nd1->IsRightBoundary() )
         if( nd1->IsBoundary() )
         {
-          gammGP[0]  = 0.0;
+          //gammGP[0]  = 0.0;
           //gammGP[0]  = cutFEMparams[6] *mu* h1*h1*h1;
           //gammGP[0]  = cutFEMparams[6] *mu*h1/rho;
           gammGP[0]  = cutFEMparams[6] *mu*h1;
-          gammGP[2]  = cutFEMparams[7] * h1*h1*h1/mu;
           gammGP[1]  = gammGP[0];
-          //gammGP[2]  = gammGP[0];
-        }
+          gammGP[2]  = cutFEMparams[7] * h1*h1*h1/mu;
+         }
         else
         {
-          //gammGP[0]  = cutFEMparams[6] * mu*h1/rho;
           gammGP[0]  = cutFEMparams[6] * mu*h1;
           gammGP[1]  = gammGP[0];
           gammGP[2]  = cutFEMparams[7] * h1*h1*h1/mu;
-          //gammGP[2]  = gammGP[0];
         }
 
         bb1 = 1.0;
@@ -848,10 +839,10 @@ void  HBSplineCutFEM::applyGhostPenalty2D()
                   // multiply dvol with 0.5 as the ghost-penalty operation is applied
                   // twice on the face shared by the two elements both of which are cut elements
 
-                  //if( nd2->GetDomainNumber() == -1 )
-                    //dvol *= 0.5;
+                  if( nd2->GetDomainNumber() == -1 )
+                    dvol *= 0.5;
 
-                  //printf(" %4d \t %4d \t %12.6f \t %12.6f \n", side, dir, vv, uu);
+                  //printf(" %4d \t %4d \t %12.6f \t %12.6f \n", side, dir, param[0], param[1]);
 
                   GeomData.computeBasisFunctionsGhostPenalty2D(knotBegin1, knotIncr1, param, NN1, dNN1_dx, dNN1_dy );
 

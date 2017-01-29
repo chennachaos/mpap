@@ -256,6 +256,8 @@ class IsogeometricFEM: public Domain
 
     void  computeElementErrors(int);
 
+    //void  mapper1(vtkSmartPointer<vtkUnstructuredGrid> uGrid);
+
 
   protected:
 

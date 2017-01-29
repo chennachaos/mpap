@@ -7,8 +7,8 @@
 #include "ComputerTime.h"
 #include "MpapTime.h"
 #include "conditionalOStream.h"
-#include "mpi.h"
 #include "my_types.h"
+#include "mpi.h"
 #include "metis.h"
 
 
@@ -207,9 +207,11 @@ int  HBSplineCutFEM::setCoveringUncovering()
 
 
 
-//
+
 int  HBSplineCutFEM::prepareMatrixPattern()
 {
+    assert(SOLVER_TYPE == SOLVER_TYPE_PETSC);
+
     time_t tstart, tend; 
 
     int  tempDOF, domTemp, npElem, ind;
@@ -224,10 +226,8 @@ int  HBSplineCutFEM::prepareMatrixPattern()
     MPI_Comm_size(MPI_COMM_WORLD, &n_mpi_procs);
     MPI_Comm_rank(MPI_COMM_WORLD, &this_mpi_proc);
 
-    cout << " this_mpi_proc " << this_mpi_proc << endl;
-    cout << " n_mpi_procs " << n_mpi_procs << endl;
-
-    ConditionalOStream  pcout(std::cout,  (this_mpi_proc == 0) );
+    //cout << " this_mpi_proc " << this_mpi_proc << endl;
+    //cout << " n_mpi_procs " << n_mpi_procs << endl;
 
     int n_subdomains = n_mpi_procs, subdomain=0;
 
@@ -237,13 +237,12 @@ int  HBSplineCutFEM::prepareMatrixPattern()
     prepareCutElements();
 
     tend = time(0);
-    printf("HBSplineCutFEM::prepareCutElements() took %8.4f second(s) \n ", difftime(tend, tstart) );
-
+    //printf("HBSplineCutFEM::prepareCutElements() took %8.4f second(s) \n ", difftime(tend, tstart) );
 
     nElem = activeElements.size();
     nNode = gridBF1;
 
-    cout << " nNode = " << nNode << endl;
+    PetscSynchronizedPrintf(MPI_COMM_WORLD, " nNode = %8d \n", nNode);
 
     if(n_mpi_procs == 1)
     {
@@ -300,7 +299,6 @@ int  HBSplineCutFEM::prepareMatrixPattern()
       nElem_local = elem_end - elem_start + 1;
 
       cout << " elem_start = " << elem_start << '\t' << elem_end << '\t' << nElem_local << endl;
-
 
       idx_t eptr[nElem+1];
       idx_t epart[nElem];
@@ -364,7 +362,6 @@ int  HBSplineCutFEM::prepareMatrixPattern()
         //cout << endl;
       //}
 
-
       //PetscInt  nodes_per_side;
       idx_t nodes_per_side;
       
@@ -374,28 +371,28 @@ int  HBSplineCutFEM::prepareMatrixPattern()
         nodes_per_side = 3;
 
 
-    //
-    idx_t  nWeights  = 1;
-    idx_t  nParts = n_mpi_procs;
-    idx_t  objval;
-    idx_t  *xadj, *adjncy;
-    idx_t  numflag=0;
+      //
+      idx_t  nWeights  = 1;
+      idx_t  nParts = n_mpi_procs;
+      idx_t  objval;
+      idx_t  *xadj, *adjncy;
+      idx_t  numflag=0;
 
-    idx_t options[METIS_NOPTIONS];
+      idx_t options[METIS_NOPTIONS];
 
-    METIS_SetDefaultOptions(options);
+      METIS_SetDefaultOptions(options);
 
-    // Specifies the partitioning method.
-    options[METIS_OPTION_PTYPE] = METIS_PTYPE_RB;    // Multilevel recursive bisectioning.
-    options[METIS_OPTION_PTYPE] = METIS_PTYPE_KWAY;  // Multilevel k-way partitioning.
+      // Specifies the partitioning method.
+      options[METIS_OPTION_PTYPE] = METIS_PTYPE_RB;    // Multilevel recursive bisectioning.
+      options[METIS_OPTION_PTYPE] = METIS_PTYPE_KWAY;  // Multilevel k-way partitioning.
 
-    //options[METIS_OPTION_NSEPS] = 10;
+      //options[METIS_OPTION_NSEPS] = 10;
 
-    options[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_CUT;   // Edge-cut minimization
-    //options[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_VOL; // Total communication volume minimization
+      options[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_CUT;   // Edge-cut minimization
+      //options[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_VOL; // Total communication volume minimization
 
-    options[METIS_OPTION_NUMBERING] = 0;  // C-style numbering is assumed that starts from 0.
-    //options[METIS_OPTION_NUMBERING] = 1;  // Fortran-style numbering is assumed that starts from 1.
+      options[METIS_OPTION_NUMBERING] = 0;  // C-style numbering is assumed that starts from 0.
+      //options[METIS_OPTION_NUMBERING] = 1;  // Fortran-style numbering is assumed that starts from 1.
 
 
       // METIS partition routine
@@ -517,13 +514,12 @@ int  HBSplineCutFEM::prepareMatrixPattern()
     } // if(n_mpi_procs > 1)
 
 
-    for(ii=0; ii<nElem; ii++)
+    for(ee=0; ee<nElem; ee++)
     {
-      elems[activeElements[ii]]->initialiseDOFvalues();
-      //cout << " uuuuuuuuuuuuu " << endl;
+      elems[activeElements[ee]]->initialiseDOFvalues();
     }
 
-    pcout << " preparing matrix pattern " << endl;
+    PetscSynchronizedPrintf(MPI_COMM_WORLD, "\n    preparing matrix pattern    \n");
     //printf("\n element DOF values initialised \n\n");
     //printf("\n Finding Global positions \n\n");
 
@@ -533,10 +529,7 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
     DDconnLoc.resize(tempDOF);
 
-    cout << " tempDOF =  " << tempDOF << endl;
-    cout << " activeElements.size() = " << activeElements.size() << endl;
-
-    //cout << " jjjjjjjjjjjjjjjj " << endl;
+    //cout << " tempDOF =  " << tempDOF << endl;
 
     for(e=0; e<activeElements.size(); e++)
     {
@@ -544,9 +537,6 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
         val1 =  nd1->GetNsize();
         tt1  =  &(nd1->forAssyVec[0]);
-        //cout << e << '\t' << val1 << endl;
-
-        //printVector(nd1->forAssyVec);
 
         if( nd1->domNums[0] == 0 )
         {
@@ -559,9 +549,7 @@ int  HBSplineCutFEM::prepareMatrixPattern()
           }
         }
 
-      //cout << " hhhhhhhhhhhhhhhhhhhh " << nd1->IsCutElement() << endl;
       // connectivity for ghost-penalty terms
-      //
       if( nd1->IsCutElement() )
       {
         for(side=0; side<NUM_NEIGHBOURS; side++)
@@ -570,8 +558,6 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
           if( (nd2 != NULL) && !(nd2->IsGhost()) && nd2->IsLeaf() && (nd2->IsCutElement() || nd2->domNums[0] == 0) )
           {
-              //cout << " side = " << side << endl;
-
               nr1 = nd1->forAssyVec.size();
               nr2 = nd2->forAssyVec.size();
 
@@ -590,10 +576,9 @@ int  HBSplineCutFEM::prepareMatrixPattern()
           }
         } //for(side=0; side<NUM_NEIGHBOURS; side++)
       } //if( nd1->IsCutElement() )
-      //
     } // for(e=0;e<activeElements.size();e++)
 
-    printf("\n Global positions DONE for individual domains \n\n");
+    PetscSynchronizedPrintf(MPI_COMM_WORLD, "\n    Global positions DONE for individual domains \n\n");
 
     forAssyCutFEMprev = forAssyCutFEM;
 
@@ -605,7 +590,6 @@ int  HBSplineCutFEM::prepareMatrixPattern()
     for(ee=0; ee<tempDOF; ee++)
     {
       findUnique(DDconnLoc[ee]);
-      //printVector(DDconnLoc[ee]);
 
       if(DDconnLoc[ee].size() > 0)
       {
@@ -623,7 +607,7 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
     //printf("\n \t   Fluid DOF in the model   =  %8d\n\n", fluidDOF);
     //printf("\n \t   Solid DOF in the model   =  %8d\n\n", solidDOF);
-    printf("\n \t   Total DOF in the model   =  %8d\n\n", totalDOF);
+    PetscSynchronizedPrintf(MPI_COMM_WORLD, "\n \t   Total DOF in the model   =  %8d\n\n", totalDOF);
 
 
     vector<vector<int> > DDconn;
@@ -644,7 +628,6 @@ int  HBSplineCutFEM::prepareMatrixPattern()
       }
     } //for(ee=0; ee<DDconnLoc[dd].size(); ee++)
 
-
     //printf("\n Finding Global positions DONE \n\n");
 
     VectorXi  nnzVec(totalDOF);
@@ -662,24 +645,12 @@ int  HBSplineCutFEM::prepareMatrixPattern()
     //cout << "It took "<< difftime(tend, tstart) <<" second(s)."<< endl;
 
 
-    //cout << " AAAAAAAAAA " << endl;
-
     SolnData.node_map_new_to_old = node_map_new_to_old;
     SolnData.node_map_old_to_new = node_map_old_to_new;
 
     GeomData.node_map_new_to_old = node_map_new_to_old;
     GeomData.node_map_old_to_new = node_map_old_to_new;
 
-
-    if(SOLVER_TYPE == SOLVER_TYPE_PETSC)
-    {
-      /////////////////////////////////////////
-      //
-      // Petsc based solver
-      //
-      /////////////////////////////////////////
-
-      cout << " PetscSolver " << endl;
 
       ////////////////////////////////////////////////////////////////////////////////////////////
       // find the number of nonzeroes in the diagonal and off-diagonal portions of each processor
@@ -708,10 +679,6 @@ int  HBSplineCutFEM::prepareMatrixPattern()
         kk++;
       }
 
-      //MatCreateSeqAIJ(PETSC_COMM_WORLD, totalDOF, totalDOF, 500, &nnzVec(0), &(solver2->mtx));
-      //PetscErrorCode ierr;
-
-      //
       //Create parallel matrix, specifying only its global dimensions.
       //When using MatCreate(), the matrix format can be specified at
       //runtime. Also, the parallel partitioning of the matrix is
@@ -756,53 +723,6 @@ int  HBSplineCutFEM::prepareMatrixPattern()
       ierr = VecSetFromOptions(solverPetsc->reac);CHKERRQ(ierr);
 
       solverPetsc->currentStatus = PATTERN_OK;
-    }
-    else
-    {
-      /////////////////////////////////////////
-      //
-      // Eigen based solver
-      //
-      /////////////////////////////////////////
-
-      cout << " Eigen based solver " << totalDOF << endl;
-
-      solverEigen->mtx.setZero();
-      solverEigen->mtx.uncompress();
-
-      //solverEigen->mtx.resize(totalDOF, totalDOF);
-      solverEigen->mtx.conservativeResize(totalDOF, totalDOF);
-      //solverEigen->mtx.reserve(nnz);
-      solverEigen->mtx.reserve(nnzVec);
-      //cout << " AAAAAAAAAA " << endl;
-
-      typedef Eigen::Triplet<double> T;
-
-      vector<T> tripletList;
-
-      tripletList.reserve(nnz);
-
-      for(ii=0;ii<DDconn.size();ii++)
-      {
-        for(jj=0;jj<DDconn[ii].size();jj++)
-        {
-          tripletList.push_back(T(ii, DDconn[ii][jj], 0.0));
-        }
-      }
-
-      solverEigen->mtx.setFromTriplets(tripletList.begin(), tripletList.end());
-
-      solverEigen->mtx.makeCompressed();
-
-      //cout << solverEigen->mtx.rows() << endl;
-      //cout << solverEigen->mtx.cols() << endl;
-      //cout << solverEigen->mtx.nonZeros() << endl;
-
-      solverEigen->currentStatus = PATTERN_OK;
-    }
-
-
-    // mat is ready to go!
 
     soln.resize(totalDOF);
     soln.setZero();
@@ -834,6 +754,48 @@ int HBSplineCutFEM::prepareMatrixPattern()
     int  *tt1, *tt2, val1, val2, nnz, n1, n2, kk, e1, a, b, ll, pp, aa, bb;
     int  side, NUM_NEIGHBOURS=2*DIM, start1, start2, nr1, nr2;
 
+    nElem = activeElements.size();
+    nNode = gridBF1;
+
+    elem_start = 0;
+    elem_end   = nElem-1;
+
+    nElem_local = nElem;
+
+    totalDOF = nNode*ndof;
+
+    row_start = 0;
+    row_end   = totalDOF-1;
+
+    ndofs_local = totalDOF;
+
+    node_map_new_to_old.resize(nNode, 0);
+    node_map_old_to_new.resize(nNode, 0);
+
+    dof_map_new_to_old.resize(totalDOF, 0);
+    dof_map_old_to_new.resize(totalDOF, 0);
+
+    kk=0;
+    for(ii=0; ii<nNode; ii++)
+    {
+      node_map_new_to_old[ii] = ii;
+      node_map_old_to_new[ii] = ii;
+
+      for(jj=0; jj<ndof; jj++)
+      {
+        dof_map_new_to_old[kk] = kk;
+        dof_map_old_to_new[kk] = kk;
+        kk++;
+      }
+    }
+
+    SolnData.node_map_new_to_old = node_map_new_to_old;
+    SolnData.node_map_old_to_new = node_map_old_to_new;
+
+    GeomData.node_map_new_to_old = node_map_new_to_old;
+    GeomData.node_map_old_to_new = node_map_old_to_new;
+
+
     printf("\n Finding Global positions \n\n");
 
     vector<vector<int> >  DDconnLoc;
@@ -842,7 +804,7 @@ int HBSplineCutFEM::prepareMatrixPattern()
 
     DDconnLoc.resize(tempDOF);
 
-    cout << " activeElements.size() " << activeElements.size() << '\t' << tempDOF << endl;
+    //cout << " activeElements.size() " << activeElements.size() << '\t' << tempDOF << endl;
 
     node  *nd1, *nd2;
 
@@ -853,13 +815,14 @@ int HBSplineCutFEM::prepareMatrixPattern()
     tend = time(0);
     printf("HBSplineCutFEM::prepareCutElements() took %8.4f second(s) \n ", difftime(tend, tstart) );
 
-    //cout << " jjjjjjjjjjjjjjjj " << endl;
+    for(e=0; e<activeElements.size(); e++)
+    {
+      elems[activeElements[e]]->initialiseDOFvalues();
+    }
 
     for(e=0; e<activeElements.size(); e++)
     {
         nd1 = elems[activeElements[e]];
-
-        nd1->initialiseDOFvalues();
 
         val1 =  nd1->GetNsize();
         tt1  =  &(nd1->forAssyVec[0]);
@@ -878,7 +841,6 @@ int HBSplineCutFEM::prepareMatrixPattern()
           }
         }
 
-      //cout << " hhhhhhhhhhhhhhhhhhhh " << nd1->IsCutElement() << endl;
       // connectivity for ghost-penalty terms
       //
       if( nd1->IsCutElement() )
@@ -967,10 +929,6 @@ int HBSplineCutFEM::prepareMatrixPattern()
     // hardcoded for a single DOF rigid body
     // 
     solidDOF=0;
-    if(!STAGGERED)
-    {
-      solidDOF += 1;
-    }
 
     totalDOF = fluidDOF + solidDOF;
 
@@ -1106,9 +1064,9 @@ int HBSplineCutFEM::prepareMatrixPattern()
     soln.setZero();
     solnInit = soln;
 
-    cout << solverEigen->mtx.rows() << endl;
-    cout << solverEigen->mtx.cols() << endl;
-    cout << solverEigen->mtx.nonZeros() << endl;
+    //cout << solverEigen->mtx.rows() << endl;
+    //cout << solverEigen->mtx.cols() << endl;
+    //cout << solverEigen->mtx.nonZeros() << endl;
 
     solverEigen->currentStatus = PATTERN_OK;
 
@@ -1118,7 +1076,7 @@ int HBSplineCutFEM::prepareMatrixPattern()
 
   return 1;
 }
-8/
+*/
 
 
 

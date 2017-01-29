@@ -71,6 +71,7 @@ void HBSplineCutFEM::plotGeomAdapIntegration2D(int val1, bool flag2, int col, bo
             quadVTK->GetPointIds()->SetId(ll, pt[ll]);
 
           cellDataVTK->InsertNextValue( ndTemp->GetDomainNumber() );
+          cellDataVTK2->InsertNextValue(ndTemp->get_subdomain_id());
           //cellDataVTK2->InsertNextValue( ndTemp->GetLevel() );
 
           uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
@@ -178,6 +179,7 @@ void HBSplineCutFEM::plotGeomAdapIntegration2D(int val1, bool flag2, int col, bo
                 quadVTK->GetPointIds()->SetId(ll, pt[ll]);
 
               cellDataVTK->InsertNextValue( adapNd2->GetDomainNumber() );
+              cellDataVTK2->InsertNextValue(ndTemp->get_subdomain_id());
               //cellDataVTK2->InsertNextValue( adapNd2->GetLevel() );
               uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
             //}
@@ -225,11 +227,11 @@ void HBSplineCutFEM::plotGeomAdapIntegration2D(int val1, bool flag2, int col, bo
 
     uGridVTK->SetPoints(pointsVTK);
 
-    cellDataVTK->SetName("ElemType");
-    cellDataVTK2->SetName("ElemLevel");
+    //cellDataVTK->SetName("ElemType");
+    //cellDataVTK2->SetName("ElemLevel");
 
     uGridVTK->GetCellData()->SetScalars(cellDataVTK);
-    //uGridVTK->GetCellData()->AddArray(cellDataVTK2);
+    uGridVTK->GetCellData()->AddArray(cellDataVTK2);
 
     return;
 }
@@ -237,7 +239,6 @@ void HBSplineCutFEM::plotGeomAdapIntegration2D(int val1, bool flag2, int col, bo
 
 
 
-//
 void HBSplineCutFEM::plotGeomAdapIntegration3D(int val1, bool flag2, int col, bool PLOT_KNOT_LINES, int* resln)
 {
     int  ii, ee, ll, kk, totalNGP=0;
@@ -276,6 +277,7 @@ void HBSplineCutFEM::plotGeomAdapIntegration3D(int val1, bool flag2, int col, bo
           hexVTK->GetPointIds()->SetId(ll, ptIds[ll]);
 
         cellDataVTK->InsertNextValue( ndTemp->GetDomainNumber() );
+        cellDataVTK2->InsertNextValue(ndTemp->get_subdomain_id());
 
         uGridVTK->InsertNextCell(hexVTK->GetCellType(), hexVTK->GetPointIds());
       }
@@ -388,6 +390,8 @@ void HBSplineCutFEM::plotGeomAdapIntegration3D(int val1, bool flag2, int col, bo
                 hexVTK->GetPointIds()->SetId(ll, ptIds[ll]);
 
               cellDataVTK->InsertNextValue( adapNd2->GetDomainNumber() );
+              cellDataVTK2->InsertNextValue(ndTemp->get_subdomain_id());
+
               uGridVTK->InsertNextCell(hexVTK->GetCellType(), hexVTK->GetPointIds());
             //}
 
@@ -398,7 +402,6 @@ void HBSplineCutFEM::plotGeomAdapIntegration3D(int val1, bool flag2, int col, bo
 
             //cout <<  adapNd2->GetID() << '\t' << adapNd2->GetOrientation() << endl;
             while( adapNd2->GetOrientation() == RIGHT )
-            //while(adapNd3 == NULL)
             {
               //cout << " inside IF " << endl;
               adapNd2 = adapNd2->GetParent();
@@ -428,10 +431,11 @@ void HBSplineCutFEM::plotGeomAdapIntegration3D(int val1, bool flag2, int col, bo
 
     PetscPrintf(MPI_COMM_WORLD, "\n Total number of Gauss points in cut cells = %d \n\n", totalNGP);
 
-    cellDataVTK->SetName("ElemType");
+    //cellDataVTK->SetName("ElemType");
 
     uGridVTK->SetPoints(pointsVTK);
     uGridVTK->GetCellData()->SetScalars(cellDataVTK);
+    uGridVTK->GetCellData()->AddArray(cellDataVTK2);
 
     return;
 }
@@ -668,8 +672,9 @@ void  HBSplineCutFEM::postProcessAdapIntegration2D(int vartype, int vardir, int 
           quadVTK->GetPointIds()->SetId(3, pt[2]);
 
           uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
-          cellDataVTK->InsertNextValue(0);
-          cellDataVTK2->InsertNextValue(0);
+
+          cellDataVTK->InsertNextValue(ndTemp->GetDomainNumber() );
+          cellDataVTK2->InsertNextValue(ndTemp->get_subdomain_id());
 	  }
         } //if( !nd->IsCutElement() )
         else // the element is cutCell
@@ -711,6 +716,7 @@ void  HBSplineCutFEM::postProcessAdapIntegration2D(int vartype, int vardir, int 
               }
 
               cellDataVTK->InsertNextValue(poly->GetDomainNumber());
+              cellDataVTK2->InsertNextValue(ndTemp->get_subdomain_id());
 
               uGridVTK->InsertNextCell(triaVTK->GetCellType(), triaVTK->GetPointIds());
             }
@@ -729,6 +735,10 @@ void  HBSplineCutFEM::postProcessAdapIntegration2D(int vartype, int vardir, int 
 
     uGridVTK->GetPointData()->SetScalars(scaVTK);
     uGridVTK->GetPointData()->AddArray(scaVTK2);
+
+    uGridVTK->GetCellData()->SetScalars(cellDataVTK);
+    uGridVTK->GetCellData()->AddArray(cellDataVTK2);
+
     // create a write object and write uGridVTK to it
   }
   else // for Stokes and Navier-Stokes
@@ -819,8 +829,12 @@ void  HBSplineCutFEM::postProcessAdapIntegration2D(int vartype, int vardir, int 
             quadVTK->GetPointIds()->SetId(3, pt[2]);
 
             uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
+
             //cellDataVTK->InsertNextValue(0);
             //cellDataVTK2->InsertNextValue(0);
+
+            cellDataVTK->InsertNextValue(ndTemp->GetDomainNumber() );
+            cellDataVTK2->InsertNextValue(ndTemp->get_subdomain_id());
 
             //cout << " ooooooooooooo " << endl;
         } //if( !nd->IsCutElement() )
@@ -859,6 +873,8 @@ void  HBSplineCutFEM::postProcessAdapIntegration2D(int vartype, int vardir, int 
 
               cellDataVTK->InsertNextValue( adapNd2->GetDomainNumber() );
               //cellDataVTK2->InsertNextValue( adapNd2->GetLevel() );
+              cellDataVTK2->InsertNextValue(ndTemp->get_subdomain_id());
+
               uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
 
               tmp0 = adapNd2->GetKnots(Dir1);
@@ -958,8 +974,12 @@ void  HBSplineCutFEM::postProcessAdapIntegration2D(int vartype, int vardir, int 
     uGridVTK->GetPointData()->SetVectors(vecVTK);
     //uGridVTK->GetPointData()->AddArray(vecVTK2);
     uGridVTK->GetPointData()->AddArray(scaVTK2);
+
+    uGridVTK->GetCellData()->SetScalars(cellDataVTK);
+    uGridVTK->GetCellData()->AddArray(cellDataVTK2);
+
     //cout << " jjjjjjjjjjjjjjjjjj " << endl;
-}
+  }
 
     return;
 }
@@ -992,7 +1012,7 @@ void  HBSplineCutFEM::postProcessAdapIntegration3D(int vartype, int vardir, int 
 
     time_t tstart, tend;
 
-    node* nd;
+    node* ndTemp;
 
   //if(ndf == 1)
   //{
@@ -1013,20 +1033,17 @@ void  HBSplineCutFEM::postProcessAdapIntegration3D(int vartype, int vardir, int 
     
     for(ee=0; ee<activeElements.size(); ee++)
     {
-        nd = elems[activeElements[ee]];
+        ndTemp = elems[activeElements[ee]];
         //cout << " Node # " << nd->GetID() << endl;
 
-        knotBegin = nd->GetKnotBegin();
-        knotIncr  = nd->GetKnotIncrement();
+        knotBegin = ndTemp->GetKnotBegin();
+        knotIncr  = ndTemp->GetKnotIncrement();
 
-        //printf("\t tmp[0] and tmp[1]  ... : %12.8f\t%12.8f\n", tmp[0], tmp[1] );
-        //cout << " nd->GetDomainNumber() = " << nd->GetDomainNumber() << endl;
-
-          if( (nd->domNums.size() == 1) && (nd->domNums[0] == 0) )
+          if( (ndTemp->domNums.size() == 1) && (ndTemp->domNums[0] == 0) )
           {
-             tmp0 = nd->GetKnots(Dir1);
-             tmp1 = nd->GetKnots(Dir2);
-             tmp2 = nd->GetKnots(Dir3);
+             tmp0 = ndTemp->GetKnots(Dir1);
+             tmp1 = ndTemp->GetKnots(Dir2);
+             tmp2 = ndTemp->GetKnots(Dir3);
 
              incr1 = tmp0[2] ;
              incr2 = tmp1[2] ;
@@ -1064,7 +1081,7 @@ void  HBSplineCutFEM::postProcessAdapIntegration3D(int vartype, int vardir, int 
 
                 GeomData.computeBasisFunctions3D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy, dNN_dz);
 
-                if(nd->GetParent() == NULL)
+                if(ndTemp->GetParent() == NULL)
                 {
                   N = NN;
                   dN_dx = dNN_dx;
@@ -1073,17 +1090,17 @@ void  HBSplineCutFEM::postProcessAdapIntegration3D(int vartype, int vardir, int 
                 }
                 else
                 {
-                  N = nd->SubDivMat*NN;
-                  dN_dx = nd->SubDivMat*dNN_dx;
-                  dN_dy = nd->SubDivMat*dNN_dy;
-                  dN_dz = nd->SubDivMat*dNN_dz;
+                  N = ndTemp->SubDivMat*NN;
+                  dN_dx = ndTemp->SubDivMat*dNN_dx;
+                  dN_dy = ndTemp->SubDivMat*dNN_dy;
+                  dN_dz = ndTemp->SubDivMat*dNN_dz;
                 }
 
-                vec[0] = nd->computeValue(0, N);
-                vec[1] = nd->computeValue(1, N);
-                vec[2] = nd->computeValue(2, N);
+                vec[0] = ndTemp->computeValue(0, N);
+                vec[1] = ndTemp->computeValue(1, N);
+                vec[2] = ndTemp->computeValue(2, N);
 
-                fact   = nd->computeValue(3, N);
+                fact   = ndTemp->computeValue(3, N);
 
                 vecVTK->InsertNextTuple(vec);
                 vecVTK2->InsertNextTuple(vec);
@@ -1108,12 +1125,13 @@ void  HBSplineCutFEM::postProcessAdapIntegration3D(int vartype, int vardir, int 
             //cellDataVTK->InsertNextValue(0);
             //cellDataVTK2->InsertNextValue(0);
 
-            //cout << " ooooooooooooo " << endl;
-         } // if( (nd->domNums.size() == 0) && (nd->domNums[0] == 0) )
-         else if( nd->domNums.size() > 1 )
-        {
-          //cout << " nd->GetDomainNumber() = " << nd->GetDomainNumber() << endl;
+            cellDataVTK->InsertNextValue(ndTemp->GetDomainNumber() );
+            cellDataVTK2->InsertNextValue(ndTemp->get_subdomain_id());
 
+            //cout << " ooooooooooooo " << endl;
+         } // if( (ndTemp->domNums.size() == 0) && (ndTemp->domNums[0] == 0) )
+         else if( ndTemp->domNums.size() > 1 )
+        {
           /////////////////////////////////////////////////////////////
           //  method 2
           /////////////////////////////////////////////////////////////
@@ -1122,10 +1140,7 @@ void  HBSplineCutFEM::postProcessAdapIntegration3D(int vartype, int vardir, int 
 
           adapTreePTR  adapNd1, adapNd2, adapNd3;
         
-          adapNd2 = nd->adapIntegNode;
-        
-          //adapNd2 = adapNd1->GetChild(0);
-          //cout << adapNd2->GetID() << endl;
+          adapNd2 = ndTemp->adapIntegNode;
 
           while( adapNd2 != NULL )
           {
@@ -1174,7 +1189,7 @@ void  HBSplineCutFEM::postProcessAdapIntegration3D(int vartype, int vardir, int 
 
                   GeomData.computeBasisFunctions3D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy, dNN_dz);
 
-                  if(nd->GetParent() == NULL)
+                  if(ndTemp->GetParent() == NULL)
                   {
                     N = NN;
                     dN_dx = dNN_dx;
@@ -1183,16 +1198,16 @@ void  HBSplineCutFEM::postProcessAdapIntegration3D(int vartype, int vardir, int 
                   }
                   else
                   {
-                    N = nd->SubDivMat*NN;
-                    dN_dx = nd->SubDivMat*dNN_dx;
-                    dN_dy = nd->SubDivMat*dNN_dy;
-                    dN_dz = nd->SubDivMat*dNN_dz;
+                    N = ndTemp->SubDivMat*NN;
+                    dN_dx = ndTemp->SubDivMat*dNN_dx;
+                    dN_dy = ndTemp->SubDivMat*dNN_dy;
+                    dN_dz = ndTemp->SubDivMat*dNN_dz;
                   }
 
-                  vec[0] = nd->computeValue(0, N);
-                  vec[1] = nd->computeValue(1, N);
-                  vec[2] = nd->computeValue(2, N);
-                  fact   = nd->computeValue(3, N);
+                  vec[0] = ndTemp->computeValue(0, N);
+                  vec[1] = ndTemp->computeValue(1, N);
+                  vec[2] = ndTemp->computeValue(2, N);
+                  fact   = ndTemp->computeValue(3, N);
 
                   vecVTK->InsertNextTuple(vec);
                   vecVTK2->InsertNextTuple(vec);
@@ -1212,6 +1227,10 @@ void  HBSplineCutFEM::postProcessAdapIntegration3D(int vartype, int vardir, int 
                 hexVTK->GetPointIds()->SetId(7, ptIds[6]);
 
                 uGridVTK->InsertNextCell(hexVTK->GetCellType(), hexVTK->GetPointIds());
+
+                cellDataVTK->InsertNextValue(ndTemp->GetDomainNumber() );
+                cellDataVTK2->InsertNextValue(ndTemp->get_subdomain_id());
+
             } // if( (adapNd2->GetDomainNumber() <= 0) )
 
             if(adapNd2->GetOrientation() == -1)
@@ -1234,10 +1253,8 @@ void  HBSplineCutFEM::postProcessAdapIntegration3D(int vartype, int vardir, int 
                 //cout <<  adapNd2->GetID() << '\t' << adapNd2->GetOrientation() << endl;
                 adapNd3 = adapNd2->GetNeighbour(neigbour_map2[adapNd2->GetOrientation()]);
 	      }
-
               //cout << adapNd2->GetID() << endl;
             }
-
             adapNd2 = adapNd3;
           }
           else
@@ -1262,6 +1279,10 @@ void  HBSplineCutFEM::postProcessAdapIntegration3D(int vartype, int vardir, int 
     uGridVTK->GetPointData()->SetVectors(vecVTK);
     uGridVTK->GetPointData()->AddArray(vecVTK2);
     //uGridVTK->GetPointData()->AddArray(scaVTK2);
+
+    uGridVTK->GetCellData()->SetScalars(cellDataVTK);
+    uGridVTK->GetCellData()->AddArray(cellDataVTK2);
+
     //cout << " jjjjjjjjjjjjjjjjjj " << endl;
   }
 

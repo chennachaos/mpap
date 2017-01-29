@@ -5,7 +5,6 @@
 #include "ComputerTime.h"
 #include "FunctionsEssGrp.h"
 #include "RunControl.h"
-
 #include "petscmat.h"
 
 
@@ -42,7 +41,7 @@ int macro27(Macro &macro)
   {
     while (ch.which(yes)<0 && ch.which(no)<0) 
     {
-      //p0cout << "    continue with macro execution ? (y/n) [y] ";
+      //cout << "    continue with macro execution ? (y/n) [y] ";
       PetscPrintf(MPI_COMM_WORLD, "    continue with macro execution ? (y/n) [y] ");
 
       ch.free().append("y").inputKeepIfReturn();

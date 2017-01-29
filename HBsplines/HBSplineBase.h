@@ -3,15 +3,8 @@
 #define incl_HBSplineBase_CLASS_h
 
 
-//#include "MyStringList.h"
-//#include "MathMatrix.h"
-//#include "List.h"
-//#include "MathVector.h"
-//#include "PropertyItem.h"
 #include "Solver.h"
-
 #include "TreeNode.h"
-
 #include "Domain.h"
 #include "Definitions.h"
 #include "DomainTree.h"
@@ -127,7 +120,6 @@ class HBSplineBase: public Domain
         vtkSmartPointer<vtkTetra>                tetVTK;
         vtkSmartPointer<vtkHexahedron>           hexVTK;
 
-        //vtkSmartPointer<vtkDoubleArray>          vectors, vectors2, scalars, scalars2;
         vtkSmartPointer<vtkFloatArray>          vecVTK, vecVTK2, scaVTK, scaVTK2, cellDataVTK, cellDataVTK2;
         vtkSmartPointer<vtkXMLUnstructuredGridWriter>  writerUGridVTK;
 
