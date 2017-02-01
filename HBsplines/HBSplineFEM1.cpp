@@ -756,9 +756,10 @@ void HBSplineFEM::prepareInputData()
     for(int ii=0; ii<activeElements.size(); ii++)
     {
       elems[activeElements[ii]]->initialiseDOFvalues();
-      //cout << " uuuuuuuuuuuuu " << endl;
     }
 
+
+    cout << " uuuuuuuuuuuuu " << endl;
 
     ///////////////////////////////////////////////////
     //
@@ -786,9 +787,11 @@ void HBSplineFEM::prepareInputData()
         //lme->elem.resize(lme->gausspoints.size());
         for(gp=0;gp<lme->gausspoints.size();gp++)
         {
+          //cout << " gp = " << gp << endl;
           lme->computePointAtGP(gp, geom);
+          //cout << " geom = " << geom[0] << '\t' << geom[1] << '\t' << geom[2] << endl;
           r = findCellNumber(geom);
-
+          //cout << " aaaaaaaaaaaaa  " << endl;
           lme->elemNums[gp] = r;
           //lme->elem[gp] = elems[r];
           //printf("xx = %12.6f, yy = %12.6f, zz = %12.6f, dvol = %5d, \n", geom[0], geom[1], geom[2], r);
@@ -799,6 +802,7 @@ void HBSplineFEM::prepareInputData()
       }
     }
 
+    cout << " jjjjjjjjjjjjjjj  " << endl;
 
     velDOF  = gridBF1 * ndof;  // equal order for velocity and pressure
     presDOF = 0;
@@ -823,7 +827,7 @@ void HBSplineFEM::prepareInputData()
 
       solidDOF += contElemData.size();
     }
-    //cout << " jjjjjjjjjjjjjjj  " << endl;
+    cout << " jjjjjjjjjjjjjjj  " << endl;
 
     totalDOF = velDOF + presDOF + IBDOF + solidDOF;
 

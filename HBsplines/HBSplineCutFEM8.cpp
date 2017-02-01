@@ -166,8 +166,8 @@ void HBSplineCutFEM::plotGeomAdapIntegration2D(int val1, bool flag2, int col, bo
         {
           if( adapNd2->IsLeaf() )
           {
-            //if( (adapNd2->GetDomainNumber() == 0) || (adapNd2->GetDomainNumber() == -1) )
-            //{
+            if( (adapNd2->GetDomainNumber() == 0) || (adapNd2->GetDomainNumber() == -1) )
+            {
               bbTemp = adapNd2->GetAABB();
 
               pt[0] = pointsVTK->InsertNextPoint(bbTemp.minBB[0], bbTemp.minBB[1], 0.0);
@@ -182,7 +182,7 @@ void HBSplineCutFEM::plotGeomAdapIntegration2D(int val1, bool flag2, int col, bo
               cellDataVTK2->InsertNextValue(ndTemp->get_subdomain_id());
               //cellDataVTK2->InsertNextValue( adapNd2->GetLevel() );
               uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
-            //}
+            }
 
             if(adapNd2->GetOrientation() == -1)
               adapNd3 = NULL;

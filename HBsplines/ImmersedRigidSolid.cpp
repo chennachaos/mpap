@@ -1391,7 +1391,8 @@ if(totalDOF > 1)
 
   //gn = disp-5.0;
   //gn = disp-1.55;
-  gn = disp-20.4;
+  gn = disp-1.65;
+  //gn = disp-20.4;
   //gn = disp-80.0*PI/180.0;
 
   double lamn2 = SolnData.var1Cur[2];

@@ -92,7 +92,7 @@ void HBSplineCutFEM::plotGeom(int val1, bool flag2, int col, bool PLOT_KNOT_LINE
     cellDataVTK->SetName("ElemType");
     cellDataVTK2->SetName("SubdomId");
 
-    //uGridVTK->GetCellData()->SetScalars(cellDataVTK);
+    uGridVTK->GetCellData()->SetScalars(cellDataVTK);
     //uGridVTK->GetCellData()->AddArray(cellDataVTK2);
 
 
@@ -198,10 +198,12 @@ void HBSplineCutFEM::plotGeomSubTrias2D(int val1, bool flag2, int col, bool PLOT
 
     for(ee=0;ee<activeElements.size();ee++)
     {
-        ndTemp = elems[activeElements[ee]];
+      ndTemp = elems[activeElements[ee]];
 
-        //if( nd1->GetDomainNumber() < 5 )
-        if( !ndTemp->IsCutElement() )
+      //if( !ndTemp->IsCutElement() )
+      if( !(ndTemp->GetDomainNumber() == -1) )
+      {
+        if( ndTemp->GetDomainNumber() == 0 )
         {
           bbTemp = ndTemp->GetAABB();
 
@@ -220,8 +222,9 @@ void HBSplineCutFEM::plotGeomSubTrias2D(int val1, bool flag2, int col, bool PLOT
 
           uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
         }
-        else // the element is cutCell
-        {
+      }
+      else // the element is cutCell
+      {
           totalNGP += ndTemp->Quadrature.gausspoints.size();
 
           vtkSmartPointer<vtkTriangle> triaVTK =  vtkSmartPointer<vtkTriangle>::New();
@@ -234,20 +237,22 @@ void HBSplineCutFEM::plotGeomSubTrias2D(int val1, bool flag2, int col, bool PLOT
           {
             poly = ndTemp->subTrias[ii];
 
-            for(kk=0; kk<3; kk++)
+            if( poly->GetDomainNumber() == 0 )
             {
-              ptTemp = poly->GetPoint(kk);
+              for(kk=0; kk<3; kk++)
+              {
+                ptTemp = poly->GetPoint(kk);
 
-              ptId = pointsVTK->InsertNextPoint(ptTemp[0], ptTemp[1], 0.0);
+                ptId = pointsVTK->InsertNextPoint(ptTemp[0], ptTemp[1], 0.0);
 
-              triaVTK->GetPointIds()->SetId(kk, ptId );
-            }
+                triaVTK->GetPointIds()->SetId(kk, ptId );
+              }
 
-            cellDataVTK->InsertNextValue(poly->GetDomainNumber());
-            cellDataVTK2->InsertNextValue(ndTemp->get_subdomain_id());
+              cellDataVTK->InsertNextValue(poly->GetDomainNumber());
+              cellDataVTK2->InsertNextValue(ndTemp->get_subdomain_id());
 
-            uGridVTK->InsertNextCell(triaVTK->GetCellType(), triaVTK->GetPointIds());
-
+              uGridVTK->InsertNextCell(triaVTK->GetCellType(), triaVTK->GetPointIds());
+	    }
           } //  for(ii=0; ii<nd->subTrias.size(); ii++)
         } //else
     } // for(ee=0;ee<elems.size();ee++)

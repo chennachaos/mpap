@@ -1464,7 +1464,7 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
             specVal = DirichletData[aa][2];
 
             //if(2 < 1)
-	    //
+	    /*
             if(side == 0 )
             {
               if(dir == 0)
@@ -1479,7 +1479,7 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
                   //specVal = 0.0;
               }
             }
-            //
+            */
             /*
             if(side == 3)
             {
