@@ -1,14 +1,12 @@
 
 
 #include "LagrangeElem2DStructSolidMixed.h"
-
 #include "Debug.h"
 #include "MpapTime.h"
 #include "ComputerTime.h"
 #include "GeomDataLagrange.h"
 #include "SolutionData.h"
 #include "FunctionsMaterial.h"
-#include "NurbsShapeFunctions.h"
 
 
 using namespace std;

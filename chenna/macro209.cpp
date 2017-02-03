@@ -1,12 +1,7 @@
 #include "Macro.h"
 #include "DomainTree.h"
-#include "IsogeometricFEM.h"
-
-//#include "Plot.h"
-
 
 extern DomainTree domain;
-//extern Plot       plot;
 
 
 int macro209(Macro &macro)
@@ -74,13 +69,12 @@ int macro209(Macro &macro)
 
   //if (!plot)
   //{
-     domain(type,id).findMinMaxX(xmn,xmx,defm);
+     //domain(type,id).findMinMaxX(xmn,xmx,defm);
 
     //plot.fit(xmn,xmx,domain(type,id).ndm);
   //}
   
-  isogeometricFEM(domain(type,id)).discreteContourplot(val1, val2, index, nCols, umnx, umn, umx, legd);
-
+  //isogeometricFEM(domain(type,id)).discreteContourplot(val1, val2, index, nCols, umnx, umn, umx, legd);
 
 //--------------------------------------------------------------------------------------------------
   return 0;  

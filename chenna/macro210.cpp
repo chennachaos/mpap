@@ -1,12 +1,9 @@
 
 #include "Macro.h"
 #include "DomainTree.h"
-#include "IsogeometricFEM.h"
-//#include "Plot.h"
 #include "HBSplineFEM.h"
 
 extern DomainTree domain;
-//extern Plot       plot;
 
 int macro210(Macro &macro)
 {
@@ -46,9 +43,6 @@ int macro210(Macro &macro)
   patchnum = macro.p[5];
 
   hbsplineFEM(domain(type,id)).writeReadResult(rr, macro.strg);
-  
-  
-
 
 //--------------------------------------------------------------------------------------------------
   return 0;  

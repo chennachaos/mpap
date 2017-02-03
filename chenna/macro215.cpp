@@ -1,9 +1,9 @@
 
 #include "Macro.h"
 #include "DomainTree.h"
-#include "PlotVTK.h"
+//#include "PlotVTK.h"
 
-extern PlotVTK  plotvtk;
+//extern PlotVTK  plotvtk;
 
 
 int macro215(Macro &macro)
@@ -45,8 +45,7 @@ int macro215(Macro &macro)
   color[2] = macro.p[2];
   color[3] = macro.p[3];
 
-  plotvtk.setBackgroundColor(color);
-
+  //plotvtk.setBackgroundColor(color);
 
 //--------------------------------------------------------------------------------------------------
 

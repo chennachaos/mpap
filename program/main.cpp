@@ -1,19 +1,14 @@
 //#define EIGEN_YES_I_KNOW_SPARSE_MODULE_IS_NOT_STABLE_YET
 
 #include <iostream>
-
 #include "Definitions.h"
 #include "FunctionsProgram.h"
-
 #include "Global.h"
 #include "MyString.h"
 #include "FunctionsEssGrp.h"
-
-
 #include "UnixGlobal.h"
-
 #include "petscmat.h"
-#include "conditionalOStream.h"
+//#include "conditionalOStream.h"
 
 
 int main(int argc, char **argv)
@@ -24,10 +19,10 @@ int main(int argc, char **argv)
 
   PetscInitialize(NULL, NULL, "petsc_options.dat", NULL);
 
-  PetscInt  this_mpi_proc;
-  MPI_Comm_rank(MPI_COMM_WORLD, &this_mpi_proc);
+  //PetscInt  this_mpi_proc;
+  //MPI_Comm_rank(MPI_COMM_WORLD, &this_mpi_proc);
 
-  ConditionalOStream  p0cout(std::cout,  (this_mpi_proc == 0) );
+  //ConditionalOStream  p0cout(std::cout,  (this_mpi_proc == 0) );
 
 
   int i;
@@ -105,7 +100,8 @@ int main(int argc, char **argv)
 
   //std::cout << "   =====================================================\n";
   //std::cout << "    mpap2 aborted. \n\n";
-  p0cout << " \n\n\n   program is successful... \n\n\n " << endl;
+  //p0cout << " \n\n\n   program is successful... \n\n\n " << endl;
+  PetscPrintf(MPI_COMM_WORLD, " \n\n\n   program is successful... \n\n\n ");
 
   //PetscErrorCode ierr;
 

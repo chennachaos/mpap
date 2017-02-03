@@ -1,11 +1,8 @@
 #include "Macro.h"
 #include "DomainTree.h"
-#include "IsogeometricFEM.h"
-//#include "Plot.h"
 
 
 extern DomainTree domain;
-//extern Plot       plot;
 
 
 int macro203(Macro &macro)
@@ -49,10 +46,7 @@ int macro203(Macro &macro)
   rsys = roundToInt(macro.p[2]);
   val  = roundToInt(macro.p[3]);
 
-  isogeometricFEM(domain(type,id)).setDifferentFlags(rsys, val);
-
-  
-  
+  //isogeometricFEM(domain(type,id)).setDifferentFlags(rsys, val);  
 
 
 //--------------------------------------------------------------------------------------------------

@@ -1,14 +1,12 @@
 
 #include "Macro.h"
 #include "DomainTree.h"
-#include "IsogeometricFEM.h"
 #include "HBSplineFEM.h"
 #include "HBSplineCutFEM.h"
-//#include "Plot.h"
 
 
 extern DomainTree domain;
-extern MpapTime mpapTime;
+//extern MpapTime mpapTime;
 
 
 int macro225(Macro &macro)
@@ -37,13 +35,7 @@ int macro225(Macro &macro)
   id   = roundToInt(macro.p[1]) - 1;
   tol  = macro.p[2];
   
-//  cout << " tol " << tol << endl;
-
-
   hbsplineFEM(domain(type,id)).performAdaptiveRefinement(tol);
-
-
-
 
 //--------------------------------------------------------------------------------------------------
   return 0;  

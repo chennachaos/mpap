@@ -1,12 +1,9 @@
 
 #include "Macro.h"
 #include "DomainTree.h"
-#include "IsogeometricFEM.h"
-//#include "Plot.h"
 
 
 extern DomainTree domain;
-//extern Plot       plot;
 
 
 int macro221(Macro &macro)
@@ -82,20 +79,14 @@ int macro221(Macro &macro)
   umn   = macro.p[11];
   umx   = macro.p[12];
 
-
   //if(!plot) 
   //{
-    domain(type,id).findMinMaxX(xmn,xmx,defm);
+    //domain(type,id).findMinMaxX(xmn,xmx,defm);
 
     //plot.fit(xmn,xmx,domain(type,id).ndm);
   //}
 
-  isogeometricFEM(domain(type,id)).contourplotVTK2(val1, val2, flag1, index, nCols, umnx, umn, umx, resln);
-
-
-  
-  
-
+  //isogeometricFEM(domain(type,id)).contourplotVTK2(val1, val2, flag1, index, nCols, umnx, umn, umx, resln);
 
 //--------------------------------------------------------------------------------------------------
   return 0;  

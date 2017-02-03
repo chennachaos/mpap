@@ -9,7 +9,6 @@
 #include "RunControl.h"
 #include "MpapTime.h"
 #include "MacroQueue.h"
-////#include "Plot.h"
 #include "WorkSpace.h"
 #include "SolverWorkSpace.h"
 #include "List.h"
@@ -17,7 +16,6 @@
 #include "ComputerTime.h"
 #include "Counter.h"
 #include "SolverTime.h"
-#include "PlotVTK.h"
 
 DomainTree domain;
 
@@ -37,10 +35,6 @@ RunControl runCtrl;
 MacroQueue macroQueue;
 
 MpapTime mpapTime;
-
-//Plot plot;
-
-PlotVTK plotvtk;
 
 ComputerTime computerTime;
 

@@ -1,9 +1,9 @@
 
 #include "Macro.h"
 #include "DomainTree.h"
-#include "PlotVTK.h"
+//#include "PlotVTK.h"
 
-extern PlotVTK  plotvtk;
+//extern PlotVTK  plotvtk;
 
 
 int macro216(Macro &macro)
@@ -35,8 +35,7 @@ int macro216(Macro &macro)
   type = roundToInt(macro.p[0]);
   id   = roundToInt(macro.p[1]) - 1;
 
-  plotvtk.clearWindow();
-
+  //plotvtk.clearWindow();
 
 //--------------------------------------------------------------------------------------------------
 

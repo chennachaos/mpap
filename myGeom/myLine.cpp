@@ -214,7 +214,7 @@ int  myLine::computeBasisFunctions(myPoint& param, myPoint& geom, VectorXd&  Nb,
 
     //cout << xx[0] << '\t' << xx[1] << endl;
 
-    double dx{0.0}, dy{0.0};
+    double dx=0.0, dy=0.0;
     geom.setZero();
     for(int ii=0; ii<nVert; ii++)
     {

@@ -1,9 +1,9 @@
 
 #include "Macro.h"
 #include "DomainTree.h"
-#include "PlotVTK.h"
+//#include "PlotVTK.h"
 
-extern PlotVTK  plotvtk;
+//extern PlotVTK  plotvtk;
 
 
 int macro220(Macro &macro)
@@ -38,10 +38,7 @@ int macro220(Macro &macro)
 
   index  = macro.p[0] - 1;
 
-//cout << " index " << index << endl;
-
-  plotvtk.VtkGL2PSExporter(macro.strg, index);
-
+  //plotvtk.VtkGL2PSExporter(macro.strg, index);
 
 //--------------------------------------------------------------------------------------------------
 

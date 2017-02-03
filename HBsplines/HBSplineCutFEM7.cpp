@@ -2,7 +2,6 @@
 #include "HBSplineCutFEM.h"
 #include "ComputerTime.h"
 #include "MpapTime.h"
-#include "PlotVTK.h"
 #include "Functions.h"
 #include "Files.h"
 #include "MyString.h"
@@ -12,10 +11,8 @@
 #include "DistFunctions.h"
 #include "AABB.h"
 
-extern PlotVTK  plotvtk;
 extern ComputerTime       computerTime;
 extern MpapTime mpapTime;
-
 extern Files files;
 
 using namespace myGeom;
@@ -42,8 +39,8 @@ void HBSplineCutFEM::plotGeom(int val1, bool flag2, int col, bool PLOT_KNOT_LINE
     vecVTK->Reset();
     vecVTK2->Reset();
 
-    //cellDataVTK->Reset();
-    //cellDataVTK2->Reset();
+    cellDataVTK->Reset();
+    cellDataVTK2->Reset();
 
     //cout << "uGridVTK->GetPointData()->GetNumberOfArrays() = " << '\t' << uGridVTK->GetPointData()->GetNumberOfArrays() << endl;
     //cout << "uGridVTK->GetCellData()->GetNumberOfArrays() = " << '\t' << uGridVTK->GetCellData()->GetNumberOfArrays() << endl;
@@ -378,21 +375,6 @@ void  HBSplineCutFEM::postProcessFlow(int vartype, int vardir, int nCol, bool um
     {
       ImmersedBodyObjects[bb]->postProcess(filecount);
     }
-    
-    // a file Bspline.vtu will be created which can be directly read into paraview
-
-    //mapperVTK->SetInputConnection(uGridVTK->GetProducerPort());
-    //mapperVTK->SetInputData(uGridVTK);
-
-    //actorVTK->SetMapper(mapperVTK);
-    //actorVTK->GetProperty()->EdgeVisibilityOff();
-    //actorVTK->GetProperty()->SetEdgeColor(0,0,0);
-    //actorVTK->GetProperty()->SetPointSize(5.0);
-    //actorVTK->GetProperty()->SetLineWidth(2.0);
-
-    //plotvtk.rendr->AddActor(actorVTK);
-    //plotvtk.rendr->ResetCamera();
-    //plotvtk.renWindow->Render();
 
     return;
 }
@@ -656,7 +638,7 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
 
             uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
             cellDataVTK->InsertNextValue(0);
-            cellDataVTK2->InsertNextValue(0);
+            cellDataVTK2->InsertNextValue(ndTemp->get_subdomain_id());
 
             //cout << " ooooooooooooo " << endl;
         } //if( !nd->IsCutElement() )
@@ -739,6 +721,8 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
     uGridVTK->GetPointData()->SetVectors(vecVTK);
     uGridVTK->GetPointData()->AddArray(vecVTK2);
     uGridVTK->GetPointData()->AddArray(scaVTK2);
+
+    uGridVTK->GetCellData()->SetScalars(cellDataVTK2);
     //cout << " jjjjjjjjjjjjjjjjjj " << endl;
   }
 
@@ -1009,7 +993,7 @@ void  HBSplineCutFEM::postProcessSubTrias3D(int vartype, int vardir, int nCol, b
 
             uGridVTK->InsertNextCell(hexVTK->GetCellType(), hexVTK->GetPointIds());
             //cellDataVTK->InsertNextValue(0);
-            //cellDataVTK2->InsertNextValue(0);
+            cellDataVTK2->InsertNextValue(ndTemp->get_subdomain_id());
             //cout << " ooooooooooooo " << endl;
         } //if( !nd->IsCutElement() )
         else // the element is cutCell
@@ -1087,6 +1071,8 @@ void  HBSplineCutFEM::postProcessSubTrias3D(int vartype, int vardir, int nCol, b
     //uGridVTK->GetPointData()->AddArray(vecVTK2);
     //uGridVTK->GetPointData()->AddArray(scaVTK2);
     //cout << " jjjjjjjjjjjjjjjjjj " << endl;
+
+    uGridVTK->GetCellData()->SetScalars(cellDataVTK2);
   }
 
   return;

@@ -9,8 +9,6 @@
 #include "MyString.h"
 #include "Debug.h"
 #include "RunControl.h"
-////#include "Plot.h"
-// include all domain types
 #include "Domain.h"
 //#include "IsogeometricFEM.h"
 #include "HBSplineFEM.h"
@@ -20,12 +18,10 @@
 
 using namespace std;
 
-
 extern Files      files;
 extern DomainTree domain;
 extern bool       keep;
 extern RunControl runCtrl;
-////extern Plot       plot;
 
 
 bool prgReadFile(void)

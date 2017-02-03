@@ -1,12 +1,8 @@
 
 #include "Macro.h"
 #include "DomainTree.h"
-#include "IsogeometricFEM.h"
-//#include "Plot.h"
-
 
 extern DomainTree domain;
-extern MpapTime mpapTime;
 
 
 int macro211(Macro &macro)
@@ -21,7 +17,6 @@ int macro211(Macro &macro)
     macro.sensitivity[BATCH] = true;
 
     macro.db.selectDomain();
-
 
     macro.db.frameButtonBox();
 
@@ -40,8 +35,7 @@ int macro211(Macro &macro)
   id   = roundToInt(macro.p[1]) - 1;
   ind  = roundToInt(macro.p[2]) - 1;
 
-   isogeometricFEM(domain(type,id)).plotModeShape(ind, 0);
-
+  //isogeometricFEM(domain(type,id)).plotModeShape(ind, 0);
 
 //--------------------------------------------------------------------------------------------------
   return 0;  

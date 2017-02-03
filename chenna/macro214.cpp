@@ -1,11 +1,7 @@
 
 #include "Macro.h"
 #include "DomainTree.h"
-//#include "IsogeometricFEM.h"
-#include "PlotVTK.h"
 
-
-extern PlotVTK  plotvtk;
 
 int macro214(Macro &macro)
 {
@@ -35,9 +31,8 @@ int macro214(Macro &macro)
 
   type = roundToInt(macro.p[0]);
   id   = roundToInt(macro.p[1]) - 1;
-  
-  plotvtk.set();
 
+  //plotvtk.set();
 
 //--------------------------------------------------------------------------------------------------
 

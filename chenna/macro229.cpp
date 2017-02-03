@@ -1,13 +1,10 @@
 #include "Macro.h"
 #include "DomainTree.h"
-#include "IsogeometricFEM.h"
 #include "HBSplineFEM.h"
 #include "HBSplineCutFEM.h"
-//#include "Plot.h"
 
 
 extern DomainTree domain;
-//extern Plot       plot;
 
 
 int macro229(Macro &macro)
@@ -60,15 +57,14 @@ int macro229(Macro &macro)
   index -= 1;
 
   //cout << index << '\t' << nPs << '\t' << u0 << '\t' << u1 << '\t' << v0 << '\t' << v1 << endl;
-  if(type == 26)
-    cout << " isogeometricFEM(domain(type,id)).computeLiftAndDrag()  .... not implemented yet " << endl;
+  //if(type == 26)
+    //cout << " isogeometricFEM(domain(type,id)).computeLiftAndDrag()  .... not implemented yet " << endl;
  
   if(type == 27)
     hbsplineFEM(domain(type,id)).computeTotalForce(index);
 
   if(type == 28)
     hbsplineCutFEM(domain(type,id)).computeTotalForce(index);
-
 
 //--------------------------------------------------------------------------------------------------
   return 0;  

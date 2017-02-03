@@ -33,6 +33,8 @@ void  HBSplineCutFEM::prepareCutElements()
 
   if( ImmersedBodyObjects.size() == 0 )
   {
+    fluidElementIds = activeElements;
+
     for(ee=0; ee<activeElements.size(); ee++)
     {
       nd1 = elems[activeElements[ee]];
@@ -43,6 +45,7 @@ void  HBSplineCutFEM::prepareCutElements()
   }
   
   cutCellIds.clear();
+  fluidElementIds.clear();
 
   for(int bb=0; bb<ImmersedBodyObjects.size(); bb++)
   {
@@ -50,78 +53,15 @@ void  HBSplineCutFEM::prepareCutElements()
     ImmersedBodyObjects[bb]->computeAABB(2);
   }
 
-/*
-  if(CUTCELL_INTEGRATION_TYPE == 1)
-  {
-    if(ndm == 1)
-      prepareCutElementsSubTrias1D();
-    else if(ndm == 2)
-      prepareCutElementsSubTrias2D();
-    else
-      prepareCutElementsSubTrias3D();
-  }
-  else
-  {
-    if(ndm == 1)
-      prepareCutElementsAdapIntegration1D();
-    else if(ndm == 2)
-      prepareCutElementsAdapIntegration2D();
-    else
-      prepareCutElementsAdapIntegration3D();
-  }
-*/
-
   cout << " HBSplineCutFEM::prepareCutElements() " << endl;
-
-/*
-//#pragma omp parallel for default(shared)  private(ee, nd1)
-//{
-  for(ee=0; ee<activeElements.size(); ee++)
-  {
-    nd1 = elems[activeElements[ee]];
-
-    //cout << " gggggggggggg " << ee << endl;
-
-    //domTemp = *std::max_element(nd1->domNums.begin(), nd1->domNums.end() ) - 1;
-
-    //if( !GeomData.domainFixedYesNo[domTemp] )
-    //{
-      if( nd1->prepareCutCell(cutFEMparams) != 1)
-      {
-	cerr << " Error in prepareCutCell() for TreeNode<2>::prepareCutCell() " << endl;
-      }
-      
-      //if( nd1->IsRightBoundary() && nd1->IsTopBoundary() && nd1->IsBackBoundary() )
-        //printVector(nd1->domNums);
-
-      if( nd1->IsCutElement() )
-      {
-        cutCellIds.push_back(activeElements[ee]);
-
-        //cout << " hhhhhhhhhhhh " << endl;
-
-        if(cutFEMparams[0] == 1)
-          nd1->computeGaussPointsSubTrias(cutFEMparams[2], false);
-        else
-          nd1->computeGaussPointsAdapIntegration(cutFEMparams[3], cutFEMparams[4], false, true);
-      }
-      //cout << " ffffffffffff " << endl;
-    //}
-  }
-//}
-*/
 
   //GeomData.domainFixedYesNo[0] = 0;
   //GeomData.domainFixedYesNo[1] = 0;
 
-//#pragma omp parallel for default(shared)  private(ee, nd1)
-//{
   for(ee=0; ee<activeElements.size(); ee++)
   {
     nd1 = elems[activeElements[ee]];
 
-    //cout << " gggggggggggg " << ee << endl;
-    
     flag = false;
 
     if( nd1->domNums.size() == 0 )
@@ -157,29 +97,23 @@ void  HBSplineCutFEM::prepareCutElements()
       {
         cerr << " Error in prepareCutCell() for TreeNode<2>::prepareCutCell() " << endl;
       }
-      
-      //if( nd1->IsRightBoundary() && nd1->IsTopBoundary() && nd1->IsBackBoundary() )
-        //printVector(nd1->domNums);
 
       if( nd1->IsCutElement() )
       {
         cutCellIds.push_back(activeElements[ee]);
-
-        //cout << " hhhhhhhhhhhh " << endl;
 
         if(cutFEMparams[0] == 1)
           nd1->computeGaussPointsSubTrias(cutFEMparams[2], false);
         else
           nd1->computeGaussPointsAdapIntegration(cutFEMparams[3], cutFEMparams[4], false, true);
       }
-      //cout << " ffffffffffff " << endl;
+    }
+
+    if( nd1->GetDomainNumber() <= 0 )
+    {
+      fluidElementIds.push_back( nd1->GetID() );
     }
   }
-//}
-
-  //int resln[]={1,1,1};
-
-  //plotGeom(1, 1, 10, 0, resln);
 
   cout << " HBSplineCutFEM::prepareCutElements() " << endl;
 

@@ -1,17 +1,13 @@
 
 #include "HBSplineFEM.h"
 #include "MpapTime.h"
-#include "PlotVTK.h"
 #include "Functions.h"
 #include "Files.h"
 #include "MyString.h"
 #include "headersVTK.h"
 
 
-extern PlotVTK  plotvtk;
 extern MpapTime mpapTime;
-
-
 extern Files files;
 
 
@@ -19,11 +15,6 @@ extern Files files;
 void HBSplineFEM::plotGeom(int val1, bool flag2, int col, bool PLOT_KNOT_LINES, int* resln)
 {
     //cout << "     HBSplineFEM: plotgeometry ...\n\n";
-
-    //if(!plotvtk.ActiveFlag)
-      //plotvtk.set();
-
-    //plotvtk.clearWindow();
 
     pointsVTK->Reset();
     //lineVTK->Reset();
@@ -52,26 +43,6 @@ void HBSplineFEM::plotGeom(int val1, bool flag2, int col, bool PLOT_KNOT_LINES, 
 #endif
 
     writerUGridVTK->Write();
-
-    //mapperVTK->SetInputConnection(uGridVTK->GetProducerPort());
-    ////mapperVTK->SetInputData(uGridVTK);
-
-    //actorVTK->SetMapper(mapperVTK);
-    //actorVTK->GetProperty()->EdgeVisibilityOn();
-    //actorVTK->GetProperty()->SetEdgeColor(0,0,0);
-    //actorVTK->GetProperty()->SetPointSize(5.0);
-    //actorVTK->GetProperty()->SetLineWidth(2.0);
-
-    //double  color[3];
-    //getColorValue(col, color);
-
-    //actorVTK->GetProperty()->SetColor(color[0], color[1], color[2]);
-
-    //actorVTK->SetMapper(mapperVTK);
-
-    //plotvtk.rendr->AddActor(actorVTK);
-    //plotvtk.rendr->ResetCamera();
-    //plotvtk.renWindow->Render();
 
     return;
 }
@@ -236,8 +207,6 @@ void HBSplineFEM::plotGeom3D(int val1, bool flag2, int col, bool PLOT_KNOT_LINES
 
 void  HBSplineFEM::postProcessFlow(int vartype, int vardir, int nCol, bool umnxflag, double umin, double umax, int* resln)
 {
-    //plotvtk.clearWindow();
-
     if(CREATE_POSTPROCESS_GRID)
     {
       if(DIM == 1)
@@ -456,22 +425,6 @@ void  HBSplineFEM::createPostProcessGrid2D(int vartype, int vardir, int nCol, bo
 
     writerUGridVTK->Write();
     
-    // a file Bspline.vtu will be created which can be directly read into paraview
-
-    //mapperVTK->SetInputConnection(uGridVTK->GetProducerPort());
-    ////mapperVTK->SetInputData(uGridVTK);
-
-    //actorVTK->SetMapper(mapperVTK);
-    //actorVTK->GetProperty()->EdgeVisibilityOff();
-    //actorVTK->GetProperty()->SetEdgeColor(0,0,0);
-    //actorVTK->GetProperty()->SetPointSize(5.0);
-    //actorVTK->GetProperty()->SetLineWidth(2.0);
-    ////actorVTK->GetProperty()->SetColor(0,0,1);
-
-    //plotvtk.rendr->AddActor(actorVTK);
-    //plotvtk.rendr->ResetCamera();
-    //plotvtk.renWindow->Render();
-
     return;
 }
 //
@@ -618,20 +571,6 @@ void  HBSplineFEM::postProcess1D(int vartype, int vardir, int nCol, bool umnxfla
 
     uGridVTK->SetPoints(pointsVTK);
 
-    //mapperVTK->SetInputConnection(uGridVTK->GetProducerPort());
-    ////mapperVTK->SetInputData(uGridVTK);
-
-    //actorVTK->SetMapper(mapperVTK);
-    //actorVTK->GetProperty()->EdgeVisibilityOn();
-    //actorVTK->GetProperty()->SetEdgeColor(0,0,0);
-    //actorVTK->GetProperty()->SetPointSize(5.0);
-    //actorVTK->GetProperty()->SetLineWidth(2.0);
-    ////actorVTK->GetProperty()->SetColor(0,0,1); //green
-
-    //plotvtk.rendr->AddActor(actorVTK);
-    //plotvtk.rendr->ResetCamera();
-    //plotvtk.renWindow->Render();
-
     return;
 }
 
@@ -640,8 +579,6 @@ void  HBSplineFEM::postProcess1D(int vartype, int vardir, int nCol, bool umnxfla
 // for the general mesh (including Hierarchical splines)
 void  HBSplineFEM::postProcess2D(int vartype, int vardir, int nCol, bool umnxflag, double umin, double umax, int* resln)
 {
-    //plotvtk.clearWindow();
-
     //uGridVTK->Reset();
     //pointsVTK->Reset();
 
@@ -901,21 +838,6 @@ void  HBSplineFEM::postProcess2D(int vartype, int vardir, int nCol, bool umnxfla
         ImmersedBodyObjects[ee]->postProcess(filecount);
     }
     
-    // a file Bspline.vtu will be created which can be directly read into paraview
-
-    //mapperVTK->SetInputConnection(uGridVTK->GetProducerPort());
-    ////mapperVTK->SetInputData(uGridVTK);
-
-    //actorVTK->SetMapper(mapperVTK);
-    //actorVTK->GetProperty()->EdgeVisibilityOff();
-    //actorVTK->GetProperty()->SetEdgeColor(0,0,0);
-    //actorVTK->GetProperty()->SetPointSize(5.0);
-    //actorVTK->GetProperty()->SetLineWidth(2.0);
-
-    //plotvtk.rendr->AddActor(actorVTK);
-    //plotvtk.rendr->ResetCamera();
-    //plotvtk.renWindow->Render();
-
     return;
 }
 //
@@ -932,8 +854,6 @@ void  HBSplineFEM::createPostProcessGrid3D(int vartype, int vardir, int nCol, bo
       exit(1);
     }
     
-    //plotvtk.clearWindow();
-
     uGridVTK->Reset();
     pointsVTK->Reset();
 
@@ -950,14 +870,10 @@ void  HBSplineFEM::createPostProcessGrid3D(int vartype, int vardir, int nCol, bo
 
     vtkIdType pt[8];
     
-    //cout << " Llllllllll " << endl;
-
     index = 0;
     for(e=0;e<activeElements.size();e++)
     {
            nd1 = elems[activeElements[e]];
-
-           //cout << " Node # " << nd1->GetID() << endl;
 
            tmp1 = nd1->GetKnots(0);
            tmp2 = nd1->GetKnots(1);
@@ -1106,22 +1022,6 @@ void  HBSplineFEM::createPostProcessGrid3D(int vartype, int vardir, int nCol, bo
 
     writerUGridVTK->Write();
     
-    // a file Bspline.vtu will be created which can be directly read into paraview
-
-    //mapperVTK->SetInputConnection(uGridVTK->GetProducerPort());
-    ////mapperVTK->SetInputData(uGridVTK);
-
-    //actorVTK->SetMapper(mapperVTK);
-    //actorVTK->GetProperty()->EdgeVisibilityOff();
-    //actorVTK->GetProperty()->SetEdgeColor(0,0,0);
-    //actorVTK->GetProperty()->SetPointSize(5.0);
-    //actorVTK->GetProperty()->SetLineWidth(2.0);
-    ////actorVTK->GetProperty()->SetColor(0,0,1);
-
-    //plotvtk.rendr->AddActor(actorVTK);
-    //plotvtk.rendr->ResetCamera();
-    //plotvtk.renWindow->Render();
-
     return;
 }
 
@@ -1130,8 +1030,6 @@ void  HBSplineFEM::createPostProcessGrid3D(int vartype, int vardir, int nCol, bo
 void  HBSplineFEM::postProcess3D(int vartype, int vardir, int nCol, bool umnxflag, double umin, double umax, int* resln)
 {
     //cout << " HBSplineFEM::postProcess3D " << endl;
-
-    //plotvtk.clearWindow();
 
     uGridVTK->Reset();
     pointsVTK->Reset();
@@ -1366,22 +1264,6 @@ void  HBSplineFEM::postProcess3D(int vartype, int vardir, int nCol, bool umnxfla
 
     writerUGridVTK->Write();
     
-    // a file Bspline.vtu will be created which can be directly read into paraview
-
-    //mapperVTK->SetInputConnection(uGridVTK->GetProducerPort());
-    ////mapperVTK->SetInputData(uGridVTK);
-
-    //actorVTK->SetMapper(mapperVTK);
-    //actorVTK->GetProperty()->EdgeVisibilityOff();
-    //actorVTK->GetProperty()->SetEdgeColor(0,0,0);
-    //actorVTK->GetProperty()->SetPointSize(5.0);
-    //actorVTK->GetProperty()->SetLineWidth(2.0);
-    ////actorVTK->GetProperty()->SetColor(0,0,1);
-
-    //plotvtk.rendr->AddActor(actorVTK);
-    //plotvtk.rendr->ResetCamera();
-    //plotvtk.renWindow->Render();
-
     return;
 }
 

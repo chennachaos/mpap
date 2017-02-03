@@ -43,7 +43,7 @@ class HBSplineCutFEM: public HBSplineBase
 
         double  GHOST_PENALTY;
 
-        vector<int>  domainTotalDOF, domainStartDOF, cutCellIds;
+        vector<int>  domainTotalDOF, domainStartDOF, cutCellIds, fluidElementIds;
 
         vector<bool>  domainInclYesNo;
 

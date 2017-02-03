@@ -1,12 +1,8 @@
 
 #include "Macro.h"
 #include "DomainTree.h"
-#include "IsogeometricFEM.h"
-//#include "Plot.h"
-
 
 extern DomainTree domain;
-//extern Plot       plot;
 
 
 int macro206(Macro &macro)
@@ -58,17 +54,12 @@ int macro206(Macro &macro)
   param = macro.p[5];
   incr = macro.p[6];
 
-  if(val1 == 0)
-    isogeometricFEM(domain(type,id)).printDispsAtParameter(patchnum, dir, param, incr);
-  else if(val1 == 1)
-    isogeometricFEM(domain(type,id)).printStrainsAtParameter(patchnum, dir, param, incr);
-  else
-    isogeometricFEM(domain(type,id)).printStressesAtParameter(patchnum, dir, param, incr);
-
-
-  
-  
-
+  //if(val1 == 0)
+    //isogeometricFEM(domain(type,id)).printDispsAtParameter(patchnum, dir, param, incr);
+  //else if(val1 == 1)
+    //isogeometricFEM(domain(type,id)).printStrainsAtParameter(patchnum, dir, param, incr);
+  //else
+    //isogeometricFEM(domain(type,id)).printStressesAtParameter(patchnum, dir, param, incr);
 
 //--------------------------------------------------------------------------------------------------
   return 0;  

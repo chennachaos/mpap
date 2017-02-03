@@ -97,9 +97,9 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
 
       //cout << " wwwwwwwwwww " << endl;
 
-    for(ee=0; ee<activeElements.size(); ee++)
+    for(ee=0; ee<fluidElementIds.size(); ee++)
     {
-      node *nd = elems[activeElements[ee]];
+      node *nd = elems[fluidElementIds[ee]];
 
       //cout << " nd->GetID() " <<  nd->GetID() << '\t' <<  nd->GetLevel() << endl;
 

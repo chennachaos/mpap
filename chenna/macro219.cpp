@@ -1,9 +1,9 @@
 
 #include "Macro.h"
 #include "DomainTree.h"
-#include "PlotVTK.h"
+//#include "PlotVTK.h"
 
-extern PlotVTK  plotvtk;
+//extern PlotVTK  plotvtk;
 
 
 int macro219(Macro &macro)
@@ -37,8 +37,7 @@ int macro219(Macro &macro)
 
   index  = macro.p[0] - 1;
 
-  plotvtk.writeImages(macro.strg, index);
-
+  //plotvtk.writeImages(macro.strg, index);
 
 //--------------------------------------------------------------------------------------------------
 

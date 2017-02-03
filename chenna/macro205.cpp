@@ -2,7 +2,6 @@
 
 #include "Macro.h"
 #include "DomainTree.h"
-#include "IsogeometricFEM.h"
 #include "HBSplineFEM.h"
 #include "HBSplineCutFEM.h"
 #include "StandardFEM.h"
@@ -44,12 +43,11 @@ int macro205(Macro &macro)
   v1 = macro.p[4];
   w1 = macro.p[5];
   
-  if(type == 26)
-    isogeometricFEM(domain(type,id)).printResultAtPoint(patchnum, u1, v1, w1);
+  //if(type == 26)
+    //isogeometricFEM(domain(type,id)).printResultAtPoint(patchnum, u1, v1, w1);
  
   if(type == 27)
     hbsplineFEM(domain(type,id)).printResultAtPoint(patchnum, u1, v1, w1);
-
 
 //--------------------------------------------------------------------------------------------------
   return 0;  

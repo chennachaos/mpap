@@ -2,10 +2,9 @@
 
 #include "Macro.h"
 #include "DomainTree.h"
-#include "PlotVTK.h"
+//#include "PlotVTK.h"
 
-
-extern PlotVTK  plotvtk;
+//extern PlotVTK  plotvtk;
 
 
 int macro222(Macro &macro)
@@ -43,12 +42,10 @@ int macro222(Macro &macro)
   v1 = macro.p[2];
   w1 = macro.p[3];
   
-  if(flag)  
-    plotvtk.addAxes(u1, v1, w1);
-  else
-    plotvtk.removeAxes(); 
-  
-
+  //if(flag)  
+    //plotvtk.addAxes(u1, v1, w1);
+  //else
+    //plotvtk.removeAxes();
 
 //--------------------------------------------------------------------------------------------------
   return 0;  

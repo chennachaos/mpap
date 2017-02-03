@@ -2,17 +2,13 @@
 #include "LagrangeElement.h"
 #include "StandardFEM.h"
 #include "MpapTime.h"
-#include "PlotVTK.h"
 #include "Functions.h"
 #include "Files.h"
 #include "MyString.h"
 #include "KimMoinFlow.h"
 
 
-
-extern PlotVTK  plotvtk;
 extern MpapTime mpapTime;
-
 extern Files files;
 
 

@@ -239,7 +239,10 @@ int  HBSplineCutFEM::prepareMatrixPattern()
     tend = time(0);
     //printf("HBSplineCutFEM::prepareCutElements() took %8.4f second(s) \n ", difftime(tend, tstart) );
 
-    nElem = activeElements.size();
+    cout << " activeElements.size () = "  << activeElements.size() << endl;
+    cout << " fluidElementIds.size () = "  << fluidElementIds.size() << endl;
+
+    nElem = fluidElementIds.size();
     nNode = gridBF1;
 
     PetscSynchronizedPrintf(MPI_COMM_WORLD, " nNode = %8d \n", nNode);
@@ -396,8 +399,8 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
 
       // METIS partition routine
-      int ret = METIS_PartMeshNodal(&nElem, &nNode, eptr, eind, NULL, NULL, &nParts, NULL, options, &objval, epart, npart);
-      //int ret = METIS_PartMeshDual(&nElem, &nNode, eptr, eind, NULL, NULL, &nodes_per_side, &n_mpi_procs, NULL, options, &objval, epart, npart);
+      //int ret = METIS_PartMeshNodal(&nElem, &nNode, eptr, eind, NULL, NULL, &nParts, NULL, options, &objval, epart, npart);
+      int ret = METIS_PartMeshDual(&nElem, &nNode, eptr, eind, NULL, NULL, &nodes_per_side, &n_mpi_procs, NULL, options, &objval, epart, npart);
 
       //idx_t  wgtflag=0, numflag=0, ncon=0, ncommonnodes=2, nparts=n_mpi_procs;
       //idx_t  *elmdist;

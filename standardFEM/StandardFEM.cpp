@@ -1,18 +1,14 @@
 
 
 #include "LagrangeElement.h"
-
 #include "StandardFEM.h"
-
 #include "DataBlockTemplate.h"
 #include "ComputerTime.h"
 #include "MpapTime.h"
 #include "TimeFunction.h"
-#include "PlotVTK.h"
 #include "PropertyTypeEnum.h"
 #include "NewLagrangeElement.h"
-#include "../lib/List.h"
-#include <omp.h>
+#include "List.h"
 #include "Functions.h"
 #include "KimMoinFlow.h"
 #include <algorithm>    // std::any_of
@@ -22,7 +18,6 @@ extern DomainTree         domain;
 extern List<TimeFunction> timeFunction;
 extern MpapTime           mpapTime;
 extern ComputerTime       computerTime;
-extern PlotVTK  plotvtk;
 
 
 using namespace std;

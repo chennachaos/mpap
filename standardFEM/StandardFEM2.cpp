@@ -2,25 +2,19 @@
 
 #include "SolverPardisoEigen.h"
 #include "SolverMA41Eigen.h"
-
 #include "StandardFEM.h"
-
 #include "MpapTime.h"
 #include "TimeFunction.h"
 #include "SolverPetsc.h"
 #include "LagrangeElement.h"
 #include "SolutionData.h"
-
 #include "conditionalOStream.h"
 #include "my_types.h"
 #include "mpi.h"
-
 #include "metis.h"
 
-//extern ComputerTime       computerTime;
 extern MpapTime mpapTime;
 extern List<TimeFunction> timeFunction;
-
 
 //typedef int idx_t ;
 

@@ -1,15 +1,11 @@
 #include "Macro.h"
 #include "DomainTree.h"
-#include "IsogeometricFEM.h"
 #include "HBSplineFEM.h"
 #include "HBSplineCutFEM.h"
 #include "StandardFEM.h"
-//#include "HBScutFEMElasticity.h"
-//#include "Plot.h"
 
 
 extern DomainTree domain;
-//extern Plot       plot;
 
 
 int macro228(Macro &macro)
@@ -50,12 +46,11 @@ int macro228(Macro &macro)
   index = roundToInt(macro.p[2]);
   tol   = macro.p[3];
   
-  //cout << '\t' << flag1 << '\t' << Niter << '\t' << stol << '\t' << tol << endl;
   switch(type)
   {
-    case 26:
-        isogeometricFEM(domain(type,id)).computeElementErrors(index);
-      break;
+    //case 26:
+        //isogeometricFEM(domain(type,id)).computeElementErrors(index);
+      //break;
  
     case 27:
         hbsplineFEM(domain(type,id)).computeElementErrors(index);

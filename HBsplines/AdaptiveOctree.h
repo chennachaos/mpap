@@ -388,7 +388,6 @@ bool AdaptiveOctree<DIM>::within(myPoint& pt)
 }
 
 
-
 #ifdef _DOMAIN1D
 typedef AdaptiveOctree<1>  adapOctree;
 #endif

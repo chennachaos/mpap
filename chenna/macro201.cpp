@@ -1,15 +1,11 @@
 
 #include "Macro.h"
 #include "DomainTree.h"
-#include "IsogeometricFEM.h"
 #include "HBSplineFEM.h"
 #include "HBSplineCutFEM.h"
 #include "StandardFEM.h"
-//#include "Plot.h"
-//#include "HBScutFEMElasticity.h"
 
 extern DomainTree domain;
-//extern Plot       plot;
 
 int macro201(Macro &macro)
 {

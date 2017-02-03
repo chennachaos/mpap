@@ -1,11 +1,8 @@
 #include "Macro.h"
 #include "DomainTree.h"
-#include "IsogeometricFEM.h"
-//#include "Plot.h"
 
 
 extern DomainTree domain;
-//extern Plot       plot;
 
 
 int macro227(Macro &macro)
@@ -54,13 +51,10 @@ int macro227(Macro &macro)
   stol   = macro.p[4];
   tol   = macro.p[5];
   
-  //cout << '\t' << flag1 << '\t' << Niter << '\t' << stol << '\t' << tol << endl;
-  
-  if(soltype == 1)
-    isogeometricFEM(domain(type,id)).LMSolver(Niter, stol, tol, 1.0);
-  else
-    isogeometricFEM(domain(type,id)).ConvectionSolver(Niter, stol, tol, 1.0);
-
+  //if(soltype == 1)
+    //isogeometricFEM(domain(type,id)).LMSolver(Niter, stol, tol, 1.0);
+  //else
+    //isogeometricFEM(domain(type,id)).ConvectionSolver(Niter, stol, tol, 1.0);
 
 //--------------------------------------------------------------------------------------------------
   return 0;  

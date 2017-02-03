@@ -1,16 +1,12 @@
 
 #include "Macro.h"
 #include "DomainTree.h"
-#include "IsogeometricFEM.h"
 #include "HBSplineFEM.h"
 #include "HBSplineCutFEM.h"
 #include "StandardFEM.h"
-//#include "Plot.h"
-//#include "HBScutFEMElasticity.h"
 
 
 extern DomainTree domain;
-//extern Plot       plot;
 
 
 int macro226(Macro &macro)
@@ -77,8 +73,8 @@ int macro226(Macro &macro)
   umn   = macro.p[9];
   umx   = macro.p[10];
 
-  if(type == 26)
-    isogeometricFEM(domain(type,id)).postProcessFlow(val1, val2, nCols, umnx, umn, umx, resln);
+  //if(type == 26)
+    //isogeometricFEM(domain(type,id)).postProcessFlow(val1, val2, nCols, umnx, umn, umx, resln);
  
   if(type == 27)
     hbsplineFEM(domain(type,id)).postProcessFlow(val1, val2, nCols, umnx, umn, umx, resln);

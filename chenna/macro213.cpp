@@ -1,12 +1,9 @@
 
 #include "Macro.h"
 #include "DomainTree.h"
-#include "IsogeometricFEM.h"
-//#include "Plot.h"
 
 
 extern DomainTree domain;
-//extern Plot       plot;
 
 
 int macro213(Macro &macro)
@@ -55,7 +52,7 @@ int macro213(Macro &macro)
   patch2 = roundToInt(macro.p[4]) - 1;
   dir = roundToInt(macro.p[5]);
 
-    isogeometricFEM(domain(type,id)).checkContSurfs(geom, patch1, patch2, dir);
+  //isogeometricFEM(domain(type,id)).checkContSurfs(geom, patch1, patch2, dir);
 
 //--------------------------------------------------------------------------------------------------
   return 0;  

@@ -1,10 +1,6 @@
 
 #include "Macro.h"
 #include "DomainTree.h"
-#include "PlotVTK.h"
-
-extern PlotVTK  plotvtk;
-
 
 int macro223(Macro &macro)
 {
@@ -34,8 +30,7 @@ int macro223(Macro &macro)
 
   index  = macro.p[0] - 1;
 
-  plotvtk.VtkReflect(index);
-
+  //plotvtk.VtkReflect(index);
 
 //--------------------------------------------------------------------------------------------------
 

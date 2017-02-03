@@ -1,11 +1,7 @@
 #include "Macro.h"
 #include "DomainTree.h"
-#include "IsogeometricFEM.h"
-//#include "Plot.h"
-
 
 extern DomainTree domain;
-//extern Plot       plot;
 
 
 int macro224(Macro &macro)
@@ -54,8 +50,7 @@ int macro224(Macro &macro)
   
   //cout << '\t' << flag1 << '\t' << Niter << '\t' << stol << '\t' << tol << endl;
 
-  isogeometricFEM(domain(type,id)).BFGSsolver(Niter, flag1, stol, tol);
-
+  //isogeometricFEM(domain(type,id)).BFGSsolver(Niter, flag1, stol, tol);
 
 //--------------------------------------------------------------------------------------------------
   return 0;  

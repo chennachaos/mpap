@@ -15,7 +15,6 @@
 #include "util.h"
 #include "DistFunctions.h"
 #include "myConstants.h"
-#include "NurbsUtilities.h"
 #include "mpi.h"
 
 

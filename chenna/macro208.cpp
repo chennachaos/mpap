@@ -1,14 +1,12 @@
 
 #include "Macro.h"
 #include "DomainTree.h"
-#include "IsogeometricFEM.h"
 #include "HBSplineCutFEM.h"
 #include "StandardFEM.h"
-//#include "Plot.h"
 
 
 extern DomainTree domain;
-//extern Plot       plot;
+
 
 int macro208(Macro &macro)
 {
@@ -60,13 +58,10 @@ int macro208(Macro &macro)
   index = macro.p[4];
   patchnum = macro.p[5];
 
-  if(rr == 1)
-    isogeometricFEM(domain(type,id)).writeGeomToFile(macro.strg, geom, index, patchnum);
-  if(rr == 2)
-    isogeometricFEM(domain(type,id)).readSurfaceFromFile(macro.strg, geom, patchnum);
-  
-  
-
+  //if(rr == 1)
+    //isogeometricFEM(domain(type,id)).writeGeomToFile(macro.strg, geom, index, patchnum);
+  //if(rr == 2)
+    //isogeometricFEM(domain(type,id)).readSurfaceFromFile(macro.strg, geom, patchnum);
 
 //--------------------------------------------------------------------------------------------------
   return 0;  

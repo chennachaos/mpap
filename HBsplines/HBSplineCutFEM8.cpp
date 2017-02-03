@@ -2,28 +2,22 @@
 #include "HBSplineCutFEM.h"
 #include "ComputerTime.h"
 #include "MpapTime.h"
-#include "PlotVTK.h"
 #include "Functions.h"
 #include "Files.h"
 #include "MyString.h"
 #include "headersVTK.h"
 #include "myGeomUtilities.h"
-#include "NurbsUtilities.h"
 #include "myTria.h"
 #include "DistFunctions.h"
 #include "AABB.h"
 
 
-extern PlotVTK  plotvtk;
 extern ComputerTime       computerTime;
 extern MpapTime mpapTime;
-
-
 extern Files files;
 
+
 using namespace myGeom;
-
-
 
 
 
