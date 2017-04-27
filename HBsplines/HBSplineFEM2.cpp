@@ -324,18 +324,6 @@ void  HBSplineFEM::solveSolidProblem()
 
 
 
-void  HBSplineFEM::updateImmersedPointPositions()
-{
-  IB_MOVED = false;
-  for(int bb=0; bb<nImmSolids; bb++)
-  {
-    IB_MOVED = (IB_MOVED || ImmersedBodyObjects[bb]->updatePointPositions() );
-  }
-  //cout << " HBSplineFEM::updateImmersedPointPositions() " << endl;
-
-  return;
-}
-
 
 void  HBSplineFEM::writeNodalData()
 {
@@ -537,11 +525,13 @@ void  HBSplineFEM::applyInterfaceTerms2D()
             //cout << specValx[0] << '\t' << specValy[0] << endl;
             //cout << specValx[1] << '\t' << specValy[1] << endl;
 
+            //cout << " lme->gausspoints.size() = " << lme->gausspoints.size() << endl;
+
             for(gp=0;gp<lme->gausspoints.size();gp++)
             {
               computeLagrangeBFsLine2D(nlb-1, lme->gausspoints[gp], &xx(0), &yy(0), &Nb(0), &dNb(0), detJ);
 
-              //cout << " detJ " << detJ << '\t' << gaussweights[gp] << endl;
+              //cout << " detJ " << detJ << '\t' << lme->gaussweights[gp] << '\t' << Nb[0] << endl;
 
               dvol  = lme->gaussweights[gp] * detJ;
 
@@ -573,7 +563,7 @@ void  HBSplineFEM::applyInterfaceTerms2D()
               //printf("Nb = %12.6f, nlb = %5d \n", Nb[0], nlb);
               //printf("vel2[0] = %12.6f, vel2[1] = %12.6f \n", vel2[0], vel2[1]);
               //printf("lagmults[0] = %12.6f, lagmults[1] = %12.6f \n", lagmults[0], lagmults[1]);
-              //printf("detJ = %12.6f, gw = %5d \n", detJ, lme->gaussweights[gp]);
+              //printf("detJ = %12.6f, gw = %12.6f \n", detJ, lme->gaussweights[gp]);
 
               nd = elems[findCellNumber(geom)];
 

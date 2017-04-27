@@ -391,7 +391,7 @@ void TreeNode<2>::computeVelocityAndStress(myPoint& param, myPoint& vel, MatrixX
 
     double  b1, b2, b3, b4, pres;
 
-    VectorXd  NN(totnlbf), dNN_dx(totnlbf), dNN_dy(totnlbf), velDot(2);
+    VectorXd  NN(totnlbf), dNN_dx(totnlbf), dNN_dy(totnlbf);
     VectorXd  N, dN_dx, dN_dy;
 
     double  rho = elmDat[3];
@@ -444,6 +444,10 @@ void TreeNode<2>::computeVelocityAndStress(myPoint& param, myPoint& vel, MatrixX
       acce(0) += ( b1 * N(ii) );
       acce(1) += ( b2 * N(ii) );
     }
+
+    // convective acceleration
+    acce[0] +=  stress(0,0)*vel[0] + stress(0,1)*vel[1] ;
+    acce[1] +=  stress(1,0)*vel[0] + stress(1,1)*vel[1] ;
 
     // this is pseudo-stress
     stress *= mu;

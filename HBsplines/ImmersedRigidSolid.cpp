@@ -273,6 +273,9 @@ void  ImmersedRigidSolid::SetNodalPositions(vector<vector<double> >&  datatemp)
   GeomData.specValNew.resize(nNode);
   GeomData.specValCur.resize(nNode);
 
+  GeomData.acceNew.resize(nNode);
+  GeomData.acceCur.resize(nNode);
+
   int ii, jj;
   double val;
 
@@ -290,6 +293,10 @@ void  ImmersedRigidSolid::SetNodalPositions(vector<vector<double> >&  datatemp)
 
       GeomData.specValNew[ii][jj]  = 0.0;
       GeomData.specValCur[ii][jj]  = 0.0;
+
+      GeomData.acceNew[ii][jj]  = 0.0;
+      GeomData.acceCur[ii][jj]  = 0.0;
+
     }
   }
 
@@ -305,13 +312,11 @@ void ImmersedRigidSolid::initialise()
 {
   SolnData.STAGGERED = STAGGERED;
   
-  printSelf();
+  //printSelf();
 
   setSolver(1);
   setTimeParam();
   computeInitialAcceleration();
-
-  cout << " lllllllllllll " << endl;
 
   return;
 }
@@ -586,7 +591,7 @@ void  ImmersedRigidSolid::updatePointPositions2D()
     t0 = 0.0;
     wn = 1.0;
 
-    cout << " PRESC_MOTION = " << PRESC_MOTION << endl;
+    //cout << " PRESC_MOTION = " << PRESC_MOTION << endl;
 
     //if(PRESC_MOTION && (mpapTime.cur > t0)  && ( (id==0) || (id==1)) )
     if(PRESC_MOTION && (mpapTime.cur > t0)  && ( id==0) )
@@ -1272,14 +1277,14 @@ void ImmersedRigidSolid::SolveTimeStep()
 
 
 
-void ImmersedRigidSolid::applyBoundaryConditions()
+int ImmersedRigidSolid::applyBoundaryConditions()
 {   
-  return;
+  return 0;
 }
 
-void ImmersedRigidSolid::applyExternalForces()
+int ImmersedRigidSolid::applyExternalForces()
 {
-  return;
+  return 0;
 }
 
 
@@ -1706,7 +1711,7 @@ int ImmersedRigidSolid::AssembleGlobalMatrixAndVector(int ind1, int ind2, Sparse
 
 
 
-int ImmersedRigidSolid::AssembleGlobalMatrixAndVectorCutFEM(int ind1, int ind2, SparseMatrixXd& mtx, double* rhs)
+int ImmersedRigidSolid::AssembleGlobalMatrixAndVectorCutFEM(int start1, int start2, SolverPetsc* solverTemp)
 {
   calcStiffnessAndResidual(1, 0, 0);
   //printMatrix(Klocal);
@@ -1716,17 +1721,19 @@ int ImmersedRigidSolid::AssembleGlobalMatrixAndVectorCutFEM(int ind1, int ind2, 
   //printVector(assy4r);
   //cout << " disp = " << SolnData.var1Cur(1) << endl;
 
+  cout << " ImmersedRigidSolid::AssembleGlobalMatrixAndVectorCutFEM ... needs to be corrected " << endl;
+
   int ii, jj, r, c, kk, ll;
 
   for(ii=0;ii<totalDOF;ii++)
   {
-    r  = ind1 + ii;
+    r  = start1 + ii;
     kk = assy4r[ii];
 
-    rhs[r] += Flocal[kk];
+    //rhs[r] += Flocal[kk];
 
-    for(jj=0;jj<totalDOF;jj++)
-      mtx.coeffRef(r, ind2+jj) += Klocal(kk, assy4r[jj]);
+    //for(jj=0;jj<totalDOF;jj++)
+      //mtx.coeffRef(r, start2+jj) += Klocal(kk, assy4r[jj]);
   }
 
   return 0;

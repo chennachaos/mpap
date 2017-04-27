@@ -26,10 +26,12 @@ using namespace std;
 
 HBSplineFEM::HBSplineFEM()
 {
-    stagParams.resize(3);
-    stagParams[0] = 0;
-    stagParams[1] = 1;
-    stagParams[2] = 0;
+  stagParams.resize(10);
+  stagParams[0] = 0;
+  stagParams[1] = 1;
+  stagParams[2] = 0;
+  stagParams[3] = 0;
+  stagParams[4] = 0;
 
     velDOF = presDOF = fluidDOF = IBDOF = solidDOF = 0;
     CREATE_POSTPROCESS_GRID = true;

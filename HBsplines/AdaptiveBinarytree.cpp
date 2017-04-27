@@ -448,8 +448,6 @@ void AdaptiveBinarytree<2>::mergeGaussPoints(int refLev2, int inclDom, int dummy
 
   int mergeFlag=0;
 
-  //cout << " AAAAAAAAAA .... " << sideTemp << endl;
-
   if(sideTemp == -1)
     adapIntegNodeLocal->computeGaussPointsForMerging(0, inclDom, 1, mergeFlag, QuadratureLocal);
   else
@@ -472,18 +470,12 @@ void AdaptiveBinarytree<2>::mergeGaussPoints(int refLev2, int inclDom, int dummy
     //cout << gp << '\t' << geom[0] << '\t' << geom[1] << '\t' << QuadratureLocal.gaussweights[gp] << endl;
     wt +=  QuadratureLocal.gaussweights[gp];
     
-    //for(ii=0; ii<2; ii++)
-      //param[ii] = (2.0*QuadratureLocal.gausspoints[gp][ii] - knots[ii][3])/knots[ii][2];
-    
     ptTemp += param;
   }
-
-  //cout << " wt = " << wt << '\t' << QuadratureLocal.gausspoints.size() << '\t' << JacMultElem << endl;
 
   nGPsMerge = QuadratureLocal.gausspoints.size();
 
   ptTemp /= nGPsMerge;
-
 
   delete  adapIntegNodeLocal;
 
@@ -537,16 +529,10 @@ void AdaptiveBinarytree<3>::mergeGaussPoints(int refLev2, int inclDom, int dummy
     //GeomData->ComputeCoord(param, geom);
     //ptTemp += geom;
 
-    //cout << gp << '\t' << geom[0] << '\t' << geom[1] << '\t' << QuadratureLocal.gaussweights[gp] << endl;
     wt +=  QuadratureLocal.gaussweights[gp];
-    
-    //for(ii=0; ii<3; ii++)
-      //param[ii] = (2.0*QuadratureLocal.gausspoints[gp][ii] - knots[ii][3])/knots[ii][2];
     
     ptTemp += param;
   }
-
-  //cout << " wt = " << wt << '\t' << QuadratureLocal.gausspoints.size() << '\t' << JacMultElem << endl;
 
   nGPsMerge = QuadratureLocal.gausspoints.size();
 

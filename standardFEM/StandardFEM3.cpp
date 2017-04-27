@@ -281,13 +281,13 @@ void  StandardFEM::postProcess(int vartype, int vardir, int nCol, bool umnxflag,
     {
       for(ii=0;ii<GeomData.NodePosOrig.size();ii++)
       {
-        xx = GeomData.NodePosOrig[ii][0];
-        yy = GeomData.NodePosOrig[ii][1];
-        zz = GeomData.NodePosOrig[ii][2];
+        //xx = GeomData.NodePosOrig[ii][0];
+        //yy = GeomData.NodePosOrig[ii][1];
+        //zz = GeomData.NodePosOrig[ii][2];
 
-        //xx = GeomData.NodePosNew[ii][0];
-        //yy = GeomData.NodePosNew[ii][1];
-        //zz = GeomData.NodePosNew[ii][2];
+        xx = GeomData.NodePosNew[ii][0];
+        yy = GeomData.NodePosNew[ii][1];
+        zz = GeomData.NodePosNew[ii][2];
 
         pt[0] = pointsVTK->InsertNextPoint(xx, yy, zz);
 

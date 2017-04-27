@@ -26,14 +26,48 @@ using namespace myGeom;
 
 void  HBSplineCutFEM::prepareCutElements()
 {
-  int  ee, bb, domTemp;
+  //PetscPrintf(MPI_COMM_WORLD, "  HBSplineCutFEM::prepareCutElements() \n");
+
+  int  bb, dd, ee, ii, kk, domTemp, ind1, ind2, count;
   bool  flag;
 
   node  *nd1;
 
+  nElem = activeElements.size();
+  nNode = gridBF1;
+
+  totalDOF = nNode*ndof;
+
+  grid_to_cutfem_BFprev  = grid_to_cutfem_BF;
+  grid_to_cutfem_DOFprev = grid_to_cutfem_DOF;
+
+  grid_to_cutfem_BF.assign(gridBF1, -1);
+  grid_to_cutfem_DOF.assign(totalDOF, -1);
+
+  cutfem_to_grid_BF.clear();
+  cutfem_to_grid_DOF.clear();
+
+
   if( ImmersedBodyObjects.size() == 0 )
   {
     fluidElementIds = activeElements;
+
+    cutfem_to_grid_BF.resize(gridBF1);
+    cutfem_to_grid_DOF.resize(totalDOF);
+
+    kk=0;
+    for(ii=0; ii<gridBF1; ii++)
+    {
+      cutfem_to_grid_BF[ii] = ii;
+      grid_to_cutfem_BF[ii] = ii;
+
+      for(dd=0; dd<ndof; dd++)
+      {
+        cutfem_to_grid_DOF[kk] = kk;
+        grid_to_cutfem_DOF[kk] = kk;
+        kk++;
+      }
+    }
 
     for(ee=0; ee<activeElements.size(); ee++)
     {
@@ -49,21 +83,25 @@ void  HBSplineCutFEM::prepareCutElements()
 
   for(int bb=0; bb<ImmersedBodyObjects.size(); bb++)
   {
+    //cout << " jjjjjjjjjjjjjjjj " << endl;
     ImmersedBodyObjects[bb]->UpdateImmersedFaces();
+    //cout << " jjjjjjjjjjjjjjjj " << endl;
     ImmersedBodyObjects[bb]->computeAABB(2);
   }
 
-  cout << " HBSplineCutFEM::prepareCutElements() " << endl;
-
+  cout << " immersed objected updated " << endl;
+  
   //GeomData.domainFixedYesNo[0] = 0;
   //GeomData.domainFixedYesNo[1] = 0;
 
-  for(ee=0; ee<activeElements.size(); ee++)
+  for(ee=0; ee<nElem; ee++)
   {
     nd1 = elems[activeElements[ee]];
+    //cout << ee << '\t' << nd1->GetID() << endl;
 
     flag = false;
 
+    /*
     if( nd1->domNums.size() == 0 )
     {
       flag = true;
@@ -88,14 +126,19 @@ void  HBSplineCutFEM::prepareCutElements()
 
       if( !GeomData.domainFixedYesNo[domTemp] )
         flag = true;
-    } 
+    }
+    */
 
+    flag = true;
 
     if( flag )
     {
-      if( nd1->prepareCutCell(cutFEMparams) != 1)
+      kk = nd1->prepareCutCell(cutFEMparams);
+
+      if( kk != 1)
       {
-        cerr << " Error in prepareCutCell() for TreeNode<2>::prepareCutCell() " << endl;
+        cerr << " Error in prepareCutCell() for TreeNode<>::prepareCutCell() " << kk << endl;
+        exit(kk);
       }
 
       if( nd1->IsCutElement() )
@@ -108,14 +151,58 @@ void  HBSplineCutFEM::prepareCutElements()
           nd1->computeGaussPointsAdapIntegration(cutFEMparams[3], cutFEMparams[4], false, true);
       }
     }
+    //cout << " iiiiiii " << endl;
 
     if( nd1->GetDomainNumber() <= 0 )
     {
       fluidElementIds.push_back( nd1->GetID() );
+
+      //printVector(nd1->GlobalBasisFuncs);
+
+      for(ii=0; ii<nd1->GlobalBasisFuncs.size(); ii++)
+        grid_to_cutfem_BF[nd1->GlobalBasisFuncs[ii]] = 1;
     }
   }
 
-  cout << " HBSplineCutFEM::prepareCutElements() " << endl;
+  cout << " aaaaaaaaaaaaaaaaaa " << endl;
+  
+  nNode = 0;
+  for(ee=0; ee<gridBF1; ee++)
+  {
+    if(grid_to_cutfem_BF[ee] == 1)
+    {
+      grid_to_cutfem_BF[ee] = nNode;
+      cutfem_to_grid_BF.push_back(ee);
+
+      ind1 = ndof*ee;
+      ind2 = ndof*nNode;
+      for(dd=0; dd<ndof; dd++)
+      {
+        grid_to_cutfem_DOF[ind1+dd] = ind2+dd;
+        cutfem_to_grid_DOF.push_back(ind1+dd);
+      }
+      nNode++;
+    }
+  }
+
+  //for(ee=0; ee<gridBF1; ee++)
+    //cout << ee << '\t' << grid_to_cutfem_DOF[ee] << endl;
+  //printVector(grid_to_cutfem_DOF);
+
+  nElem     =  fluidElementIds.size();
+  fluidDOF  =  nNode*ndof;
+
+  //PetscPrintf(MPI_COMM_WORLD, "  nNode    = %d \n", nNode);
+  //PetscPrintf(MPI_COMM_WORLD, "  fluidDOF = %d \n", fluidDOF);
+  //PetscPrintf(MPI_COMM_WORLD, "  HBSplineCutFEM::prepareCutElements() \n\n");
+
+  //if(this_mpi_proc==0)
+  //{
+    //for(ii=0; ii<grid_to_cutfem_BF.size(); ii++)
+      //cout << ii << '\t' << grid_to_cutfem_BF[ii] << endl;
+  //}
+
+  //MPI_Barrier(MPI_COMM_WORLD);
 
   return;
 }

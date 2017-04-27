@@ -427,7 +427,7 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
     tend = time(0); 
     //cout << "HBSplineFEM::calcStiffnessAndResidual()  took "<< difftime(tend, tstart) <<" second(s)."<< endl;
 
-    //printf("\n rhsVec norm = %12.6E \n", solver->rhsVec.norm());
+    printf("\n rhsVec norm = %12.6E \n", solverEigen->rhsVec.norm());
 
     ////////////////////////////////////////////////////////
     //
@@ -449,7 +449,7 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
     //printData(1, 1);
     //printData(3, 1);
     //cout << " rhsVec " << endl;        printVector(&(solver->rhsVec(0)), totalDOF);
-    //printf("\n rhsVec norm = %12.6E \n", solver->rhsVec.norm());
+    printf("\n rhsVec norm = %12.6E \n", solverEigen->rhsVec.norm());
 
     //cout << " rhsVec " << endl;
    //for(int ii=fluidDOF-10;ii<totalDOF;ii++)

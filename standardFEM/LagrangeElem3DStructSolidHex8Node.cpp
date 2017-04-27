@@ -113,9 +113,9 @@ int LagrangeElem3DStructSolidHex8Node::calcStiffnessAndResidual(MatrixXd& Klocal
   bforce[1]  = 0.0;
   bforce[2]  = 0.0;
 
-  //bforce[0]  = elmDat[6]*timeFunction[0].prop ;
-  //bforce[1]  = elmDat[7]*timeFunction[0].prop ;
-  //bforce[2]  = elmDat[7]*timeFunction[0].prop ;
+  bforce[0]  = elmDat[6]*timeFunction[0].prop ;
+  bforce[1]  = elmDat[7]*timeFunction[0].prop ;
+  bforce[2]  = elmDat[7]*timeFunction[0].prop ;
 
   double  af = SolnData->td(2);
   double  acceFact1 = SolnData->td(5);

@@ -115,8 +115,7 @@ int LagrangeElem2DStokesTria3Node::calcStiffnessAndResidual(MatrixXd& Klocal, Ve
     tau[1] = elmDat[9]*stabParam;  // PSPG
     tau[2] = elmDat[10]*stabParam; // LSIC
 
-    int nGP1 = 2;
-    int nGP2 = 2;
+    int nGP1 = 1;
 
     getGaussPointsTriangle(nGP1, GeomData->gausspoints1, GeomData->gausspoints2, GeomData->gaussweights1);
 

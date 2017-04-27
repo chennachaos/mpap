@@ -10,9 +10,6 @@
 extern MpapTime           mpapTime;
 
 
-//using namespace std;
-
-
 
 void HBSplineFEM::setTimeParam()
 {

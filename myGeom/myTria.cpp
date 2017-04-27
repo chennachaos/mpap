@@ -35,26 +35,6 @@ void  myTria::computeAABB()
 }  
 
 
-void myTria::computeNormal()
-{
-  // normal to a plane passing through 3 points defined by 
-  // the conrners (P0, P1, P2) of a triangle
-  // 
-  // normal = (P1-P0) X (P2-P0)
-
-  normal = (ptList[2]-ptList[0]).cross(ptList[1]-ptList[0]);
-
-  normal.normalize();
-  
-  d0 = -normal.dot(ptList[0]);
-  
-  return;
-}
-
-
-
-
-
 double  myTria::volume()
 {
     double val = ptList[0][0]*(ptList[1][1]-ptList[2][1]);
@@ -74,17 +54,20 @@ int myTria::orientation()
 
 void myTria::reverseOrientation()
 { 
-  return ; 
+  return ;
 }
 
 
 
 double  myTria::volumeFromGaussPoints(int nGP)
 {
+  // compute area of the quadrilateral using numerical integration
+  // with Guass points
+  
   vector<double>  gps1(nGP), gps2(nGP), gws(nGP);
 
   getGaussPointsTriangle(nGP, gps1, gps2, gws);
-  
+
   int  ii, gp, nlbf=nVert, deg=1;
   double  Jac, detinv, xx, yy, dvol;
   double  N[3], dN_du[2][3];
@@ -514,6 +497,24 @@ int  myTria::computeGeometry(myPoint&  param, myPoint&  _geom)
   _geom = ptList[0];
 
   return 1;
+}
+
+
+
+void myTria::computeNormal()
+{
+  // normal to a plane passing through 3 points defined by 
+  // the conrners (P0, P1, P2) of a triangle
+  // 
+  // normal = (P1-P0) X (P2-P0)
+
+  normal = (ptList[2]-ptList[0]).cross(ptList[1]-ptList[0]);
+
+  normal.normalize();
+  
+  d0 = -normal.dot(ptList[0]);
+  
+  return;
 }
 
 

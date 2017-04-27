@@ -15,30 +15,25 @@ SolverPetsc::SolverPetsc()
 {
   if(debug) cout << " SolverPetsc constructor\n\n";
 
-  //PetscInitialize(NULL,NULL,(char *)0,NULL);
-
-  //PetscInitialize(NULL, NULL, "petsc_options.dat", NULL);
-
-  //MPI_Comm_size(PETSC_COMM_WORLD, &size);
-
-  //if (size != 1) SETERRQ(1,"This is a uniprocessor example only!");
-
-  //ierr = PetscOptionsGetInt(PETSC_NULL, "-n", &nRow, PETSC_NULL);CHKERRQ(ierr);
-
   //MatCreate(PETSC_COMM_WORLD, &mtx);
 
+  //VecCreate(PETSC_COMM_WORLD, &soln);
+  //VecCreate(PETSC_COMM_WORLD, &solnPrev);
+  //VecCreate(PETSC_COMM_WORLD, &rhsVec);
+  //VecCreate(PETSC_COMM_WORLD, &reac);
+
+  //ierr = KSPCreate(PETSC_COMM_WORLD, &ksp);CHKERRV(ierr);
 }
 
 
 SolverPetsc::~SolverPetsc()
 {
   if (debug)  cout << " SolverPetsc destructor\n\n";
-
-  free();
-
-  //ierr = PetscFinalize();//CHKERRQ(ierr);
-
-  //return;
+  //PetscPrintf(MPI_COMM_WORLD, "SolverPetsc::~SolverPetsc() \n");
+  cout << "SolverPetsc::~SolverPetsc() " << endl;
+  //free();
+  //PetscPrintf(MPI_COMM_WORLD, "SolverPetsc::~SolverPetsc() \n");
+  cout << "SolverPetsc::~SolverPetsc() " << endl;
 }
 
 
@@ -46,99 +41,36 @@ int SolverPetsc::initialise(int p1, int p2, int p3)
 {
     nRow = nCol = p3;
 
-    //cout << " p1   = " << p1 << endl;
-    //cout << " nRow = " << nRow << endl;
-
-    //VecCreate(PETSC_COMM_WORLD, &soln);
-    //VecCreate(PETSC_COMM_WORLD, &solnPrev);
-    //VecCreate(PETSC_COMM_WORLD, &rhsVec);
-    //VecCreate(PETSC_COMM_WORLD, &reac);
-    ////ierr = PetscObjectSetName((PetscObject) x, "Solution");CHKERRQ(ierr);
-
-    //ierr = VecSetSizes(soln, PETSC_DECIDE, nRow);CHKERRQ(ierr);
-    //ierr = VecSetSizes(solnPrev, PETSC_DECIDE, nRow);CHKERRQ(ierr);
-    //ierr = VecSetSizes(rhsVec, PETSC_DECIDE, nRow);CHKERRQ(ierr);
-    //ierr = VecSetSizes(reac, PETSC_DECIDE, p1);CHKERRQ(ierr);
-
-    //ierr = VecSetFromOptions(soln);CHKERRQ(ierr);
-    //ierr = VecDuplicate(soln, &rhsVec);CHKERRQ(ierr);
-    //ierr = VecDuplicate(soln, &solnPrev);CHKERRQ(ierr);
-    //ierr = VecSetFromOptions(reac);CHKERRQ(ierr);
-
-    //cout << " AAAAAAAAAA " << endl;
-    //ierr = MatCreateSeqAIJ(PETSC_COMM_WORLD,nRow,nRow,15000,NULL,&mtx);CHKERRQ(ierr);
-
-    //ierr = MatSetSizes(mtx,PETSC_DECIDE,PETSC_DECIDE,nRow,nRow);CHKERRQ(ierr);
-
-    //ierr = MatSetFromOptions(mtx);CHKERRQ(ierr);
-    
-    //cout << " AAAAAAAAAA " << endl;
-    //SetSolverAndParameters();
-
     return 0;
 }
 
 
 int SolverPetsc::SetSolverAndParameters()
 {
-    ///////////////////////
-    // Create the linear solver and set various options
-    ///////////////////////
-    PetscPrintf(MPI_COMM_WORLD, " AAAAAAAAAA \n");
+    //PetscPrintf(MPI_COMM_WORLD, " AAAAAAAAAA \n");
     ierr = KSPCreate(PETSC_COMM_WORLD, &ksp);CHKERRQ(ierr);
 
-    ///////////////////////
-    //Set operators. Here the matrix that defines the linear system
-    //also serves as the preconditioning matrix.
-    ///////////////////////
-    PetscPrintf(MPI_COMM_WORLD, " BBBBBBBBBB \n");
+    //PetscPrintf(MPI_COMM_WORLD, " BBBBBBBBBB \n");
     ierr = KSPSetOperators(ksp, mtx, mtx);CHKERRQ(ierr);
-    PetscPrintf(MPI_COMM_WORLD, " AAAAAAAAAA \n");
-    ierr = KSPSetFromOptions(ksp);CHKERRQ(ierr);
-    PetscPrintf(MPI_COMM_WORLD, " cccccccccc \n");
-    ///////////////////////
-    /*
-    Set linear solver defaults for this problem (optional).
-    - By extracting the KSP and PC contexts from the KSP context,
-    we can then directly call any KSP and PC routines to set
-    various options.
-    - The following four statements are optional; all of these
-    parameters could alternatively be specified at runtime via
-    KSPSetFromOptions();
-    */
-    ///////////////////////
 
-    //KSPSetType(ksp, KSPPREONLY);
+    ierr = KSPSetFromOptions(ksp);CHKERRQ(ierr);
+
+
+
     KSPSetType(ksp, KSPCG);
-    //KSPSetType(ksp, KSPGMRES);
-    //KSPSetType(ksp, KSPBCGS);
-    //KSPSetType(ksp, KSPBICG);
-    //KSPSetType(ksp, KSPLSQR);
-    //KSPGMRESSetRestart(ksp, 100);
-    PetscPrintf(MPI_COMM_WORLD, " AAAAAAAAAA \n");
 
     ierr = KSPGetPC(ksp,&pc);CHKERRQ(ierr);
 
-    //ierr = PCSetType(pc,PCJACOBI);CHKERRQ(ierr);
-    ierr = PCSetType(pc,PCILU);CHKERRQ(ierr);
-    //ierr = PCSetType(pc,PCLU);CHKERRQ(ierr);
-    //ierr = PCSetType(pc,PCCholesky);CHKERRQ(ierr);
-    //ierr = PCSetType(pc,PCNONE);CHKERRQ(ierr);
-    ierr = KSPSetTolerances(ksp,1.0e-12,PETSC_DEFAULT,PETSC_DEFAULT,PETSC_DEFAULT);CHKERRQ(ierr);
-    PetscPrintf(MPI_COMM_WORLD, " qqqqqqqqqq \n");
+    PCSetType(pc, PCILU);
 
-    // Set runtime options, e.g.,
-    // -ksp_type <type> -pc_type <type> -ksp_monitor -ksp_rtol <rtol>
-    // These options will override those specified above as long as
-    // KSPSetFromOptions() is called _after_ any other customization
-    // routines.
+    //PetscPrintf(MPI_COMM_WORLD, " qqqqqqqqqq \n");
 
     //KSPSetInitialGuessNonzero(ksp,PETSC_TRUE);
-    KSPSetInitialGuessNonzero(ksp, PETSC_FALSE);
+    //KSPSetInitialGuessNonzero(ksp, PETSC_FALSE);
 
     ierr = KSPSetFromOptions(ksp);CHKERRQ(ierr);
 
-    PetscPrintf(MPI_COMM_WORLD, " qqqqqqqqqq \n");
+    //PetscPrintf(MPI_COMM_WORLD, " qqqqqqqqqq \n");
 
     return 0;
 }
@@ -172,12 +104,26 @@ int SolverPetsc::zeroMtx()
 
 int SolverPetsc::free()
 {
-    //ierr = VecDestroy(&soln);CHKERRQ(ierr);
-    //ierr = VecDestroy(&solnPrev);CHKERRQ(ierr);
-    //ierr = VecDestroy(&rhsVec);CHKERRQ(ierr);
-    //ierr = MatDestroy(&mtx);CHKERRQ(ierr);
-    //ierr = KSPDestroy(&ksp);CHKERRQ(ierr);
+  //PetscPrintf(MPI_COMM_WORLD, "SolverPetsc::free() \n");
+  cout << "SolverPetsc::free() " << endl;
 
+  //ierr = KSPReset(ksp);CHKERRQ(ierr);
+  //cout << " ierr = " << ierr << endl;
+  ierr = VecDestroy(&soln);CHKERRQ(ierr);
+  //cout << " ierr = " << ierr << endl;
+  ierr = VecDestroy(&solnPrev);CHKERRQ(ierr);
+  //cout << " ierr = " << ierr << endl;
+  ierr = VecDestroy(&rhsVec);CHKERRQ(ierr);
+  //cout << " ierr = " << ierr << endl;
+  ierr = VecDestroy(&reac);CHKERRQ(ierr);
+  //cout << " ierr = " << ierr << endl;
+  ierr = MatDestroy(&mtx);CHKERRQ(ierr);
+  //cout << " ierr = " << ierr << endl;
+  ierr = KSPDestroy(&ksp);CHKERRQ(ierr);
+  //cout << " ierr = " << ierr << endl;
+
+  //PetscPrintf(MPI_COMM_WORLD, "SolverPetsc::free() \n");
+  cout << "SolverPetsc::free() " << endl;
   return 1;
 }
 
@@ -265,13 +211,13 @@ int SolverPetsc::solve()
 
   //MatView(mtx,PETSC_VIEWER_STDOUT_WORLD);
 
-  VecZeroEntries(soln);
-
   VecAssemblyBegin(rhsVec);
   VecAssemblyEnd(rhsVec);
 
   VecAssemblyBegin(soln);
   VecAssemblyEnd(soln);
+
+  VecZeroEntries(soln);
 
   computerTime.go(fct);
 
@@ -333,13 +279,17 @@ int SolverPetsc::factoriseAndSolve()
 int SolverPetsc::AssembleMatrixAndVector(vector<int>& row, vector<int>& col, MatrixXd& Klocal, VectorXd& Flocal)
 {
   int ii, jj;
-  for(ii=0;ii<row.size();ii++)
+
+  int size1 = row.size();
+  int size2 = col.size();
+
+  for(ii=0;ii<size1;ii++)
   {
-    VecSetValues(rhsVec, 1, &row[ii], &Flocal(ii), ADD_VALUES);
-    for(jj=0;jj<col.size();jj++)
+    VecSetValue(rhsVec, row[ii], Flocal(ii), ADD_VALUES);
+
+    for(jj=0;jj<size2;jj++)
     {
-      //cout << ii << '\t' << jj << endl;
-      MatSetValues(mtx, 1, &row[ii], 1, &col[jj], &(Klocal(ii,jj)), ADD_VALUES);
+      MatSetValue(mtx, row[ii], col[jj], Klocal(ii,jj), ADD_VALUES);
     }
   }
 
@@ -348,133 +298,57 @@ int SolverPetsc::AssembleMatrixAndVector(vector<int>& row, vector<int>& col, Mat
 
 
 
-int SolverPetsc::AssembleMatrixAndVector(int start, int c1, vector<int>& vec1, vector<int>& vec2, MatrixXd& Klocal, VectorXd& Flocal)
+int SolverPetsc::AssembleMatrixAndVector(int start1, int start2, vector<int>& row, vector<int>& col, MatrixXd& Klocal, VectorXd& Flocal)
 {
-  int ii, jj, aa, bb, size1, size2;
+  int ii, jj, r1, c1;
 
-  //printVector(vec1);
-  //printVector(vec2);
-  
-  size1 = vec1.size();
-  size2 = vec2.size();
+  int size1 = row.size();
+  int size2 = col.size();
 
   for(ii=0;ii<size1;ii++)
   {
-    VecSetValues(rhsVec, 1, &vec1[ii], &Flocal(ii), ADD_VALUES);
+    r1 = start1 + row[ii];
 
-    //for(jj=0;jj<size1;jj++)
-      //mtx.coeffRef(vec1[ii], vec1[jj]) += Klocal(ii, jj);
+    VecSetValue(rhsVec, r1, Flocal(ii), ADD_VALUES);
 
     for(jj=0;jj<size2;jj++)
     {
-      aa = start + vec2[jj];
-      bb = size1 + jj;
-      
-      MatSetValues(mtx, 1, &vec1[ii], 1, &aa,       &(Klocal(ii,bb)), ADD_VALUES);
-      MatSetValues(mtx, 1, &aa,       1, &vec1[ii], &(Klocal(bb,ii)), ADD_VALUES);
+      c1 = start2 + col[jj];
+      MatSetValue(mtx, r1, c1, Klocal(ii,jj), ADD_VALUES);
     }
   }
 
-  for(ii=0;ii<size2;ii++)
-  {
-    aa = start + vec2[ii];
-    VecSetValues(rhsVec, 1, &aa, &Flocal(size1+ii), ADD_VALUES);
-  }
+  return 0;
+}
 
-/*
-  if(STABILISED)
+
+
+
+int SolverPetsc::AssembleMatrixAndVectorCutFEM(int start, int c1, vector<int>& forAssyElem, vector<int>& map_to_cutfem, MatrixXd& Klocal, VectorXd& Flocal)
+{
+  int ii, jj, r, kk=0;
+
+  int  size1 = forAssyElem.size();
+  int  size2 = size1*size1;
+
+  PetscInt  row1[size1];
+  PetscScalar  array[size2];
+
+  for(ii=0;ii<size1;ii++)
   {
-  for(ii=0;ii<size2;ii++)
-  {
-    aa = start + vec2[ii];
-    bb = size1 + ii;
-    for(jj=0;jj<size2;jj++)
+    r = map_to_cutfem[forAssyElem[ii]];
+
+    VecSetValue(rhsVec, r, Flocal(ii), ADD_VALUES);
+
+    row1[ii] = r;
+
+    for(jj=0;jj<size1;jj++)
     {
-      c = start+vec2[jj];
-      MatSetValues(mtx, 1, &aa, 1, &c, &(Klocal(bb,size1+jj)), ADD_VALUES);
+      array[kk++] = Klocal(ii,jj);
     }
   }
-  }
-*/
-  return 0;
-}
 
-
-
-
-int SolverPetsc::AssembleMatrixAndVector(int start, int c1, vector<int>& vec1, MatrixXd& Klocal, VectorXd& Flocal)
-{
-  int ii, jj, size1;
-
-  //printVector(vec1);
-  //printVector(vec2);
-  
-  size1 = vec1.size();
-
-  for(ii=0;ii<size1;ii++)
-  {
-    VecSetValue(rhsVec, vec1[ii], Flocal(ii), ADD_VALUES);
-    //VecSetValues(rhsVec, 1, &vec1[ii], &Flocal(ii), ADD_VALUES);
-
-    for(jj=0;jj<size1;jj++)
-      MatSetValue(mtx, vec1[ii], vec1[jj], Klocal(ii,jj), ADD_VALUES);
-      
-      //MatSetValues(mtx, 1, &vec1[ii], 1, &vec1[jj], &(Klocal(ii,jj)), ADD_VALUES);
-      //ierr = MatSetValue(mtx, aa, bb, Klocal(ii, jj), ADD_VALUES);
-  }
-
-  return 0;
-}
-
-
-
-int SolverPetsc::AssembleVector(int start, int c1, vector<int>& vec1, VectorXd& Flocal)
-{
-  int ii, jj;
-
-  for(ii=0;ii<vec1.size();ii++)
-  {
-    VecSetValues(rhsVec, 1, &vec1[ii], &Flocal(ii), ADD_VALUES);
-  }
-
-  return 0;
-}
-
-
-
-int SolverPetsc::AssembleMatrixAndVectorCutFEM(int start, int c1, vector<int>& tempVec, vector<int>& forAssy, MatrixXd& Klocal, VectorXd& Flocal)
-{
-  int ii, jj, size1, r;
-
-  //printVector(vec1);
-  //printVector(vec2);
-
-/*
-  size1 = tempVec.size();
-
-  for(ii=0;ii<size1;ii++)
-  {
-    r = start+forAssy[tempVec[ii]];
-
-    rhsVec[r] += Flocal(ii);
-
-    for(jj=0;jj<size1;jj++)
-      mtx.coeffRef(r, start+forAssy[tempVec[jj]]) += Klocal(ii, jj);
-  }
-*/
-//
-  size1 = tempVec.size();
-
-  for(ii=0;ii<size1;ii++)
-  {
-    r = forAssy[tempVec[ii]];
-
-    VecSetValues(rhsVec, 1, &r, &Flocal(ii), ADD_VALUES);
-
-    for(jj=0;jj<size1;jj++)
-      MatSetValues(mtx, 1, &r, 1, &forAssy[tempVec[jj]], &(Klocal(ii,jj)), ADD_VALUES);
-  }
-//
+  MatSetValues(mtx, size1, row1, size1, row1, array, ADD_VALUES);
 
   return 0;
 }
@@ -526,6 +400,60 @@ int SolverPetsc::AssembleMatrixAndVectorCutFEM3(int start1, int start2, vector<i
  
   return 0;
 }
+
+
+
+
+
+int SolverPetsc::AssembleMatrixAndVectorMixedFormulation(int start, int c1, vector<int>& vec1, vector<int>& vec2, MatrixXd& Klocal, VectorXd& Flocal)
+{
+  int ii, jj, aa, bb, size1, size2;
+
+  //printVector(vec1);
+  //printVector(vec2);
+  
+  size1 = vec1.size();
+  size2 = vec2.size();
+
+  for(ii=0;ii<size1;ii++)
+  {
+    VecSetValues(rhsVec, 1, &vec1[ii], &Flocal(ii), ADD_VALUES);
+
+    //for(jj=0;jj<size1;jj++)
+      //mtx.coeffRef(vec1[ii], vec1[jj]) += Klocal(ii, jj);
+
+    for(jj=0;jj<size2;jj++)
+    {
+      aa = start + vec2[jj];
+      bb = size1 + jj;
+      
+      MatSetValues(mtx, 1, &vec1[ii], 1, &aa,       &(Klocal(ii,bb)), ADD_VALUES);
+      MatSetValues(mtx, 1, &aa,       1, &vec1[ii], &(Klocal(bb,ii)), ADD_VALUES);
+    }
+  }
+
+  for(ii=0;ii<size2;ii++)
+  {
+    aa = start + vec2[ii];
+    VecSetValues(rhsVec, 1, &aa, &Flocal(size1+ii), ADD_VALUES);
+  }
+  return 0;
+}
+
+
+
+int SolverPetsc::AssembleVector(int start, int c1, vector<int>& vec1, VectorXd& Flocal)
+{
+  int ii, jj;
+
+  for(ii=0;ii<vec1.size();ii++)
+  {
+    VecSetValues(rhsVec, 1, &vec1[ii], &Flocal(ii), ADD_VALUES);
+  }
+
+  return 0;
+}
+
 
 
 

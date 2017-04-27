@@ -74,7 +74,7 @@ void GeomDataHBSplines::build()
 
     //cout << " Jacobian[0] " << Jacobian[0] << '\t' << Jacobian[1] << '\t' << Jacobian[2] << '\t'<< Jfull << endl;
     
-    //cout << " totalNGP " << nGP[0] << '\t' << nGP[1] << '\t' << totalNGP << endl;
+    cout << " totalNGP " << nGP[0] << '\t' << nGP[1] << '\t' << totalNGP << endl;
 
     // compute subdivision coefficient matrices
 
@@ -239,20 +239,16 @@ void GeomDataHBSplines::build()
     double  dw = 1.0/nelem[2];
     double  incr1, incr2, incr3, val1, val2, val3, val4, val5, val6, uu, vv, ww;
 
-    shpfns.resize(10); // 1 level(s)
+    shpfns.resize(8); // index 1 - level(s)
     
     myPoint  knotBegin, knotIncr, param;
     knotBegin.setZero();
     knotIncr = knotBegin;
     param = knotBegin;
 
-    incr1 = du;
-    incr2 = dv;
-    incr3 = dw;
-    
-    //printf("KKKKKKKKKKK \n");
+    incr1 = du;    incr2 = dv;    incr3 = dw;
 
-    for(lev=0;lev<10;lev++)
+    for(lev=0;lev<8;lev++)
     {
       shpfns[lev].resize(totalNGP);
 
@@ -284,6 +280,15 @@ void GeomDataHBSplines::build()
           computeBasisFunctions2D(knotBegin, knotIncr, param, shpfns[lev][ind].N, 
                                     shpfns[lev][ind].dN_dx, shpfns[lev][ind].dN_dy,
                                     shpfns[lev][ind].d2N_dx2, shpfns[lev][ind].d2N_dy2);
+
+          //printVector(shpfns[lev][ind].N);
+          //printf("\n\n\n");
+          //printVector(shpfns[lev][ind].dN_dx);
+          //printf("\n\n\n");
+          //printVector(shpfns[lev][ind].dN_dy);
+          //printf("\n\n\n");
+
+
           ind++;
         }
         }
@@ -1383,6 +1388,7 @@ int  GeomDataHBSplines::doIntersect2Dfor3D(int sideTemp, double coord3, AABB& bb
 
   return  1;
 }
+
 
 
 int  GeomDataHBSplines::doIntersect3D(AABB& bbTemp, bool flag, vector<int>& vecTemp, vector<myPoint>& ptOut, vector<int>& domVec)

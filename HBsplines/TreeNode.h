@@ -47,9 +47,9 @@ class TreeNode
 
         bool FuncFlag, GHOST_FLAG, ACTIVE_FLAG, PROCESSED;
     
-        TreeNode_PTR  *child, parent, *neighbours;
+        TreeNode_PTR  *child, parent;//, *neighbours;
 
-        //int domainNum;
+        TreeNode_PTR  neighbours[2*DIM];
 
     public:
 
@@ -71,9 +71,9 @@ class TreeNode
 
         vector<myPoly*>  subTrias;
 
-        //typedef  AdaptiveOctree<DIM>*  adapTreePTR;
+        typedef  AdaptiveOctree<DIM>*  adapTreePTR;
 
-        typedef  AdaptiveBinarytree<DIM>*  adapTreePTR;
+        //typedef  AdaptiveBinarytree<DIM>*  adapTreePTR;
 
         //AdaptiveOctree<DIM>  *adapIntegNode1;
         //AdaptiveBinarytree<DIM>  *adapIntegNode2;
@@ -426,7 +426,7 @@ TreeNode<DIM>::TreeNode():FuncFlag(false), level(0), NUM_CHILDREN(0), GHOST_FLAG
     id = nodecount++;
 
     child = NULL;
-    neighbours = NULL;
+    //neighbours = NULL;
     parent = NULL;
     adapIntegNode = NULL;
     
@@ -440,10 +440,10 @@ TreeNode<DIM>::TreeNode():FuncFlag(false), level(0), NUM_CHILDREN(0), GHOST_FLAG
 
     NUM_NEIGHBOURS = 2*DIM;
 
-    neighbours = new TreeNode_PTR[NUM_NEIGHBOURS];
+    //neighbours = new TreeNode_PTR[NUM_NEIGHBOURS];
     for(int ii=0;ii<NUM_NEIGHBOURS;ii++)
       neighbours[ii] = NULL;
-    
+
     subdomId = 0;
     //domNums.push_back(0);
 }
@@ -457,7 +457,7 @@ TreeNode<DIM>::TreeNode(int lev):level(lev), NUM_CHILDREN(0), FuncFlag(false), G
     id = nodecount++;
 
     child = NULL;
-    neighbours = NULL;
+    //neighbours = NULL;
     parent = NULL;
     adapIntegNode = NULL;
 
@@ -474,7 +474,7 @@ TreeNode<DIM>::TreeNode(int lev):level(lev), NUM_CHILDREN(0), FuncFlag(false), G
 
     NUM_NEIGHBOURS = 2*DIM;
 
-    neighbours = new TreeNode_PTR[NUM_NEIGHBOURS];
+    //neighbours = new TreeNode_PTR[NUM_NEIGHBOURS];
     for(int ii=0;ii<NUM_NEIGHBOURS;ii++)
       neighbours[ii] = NULL;
 
@@ -497,14 +497,15 @@ TreeNode<DIM>::~TreeNode()
     child = NULL;
   }
 
-  if(neighbours != NULL)
-  {
-    //for(int ii=0;ii<NUM_NEIGHBOURS;ii++)
+  //if(neighbours != NULL)
+  //{
+    for(int ii=0;ii<NUM_NEIGHBOURS;ii++)
+      neighbours[ii] = NULL;
       //delete neighbours[ii];
 
-    delete [] neighbours;
-    neighbours = NULL;
-  }
+    //delete [] neighbours;
+    //neighbours = NULL;
+  //}
 
   if(parent != NULL)
   {
@@ -517,8 +518,10 @@ TreeNode<DIM>::~TreeNode()
     delete *pObj; // Note that this is deleting what pObj points to, which is a pointer
   }
   subTrias.clear(); // Purge the contents so no one tries to delete them again
-
 }
+
+
+
 
 template <int DIM>
 int  TreeNode<DIM>::ResetAdaptiveIntegrationNode()

@@ -10,7 +10,6 @@
 #include "ImmersedRigidSolid.h"
 #include "ImmersedSolid.h"
 #include "ContactElementPointToPoint2D.h"
-#include <omp.h>
 
 
 extern DomainTree         domain;
@@ -36,10 +35,12 @@ HBSplineCutFEM::HBSplineCutFEM()
   slnTempPrev  = slnTemp;
   slnTempCur   = slnTemp;
 
-    stagParams.resize(3);
-    stagParams[0] = 0;
-    stagParams[1] = 1;
-    stagParams[2] = 0;
+  stagParams.resize(10);
+  stagParams[0] = 0;
+  stagParams[1] = 1;
+  stagParams[2] = 0;
+  stagParams[3] = 0;
+  stagParams[4] = 0;
 
     // add new type
 
@@ -764,10 +765,15 @@ void HBSplineCutFEM::prepareInputData()
 
   HBSplineBase::prepareInputData();
 
+  grid_to_cutfem_BF.assign(gridBF1, -1);
+  grid_to_cutfem_BFprev.assign(gridBF1, -1);
+  grid_to_proc_BF.assign(gridBF1, -1);
+
   totalDOF  = gridBF1 * ndof;
   
-  forAssyCutFEM.assign(totalDOF, -1);
-  forAssyCutFEMprev.assign(totalDOF, -1);
+  grid_to_cutfem_DOF.assign(totalDOF, -1);
+  grid_to_cutfem_DOFprev.assign(totalDOF, -1);
+  grid_to_proc_DOF.assign(totalDOF, -1);
 
   SolnData.initialise(totalDOF, totalDOF, 0, 0);
 
@@ -777,6 +783,48 @@ void HBSplineCutFEM::prepareInputData()
   SolnData.SetStaggeredParams(stagParams);
 
   int bb;
+
+  GRID_CHANGED = true;
+  IB_MOVED = false;
+
+  numDomains = ImmersedBodyObjects.size() + 1;
+
+  // 0 -> the domain is inactive
+  // 1 -> the domain is active
+
+  //for(int bb=0; bb<numDomains; bb++)
+    //domainInclYesNo[bb] = 0;
+  
+  //domainInclYesNo[0] = 1;
+
+  //GeomData.domainInclYesNo = domainInclYesNo;
+
+
+  if(nImmSolids > 0)
+  {
+    GeomData.cutFEMparams = cutFEMparams;
+    
+    CUTCELL_INTEGRATION_TYPE = cutFEMparams[0];
+
+    double minVal[]={0.0, 0.0, 0.0}, maxVal[]={0.0, 0.0, 0.0};
+
+    for(int ii=0; ii<DIM; ii++)
+    {
+      minVal[ii] = GeomData.ComputeCoord(ii, 0.0);
+      maxVal[ii] = GeomData.ComputeCoord(ii, 1.0);
+    }
+    //cout << minVal[0] << '\t' << minVal[1] << '\t' << minVal[2] << endl;
+    //cout << maxVal[0] << '\t' << maxVal[1] << '\t' << maxVal[2] << endl;
+
+    for(bb=0; bb<nImmSolids; bb++)
+      ImmersedBodyObjects[bb]->adjustBoundaryPoints(minVal, maxVal);
+  }
+
+
+
+  /*
+  // subroutines using VTK library
+  ////////////////////////////////////////////////////////////////
 
   // create the points on the background grids
   // for determining whether they lie inside/outside the immersed bodies
@@ -856,46 +904,6 @@ void HBSplineCutFEM::prepareInputData()
     //cout << " uGridVTKfluid->GetNumberOfCells()  = " <<  uGridVTKfluid->GetNumberOfCells() << endl;
   }
 
-
-  GRID_CHANGED = true;
-  IB_MOVED = false;
-
-  
-  numDomains = ImmersedBodyObjects.size() + 1;
-
-  // 0 -> the domain is inactive
-  // 1 -> the domain is active
-
-  //for(int bb=0; bb<numDomains; bb++)
-    //domainInclYesNo[bb] = 0;
-  
-  //domainInclYesNo[0] = 1;
-
-  //GeomData.domainInclYesNo = domainInclYesNo;
-
-
-  if(nImmSolids > 0)
-  {
-    GeomData.cutFEMparams = cutFEMparams;
-    
-    CUTCELL_INTEGRATION_TYPE = cutFEMparams[0];
-
-    GHOST_PENALTY = cutFEMparams[6];
-
-    double minVal[]={0.0, 0.0, 0.0}, maxVal[]={0.0, 0.0, 0.0};
-
-    for(int ii=0; ii<DIM; ii++)
-    {
-      minVal[ii] = GeomData.ComputeCoord(ii, 0.0);
-      maxVal[ii] = GeomData.ComputeCoord(ii, 1.0);
-    }
-    //cout << minVal[0] << '\t' << minVal[1] << '\t' << minVal[2] << endl;
-    //cout << maxVal[0] << '\t' << maxVal[1] << '\t' << maxVal[2] << endl;
-
-    for(bb=0; bb<nImmSolids; bb++)
-      ImmersedBodyObjects[bb]->adjustBoundaryPoints(minVal, maxVal);
-  }
-
   ////////////////////////////////////////
   // generate polygons for the immersed boundaries
   //
@@ -912,6 +920,18 @@ void HBSplineCutFEM::prepareInputData()
       ImmersedBodyObjects[bb]->selectEnclosedPoints->SetInputData(pointsPolydataVTK);
     #endif
 
+    //cout << "  HBSplineCutFEM::SetImmersedFaces()  " << endl;
+    ImmersedBodyObjects[bb]->SetImmersedFaces();
+  }
+
+  */
+
+  // subroutines using CGAL library
+  ////////////////////////////////////////////////////////////////
+
+  for(bb=0; bb<nImmSolids; bb++)
+  {
+    //cout << "  HBSplineCutFEM::SetImmersedFaces()  " << endl;
     ImmersedBodyObjects[bb]->SetImmersedFaces();
   }
 

@@ -36,7 +36,8 @@ void  HBSplineCutFEM::applyInterfaceTerms2D()
       myPoly *poly;
 
       int  aa, bb, ii, jj, nlb, nlf, ind1, ind2, nr, nc, start, r, c, kk, gp, nGauss;
-      int TI, TIp1, TIp2, TJ, TJp1, TJp2, totnlbf2, elnum;
+      int  TI, TIp1, TIp2, TJ, TJp1, TJp2, totnlbf2, elnum;
+      int  *tt1, *tt2, val1, val2, nr1, nr2, start1, rp1, cp1, cp2;
 
       nlf = 1;
       for(ii=0; ii<DIM; ii++)
@@ -45,7 +46,7 @@ void  HBSplineCutFEM::applyInterfaceTerms2D()
       double  fact, fact1, fact2, dvol, PENALTY, detJ, pres, presPrev, x0, y0, FlowRate=6.545*0.5, x1, y1, rad;
       double  Ta[6], Tb[6], bb1, bb2, NitscheFact, c1, hx, hy;
       bool  isNitsche;
-      
+
       AABB  bbTemp;
 
       double  af = SolnData.td(2);
@@ -53,7 +54,7 @@ void  HBSplineCutFEM::applyInterfaceTerms2D()
       double  rho = fluidProps[3];
       double  mu = fluidProps[4];
 
-      MatrixXd  K1, grad(2,2), stress(2,2);
+      MatrixXd  K1, grad(2,2), stress(2,2), Kc(2,3);
       VectorXd  F1;
       myPoint   vel, trac, velSpec;
       VectorXd  NN(nlf), dNN_dx(nlf), dNN_dy(nlf), N, dN_dx, dN_dy;
@@ -68,11 +69,16 @@ void  HBSplineCutFEM::applyInterfaceTerms2D()
 
       normal.setZero();
 
+      start1 = fluidDOF;
       for(bb=0;bb<ImmersedBodyObjects.size();bb++)
       {
         PENALTY     = ImmersedBodyObjects[bb]->GetPenaltyParameter();
         isNitsche   = ImmersedBodyObjects[bb]->GetNitscheFlag();
         NitscheFact = ImmersedBodyObjects[bb]->GetNitscheFact();
+
+        //cout << " PENALTY     = " << PENALTY << endl;
+        //cout << " isNitsche   = " << isNitsche << endl;
+        //cout << " NitscheFact = " << NitscheFact << endl;
 
         nlb = ImmersedBodyObjects[bb]->ImmIntgElems[0]->pointNums.size();
 
@@ -93,6 +99,9 @@ void  HBSplineCutFEM::applyInterfaceTerms2D()
           poly = ImmersedBodyObjects[bb]->ImmersedFaces[aa];
 
           //cout << bb << '\t' << aa << '\t' << lme->IsActive() << endl;
+
+          val1 = lme->pointNums.size();
+          tt1  =  &(lme->pointNums[0]);
 
           if( lme->IsActive() )
           {
@@ -119,10 +128,10 @@ void  HBSplineCutFEM::applyInterfaceTerms2D()
               poly->computeNormal(geom, normal);
 
               //if(bb==2)
-	      //{
+              //{
                 //printf("normal     ... %12.6f \t %12.6f \t %12.6f \n", normal[0], normal[1], normal[2]);
                 //printf("velSpec    ... %12.6f \t %12.6f \t %12.6f \n", velSpec[0], velSpec[1], velSpec[2]);
-	      //}
+              //}
               //cout << " dvol = " << dvol << endl;
 
               //printf("geom = %12.6f, yy = %12.6f, zz = %12.6f, dvol = %12.6f, \n", geom[0], geom[1], geom[2], dvol);
@@ -225,16 +234,14 @@ void  HBSplineCutFEM::applyInterfaceTerms2D()
                 dN_dy = nd->SubDivMat*dNN_dy;
               }
 
-              //cout << " uuuuuuuuuuu " << endl;
-
               vel[0] = velSpec[0] - nd->computeValueCur(0, N);
               vel[1] = velSpec[1] - nd->computeValueCur(1, N);
 
               //printf("vel        ... %12.6f \t %12.6f \t %12.6f \n", vel[0], vel[1], vel[2]);
 
-              ///////////////////////////////////
+              /////////////////////////////////////////
               // compute the stresses and tractions
-              ///////////////////////////////////
+              /////////////////////////////////////////
 
               grad(0,0) = nd->computeValueCur(0, dN_dx);
               grad(0,1) = nd->computeValueCur(0, dN_dy);
@@ -252,25 +259,23 @@ void  HBSplineCutFEM::applyInterfaceTerms2D()
               trac[0] = stress(0,0)*normal[0] + stress(0,1)*normal[1] ;
               trac[1] = stress(1,0)*normal[0] + stress(1,1)*normal[1] ;
 
-              //cout << " vvvvvvvvvvvvv " << endl;
-
               totnlbf2 = nr/ndof;
 
               for(ii=0;ii<totnlbf2;ii++)
               {
-                  TI   = ndof*ii;
+                  TI   = 3*ii;
                   TIp1 = TI+1;
                   TIp2 = TI+2;
 
                   bb1 = N[ii] * dvol;
-                  bb2 = bb1 * PENALTY ;
+                  bb2 = bb1 * PENALTY;
 
-                  Ta[0] = (dvol*mu)*( normal[0]*dN_dx(ii) + normal[1]*dN_dy(ii) );
+                  Ta[0] = (dvol*mu)*( dN_dx[ii]*normal[0] + dN_dy[ii]*normal[1] );
                   Ta[1] = 0.0;
                   Ta[2] = -normal[0]*bb1;
 
                   Ta[3] = 0.0;
-                  Ta[4] = (dvol*mu)*( normal[0]*dN_dx(ii) + normal[1]*dN_dy(ii) );
+                  Ta[4] = Ta[0];
                   Ta[5] = -normal[1]*bb1;
 
                   for(jj=0; jj<6; jj++)
@@ -278,7 +283,7 @@ void  HBSplineCutFEM::applyInterfaceTerms2D()
 
                   for(jj=0;jj<totnlbf2;jj++)
                   {
-                    TJ   = ndof*jj;
+                    TJ   = 3*jj;
                     TJp1 = TJ+1;
                     TJp2 = TJ+2;
 
@@ -291,13 +296,13 @@ void  HBSplineCutFEM::applyInterfaceTerms2D()
 
                     // Nitsche terms
 
-                    Tb[0] = (af*mu)*( normal[0]*dN_dx(jj) + normal[1]*dN_dy(jj) );
+                    Tb[0] = (af*mu)*( dN_dx[jj]*normal[0] + dN_dy[jj]*normal[1] );
                     Tb[1] = 0.0;
-                    Tb[2] = -normal[0]*N(jj);
+                    Tb[2] = -normal[0]*N[jj];
 
                     Tb[3] = 0.0;
-                    Tb[4] = (af*mu)*( normal[0]*dN_dx(jj) + normal[1]*dN_dy(jj) );
-                    Tb[5] = -normal[1]*N(jj);
+                    Tb[4] = Tb[0];
+                    Tb[5] = -normal[1]*N[jj];
 
                     K1(TI, TJ)      -= (bb1*Tb[0]);
                     K1(TI, TJp1)    -= (bb1*Tb[1]);
@@ -307,7 +312,7 @@ void  HBSplineCutFEM::applyInterfaceTerms2D()
                     K1(TIp1, TJp1)  -= (bb1*Tb[4]);
                     K1(TIp1, TJp2)  -= (bb1*Tb[5]);
 
-                    c1 = af*N(jj);
+                    c1 = af*N[jj];
 
                     K1(TI,   TJ)    -= (Ta[0]*c1);
                     K1(TIp1, TJ)    -= (Ta[1]*c1);
@@ -339,16 +344,100 @@ void  HBSplineCutFEM::applyInterfaceTerms2D()
 
               } // for(ii=0;ii<totnlbf2;ii++)
 
-              //cout << " uuuuuuuuuuu " << endl;
+              solverPetsc->AssembleMatrixAndVectorCutFEM(0, 0, nd->forAssyVec, grid_to_proc_DOF, K1, F1);
 
-              solverEigen->AssembleMatrixAndVectorCutFEM(0, 0, nd->forAssyVec, forAssyCutFEM, K1, F1);
+              if(!STAGGERED)
+              {
+                  //trac[0] =  stress(0,0)*normal[0] + stress(0,1)*normal[1] ;
+                  //trac[1] =  stress(1,0)*normal[0] + stress(1,1)*normal[1] ;
 
-              //cout << " fffffffffff " << endl;
+                  //trac[0] += PENALTY*(vel[0]-velSpec[0]);
+                  //trac[1] += PENALTY*(vel[1]-velSpec[1]);
+
+                  //trac[0] -= PENALTY*(vel[0]);
+                  //trac[1] -= PENALTY*(vel[1]);
+
+                  nr1  =  lme->pointNums.size();
+                  tt1  =  &(lme->pointNums[0]);
+
+                  nr2  =  nd->GlobalBasisFuncs.size();
+                  tt2  =  &(nd->GlobalBasisFuncs[0]);
+                  //nr1 = nd1->forAssyVec.size();
+
+                  for(ii=0; ii<nr1; ii++)
+                  {
+                    r   = start1 + tt1[ii]*2;
+                    rp1 = r+1;
+                    
+                    bb1 = Nb[ii]*dvol;
+                    bb2 = bb1 * PENALTY;
+
+                    fact1 = -bb1*trac[0];
+                    fact2 = -bb1*trac[1];
+
+                    //VecSetValue(solverPetsc->rhsVec, r,    fact1, ADD_VALUES);
+                    //VecSetValue(solverPetsc->rhsVec, rp1,  fact2, ADD_VALUES);
+
+                    for(jj=0; jj<nr2; jj++)
+                    {
+                      c  = grid_to_proc_BF[tt2[jj]]*ndof;
+                      cp1 = c+1;
+                      cp2 = c+2;
+
+                      fact = -af*bb2*N[jj];
+
+                      //Ksf
+                      MatSetValue(solverPetsc->mtx, r,   c,   fact, ADD_VALUES);
+                      MatSetValue(solverPetsc->mtx, rp1, cp1, fact, ADD_VALUES);
+
+                      //Kfs
+                      MatSetValue(solverPetsc->mtx, c,   r,   fact, ADD_VALUES);
+                      MatSetValue(solverPetsc->mtx, cp1, rp1, fact, ADD_VALUES);
+
+                      Tb[0] = (af*mu)*( dN_dx[jj]*normal[0] + dN_dy[jj]*normal[1] );
+                      Tb[1] = 0.0;
+                      Tb[2] = -normal[0]*N[jj];
+
+                      Tb[3] = 0.0;
+                      Tb[4] = Tb[0];
+                      Tb[5] = -normal[1]*N[jj];
+
+                      Kc(0, 0)  = bb1*Tb[0];
+                      Kc(0, 1)  = bb1*Tb[1];
+                      Kc(0, 2)  = bb1*Tb[2];
+
+                      Kc(1, 0)  = bb1*Tb[3];
+                      Kc(1, 1)  = bb1*Tb[4];
+                      Kc(1, 2)  = bb1*Tb[5];
+
+                      //Ksf
+                      MatSetValue(solverPetsc->mtx, r,     c,    Kc(0,0), ADD_VALUES);
+                      MatSetValue(solverPetsc->mtx, r,     cp1,  Kc(0,1), ADD_VALUES);
+                      MatSetValue(solverPetsc->mtx, r,     cp2,  Kc(0,2), ADD_VALUES);
+
+                      MatSetValue(solverPetsc->mtx, rp1,   c,    Kc(1,0), ADD_VALUES);
+                      MatSetValue(solverPetsc->mtx, rp1,   cp1,  Kc(1,1), ADD_VALUES);
+                      MatSetValue(solverPetsc->mtx, rp1,   cp2,  Kc(1,2), ADD_VALUES);
+
+                      Kc = Kc*NitscheFact;
+                      //Kfs
+                      MatSetValue(solverPetsc->mtx, c,     r,    Kc(0,0), ADD_VALUES);
+                      MatSetValue(solverPetsc->mtx, cp1,   r,    Kc(0,1), ADD_VALUES);
+                      MatSetValue(solverPetsc->mtx, cp2,   r,    Kc(0,2), ADD_VALUES);
+
+                      MatSetValue(solverPetsc->mtx, c,     rp1,  Kc(1,0), ADD_VALUES);
+                      MatSetValue(solverPetsc->mtx, cp1,   rp1,  Kc(1,1), ADD_VALUES);
+                      MatSetValue(solverPetsc->mtx, cp2,   rp1,  Kc(1,2), ADD_VALUES);
+
+                    } // for(jj=0; jj<nr2; jj++)
+                  } // for(ii=0; ii<nr1; ii++)
+              } //if(!STAGGERED)
+
             }//for(gp=0...
           } // if( lme->IsActive() )
         }//for(aa=0...
+        start1 += ImmersedBodyObjects[bb]->GetTotalDOF();
       }//for(bb=0;...
-      //
 
   //cout << " HBSplineCutFEM::applyInterfaceTerms2D() ... FINISHED  " << endl;
 
@@ -424,7 +513,7 @@ void  HBSplineCutFEM::applyInterfaceTerms3D()
 
       double  fact, fact1, fact2, fact3, dvol, PENALTY;
       double  detJ, pres, bb1, bb2, NitscheFact, c1;
-      double  Ta[4], Tb[4], surfArea=0.0;
+      double  Ta[12], Tb[12], surfArea=0.0;
 
       double  af  = SolnData.td(2);
       double  rho = fluidProps[3];
@@ -466,7 +555,13 @@ void  HBSplineCutFEM::applyInterfaceTerms3D()
 
         //xx.resize(nlb);          yy.resize(nlb);          zz.resize(nlb);
 
-        getGaussPointsTriangle(nGauss, gausspoints1, gausspoints2, gaussweights);
+        if(nlb == 3)
+          getGaussPointsTriangle(nGauss, gausspoints1, gausspoints2, gaussweights);
+        else
+          getGaussPointsQuad(nGauss, gausspoints1, gausspoints2, gaussweights);
+
+        cout << " nGauss = " << nGauss << endl;
+
         //printVector(gausspoints);          printf("\n\n\n\n");
         //printVector(gaussweights);          printf("\n\n\n\n");
 
@@ -476,16 +571,13 @@ void  HBSplineCutFEM::applyInterfaceTerms3D()
         {
           lme  = ImmersedBodyObjects[bb]->ImmIntgElems[aa];
           poly = ImmersedBodyObjects[bb]->ImmersedFaces[aa];
-          
+
           if( lme->IsActive() )
           {
             for(gp=0;gp<nGauss;gp++)
             {
               param[0] = gausspoints1[gp];
               param[1] = gausspoints2[gp];
-              
-              //cout << " Need to implement computing basis functions for boundary triangles in 3D " << endl;
-              //computeLagrangeBFs1D2(nlb-1, gausspoints[gp], &xx(0), &yy(0), &Nb(0), &dNb(0), detJ);
 
               poly->computeBasisFunctions(param, geom, Nb, detJ);
 
@@ -495,7 +587,7 @@ void  HBSplineCutFEM::applyInterfaceTerms3D()
               poly->computeNormal();
               poly->computeNormal(param, normal);
 
-              normal *= -1.0;
+              //normal *= -1.0;
 
               lme->computeVelocityCur(Nb, velSpec );
 
@@ -550,19 +642,21 @@ void  HBSplineCutFEM::applyInterfaceTerms3D()
               
               //nd->computeVelocityAndStressCur(param, vel1, stress1);
 
-              stress(0,0) = mu*ndTemp->computeValueCur(0, dN_dx);
-              stress(0,1) = mu*ndTemp->computeValueCur(0, dN_dy);
-              stress(0,2) = mu*ndTemp->computeValueCur(0, dN_dz);
+              stress(0,0) = ndTemp->computeValueCur(0, dN_dx);
+              stress(0,1) = ndTemp->computeValueCur(0, dN_dy);
+              stress(0,2) = ndTemp->computeValueCur(0, dN_dz);
 
-              stress(1,0) = mu*ndTemp->computeValueCur(1, dN_dx);
-              stress(1,1) = mu*ndTemp->computeValueCur(1, dN_dy);
-              stress(1,2) = mu*ndTemp->computeValueCur(1, dN_dz);
+              stress(1,0) = ndTemp->computeValueCur(1, dN_dx);
+              stress(1,1) = ndTemp->computeValueCur(1, dN_dy);
+              stress(1,2) = ndTemp->computeValueCur(1, dN_dz);
 
-              stress(2,0) = mu*ndTemp->computeValueCur(2, dN_dx);
-              stress(2,1) = mu*ndTemp->computeValueCur(2, dN_dy);
-              stress(2,2) = mu*ndTemp->computeValueCur(2, dN_dz);
+              stress(2,0) = ndTemp->computeValueCur(2, dN_dx);
+              stress(2,1) = ndTemp->computeValueCur(2, dN_dy);
+              stress(2,2) = ndTemp->computeValueCur(2, dN_dz);
 
-              pres        =    ndTemp->computeValue(3, N);
+              pres        = ndTemp->computeValue(3, N);
+
+              stress  = mu*stress;
 
               stress(0,0) -= pres;
               stress(1,1) -= pres;
@@ -586,13 +680,22 @@ void  HBSplineCutFEM::applyInterfaceTerms3D()
                   bb1 = N[ii] * dvol;
                   bb2 = bb1 * PENALTY ;
 
-                  Ta[0]  = (dvol*mu)*( dN_dx(ii)*normal[0] + dN_dy(ii)*normal[1] + dN_dz(ii)*normal[2] );
+                  Ta[0]  =  (dvol*mu)*( dN_dx[ii]*normal[0] + dN_dy[ii]*normal[1] + dN_dz[ii]*normal[2] );
+                  Ta[1]  =  0.0;
+                  Ta[2]  =  0.0;
+                  Ta[3]  =  -normal[0]*bb1;
 
-                  Ta[1]  = -normal[0]*bb1;
-                  Ta[2]  = -normal[1]*bb1;
-                  Ta[3]  = -normal[2]*bb1;
-                  
-                  for(jj=0; jj<4; jj++)
+                  Ta[4]  =  0.0;
+                  Ta[5]  =  Ta[0];
+                  Ta[6]  =  0.0;
+                  Ta[7]  =  -normal[1]*bb1;
+
+                  Ta[8]  =  0.0;
+                  Ta[9]  =  0.0;
+                  Ta[10] =  Ta[0];
+                  Ta[11] =  -normal[2]*bb1;
+
+                  for(jj=0; jj<12; jj++)
                     Ta[jj] *= NitscheFact;
 
                   for(jj=0;jj<totnlbf2;jj++)
@@ -609,31 +712,53 @@ void  HBSplineCutFEM::applyInterfaceTerms3D()
                     K1(TIp2, TJp2) += fact;
 
                     // Nitsche terms
-                    Tb[0]  = af*mu*( dN_dx(jj)*normal[0] + dN_dy(jj)*normal[1] + dN_dz(jj)*normal[2] );
+                    Tb[0]  =  af*mu*( dN_dx[jj]*normal[0] + dN_dy[jj]*normal[1] + dN_dz[jj]*normal[2] );
+                    Tb[1]  =  0.0;
+                    Tb[2]  =  0.0;
+                    Tb[3]  =  -normal[0]*N[jj];
 
-                    Tb[1]  = -normal[0]*N[jj];
-                    Tb[2]  = -normal[1]*N[jj];
-                    Tb[3]  = -normal[2]*N[jj];
+                    Tb[4]  =  0.0;
+                    Tb[5]  =  Tb[0];
+                    Tb[6]  =  0.0;
+                    Tb[7]  =  -normal[1]*N[jj];
+
+                    Tb[8]  =  0.0;
+                    Tb[9]  =  0.0;
+                    Tb[10] =  Tb[0];
+                    Tb[11] =  -normal[2]*N[jj];
+
+
+                    K1(TI,   TJ)    -= (bb1*Tb[0]);
+                    K1(TI,   TJp1)  -= (bb1*Tb[1]);
+                    K1(TI,   TJp2)  -= (bb1*Tb[2]);
+                    K1(TI,   TJp3)  -= (bb1*Tb[3]);
+
+                    K1(TIp1, TJ)    -= (bb1*Tb[4]);
+                    K1(TIp1, TJp1)  -= (bb1*Tb[5]);
+                    K1(TIp1, TJp2)  -= (bb1*Tb[6]);
+                    K1(TIp1, TJp3)  -= (bb1*Tb[7]);
+
+                    K1(TIp2, TJ)    -= (bb1*Tb[8]);
+                    K1(TIp2, TJp1)  -= (bb1*Tb[9]);
+                    K1(TIp2, TJp2)  -= (bb1*Tb[10]);
+                    K1(TIp2, TJp3)  -= (bb1*Tb[11]);
 
                     c1 = af*N[jj];
 
-                    K1(TI, TJ)      -= (bb1*Tb[0]);
-                    K1(TI, TJp3)    -= (bb1*Tb[1]);
+                    K1(TI,   TJ)    -= (Ta[0]*c1);
+                    K1(TIp1, TJ)    -= (Ta[1]*c1);
+                    K1(TIp2, TJ)    -= (Ta[2]*c1);
+                    K1(TIp3, TJ)    -= (Ta[3]*c1);
 
-                    K1(TI, TJ)      -= (Ta[0]*c1);
-                    K1(TIp3, TJ)    -= (Ta[1]*c1);
+                    K1(TI,   TJp1)  -= (Ta[4]*c1);
+                    K1(TIp1, TJp1)  -= (Ta[5]*c1);
+                    K1(TIp2, TJp1)  -= (Ta[6]*c1);
+                    K1(TIp3, TJp1)  -= (Ta[7]*c1);
 
-                    K1(TIp1, TJp1)  -= (bb1*Tb[0]);
-                    K1(TIp1, TJp3)  -= (bb1*Tb[2]);
-
-                    K1(TIp1, TJp1)  -= (Ta[0]*c1);
-                    K1(TIp3, TJp1)  -= (Ta[2]*c1);
-
-                    K1(TIp2, TJp2)  -= (bb1*Tb[0]);
-                    K1(TIp2, TJp3)  -= (bb1*Tb[3]);
-
-                    K1(TIp2, TJp2)  -= (Ta[0]*c1);
-                    K1(TIp3, TJp2)  -= (Ta[3]*c1);
+                    K1(TI,   TJp2)  -= (Ta[8]*c1);
+                    K1(TIp1, TJp2)  -= (Ta[9]*c1);
+                    K1(TIp2, TJp2)  -= (Ta[10]*c1);
+                    K1(TIp3, TJp2)  -= (Ta[11]*c1);
                   }
 
                   // stabilisation terms
@@ -645,22 +770,29 @@ void  HBSplineCutFEM::applyInterfaceTerms3D()
                   // Nitsche terms
 
                   F1(TI)   += (bb1*trac[0]);
-                  F1(TI)   -= (Ta[0]*vel[0]);
-                  F1(TIp3) -= (Ta[1]*vel[0]);
-
                   F1(TIp1) += (bb1*trac[1]);
-                  F1(TIp1) -= (Ta[0]*vel[1]);
-                  F1(TIp3) -= (Ta[2]*vel[1]);
-
                   F1(TIp2) += (bb1*trac[2]);
-                  F1(TIp2) -= (Ta[0]*vel[2]);
-                  F1(TIp3) -= (Ta[3]*vel[2]);
+
+                  F1(TI)   -= (Ta[0]*vel[0]);
+                  F1(TIp1) -= (Ta[1]*vel[0]);
+                  F1(TIp2) -= (Ta[2]*vel[0]);
+                  F1(TIp3) -= (Ta[3]*vel[0]);
+
+                  F1(TI)   -= (Ta[4]*vel[1]);
+                  F1(TIp1) -= (Ta[5]*vel[1]);
+                  F1(TIp2) -= (Ta[6]*vel[1]);
+                  F1(TIp3) -= (Ta[7]*vel[1]);
+
+                  F1(TI)   -= (Ta[8]*vel[2]);
+                  F1(TIp1) -= (Ta[9]*vel[2]);
+                  F1(TIp2) -= (Ta[10]*vel[2]);
+                  F1(TIp3) -= (Ta[11]*vel[2]);
 
               } // for(ii=0;ii<totnlbf2;ii++)
 
               //cout << " uuuuuuuuuuu \n\n " << endl;
 
-              solverEigen->AssembleMatrixAndVectorCutFEM(0, 0, ndTemp->forAssyVec, forAssyCutFEM, K1, F1);
+              solverPetsc->AssembleMatrixAndVectorCutFEM(0, 0, ndTemp->forAssyVec, grid_to_proc_DOF, K1, F1);
 
             }//for(gp=0...
           } // if( lme->IsActive() )
@@ -750,7 +882,7 @@ void  HBSplineCutFEM::applyGhostPenalty2D()
     {
       nd1 = elems[cutCellIds[ee]];
 
-      //if( nd1->IsCutElement() && !( nd1->IsLeftBoundary() || nd1->IsRightBoundary() ) )
+      //if( nd1->IsCutElement() && !(nd1->IsBoundary()) )
       if( nd1->IsCutElement() )
       {
         //cout << " nd1->GetID() " <<  nd1->GetID() << '\t' <<  nd1->GetLevel() << endl;
@@ -767,17 +899,17 @@ void  HBSplineCutFEM::applyGhostPenalty2D()
         {
           //gammGP[0]  = 0.0;
           //gammGP[0]  = cutFEMparams[6] *mu* h1*h1*h1;
-          //gammGP[0]  = cutFEMparams[6] *mu*h1/rho;
           gammGP[0]  = cutFEMparams[6] *mu*h1;
           gammGP[1]  = gammGP[0];
-          gammGP[2]  = cutFEMparams[7] * h1*h1*h1/mu;
          }
         else
         {
+          //gammGP[0]  = cutFEMparams[6] *mu* h1*h1*h1;
           gammGP[0]  = cutFEMparams[6] * mu*h1;
           gammGP[1]  = gammGP[0];
-          gammGP[2]  = cutFEMparams[7] * h1*h1*h1/mu;
         }
+
+        gammGP[2]  = cutFEMparams[7] * h1*h1*h1/mu;
 
         bb1 = 1.0;
         bb2 = 1.0;
@@ -795,7 +927,7 @@ void  HBSplineCutFEM::applyGhostPenalty2D()
 
           //cout << " side = " << side << '\t' << nd2->GetDomainNumber() << endl;
           //if( !(nd2 == NULL) && !(nd2->IsGhost()) && nd2->IsLeaf() && (nd2->GetDomainNumber() == -1) && (nd2->GetDomainNumber() >= 1) )
-          //if( !(nd2 == NULL) && !(nd2->IsGhost()) && nd2->IsLeaf() )
+          //if( (nd2 != NULL) && !(nd2->IsGhost()) && !(nd2->IsBoundary()) && nd2->IsLeaf() && (nd2->IsCutElement() || nd2->domNums[0] == 0) )
           if( (nd2 != NULL) && !(nd2->IsGhost()) && nd2->IsLeaf() && (nd2->IsCutElement() || nd2->domNums[0] == 0) )
           {
               nr1 = nd1->forAssyVec.size();
@@ -961,39 +1093,45 @@ void  HBSplineCutFEM::applyGhostPenalty2D()
 
               for(ii=0; ii<nr1; ii++)
               {
-                r = forAssyCutFEM[nd1->forAssyVec[ii]];
+                r = grid_to_proc_DOF[nd1->forAssyVec[ii]];
 
-                solverEigen->rhsVec[r] += F1(ii);
+                //solverEigen->rhsVec[r] += F1(ii);
+                VecSetValue(solverPetsc->rhsVec, r, F1(ii), ADD_VALUES);
 
                 for(jj=0; jj<nr1; jj++)
                 {
-                  c = forAssyCutFEM[nd1->forAssyVec[jj]];
+                  c = grid_to_proc_DOF[nd1->forAssyVec[jj]];
 
-                  solverEigen->mtx.coeffRef(r, c) += K1(ii, jj);
+                  //solverEigen->mtx.coeffRef(r, c) += K1(ii, jj);
+                  MatSetValue(solverPetsc->mtx, r, c, K1(ii,jj), ADD_VALUES);
                 }
 
                 for(jj=0; jj<nr2; jj++)
                 {
                   //cout << ii << '\t' << jj << endl;
-                  c = forAssyCutFEM[nd2->forAssyVec[jj]];
+                  c = grid_to_proc_DOF[nd2->forAssyVec[jj]];
 
-                  solverEigen->mtx.coeffRef(r, c) += Kc(ii, jj);
-                  solverEigen->mtx.coeffRef(c, r) += Kc(ii, jj);
+                  //solverEigen->mtx.coeffRef(r, c) += Kc(ii, jj);
+                  //solverEigen->mtx.coeffRef(c, r) += Kc(ii, jj);
+                  MatSetValue(solverPetsc->mtx, r, c, Kc(ii,jj), ADD_VALUES);
+                  MatSetValue(solverPetsc->mtx, c, r, Kc(ii,jj), ADD_VALUES);
                 }
               }
               //cout << " lllllllllllllll " << endl;
 
               for(ii=0; ii<nr2; ii++)
               {
-                r = forAssyCutFEM[nd2->forAssyVec[ii]];
+                r = grid_to_proc_DOF[nd2->forAssyVec[ii]];
 
-                solverEigen->rhsVec[r] += F2(ii);
+                //solverEigen->rhsVec[r] += F2(ii);
+                VecSetValue(solverPetsc->rhsVec, r, F2(ii), ADD_VALUES);
 
                 for(jj=0; jj<nr2; jj++)
                 {
-                  c = forAssyCutFEM[nd2->forAssyVec[jj]];
+                  c = grid_to_proc_DOF[nd2->forAssyVec[jj]];
 
-                  solverEigen->mtx.coeffRef(r, c) += K2(ii, jj);
+                  //solverEigen->mtx.coeffRef(r, c) += K2(ii, jj);
+                  MatSetValue(solverPetsc->mtx, r, c, K2(ii,jj), ADD_VALUES);
                 }
               }
               //cout << " lllllllllllllll " << endl;
@@ -1327,39 +1465,45 @@ void  HBSplineCutFEM::applyGhostPenalty3D()
 
               for(ii=0; ii<nr1; ii++)
               {
-                r = forAssyCutFEM[nd1->forAssyVec[ii]];
+                r = grid_to_proc_DOF[nd1->forAssyVec[ii]];
 
-                solverEigen->rhsVec[r] += F1(ii);
+                //solverEigen->rhsVec[r] += F1(ii);
+                VecSetValue(solverPetsc->rhsVec, r, F1(ii), ADD_VALUES);
 
                 for(jj=0; jj<nr1; jj++)
                 {
-                  c = forAssyCutFEM[nd1->forAssyVec[jj]];
+                  c = grid_to_proc_DOF[nd1->forAssyVec[jj]];
 
-                  solverEigen->mtx.coeffRef(r, c) += K1(ii, jj);
+                  //solverEigen->mtx.coeffRef(r, c) += K1(ii, jj);
+                  MatSetValue(solverPetsc->mtx, r, c, K1(ii,jj), ADD_VALUES);
                 }
 
                 for(jj=0; jj<nr2; jj++)
                 {
-                  //cout << ii << '\t' << jj << endl;
-                  c = forAssyCutFEM[nd2->forAssyVec[jj]];
+                  c = grid_to_proc_DOF[nd2->forAssyVec[jj]];
 
-                  solverEigen->mtx.coeffRef(r, c) += Kc(ii, jj);
-                  solverEigen->mtx.coeffRef(c, r) += Kc(ii, jj);
+                  //solverEigen->mtx.coeffRef(r, c) += Kc(ii, jj);
+                  //solverEigen->mtx.coeffRef(c, r) += Kc(ii, jj);
+
+                  MatSetValue(solverPetsc->mtx, r, c, Kc(ii,jj), ADD_VALUES);
+                  MatSetValue(solverPetsc->mtx, c, r, Kc(ii,jj), ADD_VALUES);
                 }
               }
               //cout << " lllllllllllllll " << endl;
 
               for(ii=0; ii<nr2; ii++)
               {
-                r = forAssyCutFEM[nd2->forAssyVec[ii]];
+                r = grid_to_proc_DOF[nd2->forAssyVec[ii]];
 
-                solverEigen->rhsVec[r] += F2(ii);
+                //solverEigen->rhsVec[r] += F2(ii);
+                VecSetValue(solverPetsc->rhsVec, r, F2(ii), ADD_VALUES);
 
                 for(jj=0; jj<nr2; jj++)
                 {
-                  c = forAssyCutFEM[nd2->forAssyVec[jj]];
+                  c = grid_to_proc_DOF[nd2->forAssyVec[jj]];
 
-                  solverEigen->mtx.coeffRef(r, c) += K2(ii, jj);
+                  //solverEigen->mtx.coeffRef(r, c) += K2(ii, jj);
+                  MatSetValue(solverPetsc->mtx, r, c, K2(ii,jj), ADD_VALUES);
                 }
               }
               //cout << " lllllllllllllll " << endl;

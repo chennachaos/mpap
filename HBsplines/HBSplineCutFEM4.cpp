@@ -6,6 +6,8 @@
 #include "myDataIntegrateCutFEM.h"
 #include "ImmersedIntegrationElement.h"
 
+#include <chrono>
+typedef std::chrono::high_resolution_clock Clock;
 
 extern ComputerTime       computerTime;
 extern MpapTime mpapTime;
@@ -64,20 +66,19 @@ void HBSplineCutFEM::addExternalForces()
 
 
 
-
 int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool zeroRes)
 {
-    //cout << "     HBSplineCutFEM: generating coefficient Matrices ...\n\n";
+    PetscPrintf(MPI_COMM_WORLD, "     HBSplineCutFEM: generating coefficient Matrices ...\n\n");
 
     assert( SOLVER_TYPE == SOLVER_TYPE_PETSC );
 
     char fct[] = "HBSplineCutFEM::calcStiffnessAndResidual";
     computerTime.go(fct);
 
-    int  ee, nr, nc, dd, start=0, pp, dof, dir, domTemp=0;
+    int  ee, nr, nc, dd, start=0, pp, dof, dir, domTemp=0, bb, kk;
     double  PENALTY;
 
-    time_t tstart, tend;
+    //time_t tstart, tend;
 
     IterNum   = (iterCount == 1);
 
@@ -91,17 +92,20 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
     // stiffness and residual for the background fluid grid
     ////////////////////////////////////////////////////////
 
-    tstart = time(0);
+    //tstart = time(0);
+    //tstart = MPI_Wtime();
+    auto tstart = Clock::now();
 
     solverPetsc->zeroMtx();
 
-      //cout << " wwwwwwwwwww " << endl;
+    //cout << " wwwwwwwwwww " << endl;
 
+    //#pragma omp parallel for
     for(ee=0; ee<fluidElementIds.size(); ee++)
     {
       node *nd = elems[fluidElementIds[ee]];
 
-      //cout << " nd->GetID() " <<  nd->GetID() << '\t' <<  nd->GetLevel() << endl;
+      //cout << " nd->GetID() " <<  nd->GetID() << '\t' <<  nd->GetLevel() << '\t' << nd->GetDomainNumber() << endl;
 
       if( nd->get_subdomain_id() == this_mpi_proc )
       {
@@ -135,13 +139,23 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
           //printf("\n\n\n");
           //printVector(Flocal);
 
-          solverPetsc->AssembleMatrixAndVectorCutFEM(start, start, nd->forAssyVec, forAssyCutFEM, Klocal, Flocal);
+          //#pragma omp critical
+          solverPetsc->AssembleMatrixAndVectorCutFEM(start, start, nd->forAssyVec, grid_to_proc_DOF, Klocal, Flocal);
           //cout << " CCCCCCCCCCCCCCCC " << endl;
         }
       }
     }
 
-    //cout << " AAAAAAAAAAAAAAAAA " << endl;
+    auto tend = Clock::now();
+    //tend = time(0);
+    //tend = MPI_Wtime();
+    //printf("HBSplineCutFEM::calcStiffnessAndResidual() took %8.4f millisecond(s) \n ", difftime(tend, tstart) );
+    //printf("HBSplineCutFEM::calcStiffnessAndResidual() took %8.4f millisecond(s) \n ", std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count() );
+    cout << "HBSplineCutFEM::calcStiffnessAndResidual() took " << std::chrono::duration_cast<std::chrono::milliseconds>(tend - tstart).count() << "   milliseconds " << endl;
+
+
+
+    //cout << " MMMMMMMMMMMMMMMM " << endl;
     //printVector(pointBCs[0]);
 
     myDataIntegrateCutFEM  myData;
@@ -167,8 +181,6 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
 
         ee = findCellNumber(geom);
 
-        //cout << " ee " << ee << endl;
-
         geometryToParametric(geom, param);
         
         myData.param = param;
@@ -177,12 +189,10 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
         node *nd;
         nd = elems[ee];
 
-        int nr = nd->forAssyVec.size();// + nd->forAssyVec2.size();
+        int nr = nd->forAssyVec.size();
 
-        //cout << nr << '\t' << nc << '\t' << '\t' << PENALTY << endl;
-
-        MatrixXd  Klocal;
-        VectorXd  Flocal;
+        //MatrixXd  Klocal;
+        //VectorXd  Flocal;
 
         //Klocal = MatrixXd::Zero(nr, nc);
         //Flocal = VectorXd::Zero(nr);
@@ -192,14 +202,15 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
 
         //dof, param, spec_val, PENALTY, Klocal, Flocal
         nd->applyBoundaryConditionsAtApoint(myData);
-        solverPetsc->AssembleMatrixAndVector(0, 0, nd->forAssyVec, myData.K1, myData.F1);
+        solverPetsc->AssembleMatrixAndVector(0, 0, nd->forAssyVec, nd->forAssyVec, myData.K1, myData.F1);
       }
     }
 
-    //cout << " rhsVec " << endl;        printVector(&(solver->rhsVec(0)), totalDOF);
-    
+    //cout << " rhsVec " << endl;
+    //       printVector(&(solver->rhsVec(0)), totalDOF);
+
     //printf("\n rhsVec norm = %12.6E \n", solverEigen->rhsVec.norm());
-    
+
     if(DIM == 2)
       applyInterfaceTerms2D();
 
@@ -208,9 +219,20 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
 
     //printf("\n rhsVec norm = %12.6E \n", solverEigen->rhsVec.norm());
 
-    //cout << " rhsVec " << endl;
+    if(!STAGGERED)
+    {
+      kk = fluidDOF;
+      for(bb=0; bb<ImmersedBodyObjects.size(); bb++)
+      {
+        cout << " ppppppppppp " << kk << endl;
+        ImmersedBodyObjects[bb]->AssembleGlobalMatrixAndVectorCutFEM(kk, kk, solverPetsc);
+        cout << " ppppppppppp " << endl;
+        kk += ImmersedBodyObjects[bb]->GetTotalDOF();
+      }
+    }
 
-    //cout << " rhsVec " << endl;        printVector(&(solver->rhsVec(0)), totalDOF);
+    //cout << " rhsVec " << endl;
+    //printVector(&(solver->rhsVec(0)), totalDOF);
     //printf("\n rhsVec norm = %12.6E \n", solver->rhsVec.norm());
 
     firstIter = false;
@@ -228,21 +250,28 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
 
     if( std::isnan(rNorm) )
     {
+      //VecView(solverPetsc->rhsVec, PETSC_VIEWER_STDOUT_WORLD);
+
+      //printVector(grid_to_proc_DOF);
+      //printVector(SolnData.var1);
+
       cerr << "  NAN found "  << endl;
       exit(0);
     }
 
     PetscPrintf(MPI_COMM_WORLD, "  %5d \t %11.4e\n", iterCount, rNorm);
 
-    //COUT << domain.name(this); printf("  %11.4e\n",rNorm);
-
     ctimCalcStiffRes += computerTime.stop(fct);
     //computerTime.stopAndPrint(fct);
-   
-    //cout << "     HBSplineCutFEM: generating coefficient Matrices ...DONE  \n\n";
 
-    tend = time(0);
-    //printf("HBSplineCutFEM::calcStiffnessAndResidual() took %8.4f second(s) \n ", difftime(tend, tstart) );
+    PetscPrintf(MPI_COMM_WORLD, "     HBSplineCutFEM: generating coefficient Matrices ...DONE  \n\n");
+
+    //auto tend = Clock::now();
+    //tend = time(0);
+    //tend = MPI_Wtime();
+    //printf("HBSplineCutFEM::calcStiffnessAndResidual() took %8.4f millisecond(s) \n ", difftime(tend, tstart) );
+    //printf("HBSplineCutFEM::calcStiffnessAndResidual() took %8.4f millisecond(s) \n ", std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count() );
+    //cout << "HBSplineCutFEM::calcStiffnessAndResidual() took " << std::chrono::duration_cast<std::chrono::milliseconds>(tend - tstart).count() << "   milliseconds " << endl;
 
     iterCount++;
 
@@ -256,7 +285,7 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
 
 int HBSplineCutFEM::factoriseSolveAndUpdate()
 {
-  //cout << "     HBSplineCutFEM: solving the matrix system ...  \n\n";
+  cout << "     HBSplineCutFEM: solving the matrix system ...  \n\n";
   char fct[] = "HBSplineCutFEM::factoriseSolveAndUpdate";
   computerTime.go(fct);
 
@@ -278,8 +307,8 @@ int HBSplineCutFEM::factoriseSolveAndUpdate()
 
     solverPetsc->factoriseAndSolve();
 
-    //tend = time(0);
-    //printf("HBSplineCutFEM::factoriseSolveAndUpdate() took %8.4f second(s) \n ", difftime(tend, tstart) );
+    tend = time(0);
+    printf("HBSplineCutFEM::factoriseSolveAndUpdate() took %8.4f second(s) \n ", difftime(tend, tstart) );
 
     //VecView(solver2->soln, PETSC_VIEWER_STDOUT_WORLD);
 
@@ -300,6 +329,7 @@ int HBSplineCutFEM::factoriseSolveAndUpdate()
 
     // update solution vector
 
+    kk=0;
     for(ii=0; ii<nNode; ii++)
     {
       //cout << ii << '\t' << node_map_old_to_new[ii] << '\t' << node_map_new_to_old[ii] << endl;
@@ -309,31 +339,26 @@ int HBSplineCutFEM::factoriseSolveAndUpdate()
         soln[kk++] = arrayTemp[jj+dd];
     }
 
-    //cout << " fluidDOF = " << fluidDOF << endl;
     for(ii=0; ii<fluidDOF; ii++)
-      SolnData.var1[ii] += soln[ii];
-
-    //for(ii=0; ii<fluidDOF; ii++)
-      //SolnData.var1[forAssyCutFEM2[ii]] += soln[ii];
-
-    //for(ii=0; ii<fluidDOF; ii++)
-      //SolnData.var1[forAssyCutFEM2[node_map_new_to_old[ii]]] += soln[ii];
-
-    VecRestoreArray(vec_SEQ, &arrayTemp);
+      SolnData.var1[proc_to_grid_DOF[ii]] += soln[ii];
 
     if(!STAGGERED)
     {
       cout << " need to update this for monolithic scheme " << endl;
+      kk = fluidDOF;
       for(bb=0; bb<ImmersedBodyObjects.size(); bb++)
       {
         //if(ImmersedBodyObjects[bb]->GetNdof() > 0)
         //{
+          cout << " AAAAAAAAAAA " << bb << endl;
+          ImmersedBodyObjects[bb]->updateDisplacement(&arrayTemp[kk]);
           //cout << " AAAAAAAAAAA " << bb << endl;
-          ImmersedBodyObjects[bb]->updateDisplacement(&arrayTemp[fluidDOF]);
-          //cout << " AAAAAAAAAAA " << bb << endl;
+          kk += ImmersedBodyObjects[bb]->GetTotalDOF();
         //}
       }
     }
+
+    VecRestoreArray(vec_SEQ, &arrayTemp);
 
   //printVector(SolnData.var1);
   //printf("\n\n\n");
@@ -344,7 +369,7 @@ int HBSplineCutFEM::factoriseSolveAndUpdate()
 
   //cout << " result " << endl;        printVector(&(soln(0)), totalDOF);
 
-  //cout << "     HBSplineCutFEM: solving the matrix system ...DONE  \n\n";
+  cout << "     HBSplineCutFEM: solving the matrix system ...DONE  \n\n";
 
   //computerTime.stopAndPrint(fct);
 

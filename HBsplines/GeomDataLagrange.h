@@ -21,7 +21,7 @@ class  GeomDataLagrange
     vector<myPoint>  gaussps, gaussws;
 
     vector<myPoint>  NodePosOrig, NodePosNew, NodePosCur, NodePosPrev, NodePosPrevCur;
-    vector<myPoint>  specValNew, specValCur;
+    vector<myPoint>  specValNew, specValCur, acceNew, acceCur;
 
     vector<int>  node_map_new_to_old;
     vector<int>  node_map_old_to_new;

@@ -24,9 +24,12 @@ using namespace std;
 
 SolverPardisoPetsc::SolverPardisoPetsc()
 {
-  comprMtxFlg = true;
+  //MatCreate(PETSC_COMM_WORLD, &mtx);
 
-  return;
+  //VecCreate(PETSC_COMM_WORLD, &soln);
+  //VecCreate(PETSC_COMM_WORLD, &solnPrev);
+  //VecCreate(PETSC_COMM_WORLD, &rhsVec);
+  //VecCreate(PETSC_COMM_WORLD, &reac);
 }
 
 
@@ -34,39 +37,37 @@ SolverPardisoPetsc::SolverPardisoPetsc()
 
 SolverPardisoPetsc::~SolverPardisoPetsc()
 {
-  int phase = -1, error = 0, idum;
+  //free();
 
-  double ddum;
+  phase = -1; error = 0;
 
   pardiso_(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
-           &N, array, csr, col, &idum, &NRHS,
+           &nRow, array, csr, col, perm, &NRHS,
            IPARM, &MSGLVL, &ddum, &ddum, &error, DPARM);
 
-  return;
 }
 
 
 
 
 
-int SolverPardisoPetsc::initialise(int numProc, int matrixType, int nrow)
+int SolverPardisoPetsc::initialise(int numProc, int matrixType, int nrow1)
 {
-  cout << " ppppppppppp " << endl;
+  nRow = nCol = nrow1;
 
-  SolverPetsc::initialise(numProc, matrixType, nrow);
-
-  cout << " ppppppppppp " << endl;
+  solnX.resize(nRow);
 
   char fct[] = "SolverPardisoPetsc::initialise";
 
-  //cout << fct << ": " << ++countThis << "\n\n";
+  if (currentStatus != PATTERN_OK)
+  {
+    prgWarning(1,fct,"prepare matrix pattern first!");
+    return 2;
+  }
 
-  //if (currentStatus != PATTERN_OK)
-    //{ prgWarning(1,fct,"prepare matrix pattern first!"); return 1; }
+  phase = 11; error = 0;
 
-  double ddum;
-
-  int idum, phase = 11, error = 0, mtxType = 11;
+  int idum, mtxType = 11;
 
   char *tmp;
 
@@ -91,10 +92,6 @@ int SolverPardisoPetsc::initialise(int numProc, int matrixType, int nrow)
 
   IPARM[2] = max(1,numProc);  // number of processors (no default value available)
   
-  //cout << " numProc " << numProc << endl;
-  
-  //IPARM[9] = 1;
-
   tmp = getenv("OMP_NUM_THREADS");
 
   if (tmp != NULL) 
@@ -104,15 +101,7 @@ int SolverPardisoPetsc::initialise(int numProc, int matrixType, int nrow)
   }
   else prgError(2,fct,"set environment variable OMP_NUM_THREADS!");
 
-  N = nrow; // dimension of matrix
-
-  nx = N;
-
-  //if(X != NULL)
-    //delete [] X;
-  //X = NULL;
- 
-  X = new double [nx];
+  //cout << " qqqqqqqqqqq " << endl;
 
   pardisoinit_(PT, &MTYPE, &SOLVER, IPARM, DPARM, &error);
 
@@ -128,24 +117,20 @@ int SolverPardisoPetsc::initialise(int numProc, int matrixType, int nrow)
   ierr = MatAssemblyBegin(mtx,MAT_FINAL_ASSEMBLY);//CHKERRQ(ierr);
   ierr = MatAssemblyEnd(mtx,MAT_FINAL_ASSEMBLY);//CHKERRQ(ierr);
   
-  //MatView(mtx, PETSC_VIEWER_STDOUT_WORLD);
-
   //cout << " ppppppppppp " << endl;
 
   PetscBool flag;
 
-  //ierr = MatGetRowIJ(mtx, 1, PETSC_FALSE, PETSC_FALSE, &nRow, &csr, &col, &flag);
-
-  //cout << " llllllllll " << endl;
+  ierr = MatGetRowIJ(mtx, 1, PETSC_FALSE, PETSC_FALSE, &nRow, &csr, &col, &flag);
 
   ierr = MatSeqAIJGetArray(mtx, &array);
   //ierr = MatGetArray(mtx, &array);
 
   pardiso_(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
-           &N, array, csr, col, &idum, &NRHS,
+           &nRow, array, csr, col, &idum, &NRHS,
            IPARM, &MSGLVL, &ddum, &ddum, &error, DPARM);
 
-  cout << " llllllllll " << endl;
+  //cout << " llllllllll " << endl;
 
   if (error != 0)
   {
@@ -153,7 +138,8 @@ int SolverPardisoPetsc::initialise(int numProc, int matrixType, int nrow)
     prgError(4,fct,"symbolic factorisation failed.");
   }
 
-  IPARM[5] = 1; // overwrite RHS with solution
+  //IPARM[5] = 1; // overwrite RHS with solution
+  IPARM[5] = 0; // do not overwrite RHS with solution
   IPARM[7] = 1; // max number of iterative refinement steps
 
   currentStatus = INIT_OK;
@@ -163,25 +149,19 @@ int SolverPardisoPetsc::initialise(int numProc, int matrixType, int nrow)
 
 
 
-
-
-
-
-int SolverPardisoPetsc::factorise(void)
+int SolverPardisoPetsc::factorise()
 {
   char fct[] = "SolverPARDISO::factorise";
 
   if (currentStatus != ASSEMBLY_OK) 
     { prgWarning(1,fct,"assemble matrix first!"); return 1; }
 
-  int phase = 22, idum, error = 0;
-
-  double ddum;
+  phase = 22; error = 0;
 
   computerTime.go(fct);
 
   pardiso_(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
-           &N, array, csr, col, &idum, &NRHS,
+           &nRow, array, csr, col, perm, &NRHS,
            IPARM, &MSGLVL, &ddum, &ddum, &error, DPARM);
 
   solverTime.total     -= solverTime.factorise;
@@ -189,8 +169,8 @@ int SolverPardisoPetsc::factorise(void)
   solverTime.total     += solverTime.factorise;
 
   currentStatus = FACTORISE_OK;
-  
-  return 0;
+
+  return 1;
 }
 
 
@@ -198,39 +178,40 @@ int SolverPardisoPetsc::factorise(void)
 
 
 
-double *SolverPardisoPetsc::solve(double *RHS, int nrhs)
+int  SolverPardisoPetsc::solve()
 { 
   char fct[] = "SolverPARDISO::solve";
  
-  if (currentStatus != FACTORISE_OK)
-    { prgWarning(1,fct,"factorise matrix first!"); return NULL; }
+  if(currentStatus != FACTORISE_OK)
+    { prgWarning(1,fct,"factorise matrix first!"); return 0; }
 
-  int phase = 33, idum, error = 0;
-
-  NRHS = nrhs;
-  
-  //cout << nx << '\t' << NRHS << endl;
-
-  if (nx < NRHS * N) 
-  {
-    delete [] X; 
-    nx = NRHS * N;
-    X = new double [nx];
-  }
-
-  //cout << fct << " NRHS = " << NRHS << "\n";
+  phase = 33; error = 0;
 
   computerTime.go(fct);
 
+  PetscScalar *arrayRhs, *arraySoln;
+
+  VecGetArray(rhsVec, &arrayRhs);
+  VecGetArray(soln, &arraySoln);
+
   pardiso_(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
-           &N, array, csr, col, &idum, &NRHS,
-           IPARM, &MSGLVL, RHS, X, &error, DPARM);
- 
+           &nRow, array, csr, col, perm, &NRHS,
+           IPARM, &MSGLVL, arrayRhs, arraySoln, &error, DPARM);
+
+  //for(int ii=0; ii<nRow; ii++)
+    //VecSetValue(soln, ii, arraySoln[ii], INSERT_VALUES);
+
+  //VecAssemblyBegin(soln);
+  //VecAssemblyEnd(soln);
+
+  VecRestoreArray(rhsVec, &arrayRhs);
+  VecRestoreArray(soln, &arraySoln);
+
   solverTime.total -= solverTime.solve;
   solverTime.solve += computerTime.stop(fct);
   solverTime.total += solverTime.solve;
 
-  return RHS;
+  return 1;
 }
 
 
@@ -238,59 +219,45 @@ double *SolverPardisoPetsc::solve(double *RHS, int nrhs)
 
 
 
-double *SolverPardisoPetsc::factoriseAndSolve(double *RHS, int nrhs)
+int  SolverPardisoPetsc::factoriseAndSolve()
 {
   char fct[] = "SolverPARDISO::factoriseAndSolve";
 
   if (currentStatus != ASSEMBLY_OK) 
-    { prgWarning(1,fct,"assemble matrix first!"); return NULL; }
+    { prgWarning(1,fct,"assemble matrix first!"); return 0; }
 
-  int phase = 23, idum, error = 0;
-
-  N = nRow; // dimension of matrix
-
-  nx = N;
-
-  NRHS = nrhs;
-  
-  //cout << nx << '\t' << NRHS << endl;
-
-  if (nx < NRHS * N) 
-  {
-    delete [] X; 
-    nx = NRHS * N;
-    X = new double [nx];
-  }
+  phase = 23; error = 0;
 
   ierr = MatAssemblyBegin(mtx,MAT_FINAL_ASSEMBLY);//CHKERRQ(ierr);
   ierr = MatAssemblyEnd(mtx,MAT_FINAL_ASSEMBLY);//CHKERRQ(ierr);
   
   //MatView(mtx, PETSC_VIEWER_STDOUT_WORLD);
 
-  //cout << fct << " NRHS = " << NRHS << endl;
-
-  //cout << " rhsVec - pardiso " << endl;        printVector(RHS, nRow);
+  VecAssemblyBegin(rhsVec);
+  VecAssemblyEnd(rhsVec);
 
   computerTime.go(fct);
 
+  PetscScalar *arrayRhs, *arraySoln;
+
+  VecGetArray(rhsVec, &arrayRhs);
+  VecGetArray(soln, &arraySoln);
+
   pardiso_(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
-           &N, array, csr, col, &idum, &NRHS,
-           IPARM, &MSGLVL, RHS, X, &error, DPARM);
+           &nRow, array, csr, col, perm, &NRHS,
+           IPARM, &MSGLVL, arrayRhs, arraySoln, &error, DPARM);
 
   solverTime.total             -= solverTime.factoriseAndSolve;
   solverTime.factoriseAndSolve += computerTime.stop(fct);
   solverTime.total             += solverTime.factoriseAndSolve;
 
+  VecRestoreArray(rhsVec, &arrayRhs);
+  VecRestoreArray(soln, &arraySoln);
+
   currentStatus = FACTORISE_OK;
 
-  //cout << " soln - pardiso " << endl;        printVector(RHS, nRow);
-
-  //cout << " ppppppppppp " << endl;
-  
-  return RHS;
+  return 1;
 }
-
-
 
 
 
@@ -298,26 +265,30 @@ double *SolverPardisoPetsc::factoriseAndSolve(double *RHS, int nrhs)
 
 int SolverPardisoPetsc::free()
 {
-  int phase = -1, idum, error = 0;
+  ierr = VecDestroy(&soln);CHKERRQ(ierr);
+  ierr = VecDestroy(&solnPrev);CHKERRQ(ierr);
+  ierr = VecDestroy(&rhsVec);CHKERRQ(ierr);
+  ierr = VecDestroy(&reac);CHKERRQ(ierr);
 
-  double ddum;
+  phase = -1; error = 0;
 
   pardiso_(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
-           &N, array, csr, col, &idum, &NRHS,
+           &nRow, array, csr, col, perm, &NRHS,
            IPARM, &MSGLVL, &ddum, &ddum, &error, DPARM);
 
+  PetscBool flag;
 
-  delete [] X;
-  X = NULL;
+  ierr = MatRestoreRowIJ(mtx, 1, PETSC_FALSE, PETSC_FALSE, &nRow, &csr, &col, &flag);
 
-  //mtx.free();
-  //compr.free();
+  MatSeqAIJRestoreArray(mtx, &array);
+
+  ierr = MatDestroy(&mtx);CHKERRQ(ierr);
+  ierr = KSPDestroy(&ksp);CHKERRQ(ierr);
 
   currentStatus = EMPTY;
 
   return 1;
 }
-    
 
 
 

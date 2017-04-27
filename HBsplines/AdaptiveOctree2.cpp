@@ -1,7 +1,19 @@
 
 #include "AdaptiveOctree.h"
-
 #include "util.h"
+
+
+/////////////////////////////////////////////////////////////////
+//
+// compute Quadrature points for cut cells using adaptive integration
+//
+// rule #1: quadrature points are computed only for those cells which either lie
+//          completely inside fluid domain or are cut by the interface
+//          
+//  IF the current cell is a LEAF 
+//     THEN compute the quadrature points of that cell
+//  ELSE
+//     traverse each CHILD of the cell and compute quadrature points of each CHILD
 
 
 
@@ -20,6 +32,7 @@ void AdaptiveOctree<2>::computeGaussPoints(int refLev2, int inclDom, int chkFlag
       //GeomData->doIntersect2D(bbox, false, vecTemp, ptOut, domNums) ;
 
 
+      // the cell is not a cut cell
       if( (domNums.size() == 1) && (domNums[0] == inclDom) )
       {
         for(gp=0; gp<GeomData->gausspoints.size(); gp++)
@@ -31,17 +44,17 @@ void AdaptiveOctree<2>::computeGaussPoints(int refLev2, int inclDom, int chkFlag
 
           GeomData->ComputeCoord(param, geom);
 
-            //if( GeomData->within(geom) == inclDom )
-            //{
-              quadTemp.gausspoints.push_back(param);
-              quadTemp.gaussweights.push_back(GeomData->gaussweights[gp]*JacMultElem);
-            //}
+          //if( GeomData->within(geom) == inclDom )
+          //{
+            quadTemp.gausspoints.push_back(param);
+            quadTemp.gaussweights.push_back(GeomData->gaussweights[gp]*JacMultElem);
+          //}
         }
       }
-      else 
+      else // the cell is a cut cell
       {
-        // merge Gauss points from all the levels below LEVEL 5
-        
+          // merge Gauss points from all the levels below LEVEL #
+
           myPoint  ptTemp;
           int count=0;
 
@@ -59,12 +72,12 @@ void AdaptiveOctree<2>::computeGaussPoints(int refLev2, int inclDom, int chkFlag
 
             GeomData->ComputeCoord(param, geom);
 
-              if( GeomData->within(geom) == inclDom )
-              {
-                quadTemp.gausspoints.push_back(param);
-                quadTemp.gaussweights.push_back(GeomData->gaussweights[gp]*JacMultElem);
-                count++;
-              }
+            if( GeomData->within(geom) == inclDom )
+            {
+              quadTemp.gausspoints.push_back(param);
+              quadTemp.gaussweights.push_back(GeomData->gaussweights[gp]*JacMultElem);
+              count++;
+            }
           } // for(gp=0; gp<GeomData->gausspoints.size(); gp++)
           
           //cout << " fact " << endl;
@@ -116,6 +129,7 @@ void AdaptiveOctree<2>::computeGaussPoints(int refLev2, int inclDom, int chkFlag
 }
 
 
+
 template<>
 void AdaptiveOctree<3>::computeGaussPoints2Dfor3D(int refLev2, int inclDom, int chkFlag, int mergeFlag, GaussQuadrature&  quadTemp)
 {
@@ -123,6 +137,8 @@ cout << " IsLeaf() ... 3D " << IsLeaf() << endl;
 
   return;
 }
+
+
 
 template<>
 void AdaptiveOctree<2>::computeGaussPoints2Dfor3D(int refLev2, int inclDom, int chkFlag, int mergeFlag, GaussQuadrature&  quadTemp)

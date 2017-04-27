@@ -8,13 +8,26 @@
 #include "myPoly.h"
 #include "headersVTK.h"
 #include  "SolverEigen.h"
+#include  "SolverPetsc.h"
 
-#include <vector>
-#include <iostream>
+#include <list>
+#include <CGAL/Simple_cartesian.h>
+#include <CGAL/AABB_tree.h>
+#include <CGAL/AABB_traits.h>
+#include <CGAL/AABB_triangle_primitive.h>
 
-using std::vector;
-using std::cout;
-using std::endl;
+typedef CGAL::Simple_cartesian<double> K;
+typedef K::FT CGAL_FT;
+typedef K::Ray_3 CGAL_Ray;
+typedef K::Line_3 CGAL_Line;
+typedef K::Point_3 CGAL_Point;
+typedef K::Segment_3 CGAL_Segment;
+typedef K::Triangle_3 CGAL_Triangle;
+typedef std::list<CGAL_Triangle>::iterator CGAL_Iterator;
+typedef CGAL::AABB_triangle_primitive<K, CGAL_Iterator> CGAL_Primitive;
+typedef CGAL::AABB_traits<K, CGAL_Primitive> CGAL_AABB_triangle_traits;
+typedef CGAL::AABB_tree<CGAL_AABB_triangle_traits> CGAL_Tree;
+
 
 using namespace myGeom;
 
@@ -44,7 +57,7 @@ class ImmersedSolid
         vector<vector<int> >  forAssyMat, forAssyCoupledHorz, forAssyCoupledVert;
         vector<vector<int> >  OutputData;
 
-        VectorXd  soln, totalForce;
+        VectorXd  soln, totalForce, fluidAcce, fluidAccePrev, fluidAcceCur;
         myPoint  centroid;
 
         MatrixXd  Khorz, Kvert;
@@ -68,6 +81,18 @@ class ImmersedSolid
 
         vtkSmartPointer<vtkSelectEnclosedPoints> selectEnclosedPoints;
         vtkSmartPointer<vtkSelectEnclosedPoints> selectEnclosedPoints2;
+
+        // CGAL related
+
+        vector<CGAL_Point>   pointsCGAL;
+        list<CGAL_Triangle>  trianglesCGAL;
+
+        //Tree tree(triangles.begin(),triangles.end());
+        CGAL_Tree treeCGAL;
+
+        //////////////////////////////////////////////////////
+        // member functions
+        //////////////////////////////////////////////////////
 
         ImmersedSolid();
 
@@ -240,11 +265,11 @@ class ImmersedSolid
         virtual int  calcStiffnessAndResidual(int solver_type=1, bool zeroMtx=true, bool zeroRes=true)
         { cout << "   'calcStiffnessAndResidual()' is not defined for this Solid!\n\n"; return 0; }
         
-        virtual void  applyBoundaryConditions(int start1, SparseMatrixXd& globalK, double* rhs)
-        { cout << "   'applyBoundaryConditions()' is not defined for this Solid!\n\n"; return; }
-        
-        virtual void  applyExternalForces()
-        { cout << "   'applyExternalForces()' is not defined for this Solid!\n\n"; return; }
+        virtual int  applyBoundaryConditions(int start1, int start2, SparseMatrixXd& globalK, double* rhs)
+        { cout << "   'applyBoundaryConditions()' is not defined for this Solid!\n\n"; return -1; }
+
+        virtual int  applyExternalForces()
+        { cout << "   'applyExternalForces()' is not defined for this Solid!\n\n"; return -1; }
 
         virtual int  factoriseSolveAndUpdate()
         { cout << "   'factoriseSolveAndUpdate()' is not defined for this Solid!\n\n"; return 0; }
@@ -297,7 +322,7 @@ class ImmersedSolid
         virtual int AssembleGlobalMatrixAndVector(int ind1, int ind2, SparseMatrixXd& mtx, double* rhs)
         { cout << "   'AssembleGlobalMatrixAndVector()' is not defined for this Solid!\n\n"; return 0; }
 
-        virtual int AssembleGlobalMatrixAndVectorCutFEM(int ind1, int ind2, SparseMatrixXd& mtx, double* rhs)
+        virtual int AssembleGlobalMatrixAndVectorCutFEM(int ind1, int ind2, SolverPetsc* solverTemp)
         { cout << "   'AssembleGlobalMatrixAndVectorCutFEM()' is not defined for this Solid!\n\n"; return 0; }
 
         virtual void  writeOutput()
@@ -323,6 +348,20 @@ class ImmersedSolid
 
         virtual void  AssembleElementVector(int ind, bool flag, double* rhs)
         { cout << "   'AssembleElementVector()' is not defined for this Solid!\n\n"; return; }
+
+        virtual  void  perform_Aitken_accelerator_force()
+        {   SolnData.perform_Aitken_accelerator_force(); return; }
+
+        virtual  void  perform_Aitken_accelerator_displacement()
+        {   SolnData.perform_Aitken_accelerator_displacement(); return; }
+
+        void  predict_force();
+        void  interpolate_force();
+
+        void  predict_displacement();
+        void  interpolate_displacement();
+
+        void  initialise_solid_state();
 };
 
 

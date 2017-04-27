@@ -892,7 +892,7 @@ void TreeNode<2>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, doub
 */
 
 
-//
+/*
 template<>
 void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
 {
@@ -967,7 +967,7 @@ void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
 
   return;
 }
-//
+*/
 
 
 /*
@@ -1048,7 +1048,7 @@ void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
 */
 
 
-//
+/*
 template<>
 void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
 {
@@ -1203,7 +1203,7 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
 
   return;
 }
-//
+*/
 
 
 

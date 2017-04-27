@@ -8,8 +8,6 @@ using namespace std;
 
 void getGaussPoints1D(int ngp, vector<double>& gausspoints, vector<double>& gaussweights)
 {
-  char fct[] = "getGaussPoints1D";
-
   gausspoints.resize(ngp);
   gaussweights.resize(ngp);
 
@@ -225,7 +223,7 @@ void getGaussPoints1D(int ngp, vector<double>& gausspoints, vector<double>& gaus
 
 void getGaussPointsHex(int ngp, vector<double>& gp1, vector<double>& gp2, vector<double>& gp3, vector<double>& gws)
 {
-  char fct[] = "getGaussPointsHex";
+  ngp = pow(ngp,1.0/3.0);
 
   gp1.resize(ngp);
   gp2.resize(ngp);
@@ -233,7 +231,7 @@ void getGaussPointsHex(int ngp, vector<double>& gp1, vector<double>& gp2, vector
   gws.resize(ngp);
 
   vector<double> gpoints1, gweights1;
-  
+
   getGaussPoints1D(ngp, gpoints1, gweights1);
 
   int ii, jj, kk, ind;
@@ -263,8 +261,6 @@ void getGaussPointsHex(int ngp, vector<double>& gp1, vector<double>& gp2, vector
 void getGaussPointsQuad(int ngp, vector<double>& gp1, vector<double>& gp2, vector<double>& gws)
 {
   //assert(ngp>0);
-  
-  char fct[] = "getGaussPointsQuad";
   
   gp1.resize(ngp);
   gp2.resize(ngp);
@@ -687,7 +683,7 @@ void getLobattoPoints(int ngp, vector<double>& gausspoints, vector<double>& gaus
             break;
 
      default:
-            cerr << " invalid value of 'ngp' ! " << endl;
+            cerr << " getGaussPoints1D()... invalid value of 'ngp' ! " << endl;
             break;
 
   }

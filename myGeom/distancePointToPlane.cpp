@@ -2,4 +2,7 @@
 
 
 
-double  distancePointToPlane(
+double  distancePointToPlane()
+{
+  return 0.0;
+}

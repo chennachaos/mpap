@@ -219,7 +219,7 @@ void HBSplineCutFEM::plotGeomSubTrias2D(int val1, bool flag2, int col, bool PLOT
         } //else
     } // for(ee=0;ee<elems.size();ee++)
 
-    //printf("\n Total number of Gauss points in cut cells = %d \n\n", totalNGP );
+    printf("\n Total number of Gauss points in cut cells = %d \n\n", totalNGP );
 
   return;
 }
@@ -426,22 +426,22 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
         incr1 = tmp0[2] ;
         incr2 = tmp1[2] ;
 
-        if( !(ndTemp->IsCutElement()) )
+        //if( !(ndTemp->IsCutElement()) )
+        if( ndTemp->GetDomainNumber() < 10 )
         {
-          if( ndTemp->GetDomainNumber() == 0 )
-          {
+          //if( ndTemp->GetDomainNumber() == 0 )
+          //{
+            fact = incr1/resln[0];
+            create_vector(tmp0[0], tmp0[1], fact, uu);
 
-          fact = incr1/resln[0];
-          create_vector(tmp0[0], tmp0[1], fact, uu);
+            fact = incr2/resln[1];
+            create_vector(tmp1[0], tmp1[1], fact, vv);
 
-          fact = incr2/resln[1];
-          create_vector(tmp1[0], tmp1[1], fact, vv);
+            //create the coordinates of the pointsVTK (nodes in FEM)
 
-          //create the coordinates of the pointsVTK (nodes in FEM)
-
-          count = 0;
-          for(jj=0;jj<vv.size();jj++)
-          {
+            count = 0;
+            for(jj=0;jj<vv.size();jj++)
+            {
               param[1] = vv[jj];
               geom[1] = ComputeGeometry(1, vv[jj]);
 
@@ -469,19 +469,19 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
 
                 count++;
               } //for(ii=0;ii<uu.size();ii++)
-          } //for(jj=0;jj<vv.size();jj++)
+            } //for(jj=0;jj<vv.size();jj++)
 
-          quadVTK->GetPointIds()->SetId(0, pt[0]);
-          quadVTK->GetPointIds()->SetId(1, pt[1]);
-          quadVTK->GetPointIds()->SetId(2, pt[3]);
-          quadVTK->GetPointIds()->SetId(3, pt[2]);
+            quadVTK->GetPointIds()->SetId(0, pt[0]);
+            quadVTK->GetPointIds()->SetId(1, pt[1]);
+            quadVTK->GetPointIds()->SetId(2, pt[3]);
+            quadVTK->GetPointIds()->SetId(3, pt[2]);
 
-          //cout << ndTemp->GetID() << '\t' << ndTemp->get_subdomain_id() << endl;
+            //cout << ndTemp->GetID() << '\t' << ndTemp->get_subdomain_id() << endl;
 
-          uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
-          cellDataVTK->InsertNextValue(0);
-          cellDataVTK2->InsertNextValue(ndTemp->get_subdomain_id());
-	  }
+            uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
+            cellDataVTK->InsertNextValue(0);
+            cellDataVTK2->InsertNextValue(ndTemp->get_subdomain_id());
+	  //}
         } //if( !nd->IsCutElement() )
         else // the element is cutCell
         {
@@ -574,8 +574,8 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
         incr1 = tmp0[2] ;
         incr2 = tmp1[2] ;
 
-        //if( !nd->IsCutElement() )
         if( ndTemp->GetDomainNumber() == 0 )
+        //if( ndTemp->GetDomainNumber() <= 10 )
         {
             fact = incr1/resln[0];
             create_vector(tmp0[0], tmp0[1], fact, uu);

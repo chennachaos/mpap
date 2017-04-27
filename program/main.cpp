@@ -27,7 +27,7 @@ int main(int argc, char **argv)
 
   int i;
   MyString tmp;  
-  char *var, *cmdLineArg [] = COMMAND_LINE_ARGUMENTS;  
+  char *cmdLineArg [] = COMMAND_LINE_ARGUMENTS;  
 
   computerTime.go("prepare");
 
@@ -91,7 +91,8 @@ int main(int argc, char **argv)
   {
     // graphical user interface
 
-    essGrpStartGUI(argc, argv);
+    cout << " No GUI available for this version " << endl;
+    //essGrpStartGUI(argc, argv);
   }
 
   quit:

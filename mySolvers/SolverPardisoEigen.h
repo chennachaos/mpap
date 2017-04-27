@@ -15,12 +15,11 @@ class SolverPardisoEigen: public SolverEigen
 
     void   *PT[64];
 
-    double  DPARM[64], *array;
+    double  DPARM[64], *array, ddum;
 
-    vector<int>  csr, col;
-    vector<int> perm;
+    vector<int>  csr, col, perm;
 
-    int    SOLVER, MTYPE, MAXFCT, MNUM, NRHS, MSGLVL, IPARM[64];
+    int   phase, error, SOLVER, MTYPE, MAXFCT, MNUM, NRHS, MSGLVL, IPARM[64];
 
     virtual int initialise(int p1 = 0, int p2 = 0, int p3 = 0);
 

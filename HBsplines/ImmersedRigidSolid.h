@@ -48,9 +48,9 @@ class ImmersedRigidSolid : public ImmersedSolid
 
         virtual int  calcStiffnessAndResidual(int solver_type=1, bool zeroMtx=true, bool zeroRes=true);
 
-        virtual void  applyBoundaryConditions();
+        virtual int  applyBoundaryConditions();
 
-        virtual void  applyExternalForces();
+        virtual int  applyExternalForces();
 
         virtual int  factoriseSolveAndUpdate();
 
@@ -84,7 +84,7 @@ class ImmersedRigidSolid : public ImmersedSolid
 
         virtual int AssembleGlobalMatrixAndVector(int ind1, int ind2, SparseMatrixXd& mtx, double* rhs);
 
-        virtual int AssembleGlobalMatrixAndVectorCutFEM(int ind1, int ind2, SparseMatrixXd& mtx, double* rhs);
+        virtual int AssembleGlobalMatrixAndVectorCutFEM(int ind1, int ind2, SolverPetsc* solverTemp);
 
         virtual void  AssembleElementVector(int ind, bool flag, double* rhs);
 };

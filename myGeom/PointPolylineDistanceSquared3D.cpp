@@ -1,9 +1,10 @@
 
 
   typedef double Scalar;
-
+/*
 Scalar PointPolylineDistanceSquared2D(myPoint& p, vector<myLine>& vertices)
 {
+
   //using Scalar = double;
   
   Scalar dSq, INFINITY;
@@ -96,11 +97,11 @@ Scalar PointPolylineDistanceSquared2D(myPoint& p, vector<myLine>& vertices)
 
   return dSq;
 }
+*/
 
 
 
-
-
+/*
 Scalar PointPolylineDistanceSquared3D(Point p, Point vertices[], int nSegments)
 {
 
@@ -175,4 +176,4 @@ zNextMinusC = vertices[i + 2].z - p.z;
 }
 return dSq;
 }
-
+*/

@@ -1,15 +1,11 @@
 
-
-
 #include "TreeNode.h"
-
-//#include "headersBoost.h"
 #include "headersVTK.h"
 #include "DistFunctions.h"
 #include "SolutionData.h"
 #include "QuadratureUtil.h"
-
 #include "myTria.h"
+
 
 
 template<>
@@ -63,6 +59,7 @@ int TreeNode<2>::prepareCutCell(vector<double>& cutFEMparams)
   if( (int) cutFEMparams[0] == 2 ) // adaptive integration
   {
     GeomData->doIntersect2D(bbox, false, cornerInOut, ptOut, domNums) ;
+    ptOut.clear();
   }
   else  // subtriangulation
   {
@@ -103,6 +100,7 @@ int TreeNode<2>::prepareCutCell(vector<double>& cutFEMparams)
       {
         ptNew = ptOut[ii];
         //cout << ii << '\t' << ptNew[0] << '\t' << ptNew[1] << '\t' << ptNew[2] << endl;
+        ptNew[2] = 0.0;
         if( !( pointExists(ptVec, ptNew) ) )
         {
           ptVec.push_back(ptNew);
@@ -192,7 +190,7 @@ int TreeNode<3>::prepareCutCell(vector<double>& cutFEMparams)
   
   if( (int) cutFEMparams[0] == 2 ) // adaptive integration
   {
-    GeomData->doIntersect3D(bbox, false, cornerInOut, ptOut, domNums) ;
+    return GeomData->doIntersect3D(bbox, false, cornerInOut, ptOut, domNums) ;
 
     //if( IsRightBoundary() && IsTopBoundary() && IsBackBoundary() )
     //{
@@ -203,7 +201,8 @@ int TreeNode<3>::prepareCutCell(vector<double>& cutFEMparams)
   }
   else // subtriangulation
   {
-    GeomData->doIntersect3D(bbox, true, cornerInOut, ptOut, domNums) ;
+    cerr << " TreeNode<3>::prepareCutCell() ... Subtriangulation is not implemented for 3D problems ... " << endl;
+    //GeomData->doIntersect3D(bbox, true, cornerInOut, ptOut, domNums) ;
   }
 
   return 1;
@@ -331,6 +330,8 @@ int TreeNode<2>::computeGaussPointsSubTrias(int nGP, int inclFlag, int flag1, in
 
   if( IsBoundary() )
   {
+    //cout << " boundary element " << endl;
+
     BoundaryQuadrature.resize(4);
     int aa, side;
 
@@ -358,6 +359,7 @@ int TreeNode<2>::computeGaussPointsSubTrias(int nGP, int inclFlag, int flag1, in
           TreeNode<2>::computeGaussPointsAdapIntegrationBoundary(side, 0, 0, inclFlag, flag2);
       }
     }
+    //cout << " boundary element " << endl;
   }
 
   return 1;
@@ -493,24 +495,18 @@ int TreeNode<2>::computeGaussPointsAdapIntegration(int refLev1, int refLev2, int
     delete  adapIntegNode;
 
   adapIntegNode = NULL;
-  
-  adapIntegNode = new AdaptiveBinarytree<2>(0);
-  //adapIntegNode = new AdaptiveOctree<2>(0);
+
+  //adapIntegNode = new AdaptiveBinarytree<2>(0);
+  adapIntegNode = new AdaptiveOctree<2>(0);
 
   adapIntegNode->SetKnots(knots[0][0], knots[0][1], knots[1][0], knots[1][1]);
 
-  //cout << " AAAAAAAAAA " << endl;
-
   adapIntegNode->GeomData = GeomData;
   adapIntegNode->domNums = domNums;
-  adapIntegNode->SetSplitDirection(-1);
+  //adapIntegNode->SetSplitDirection(-1);
 
-  //cout << " AAAAAAAAAA .... " << refLev << endl;
-  
   adapIntegNode->prepareData();
   adapIntegNode->subDivide(refLev1);
-  
-  //cout << " AAAAAAAAAA .... " << refLev << endl;
 
   Quadrature.reset();
 
@@ -577,7 +573,6 @@ int TreeNode<2>::computeGaussPointsAdapIntegration(int refLev1, int refLev2, int
   }
 
   //cout << id << '\t' << Quadrature.gausspoints.size() << endl;
-  //cout << " AAAAAAAAAA " << endl;
 
   return 1;
 }
@@ -602,25 +597,18 @@ int TreeNode<3>::computeGaussPointsAdapIntegration(int refLev1, int refLev2, int
 
   adapIntegNode = NULL;
 
-  adapIntegNode = new AdaptiveBinarytree<3>(0);
-  //adapIntegNode = new AdaptiveOctree<3>(0);
+  //adapIntegNode = new AdaptiveBinarytree<3>(0);
+  adapIntegNode = new AdaptiveOctree<3>(0);
   
   adapIntegNode->SetKnots(knots[0][0], knots[0][1], knots[1][0], knots[1][1], knots[2][0], knots[2][1]);
 
-  //cout << " AAAAAAAAAA " << endl;
-  //printVector(domNums);
-
   adapIntegNode->GeomData = GeomData;
   adapIntegNode->domNums = domNums;
-  adapIntegNode->SetSplitDirection(-1);
+  //adapIntegNode->SetSplitDirection(-1);
 
-  //cout << " AAAAAAAAAA .... " << refLev << endl;
-  
   adapIntegNode->prepareData();
   adapIntegNode->subDivide(refLev1);
  
-  //cout << " AAAAAAAAAA .... " << refLev << endl;
-  
   Quadrature.reset();
 
   //for(int dd=0; dd<domNums.size(); dd++)

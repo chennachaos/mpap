@@ -35,7 +35,6 @@ void AdaptiveOctree<1>::subDivide(int lev)
     //cout << " bbbbbbbbbbb " << endl;
 
 
-
     NUM_CHILDREN = 2;
     child  = new AdaptiveOctree_PTR[NUM_CHILDREN];
 
@@ -45,11 +44,10 @@ void AdaptiveOctree<1>::subDivide(int lev)
     
     for(ii=0;ii<NUM_CHILDREN;ii++)
     {
-       child[ii] = new AdaptiveOctree<1>(temp);
+      child[ii] = new AdaptiveOctree<1>(temp);
 
-       child[ii]->SetParent(this);
+      child[ii]->SetParent(this);
     }
-
 
     double  mid(0.0);
 
@@ -72,43 +70,46 @@ void AdaptiveOctree<1>::subDivide(int lev)
     
     if(neighbours[LEFT] != NULL)
     {
-       if(neighbours[LEFT]->IsLeaf())
-         child[LEFT]->SetNeighbour(LEFT, NULL);
-       else
-       {
-         tmpnode = neighbours[LEFT]->GetChild(RIGHT);
+      if(neighbours[LEFT]->IsLeaf())
+        child[LEFT]->SetNeighbour(LEFT, NULL);
+      else
+      {
+        tmpnode = neighbours[LEFT]->GetChild(RIGHT);
 
-         child[LEFT]->SetNeighbour(LEFT, tmpnode);
-         tmpnode->SetNeighbour(RIGHT,child[LEFT]);
-       }
+        child[LEFT]->SetNeighbour(LEFT, tmpnode);
+        tmpnode->SetNeighbour(RIGHT,child[LEFT]);
+      }
     }
     
     if(neighbours[RIGHT] != NULL)
     {
-       if(neighbours[RIGHT]->IsLeaf())
-         child[RIGHT]->SetNeighbour(RIGHT, NULL);
-       else
-       {
-         tmpnode = neighbours[RIGHT]->GetChild(LEFT);
+      if(neighbours[RIGHT]->IsLeaf())
+        child[RIGHT]->SetNeighbour(RIGHT, NULL);
+      else
+      {
+        tmpnode = neighbours[RIGHT]->GetChild(LEFT);
 
-         child[RIGHT]->SetNeighbour(RIGHT, tmpnode);
-         tmpnode->SetNeighbour(LEFT,child[RIGHT]);
-       }
+        child[RIGHT]->SetNeighbour(RIGHT, tmpnode);
+        tmpnode->SetNeighbour(LEFT,child[RIGHT]);
+      }
     }
 
-    cout << " bbbbbbbbbbb " << endl;
+    //cout << " bbbbbbbbbbb " << endl;
     for(ii=0;ii<NUM_CHILDREN;ii++)
-       child[ii]->prepareData();
+      child[ii]->prepareData();
 
-    cout << " bbbbbbbbbbb " << endl;
+    //cout << " bbbbbbbbbbb " << endl;
 
     if(level < lev)
     {
       for(ii=0;ii<NUM_CHILDREN;ii++)
         child[ii]->subDivide(lev);
     }
-    cout << " bbbbbbbbbbb " << endl;
+    //cout << " bbbbbbbbbbb " << endl;
+    
+    return;
 }
+
 
 
 
@@ -139,15 +140,16 @@ void AdaptiveOctree<2>::subDivide(int refLev)
     int ii, levTemp, jj, bb;
 
     NUM_CHILDREN = 4;
+
     child      = new AdaptiveOctree_PTR[NUM_CHILDREN];
 
     levTemp = level+1;
-    
+
     for(ii=0;ii<NUM_CHILDREN;ii++)
     {
-       child[ii] = new AdaptiveOctree<2>(levTemp);
+      child[ii] = new AdaptiveOctree<2>(levTemp);
 
-       child[ii]->SetParent(this);
+      child[ii]->SetParent(this);
     }
 
     child[SW]->orientation = SW;
@@ -188,87 +190,86 @@ void AdaptiveOctree<2>::subDivide(int refLev)
 
     if(neighbours[WEST] != NULL)
     {
-       if(neighbours[WEST]->IsLeaf())
-       {
-          child[SW]->SetNeighbour(WEST, NULL);
-          child[NW]->SetNeighbour(WEST, NULL);
-       }
-       else
-       {
-         tmpnode = neighbours[WEST]->GetChild(SE);
+      if(neighbours[WEST]->IsLeaf())
+      {
+        child[SW]->SetNeighbour(WEST, NULL);
+        child[NW]->SetNeighbour(WEST, NULL);
+      }
+      else
+      {
+        tmpnode = neighbours[WEST]->GetChild(SE);
 
-         child[SW]->SetNeighbour(WEST, tmpnode);
-         tmpnode->SetNeighbour(EAST, child[SW]);
+        child[SW]->SetNeighbour(WEST, tmpnode);
+        tmpnode->SetNeighbour(EAST, child[SW]);
 
-         tmpnode = neighbours[WEST]->GetChild(NE);
+        tmpnode = neighbours[WEST]->GetChild(NE);
 
-         child[NW]->SetNeighbour(WEST, tmpnode);
-         tmpnode->SetNeighbour(EAST, child[NW]);
-       }
+        child[NW]->SetNeighbour(WEST, tmpnode);
+        tmpnode->SetNeighbour(EAST, child[NW]);
+      }
     }
 
     if(neighbours[EAST] != NULL)
     {
-       if(neighbours[EAST]->IsLeaf())
-       {
-          child[SE]->SetNeighbour(EAST, NULL);
-          child[NE]->SetNeighbour(EAST, NULL);
-       }
-       else
-       {
-         tmpnode = neighbours[EAST]->GetChild(SW);
+      if(neighbours[EAST]->IsLeaf())
+      {
+        child[SE]->SetNeighbour(EAST, NULL);
+        child[NE]->SetNeighbour(EAST, NULL);
+      }
+      else
+      {
+        tmpnode = neighbours[EAST]->GetChild(SW);
 
-         child[SE]->SetNeighbour(EAST, tmpnode);
-         tmpnode->SetNeighbour(WEST, child[SE]);
+        child[SE]->SetNeighbour(EAST, tmpnode);
+        tmpnode->SetNeighbour(WEST, child[SE]);
 
-         tmpnode = neighbours[EAST]->GetChild(NW);
+        tmpnode = neighbours[EAST]->GetChild(NW);
 
-         child[NE]->SetNeighbour(EAST, tmpnode);
-         tmpnode->SetNeighbour(WEST, child[NE]);
-       }
+        child[NE]->SetNeighbour(EAST, tmpnode);
+        tmpnode->SetNeighbour(WEST, child[NE]);
+      }
     }
-
 
     if(neighbours[NORTH] != NULL)
     {
-       if(neighbours[NORTH]->IsLeaf())
-       {
-          child[NW]->SetNeighbour(NORTH, NULL);
-          child[NE]->SetNeighbour(NORTH, NULL);
-       }
-       else
-       {
-         tmpnode = neighbours[NORTH]->GetChild(SW);
+      if(neighbours[NORTH]->IsLeaf())
+      {
+        child[NW]->SetNeighbour(NORTH, NULL);
+        child[NE]->SetNeighbour(NORTH, NULL);
+      }
+      else
+      {
+        tmpnode = neighbours[NORTH]->GetChild(SW);
 
-         child[NW]->SetNeighbour(NORTH, tmpnode);
-         tmpnode->SetNeighbour(SOUTH, child[NW]);
+        child[NW]->SetNeighbour(NORTH, tmpnode);
+        tmpnode->SetNeighbour(SOUTH, child[NW]);
 
-         tmpnode = neighbours[NORTH]->GetChild(SE);
+        tmpnode = neighbours[NORTH]->GetChild(SE);
 
-         child[NE]->SetNeighbour(NORTH, tmpnode);
-         tmpnode->SetNeighbour(SOUTH, child[NE]);
-       }
+        child[NE]->SetNeighbour(NORTH, tmpnode);
+        tmpnode->SetNeighbour(SOUTH, child[NE]);
+      }
     }
 
     if(neighbours[SOUTH] != NULL)
     {
-       if(neighbours[SOUTH]->IsLeaf())
-       {
-          child[SW]->SetNeighbour(SOUTH, NULL);
-          child[SE]->SetNeighbour(SOUTH, NULL);
-       }
-       else
-       {
-         tmpnode = neighbours[SOUTH]->GetChild(NW);
+      if(neighbours[SOUTH]->IsLeaf())
+      {
+        child[SW]->SetNeighbour(SOUTH, NULL);
+        child[SE]->SetNeighbour(SOUTH, NULL);
+      }
+      else
+      {
+        tmpnode = neighbours[SOUTH]->GetChild(NW);
 
-         child[SW]->SetNeighbour(SOUTH, tmpnode);
-         tmpnode->SetNeighbour(NORTH, child[SW]);
+        child[SW]->SetNeighbour(SOUTH, tmpnode);
+        tmpnode->SetNeighbour(NORTH, child[SW]);
 
-         tmpnode = neighbours[SOUTH]->GetChild(NE);
+        tmpnode = neighbours[SOUTH]->GetChild(NE);
 
-         child[SE]->SetNeighbour(SOUTH, tmpnode);
-         tmpnode->SetNeighbour(NORTH, child[SE]);
-       }
+        child[SE]->SetNeighbour(SOUTH, tmpnode);
+        tmpnode->SetNeighbour(NORTH, child[SE]);
+      }
     }
     //
 
@@ -325,9 +326,9 @@ void AdaptiveOctree<3>::subDivide(int refLev)
     
     for(ii=0;ii<NUM_CHILDREN;ii++)
     {
-       child[ii] = new AdaptiveOctree<3>(levTemp);
+      child[ii] = new AdaptiveOctree<3>(levTemp);
 
-       child[ii]->SetParent(this);
+      child[ii]->SetParent(this);
     }
 
     child[SW_FRONT]->orientation = SW_FRONT;
@@ -431,205 +432,205 @@ void AdaptiveOctree<3>::subDivide(int refLev)
     nd = neighbours[WEST];
     if(nd != NULL)
     {
-       if(nd->IsLeaf())
-       {
-          child[SW_FRONT]->SetNeighbour(WEST, NULL);
-          child[NW_FRONT]->SetNeighbour(WEST, NULL);
-          child[SW_BACK ]->SetNeighbour(WEST, NULL);
-          child[NW_BACK ]->SetNeighbour(WEST, NULL);
-       }
-       else
-       {
-         tmpnode = nd->GetChild(SE_FRONT);
+      if(nd->IsLeaf())
+      {
+        child[SW_FRONT]->SetNeighbour(WEST, NULL);
+        child[NW_FRONT]->SetNeighbour(WEST, NULL);
+        child[SW_BACK ]->SetNeighbour(WEST, NULL);
+        child[NW_BACK ]->SetNeighbour(WEST, NULL);
+      }
+      else
+      {
+        tmpnode = nd->GetChild(SE_FRONT);
 
-         child[SW_FRONT]->SetNeighbour(WEST, tmpnode);
-         tmpnode->SetNeighbour(EAST, child[SW_FRONT]);
+        child[SW_FRONT]->SetNeighbour(WEST, tmpnode);
+        tmpnode->SetNeighbour(EAST, child[SW_FRONT]);
 
-         tmpnode = nd->GetChild(NE_FRONT);
+        tmpnode = nd->GetChild(NE_FRONT);
 
-         child[NW_FRONT]->SetNeighbour(WEST, tmpnode);
-         tmpnode->SetNeighbour(EAST, child[NW_FRONT]);
+        child[NW_FRONT]->SetNeighbour(WEST, tmpnode);
+        tmpnode->SetNeighbour(EAST, child[NW_FRONT]);
 
-         tmpnode = nd->GetChild(SE_BACK);
+        tmpnode = nd->GetChild(SE_BACK);
 
-         child[SW_BACK]->SetNeighbour(WEST, tmpnode);
-         tmpnode->SetNeighbour(EAST, child[SW_BACK]);
+        child[SW_BACK]->SetNeighbour(WEST, tmpnode);
+        tmpnode->SetNeighbour(EAST, child[SW_BACK]);
 
-         tmpnode = nd->GetChild(NE_BACK);
+        tmpnode = nd->GetChild(NE_BACK);
 
-         child[NW_BACK]->SetNeighbour(WEST, tmpnode);
-         tmpnode->SetNeighbour(EAST, child[NW_BACK]);
-       }
+        child[NW_BACK]->SetNeighbour(WEST, tmpnode);
+        tmpnode->SetNeighbour(EAST, child[NW_BACK]);
+      }
     }
 
     nd = neighbours[EAST];
     if(nd != NULL)
     {
-       if(nd->IsLeaf())
-       {
-          child[SE_FRONT]->SetNeighbour(EAST, NULL);
-          child[NE_FRONT]->SetNeighbour(EAST, NULL);
-          child[SE_BACK ]->SetNeighbour(EAST, NULL);
-          child[NE_BACK ]->SetNeighbour(EAST, NULL);
-       }
-       else
-       {
-         tmpnode = nd->GetChild(SW_FRONT);
+      if(nd->IsLeaf())
+      {
+        child[SE_FRONT]->SetNeighbour(EAST, NULL);
+        child[NE_FRONT]->SetNeighbour(EAST, NULL);
+        child[SE_BACK ]->SetNeighbour(EAST, NULL);
+        child[NE_BACK ]->SetNeighbour(EAST, NULL);
+      }
+      else
+      {
+        tmpnode = nd->GetChild(SW_FRONT);
 
-         child[SE_FRONT]->SetNeighbour(EAST, tmpnode);
-         tmpnode->SetNeighbour(WEST, child[SE_FRONT]);
+        child[SE_FRONT]->SetNeighbour(EAST, tmpnode);
+        tmpnode->SetNeighbour(WEST, child[SE_FRONT]);
 
-         tmpnode = nd->GetChild(NW_FRONT);
+        tmpnode = nd->GetChild(NW_FRONT);
 
-         child[NE_FRONT]->SetNeighbour(EAST, tmpnode);
-         tmpnode->SetNeighbour(WEST, child[NE_FRONT]);
+        child[NE_FRONT]->SetNeighbour(EAST, tmpnode);
+        tmpnode->SetNeighbour(WEST, child[NE_FRONT]);
 
-         tmpnode = nd->GetChild(SW_BACK);
+        tmpnode = nd->GetChild(SW_BACK);
 
-         child[SE_BACK]->SetNeighbour(EAST, tmpnode);
-         tmpnode->SetNeighbour(WEST, child[SE_BACK]);
+        child[SE_BACK]->SetNeighbour(EAST, tmpnode);
+        tmpnode->SetNeighbour(WEST, child[SE_BACK]);
 
          tmpnode = nd->GetChild(NW_BACK);
 
-         child[NE_BACK]->SetNeighbour(EAST, tmpnode);
-         tmpnode->SetNeighbour(WEST, child[NE_BACK]);
-       }
+        child[NE_BACK]->SetNeighbour(EAST, tmpnode);
+        tmpnode->SetNeighbour(WEST, child[NE_BACK]);
+      }
     }
 
     nd = neighbours[SOUTH];
     if(nd != NULL)
     {
-       if(nd->IsLeaf())
-       {
-          child[SW_FRONT]->SetNeighbour(SOUTH, NULL);
-          child[SE_FRONT]->SetNeighbour(SOUTH, NULL);
-          child[SW_BACK ]->SetNeighbour(SOUTH, NULL);
-          child[SE_BACK ]->SetNeighbour(SOUTH, NULL);
-       }
-       else
-       {
-         tmpnode = nd->GetChild(NW_FRONT);
+      if(nd->IsLeaf())
+      {
+        child[SW_FRONT]->SetNeighbour(SOUTH, NULL);
+        child[SE_FRONT]->SetNeighbour(SOUTH, NULL);
+        child[SW_BACK ]->SetNeighbour(SOUTH, NULL);
+        child[SE_BACK ]->SetNeighbour(SOUTH, NULL);
+      }
+      else
+      {
+        tmpnode = nd->GetChild(NW_FRONT);
 
-         child[SW_FRONT]->SetNeighbour(SOUTH, tmpnode);
-         tmpnode->SetNeighbour(NORTH, child[SW_FRONT]);
+        child[SW_FRONT]->SetNeighbour(SOUTH, tmpnode);
+        tmpnode->SetNeighbour(NORTH, child[SW_FRONT]);
 
-         tmpnode = nd->GetChild(NE_FRONT);
+        tmpnode = nd->GetChild(NE_FRONT);
 
-         child[SE_FRONT]->SetNeighbour(SOUTH, tmpnode);
-         tmpnode->SetNeighbour(NORTH, child[SE_FRONT]);
+        child[SE_FRONT]->SetNeighbour(SOUTH, tmpnode);
+        tmpnode->SetNeighbour(NORTH, child[SE_FRONT]);
 
-         tmpnode = nd->GetChild(NW_BACK);
+        tmpnode = nd->GetChild(NW_BACK);
 
-         child[SW_BACK]->SetNeighbour(SOUTH, tmpnode);
-         tmpnode->SetNeighbour(NORTH, child[SW_BACK]);
+        child[SW_BACK]->SetNeighbour(SOUTH, tmpnode);
+        tmpnode->SetNeighbour(NORTH, child[SW_BACK]);
 
-         tmpnode = nd->GetChild(NE_BACK);
+        tmpnode = nd->GetChild(NE_BACK);
 
-         child[SE_BACK]->SetNeighbour(SOUTH, tmpnode);
-         tmpnode->SetNeighbour(NORTH, child[SE_BACK]);
-       }
+        child[SE_BACK]->SetNeighbour(SOUTH, tmpnode);
+        tmpnode->SetNeighbour(NORTH, child[SE_BACK]);
+      }
     }
 
     nd = neighbours[NORTH];
     if(nd != NULL)
     {
-       if(nd->IsLeaf())
-       {
-          child[NW_FRONT]->SetNeighbour(NORTH, NULL);
-          child[NE_FRONT]->SetNeighbour(NORTH, NULL);
-          child[NW_BACK ]->SetNeighbour(NORTH, NULL);
-          child[NE_BACK ]->SetNeighbour(NORTH, NULL);
-       }
-       else
-       {
-         tmpnode = nd->GetChild(SW_FRONT);
+      if(nd->IsLeaf())
+      {
+        child[NW_FRONT]->SetNeighbour(NORTH, NULL);
+        child[NE_FRONT]->SetNeighbour(NORTH, NULL);
+        child[NW_BACK ]->SetNeighbour(NORTH, NULL);
+        child[NE_BACK ]->SetNeighbour(NORTH, NULL);
+      }
+      else
+      {
+        tmpnode = nd->GetChild(SW_FRONT);
 
-         child[NW_FRONT]->SetNeighbour(NORTH, tmpnode);
-         tmpnode->SetNeighbour(SOUTH, child[NW_FRONT]);
+        child[NW_FRONT]->SetNeighbour(NORTH, tmpnode);
+        tmpnode->SetNeighbour(SOUTH, child[NW_FRONT]);
 
-         tmpnode = nd->GetChild(SE_FRONT);
+        tmpnode = nd->GetChild(SE_FRONT);
 
-         child[NE_FRONT]->SetNeighbour(NORTH, tmpnode);
-         tmpnode->SetNeighbour(SOUTH, child[NE_FRONT]);
+        child[NE_FRONT]->SetNeighbour(NORTH, tmpnode);
+        tmpnode->SetNeighbour(SOUTH, child[NE_FRONT]);
 
-         tmpnode = nd->GetChild(SW_BACK);
+        tmpnode = nd->GetChild(SW_BACK);
 
-         child[NW_BACK]->SetNeighbour(NORTH, tmpnode);
-         tmpnode->SetNeighbour(SOUTH, child[NW_BACK]);
+        child[NW_BACK]->SetNeighbour(NORTH, tmpnode);
+        tmpnode->SetNeighbour(SOUTH, child[NW_BACK]);
 
-         tmpnode = nd->GetChild(SE_BACK);
+        tmpnode = nd->GetChild(SE_BACK);
 
-         child[NE_BACK]->SetNeighbour(NORTH, tmpnode);
-         tmpnode->SetNeighbour(SOUTH, child[NE_BACK]);
-       }
+        child[NE_BACK]->SetNeighbour(NORTH, tmpnode);
+        tmpnode->SetNeighbour(SOUTH, child[NE_BACK]);
+      }
     }
 
     nd = neighbours[BACK];
     if(nd != NULL)
     {
-       if(nd->IsLeaf())
-       {
-          child[SW_BACK]->SetNeighbour(BACK, NULL);
-          child[SE_BACK]->SetNeighbour(BACK, NULL);
-          child[NW_BACK]->SetNeighbour(BACK, NULL);
-          child[NE_BACK]->SetNeighbour(BACK, NULL);
-       }
-       else
-       {
-         tmpnode = nd->GetChild(SW_FRONT);
+      if(nd->IsLeaf())
+      {
+        child[SW_BACK]->SetNeighbour(BACK, NULL);
+        child[SE_BACK]->SetNeighbour(BACK, NULL);
+        child[NW_BACK]->SetNeighbour(BACK, NULL);
+        child[NE_BACK]->SetNeighbour(BACK, NULL);
+      }
+      else
+      {
+        tmpnode = nd->GetChild(SW_FRONT);
 
-         child[SW_BACK]->SetNeighbour(BACK, tmpnode);
-         tmpnode->SetNeighbour(FRONT, child[SW_BACK]);
+        child[SW_BACK]->SetNeighbour(BACK, tmpnode);
+        tmpnode->SetNeighbour(FRONT, child[SW_BACK]);
 
-         tmpnode = nd->GetChild(SE_FRONT);
+        tmpnode = nd->GetChild(SE_FRONT);
 
-         child[SE_BACK]->SetNeighbour(BACK, tmpnode);
-         tmpnode->SetNeighbour(FRONT, child[SE_BACK]);
+        child[SE_BACK]->SetNeighbour(BACK, tmpnode);
+        tmpnode->SetNeighbour(FRONT, child[SE_BACK]);
 
-         tmpnode = nd->GetChild(NW_FRONT);
+        tmpnode = nd->GetChild(NW_FRONT);
 
-         child[NW_BACK]->SetNeighbour(BACK, tmpnode);
-         tmpnode->SetNeighbour(FRONT, child[NW_BACK]);
+        child[NW_BACK]->SetNeighbour(BACK, tmpnode);
+        tmpnode->SetNeighbour(FRONT, child[NW_BACK]);
 
-         tmpnode = nd->GetChild(NE_FRONT);
+        tmpnode = nd->GetChild(NE_FRONT);
 
-         child[NE_BACK]->SetNeighbour(BACK, tmpnode);
-         tmpnode->SetNeighbour(FRONT, child[NE_BACK]);
-       }
+        child[NE_BACK]->SetNeighbour(BACK, tmpnode);
+        tmpnode->SetNeighbour(FRONT, child[NE_BACK]);
+      }
     }
 
     nd = neighbours[FRONT];
     if(nd != NULL)
     {
-       if(nd->IsLeaf())
-       {
-          child[SW_FRONT]->SetNeighbour(FRONT, NULL);
-          child[SE_FRONT]->SetNeighbour(FRONT, NULL);
-          child[NW_FRONT]->SetNeighbour(FRONT, NULL);
-          child[NE_FRONT]->SetNeighbour(FRONT, NULL);
-       }
-       else
-       {
-         tmpnode = nd->GetChild(SW_BACK);
+      if(nd->IsLeaf())
+      {
+        child[SW_FRONT]->SetNeighbour(FRONT, NULL);
+        child[SE_FRONT]->SetNeighbour(FRONT, NULL);
+        child[NW_FRONT]->SetNeighbour(FRONT, NULL);
+        child[NE_FRONT]->SetNeighbour(FRONT, NULL);
+      }
+      else
+      {
+        tmpnode = nd->GetChild(SW_BACK);
 
-         child[SW_FRONT]->SetNeighbour(FRONT, tmpnode);
-         tmpnode->SetNeighbour(BACK, child[SW_FRONT]);
+        child[SW_FRONT]->SetNeighbour(FRONT, tmpnode);
+        tmpnode->SetNeighbour(BACK, child[SW_FRONT]);
 
-         tmpnode = nd->GetChild(SE_BACK);
+        tmpnode = nd->GetChild(SE_BACK);
 
-         child[SE_FRONT]->SetNeighbour(FRONT, tmpnode);
-         tmpnode->SetNeighbour(BACK, child[SE_FRONT]);
+        child[SE_FRONT]->SetNeighbour(FRONT, tmpnode);
+        tmpnode->SetNeighbour(BACK, child[SE_FRONT]);
 
-         tmpnode = nd->GetChild(NW_BACK);
+        tmpnode = nd->GetChild(NW_BACK);
 
-         child[NW_FRONT]->SetNeighbour(FRONT, tmpnode);
-         tmpnode->SetNeighbour(BACK, child[NW_FRONT]);
+        child[NW_FRONT]->SetNeighbour(FRONT, tmpnode);
+        tmpnode->SetNeighbour(BACK, child[NW_FRONT]);
 
-         tmpnode = nd->GetChild(NE_BACK);
+        tmpnode = nd->GetChild(NE_BACK);
 
-         child[NE_FRONT]->SetNeighbour(FRONT, tmpnode);
-         tmpnode->SetNeighbour(BACK, child[NE_FRONT]);
-       }
+        child[NE_FRONT]->SetNeighbour(FRONT, tmpnode);
+        tmpnode->SetNeighbour(BACK, child[NE_FRONT]);
+      }
     }
 
     //cout << " ddddddddddd " << endl;
@@ -883,19 +884,25 @@ void AdaptiveOctree<2>::mergeGaussPoints(int refLev2, int inclDom, int dummy1, i
   int  ii, gp;
   myPoint  param, geom;
   wt = 0.0;
+  ptTemp.setZero();
+  param.setZero();
   for(gp=0; gp<QuadratureLocal.gausspoints.size(); gp++)
   {
-    //for(ii=0; ii<2; ii++)
-      //param[ii] = QuadratureLocal.gausspoints[gp][ii] ;
+    for(ii=0; ii<2; ii++)
+      param[ii] = QuadratureLocal.gausspoints[gp][ii] ;
 
     //GeomData->ComputeCoord(param, geom);
+    //ptTemp += geom;
 
     //cout << gp << '\t' << geom[0] << '\t' << geom[1] << '\t' << QuadratureLocal.gaussweights[gp] << endl;
     wt +=  QuadratureLocal.gaussweights[gp];
     
-    //for(ii=0; ii<2; ii++)
-      //QuadratureLocal.gausspoints[gp][ii] = (2.0*QuadratureLocal.gausspoints[gp][ii] - knots[ii][3])/knots[ii][2];
+    ptTemp += param;
   }
+
+  nGPsMerge = QuadratureLocal.gausspoints.size();
+
+  ptTemp /= nGPsMerge;
 
   delete  adapIntegNodeLocal;
 
@@ -938,17 +945,24 @@ void AdaptiveOctree<3>::mergeGaussPoints(int refLev2, int inclDom, int dummy1, i
   int  ii, gp;
   myPoint  param, geom;
   wt = 0.0;
+  ptTemp.setZero();
+  param.setZero();
   for(gp=0; gp<QuadratureLocal.gausspoints.size(); gp++)
   {
     for(ii=0; ii<3; ii++)
-      //param[ii] = (2.0*QuadratureLocal.gausspoints[gp][ii] - knots[ii][3])/knots[ii][2];
       param[ii] = QuadratureLocal.gausspoints[gp][ii] ;
 
-    GeomData->ComputeCoord(param, geom);
+    //GeomData->ComputeCoord(param, geom);
+    //ptTemp += geom;
 
-    //cout << gp << '\t' << geom[0] << '\t' << geom[1] << '\t' << QuadratureLocal.gaussweights[gp] << endl;
     wt +=  QuadratureLocal.gaussweights[gp];
+    
+    ptTemp += param;
   }
+
+  nGPsMerge = QuadratureLocal.gausspoints.size();
+
+  ptTemp /= nGPsMerge;
 
   delete  adapIntegNodeLocal;
 

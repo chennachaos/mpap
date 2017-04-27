@@ -4,6 +4,7 @@
 #include "MpapTime.h"
 #include "TimeFunction.h"
 #include "ImmersedIntegrationElement.h"
+#include "../utilities/SolutionData.h"
 #include "NewLagrangeElement.h"
 #include "Files.h"
 #include "StandardFEM.h"
@@ -22,7 +23,6 @@ ImmersedFlexibleSolid::ImmersedFlexibleSolid()
 
   solver = NULL;
   elems = NULL;
-
 }
 
 
@@ -45,11 +45,11 @@ ImmersedFlexibleSolid::~ImmersedFlexibleSolid()
 
   if(elems != NULL)
   {
-      for(int ii=0;ii<nElem;ii++)
-        delete elems[ii];
+    for(int ii=0;ii<nElem;ii++)
+      delete elems[ii];
 
-      delete [] elems;
-      elems = NULL;
+    delete [] elems;
+    elems = NULL;
   }
 }
 
@@ -144,8 +144,6 @@ void  ImmersedFlexibleSolid::SetSolidElements(vector<vector<int> >& elemConn)
 
   for(ee=0;ee<nElem;ee++)
   {
-    //elems[ee] = newSolidElement(SolnData.ElemProp[elemConn[ee][1]].id);
-
     elems[ee] = NewLagrangeElement(SolnData.ElemProp[elemConn[ee][1]].id);
 
     elems[ee]->elmType = elemConn[ee][0];
@@ -202,6 +200,11 @@ void  ImmersedFlexibleSolid::SetSolidElements(vector<vector<int> >& elemConn)
 
     SolnData.initialise(nNode*ndof, 0, 0, 0);
     SolnData.SetPhysicsTypetoSolid();
+    
+    fluidAcce.resize(nNode*ndof);
+    fluidAcce.setZero();
+    fluidAccePrev = fluidAcce;
+    fluidAcceCur = fluidAcce;
 
     soln.resize(nNode*ndof);
     soln.setZero();
@@ -228,6 +231,9 @@ void  ImmersedFlexibleSolid::SetNodalPositions(vector<vector<double> >&  datatem
   GeomData.specValNew.resize(nNode);
   GeomData.specValCur.resize(nNode);
 
+  GeomData.acceNew.resize(nNode);
+  GeomData.acceCur.resize(nNode);
+
   for(ii=0;ii<nNode;ii++)
   {
     for(jj=0;jj<DIM;jj++)
@@ -241,6 +247,9 @@ void  ImmersedFlexibleSolid::SetNodalPositions(vector<vector<double> >&  datatem
 
       GeomData.specValNew[ii][jj]  = 0.0;
       GeomData.specValCur[ii][jj]  = 0.0;
+
+      GeomData.acceNew[ii][jj]  = 0.0;
+      GeomData.acceCur[ii][jj]  = 0.0;
     }
   }
 
@@ -385,106 +394,202 @@ void ImmersedFlexibleSolid::writeOutput()
 }
 
 
+
 void ImmersedFlexibleSolid::postProcess(int index)
 {
-  int ii, jj, ll, ee;
+  //cout << " ImmersedFlexibleSolid::postProcess(int index) " << nNode << endl;
+
+  int ii, jj, kk, ll, ee;
 
   vtkSmartPointer<vtkPoints>              pointsVTK  =  vtkSmartPointer<vtkPoints>::New();
   vtkSmartPointer<vtkUnstructuredGrid>    uGridVTK   =  vtkSmartPointer<vtkUnstructuredGrid>::New();
-  //vtkSmartPointer<vtkPlaneSource>         plane   =  vtkSmartPointer<vtkPlaneSource>::New();
   vtkSmartPointer<vtkVertex>              vertVTK    =  vtkSmartPointer<vtkVertex>::New();
   vtkSmartPointer<vtkLine>              lineVTK    =  vtkSmartPointer<vtkLine>::New();
+  vtkSmartPointer<vtkTriangle>          triaVTK    =  vtkSmartPointer<vtkTriangle>::New();
   vtkSmartPointer<vtkQuad>              quadVTK    =  vtkSmartPointer<vtkQuad>::New();
+  vtkSmartPointer<vtkTetra>             tetraVTK   =  vtkSmartPointer<vtkTetra>::New();
+  vtkSmartPointer<vtkHexahedron>        hexVTK     =     vtkSmartPointer<vtkHexahedron>::New();
 
-  //vtkSmartPointer<vtkPolyData>  point =     vtkSmartPointer<vtkPolyData>::New();
-
+  vtkSmartPointer<vtkFloatArray>          scaVTK   =  vtkSmartPointer<vtkFloatArray>::New();
   vtkSmartPointer<vtkFloatArray>          vecVTK   =  vtkSmartPointer<vtkFloatArray>::New();
   vtkSmartPointer<vtkFloatArray>          vecVTK2  =  vtkSmartPointer<vtkFloatArray>::New();
   vtkSmartPointer<vtkFloatArray>          vecVTK3  =  vtkSmartPointer<vtkFloatArray>::New();
   vtkSmartPointer<vtkFloatArray>          vecVTK4  =  vtkSmartPointer<vtkFloatArray>::New();
 
-
-
   vtkSmartPointer<vtkXMLUnstructuredGridWriter> writerUGridVTK =  vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
 
-    double vec[3], vec2[3], xx, yy;
+    double vec[3], vec2[3], xx, yy, zz;
 
+    scaVTK->SetName("pres");
     vecVTK->SetName("disp");
     vecVTK2->SetName("velo");
     vecVTK3->SetName("acce");
     vecVTK4->SetName("force");
 
     vecVTK->SetNumberOfComponents(3);
-    vecVTK->SetNumberOfTuples(count);
+    vecVTK->SetNumberOfTuples(nNode);
     vecVTK2->SetNumberOfComponents(3);
-    vecVTK2->SetNumberOfTuples(count);
+    vecVTK2->SetNumberOfTuples(nNode);
     vecVTK3->SetNumberOfComponents(3);
-    vecVTK3->SetNumberOfTuples(count);
+    vecVTK3->SetNumberOfTuples(nNode);
     vecVTK4->SetNumberOfComponents(3);
-    vecVTK4->SetNumberOfTuples(count);
+    vecVTK4->SetNumberOfTuples(nNode);
 
-  cout << " ImmersedFlexibleSolid::postProcess(int index) " << nNode << endl;
+    vtkIdType   pt[2];
 
+    if(DIM == 2)
+    {
+      vec[2] = 0.0;
+      for(ii=0;ii<GeomData.NodePosOrig.size();ii++)
+      {
+        //xx = GeomData.NodePosOrig[ii][0];
+        //yy = GeomData.NodePosOrig[ii][1];
 
-  vector<vtkIdType>   pt(nNode);
+        xx = GeomData.NodePosNew[ii][0];
+        yy = GeomData.NodePosNew[ii][1];
 
-  for(ii=0;ii<nNode;ii++)
-  {
-    pt[ii] = pointsVTK->InsertNextPoint(GeomData.NodePosNew[ii][0], GeomData.NodePosNew[ii][1], 0.0);
-    
-    //vertVTK->GetPointIds()->SetId(0, pt[ii]);
-    
-    //uGridVTK->InsertNextCell(vertVTK->GetCellType(), vertVTK->GetPointIds());
+        pt[0] = pointsVTK->InsertNextPoint(xx, yy, 0.0);
 
-        vec[0] = SolnData.var1[ii*ndof];
-        vec[1] = SolnData.var1[ii*ndof+1];
+        //kk = node_map_old_to_new[ii]*ndof;
+        kk = ii*ndof;
+
+        vec[0] = SolnData.var1[kk];
+        vec[1] = SolnData.var1[kk+1];
         vec[2] = 0.0;
 
         vecVTK->InsertTuple(ii, vec);
 
-        vec[0] = SolnData.var1Dot[ii*ndof];
-        vec[1] = SolnData.var1Dot[ii*ndof+1];
+        vec[0] = SolnData.var1Dot[kk];
+        vec[1] = SolnData.var1Dot[kk+1];
         vec[2] = 0.0;
 
         vecVTK2->InsertTuple(ii, vec);
 
-        vec[0] = SolnData.var1DotDot[ii*ndof];
-        vec[1] = SolnData.var1DotDot[ii*ndof+1];
+        vec[0] = SolnData.var1DotDot[kk];
+        vec[1] = SolnData.var1DotDot[kk+1];
         vec[2] = 0.0;
 
         vecVTK3->InsertTuple(ii, vec);
 
-        vec[0] = SolnData.force[ii*ndof];
-        vec[1] = SolnData.force[ii*ndof+1];
+        vec[0] = SolnData.force[kk];
+        vec[1] = SolnData.force[kk+1];
         vec[2] = 0.0;
 
         vecVTK4->InsertTuple(ii, vec);
-  }
+      }
 
-  if(elems[0]->nodeNums.size() == 2)
-  {
-    for(ee=0;ee<nElem;ee++)
-    {
-      for(ll=0;ll<elems[ee]->nodeNums.size();ll++)
-        lineVTK->GetPointIds()->SetId(ll, pt[elems[ee]->nodeNums[ll]]);
-    
-      uGridVTK->InsertNextCell(lineVTK->GetCellType(), lineVTK->GetPointIds());
+      if(elems[0]->nodeNums.size() == 2) // line - for beam and truss elements
+      {
+        for(ee=0;ee<nElem;ee++)
+        {
+          for(ll=0;ll<elems[ee]->nodeNums.size();ll++)
+            lineVTK->GetPointIds()->SetId(ll, elems[ee]->nodeNums[ll]);
+
+          uGridVTK->InsertNextCell(lineVTK->GetCellType(), lineVTK->GetPointIds());
+        }
+      }
+      else if(elems[0]->nodeNums.size() == 3) // triangle element
+      {
+        for(ee=0;ee<nElem;ee++)
+        {
+          for(ll=0;ll<3;ll++)
+            triaVTK->GetPointIds()->SetId(ll, elems[ee]->nodeNums[ll]);
+
+          uGridVTK->InsertNextCell(triaVTK->GetCellType(), triaVTK->GetPointIds());
+        }
+      }
+      else if(elems[0]->nodeNums.size() == 4) // quad element
+      {
+        for(ee=0;ee<nElem;ee++)
+        {
+          quadVTK->GetPointIds()->SetId(0, elems[ee]->nodeNums[0]);
+          quadVTK->GetPointIds()->SetId(1, elems[ee]->nodeNums[1]);
+          quadVTK->GetPointIds()->SetId(2, elems[ee]->nodeNums[3]);
+          quadVTK->GetPointIds()->SetId(3, elems[ee]->nodeNums[2]);
+
+          uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
+        }
+      }
+      else
+      {
+        cout << " ERROR in 'ImmersedFlexibleSolid::postProcess()' ... this type of element is not valid " << endl;
+      }
     }
-  }
-  else if(elems[0]->nodeNums.size() == 4)
-  for(ee=0;ee<nElem;ee++)
-  {
-    quadVTK->GetPointIds()->SetId(0, elems[ee]->nodeNums[0]);
-    quadVTK->GetPointIds()->SetId(1, elems[ee]->nodeNums[1]);
-    quadVTK->GetPointIds()->SetId(2, elems[ee]->nodeNums[3]);
-    quadVTK->GetPointIds()->SetId(3, elems[ee]->nodeNums[2]);
+    else //if(DIM == 3)
+    {
+      for(ii=0;ii<GeomData.NodePosOrig.size();ii++)
+      {
+        //xx = GeomData.NodePosOrig[ii][0];
+        //yy = GeomData.NodePosOrig[ii][1];
+        //zz = GeomData.NodePosOrig[ii][2];
 
-    uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
-  }
-  else
-  {
-    cout << " Error in ... ImmersedFlexibleSolid::postProcess() "  << endl;
-  }
+        xx = GeomData.NodePosNew[ii][0];
+        yy = GeomData.NodePosNew[ii][1];
+        zz = GeomData.NodePosNew[ii][2];
+
+        pt[0] = pointsVTK->InsertNextPoint(xx, yy, zz);
+
+        //kk = node_map_old_to_new[ii]*ndof;
+        kk = ii*ndof;
+
+        vec[0] = SolnData.var1[kk];
+        vec[1] = SolnData.var1[kk+1];
+        vec[2] = SolnData.var1[kk+2];
+
+        vecVTK->InsertTuple(ii, vec);
+
+        vec[0] = SolnData.var1Dot[kk];
+        vec[1] = SolnData.var1Dot[kk+1];
+        vec[2] = SolnData.var1Dot[kk+2];
+
+        vecVTK2->InsertTuple(ii, vec);
+
+        vec[0] = SolnData.var1DotDot[kk];
+        vec[1] = SolnData.var1DotDot[kk+1];
+        vec[2] = SolnData.var1DotDot[kk+2];
+
+        vecVTK3->InsertTuple(ii, vec);
+
+        vec[0] = SolnData.force[kk];
+        vec[1] = SolnData.force[kk+1];
+        vec[2] = SolnData.force[kk+2];
+
+        vecVTK4->InsertTuple(ii, vec);
+
+        if(ndof == 4)
+        {
+          scaVTK->SetTuple1(ii, SolnData.var1[kk+3]);
+        }
+      }
+
+      if(elems[0]->nodeNums.size() == 4) // tet
+      {
+        for(ee=0;ee<nElem;ee++)
+        {
+          for(ll=0;ll<4;ll++)
+            tetraVTK->GetPointIds()->SetId(ll, elems[ee]->nodeNums[ll]);
+
+          uGridVTK->InsertNextCell(tetraVTK->GetCellType(), tetraVTK->GetPointIds());
+        }
+      }
+      else
+      {
+        for(ee=0;ee<nElem;ee++)
+        {
+          hexVTK->GetPointIds()->SetId(0, elems[ee]->nodeNums[0]);
+          hexVTK->GetPointIds()->SetId(1, elems[ee]->nodeNums[1]);
+          hexVTK->GetPointIds()->SetId(2, elems[ee]->nodeNums[3]);
+          hexVTK->GetPointIds()->SetId(3, elems[ee]->nodeNums[2]);
+
+          hexVTK->GetPointIds()->SetId(4, elems[ee]->nodeNums[4]);
+          hexVTK->GetPointIds()->SetId(5, elems[ee]->nodeNums[5]);
+          hexVTK->GetPointIds()->SetId(6, elems[ee]->nodeNums[7]);
+          hexVTK->GetPointIds()->SetId(7, elems[ee]->nodeNums[6]);
+
+          uGridVTK->InsertNextCell(hexVTK->GetCellType(), hexVTK->GetPointIds());
+        }
+      }
+    }
 
     uGridVTK->SetPoints(pointsVTK);
     uGridVTK->GetPointData()->SetVectors(vecVTK);
@@ -537,8 +642,8 @@ void ImmersedFlexibleSolid::updatePointPositions2D()
 
   //cout << " nNode = " << nNode << '\t' << ndof << endl;
 
-    for(bb=0;bb<nNode;bb++)
-    {
+  for(bb=0;bb<nNode;bb++)
+  {
       for(ii=0;ii<DIM;ii++)
       {
         ind = bb*ndof+ii;
@@ -551,11 +656,11 @@ void ImmersedFlexibleSolid::updatePointPositions2D()
         // second-order based formulation
         GeomData.specValNew[bb][ii] = SolnData.var1Dot[ind];
         GeomData.specValCur[bb][ii] = SolnData.var1DotCur[ind];
-        
-        // first-order based formulation
-        //GeomData.specValCur[bb][ii] = SolnData.var1Cur[ind+3];
+
+        GeomData.acceNew[bb][ii] = SolnData.var1DotDot[ind];
+        GeomData.acceCur[bb][ii] = SolnData.var1DotDotCur[ind];
       }
-    }
+  }
 
   //cout << " nNode = " << nNode << '\t' << ndof << endl;
 
@@ -565,6 +670,27 @@ void ImmersedFlexibleSolid::updatePointPositions2D()
 
 void ImmersedFlexibleSolid::updatePointPositions3D()
 {
+  int  ii, ind, bb;
+
+  cout << " nNode = " << nNode << '\t' << ndof << endl;
+
+  for(bb=0; bb<nNode; bb++)
+  {
+      for(ii=0; ii<3; ii++)
+      {
+        ind = bb*ndof+ii;
+
+        GeomData.NodePosNew[bb][ii] = GeomData.NodePosOrig[bb][ii] + SolnData.var1[ind];
+        GeomData.NodePosCur[bb][ii] = GeomData.NodePosOrig[bb][ii] + SolnData.var1Cur[ind];
+
+        // second-order based formulation
+        GeomData.specValNew[bb][ii] = SolnData.var1Dot[ind];
+        GeomData.specValCur[bb][ii] = SolnData.var1DotCur[ind];
+      }
+  }
+
+  //cout << " nNode = " << nNode << '\t' << ndof << endl;
+
   return;
 }
 
@@ -601,24 +727,23 @@ void ImmersedFlexibleSolid::updateForce(double* data)
   int ii, jj, ind1, ind2;
 
   SolnData.forceTemp.setZero();
+  cout << " ndof = " << ndof << endl;
 
   for(ii=0;ii<nNode;ii++)
   {
-      ind1 = ndof*ii;
-      ind2 = DIM*ii;
+    ind1 = ndof*ii;
+    ind2 = DIM*ii;
 
-      // second-order based formulation
-      for(jj=0;jj<DIM;jj++)
-        SolnData.forceTemp[ind1+jj] = -data[ind2+jj];
-
-      // first-order based formulation
-      //for(jj=0;jj<DIM;jj++)
-        //SolnData.forceTemp[ind1+3+jj] = data[ind2+jj];
+    // second-order based formulation
+    for(jj=0;jj<DIM;jj++)
+      SolnData.forceTemp[ind1+jj] = -data[ind2+jj];
   }
 
   //printf("\n\n");    printVector(SolnData.forceTemp);
 
   SolnData.interpolateForce();
+
+  fluidAcceCur = SolnData.td[2]*fluidAcce + (1.0-SolnData.td[2])*fluidAccePrev;
 
   return;
 }
@@ -637,10 +762,14 @@ void  ImmersedFlexibleSolid::updateDisplacement(double* data)
   soln.setZero();
   // update solution vector
   for(int kk=0;kk<totalDOF;kk++)
+  {
+    //cout << kk << '\t' << assy4r[kk] << endl;
+    //cout << kk << '\t' << data[kk] << endl;
     soln[assy4r[kk]] = data[kk];
-
+  }
 
   SolnData.var1Dot = soln;
+
   //cout << " totalDOF " << totalDOF << endl;
   //printVector(SolidSolnData.disp);
 

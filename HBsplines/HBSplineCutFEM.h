@@ -24,15 +24,35 @@
 //                    0 -> the domain in inactive
 //                    1 -> the domain in active
 
-// forAssyCutFEM   -  a vector<vector<int> > of size 'numDomains X gridDOF1*ndof' 
+// grid_to_cutfem_BF    -  a vector<vector<int> > of size 'numDomains X gridDOF1' 
 //                    the DOF that are not present in the current domain are given a value of '-1'
-//                    This data is used for assembling element matrix and vector
+//                    This data is used for assembling element matrix and vector.
+//                    For fluid flow this is just a vector as there is only one active domain.
 
-// forAssyCutFEM2  -  a vector<vector<int> > of size 'numDomains X domainTotalDOF[]'. 
-//                    This vector stores the global positions of each active DOF for 
-//                    the current domain.
-//                    This data is used for extracting solution for each domain from
-//                    the global solution vector
+// grid_to_cutfem_DOF    -  a vector<vector<int> > of size 'numDomains X gridDOF1*ndof' 
+//                    the DOF that are not present in the current domain are given a value of '-1'
+//                    This data is used for assembling element matrix and vector.
+//                    For fluid flow this is just a vector as there is only one active domain.
+
+// cutfem_to_grid_BF  -    a vector<vector<int> > of size 'numDomains X domainTotalDOF[]'. 
+//                        This vector stores the global positions of each active DOF for 
+//                        the current domain.
+//                        This data is used for extracting solution for each domain from
+//                        the global solution vector
+//                        For fluid flow this is just a vector as there is only one active domain.
+
+// cutfem_to_grid_DOF  -   a vector<vector<int> > of size 'numDomains X domainTotalDOF[]'. 
+//                        This vector stores the global positions of each active DOF for 
+//                        the current domain.
+//                        This data is used for extracting solution for each domain from
+//                        the global solution vector
+//                        For fluid flow this is just a vector as there is only one active domain.
+
+// grid_to_proc_BF[ii]     - node_map_old_to_new[grid_to_cutfem_BF[ii]]
+// grid_to_proc_DOF[ii]    - dof_map_old_to_new[grid_to_cutfem_DOF[ii]]
+
+// proc_to_grid_BF[ii]     - cutfem_to_grid_BF[node_map_new_to_old[ii]]
+// proc_to_grid_DOF[ii]    - cutfem_to_grid_DOF[dof_map_new_to_old[ii]]
 
 
 class HBSplineCutFEM: public HBSplineBase
@@ -41,17 +61,17 @@ class HBSplineCutFEM: public HBSplineBase
 
         int  numDomains, fluidDOF, solidDOF, CUTCELL_INTEGRATION_TYPE;
 
-        double  GHOST_PENALTY;
-
         vector<int>  domainTotalDOF, domainStartDOF, cutCellIds, fluidElementIds;
 
         vector<bool>  domainInclYesNo;
 
-        vector<int>  forAssyCutFEM, forAssyCutFEMprev, forAssyCutFEM2;
+        vector<int>  grid_to_cutfem_BF, grid_to_cutfem_BFprev, grid_to_cutfem_DOF, grid_to_cutfem_DOFprev;
+        vector<int>  cutfem_to_grid_BF, cutfem_to_grid_DOF;
+        vector<int>  grid_to_proc_BF, grid_to_proc_DOF, proc_to_grid_BF, proc_to_grid_DOF;
 
         vector<double>  cutFEMparams;
 
-        VectorXd  totalForce, slnTemp,  slnTempPrev, slnTempPrev2, slnTempCur;
+        VectorXd  slnTemp,  slnTempPrev, slnTempPrev2, slnTempCur;
 
     public:
 
@@ -104,6 +124,10 @@ class HBSplineCutFEM: public HBSplineBase
         void  applyGhostPenalty3D();
 
         int  setCoveringUncovering();
+
+        int  setCoveringUncovering1D();
+        int  setCoveringUncovering2D();
+        int  setCoveringUncovering3D();
 
         virtual  void  solveSolidProblem();
 
@@ -158,6 +182,8 @@ class HBSplineCutFEM: public HBSplineBase
         void  computeGaussPointsAdapIntegration1D();
         void  computeGaussPointsAdapIntegration2D();
         void  computeGaussPointsAdapIntegration3D();
+
+        //virtual  int  solveFluidProblem();
 
 };
 

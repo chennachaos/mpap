@@ -1,40 +1,49 @@
-#ifndef INCL_myRect_H
-#define INCL_myRect_H
+#ifndef INCL_myQuad_H
+#define INCL_myQuad_H
 
 #include "myGeomUtilities.h"
 #include "myPoly.h"
 #include "headersBasic.h"
 
+/******************************
+3--------2
+|        |
+|        |
+|        |
+0--------1
+******************************/
+
 
 namespace myGeom
 {
 
-class  myRect: public myPoly
+class  myQuad: public myPoly
 {
-   private:
+  private:
 
-   public:
+  public:
 
-    myRect(){}
+    myQuad(){}
 
-    virtual ~myRect();
+    virtual ~myQuad();
 
-    myRect(myPoint& pt1, myPoint& pt2, myPoint& pt3)
+    myQuad(myPoint& pt1, myPoint& pt2, myPoint& pt3, myPoint& pt4)
     {
       ptList.clear();
       //ptList.erase();
       ptList.push_back(pt1);
       ptList.push_back(pt2);
       ptList.push_back(pt3);
-      nVert = 3;
+      ptList.push_back(pt4);
+      nVert = 4;
     }
 
-    myRect(vector<myPoint>&   pts1)
+    myQuad(vector<myPoint>&   pts1)
     {    
-      assert(pts1.size() == 3);
+      assert(pts1.size() == 4);
 
       ptList = pts1;
-      nVert = 3;
+      nVert = 4;
     }
     
     virtual void  computeNormal();
@@ -53,9 +62,15 @@ class  myRect: public myPoly
 
     virtual  int  IntersectWithRay(const Ray& ray1, vector<myPoint>& ptOut);
 
+    virtual  int  computeGeometry(myPoint&  param, myPoint&  _geom);
+
+    virtual  int  computeNormal(myPoint&  param, myPoint&  _normal);
+
+    virtual  int  computeBasisFunctions(myPoint& param, myPoint& geom, VectorXd&  Nb, double& Jac);
+
 };
 
 }
 
 
-#endif //INCL_myRect_H
+#endif //INCL_myQuad_H

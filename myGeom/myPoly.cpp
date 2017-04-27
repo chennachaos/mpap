@@ -15,10 +15,12 @@ myPoly::myPoly()
   nVert = 0;
 }
 
+
 void  myPoly::computeNormal()
 {
   return;
 }
+
 
 double myPoly::area()
 {
@@ -45,25 +47,30 @@ area2D_Polygon( int n, Point* V )
   return 0.0;
 }
 
+
 double myPoly::surfaceArea()
 {
   return 0.0;
 }
+
 
 double myPoly::volume()
 {
   return 0.0;
 }
 
+
 double myPoly::volumeFromGaussPoints(int deg)
 {
   return 0.0;
 }
 
+
 void myPoly::getGaussPointsCUTFEM(int deg, vector<myPoint>& gps, vector<double>& gws )
 {
   return;
 }
+
 
 int myPoly::orientation()
 {
@@ -106,6 +113,7 @@ orientation2D_Polygon( int n, Point* V )
   return 0;
 }
 
+
 void myPoly::reverseOrientation()
 {
   return ;
@@ -129,26 +137,35 @@ void myPoly::reverseOrientation()
 
 void  myPoly::computeAABB()
 {
-  bbox.initialize();
+  //bbox.initialize();
   
   int ii, jj;
 
-  for(ii=0;ii<nVert;ii++)
+  bbox.minBB[0] = ptList[0][0] ;
+  bbox.minBB[1] = ptList[0][1] ;
+  bbox.minBB[2] = ptList[0][2] ;
+
+  bbox.maxBB[0] = ptList[0][0] ;
+  bbox.maxBB[1] = ptList[0][1] ;
+  bbox.maxBB[2] = ptList[0][2] ;
+
+  for(ii=1; ii<nVert; ii++)
   {
     for(jj=0; jj<3; jj++)
     {
-      //bbox.minBB[jj] = min(bbox.minBB[jj], ptList[ii][jj]);
-      //bbox.maxBB[jj] = max(bbox.maxBB[jj], ptList[ii][jj]);
-      if( ptList[ii][jj] < bbox.minBB[jj]  )
-        bbox.minBB[jj] = ptList[ii][jj] ;
+      bbox.minBB[jj] = min(bbox.minBB[jj], ptList[ii][jj]);
+      bbox.maxBB[jj] = max(bbox.maxBB[jj], ptList[ii][jj]);
 
-      if( ptList[ii][jj] > bbox.maxBB[jj]  )
-        bbox.maxBB[jj] = ptList[ii][jj] ;
+      //if( ptList[ii][jj] < bbox.minBB[jj]  )
+        //bbox.minBB[jj] = ptList[ii][jj] ;
+
+      //if( ptList[ii][jj] > bbox.maxBB[jj]  )
+        //bbox.maxBB[jj] = ptList[ii][jj] ;
     }
   }
-  
+
   return;
-}  
+}
   
   
 

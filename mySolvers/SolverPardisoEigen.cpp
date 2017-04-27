@@ -51,9 +51,7 @@ SolverPardisoEigen::SolverPardisoEigen()
 
 SolverPardisoEigen::~SolverPardisoEigen()
 {
-  int phase = -1, error = 0;
-
-  double ddum;
+  phase = -1; error = 0;
 
   pardiso_(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
            &nRow, array, &csr[0], &col[0], &perm[0], &NRHS,
@@ -80,9 +78,9 @@ int SolverPardisoEigen::initialise(int numProc, int matrixType, int nr)
   //if (currentStatus != PATTERN_OK)
     //{ prgWarning(1,fct,"prepare matrix pattern first!"); return 1; }
 
-  double ddum;
+  phase = 11; error = 0;
+  int  mtxType = 11, idum;
 
-  int  phase = 11, error = 0, mtxType = 11, idum;
 
   char *tmp;
 
@@ -95,6 +93,19 @@ int SolverPardisoEigen::initialise(int numProc, int matrixType, int nr)
     default:                 prgWarning(1,fct,"matrix assumed to be unsymmetric!");
   }
 /*
+  IPARM[3] = 31;
+//  IPARM[4] = 0;  // user input permutation
+//  IPARM[4] = 2;  // return the permutation
+//  IPARM[5] = 1;  // overwrite RHS with solution
+//  IPARM[7] = 1;  // max number of iterative refinement steps
+  IPARM[9] = 4;
+  IPARM[18] = 1;
+  //IPARM[27] = 0; // Parallel METIS ordering
+  IPARM[31] = 0; // IPARM(32) = 0 -> sparse direct solver (default) 
+  //IPARM[31] = 1; // IPARM(32)=1 -> iterative method  
+  //IPARM[9] = 1;
+*/
+
   SOLVER = 0;       // sparse direct solver
   //SOLVER = 1;       // multi-recursive iterative solver
   MTYPE  = mtxType; // matrix type
@@ -106,47 +117,10 @@ int SolverPardisoEigen::initialise(int numProc, int matrixType, int nr)
 
   IPARM[0] = 0;     // PARADISO will set IPARM to default values
   //IPARM[0] = 1;     // user input values to IPARM
-
-  IPARM[1] = 2;
-
-  IPARM[2] = max(1,numProc);  // number of processors (no default value available)
-  
-  IPARM[3] = 31;
-
-//  IPARM[4] = 0;  // user input permutation
-//  IPARM[4] = 2;  // return the permutation
-//  IPARM[5] = 1;  // overwrite RHS with solution
-//  IPARM[7] = 1;  // max number of iterative refinement steps
-  IPARM[9] = 4;
-
-  IPARM[18] = 1;
-
-  //IPARM[27] = 0; // Parallel METIS ordering
-  
-  IPARM[31] = 0; // IPARM(32) = 0 -> sparse direct solver (default) 
-  //IPARM[31] = 1; // IPARM(32)=1 -> iterative method
-
-  //cout << " numProc " << numProc << endl;
-  
-  //IPARM[9] = 1;
-*/
-
-  SOLVER = 0;       // sparse direct solver
-  MTYPE  = mtxType; // matrix type
-  MAXFCT = 1;       // maximum number of factorisations of same sparsity pattern
-                    //      to be kept in memory
-  MNUM   = 1;       // which factorisation to use
-  NRHS   = 1;       // number of right hand sides
-  MSGLVL = 0;       // output message level (1 -> print statistical information)
-
-  IPARM[0] = 0;     // PARADISO will set IPARM to default values
+  //IPARM[1] = 2;
 
   IPARM[2] = max(1,numProc);  // number of processors (no default value available)
   
-  //cout << " numProc " << numProc << endl;
-  
-  //IPARM[9] = 1;
-
   tmp = getenv("OMP_NUM_THREADS");
 
   if (tmp != NULL) 
@@ -185,34 +159,6 @@ int SolverPardisoEigen::initialise(int numProc, int matrixType, int nr)
   array = mtx.valuePtr();
 
   //cout << " hhhhhhhhhhhhhhhhh " << endl;
-  //cout << mtx.nonZeros() << endl;
-/*
-   Graph G(nRow);
-
-   for(int k=0; k<mtx.outerSize(); ++k)
-   for(SparseMatrixXd::InnerIterator it(mtx,k); it; ++it)
-     add_edge(it.row(), it.col(), G);
-
-    cout << " hhhhhhhhhhhhhhhhh " << endl;
-    property_map<Graph, vertex_index_t>::type     index_map = get(vertex_index, G);
-
-    //cout << "original bandwidth: " << bandwidth(G) << endl;
-
-    vector<Vertex> inv_perm(num_vertices(G));
-    //vector<size_type> perm(num_vertices(G));
-
-    //reverse cuthill_mckee_ordering
-    cout << " hhhhhhhhhhhhhhhhh " << endl;
-    cuthill_mckee_ordering(G, inv_perm.rbegin(), get(vertex_color, G), make_degree_map(G));
-    cout << " hhhhhhhhhhhhhhhhh " << endl;
-    perm.resize(nrow);
-    for(size_type c = 0; c != inv_perm.size(); ++c)
-      perm[index_map[inv_perm[c]]] = c+1;
-
-    //cout << "  bandwidth: " << bandwidth(G, make_iterator_property_map(&perm[0], index_map, perm[0])) << endl;
-*/
-  //IPARM[4] = 0;  // user input permutation
-  //IPARM[4] = 2;  // return the permutation
 
   perm.resize(nRow);
 
@@ -220,23 +166,6 @@ int SolverPardisoEigen::initialise(int numProc, int matrixType, int nr)
            &nRow, array, &csr[0], &col[0], &perm[0], &NRHS,
            IPARM, &MSGLVL, &ddum, &ddum, &error, DPARM);
 
-  //cout << " ppppppppppp " << IPARM[14] << '\t' << IPARM[15] <<  endl;
-  //cout << " llllllllll " << endl;
-
-/*
-   pFile2 = fopen("matrix-pattern-with-rcm.dat","w");
-
-   fprintf(pFile2, "%9d \t %9d \n", nRow, nCol );
-
-   //for(int k=0; k<10; ++k)
-     //cout << k << '\t' << perm[k] << endl;
-
-   for(int k=0; k<mtx.outerSize(); ++k)
-   for(SparseMatrixXd::InnerIterator it(mtx,k); it; ++it)
-     fprintf(pFile2, "%9d \t %9d \n", perm[it.row()], perm[it.col()]);
-
-   fclose (pFile2);
-*/
 
   if (error != 0)
   {
@@ -269,8 +198,7 @@ int SolverPardisoEigen::factorise()
   if (currentStatus != ASSEMBLY_OK) 
     { prgWarning(1,fct,"assemble matrix first!"); return 1; }
 
-  int phase = 22, idum, error = 0;
-  double ddum;
+  phase = 22; error = 0;
 
   computerTime.go(fct);
 
@@ -301,7 +229,7 @@ int SolverPardisoEigen::solve()
   if (currentStatus != FACTORISE_OK)
     { prgWarning(1,fct,"factorise matrix first!"); return 1; }
 
-  int phase = 33, idum, error = 0;
+  phase = 33; error = 0;
 
   computerTime.go(fct);
   soln.setZero();
@@ -327,7 +255,7 @@ int SolverPardisoEigen::factoriseAndSolve()
   if (currentStatus != ASSEMBLY_OK) 
     { prgWarning(1,fct,"assemble matrix first!"); return 1; }
 
-  int phase = 23, error = 0;
+  phase = 23; error = 0;
 
   computerTime.go(fct);
   soln.setZero();
@@ -349,8 +277,7 @@ int SolverPardisoEigen::factoriseAndSolve()
 
 void SolverPardisoEigen::free()
 {
-  int phase = -1, error = 0;
-  double ddum;
+  phase = -1; error = 0;
 
   pardiso_(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
            &nRow, array, &csr[0], &col[0], &perm[0], &NRHS,
@@ -363,5 +290,64 @@ void SolverPardisoEigen::free()
   return;
 }
     
+
+
+
+
+
+/*
+   Graph G(nRow);
+
+   for(int k=0; k<mtx.outerSize(); ++k)
+   for(SparseMatrixXd::InnerIterator it(mtx,k); it; ++it)
+     add_edge(it.row(), it.col(), G);
+
+    cout << " hhhhhhhhhhhhhhhhh " << endl;
+    property_map<Graph, vertex_index_t>::type     index_map = get(vertex_index, G);
+
+    //cout << "original bandwidth: " << bandwidth(G) << endl;
+
+    vector<Vertex> inv_perm(num_vertices(G));
+    //vector<size_type> perm(num_vertices(G));
+
+    //reverse cuthill_mckee_ordering
+    cout << " hhhhhhhhhhhhhhhhh " << endl;
+    cuthill_mckee_ordering(G, inv_perm.rbegin(), get(vertex_color, G), make_degree_map(G));
+    cout << " hhhhhhhhhhhhhhhhh " << endl;
+    perm.resize(nrow);
+    for(size_type c = 0; c != inv_perm.size(); ++c)
+      perm[index_map[inv_perm[c]]] = c+1;
+
+    //cout << "  bandwidth: " << bandwidth(G, make_iterator_property_map(&perm[0], index_map, perm[0])) << endl;
+
+  //IPARM[4] = 0;  // user input permutation
+  //IPARM[4] = 2;  // return the permutation
+
+  perm.resize(nRow);
+
+  pardiso_(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
+           &nRow, array, &csr[0], &col[0], &perm[0], &NRHS,
+           IPARM, &MSGLVL, &ddum, &ddum, &error, DPARM);
+
+  //cout << " ppppppppppp " << IPARM[14] << '\t' << IPARM[15] <<  endl;
+  //cout << " llllllllll " << endl;
+
+
+   pFile2 = fopen("matrix-pattern-with-rcm.dat","w");
+
+   fprintf(pFile2, "%9d \t %9d \n", nRow, nCol );
+
+   //for(int k=0; k<10; ++k)
+     //cout << k << '\t' << perm[k] << endl;
+
+   for(int k=0; k<mtx.outerSize(); ++k)
+   for(SparseMatrixXd::InnerIterator it(mtx,k); it; ++it)
+     fprintf(pFile2, "%9d \t %9d \n", perm[it.row()], perm[it.col()]);
+
+   fclose (pFile2);
+*/
+
+
+
 
 

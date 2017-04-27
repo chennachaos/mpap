@@ -164,6 +164,44 @@ void ImmersedIntegrationElement::computeVelocityCur(const VectorXd& NN, myPoint&
 
 
 
+void ImmersedIntegrationElement::computeAcceleration(const VectorXd& NN, myPoint&  velSpec)
+{
+  assert(NN.rows() == pointNums.size());
+
+  int  ii, jj;
+  velSpec.setZero();
+  for(ii=0;ii<pointNums.size();ii++)
+  {
+    for(jj=0; jj<DIM; jj++)
+      velSpec[jj] += (GeomDataLag->acceNew[pointNums[ii]][jj] * NN[ii] );
+  }
+
+  return;
+}
+
+
+
+
+void ImmersedIntegrationElement::computeAccelerationCur(const VectorXd& NN, myPoint&  velSpec)
+{
+  assert(NN.rows() == pointNums.size());
+
+  //cout << " pointNums ...  " << pointNums[0] << '\t' << pointNums[1] << endl;
+
+  int  ii, jj;
+  velSpec.setZero();
+  for(ii=0;ii<pointNums.size();ii++)
+  {
+    for(jj=0; jj<DIM; jj++)
+      velSpec[jj] += (GeomDataLag->acceCur[pointNums[ii]][jj] * NN[ii] );
+  }
+
+  return;
+}
+
+
+
+
 void ImmersedIntegrationElement::IntegrateForceAndMoment(VectorXd& vectemp, myPoint& centLoc)
 {
   // to compute total force on the immersed rigid solid

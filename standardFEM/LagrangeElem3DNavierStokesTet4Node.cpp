@@ -110,10 +110,10 @@ int LagrangeElem3DNavierStokesTet4Node::calcStiffnessAndResidual(MatrixXd& Kloca
   //bforce[1]  = elmDat[7]*timeFunction[0].prop ;
   //bforce[2]  = elmDat[7]*timeFunction[0].prop ;
 
-
   double  dt = mpapTime.dt;
   double  af = SolnData->td(2);
-  double  acceFact = SolnData->td(5);
+  double  am = SolnData->td(1);
+  double  acceFact = am*SolnData->td(9);
   double  muTaf = mu*af;
 
   double  tCur = mpapTime.cur - (1.0-af)*dt;
@@ -452,7 +452,8 @@ int LagrangeElem3DNavierStokesTet4Node::calcStiffnessAndResidual(MatrixXd& Kloca
 
   double  dt = mpapTime.dt;
   double  af = SolnData->td(2);
-  double  acceFact = SolnData->td(5);
+  double  am = SolnData->td(1);
+  double  acceFact = am*SolnData->td(9);
   double  muTaf = mu*af;
 
   double  tCur = mpapTime.cur - (1.0-af)*dt;

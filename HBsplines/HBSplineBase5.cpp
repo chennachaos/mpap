@@ -1,8 +1,12 @@
 
 #include "HBSplineBase.h"
-#include "SolverPardisoEigen.h"
-#include "SolverMA41Eigen.h"
+
 #include "SolverEigen.h"
+#include "SolverMA41Eigen.h"
+#include "SolverPardisoEigen.h"
+
+#include "SolverPetsc.h"
+#include "SolverPardisoPetsc.h"
 
 
 int  HBSplineBase::findCellNumber(const myPoint& geom)
@@ -334,6 +338,39 @@ void HBSplineBase::setSolver(int slv, int *parm, bool cIO)
 
             if(solverPetsc->initialise(0, 0, totalDOF) != 0)
               return;
+
+            solverPetsc->SetSolverAndParameters();
+
+            //solverPetsc->printInfo();
+
+        break;
+
+        case  9: // PARDISO(sym) with Petsc
+        case  10: // PARDISO(unsym) with Petsc
+
+            SOLVER_TYPE = SOLVER_TYPE_PETSC;
+
+            solverPetsc = (SolverPetsc*) new SolverPardisoPetsc;
+
+            if(parm != NULL)
+              numProc = parm[0];
+            else
+              numProc = 1;
+
+            numProc = min(MAX_PROCESSORS,numProc);
+
+            prepareMatrixPattern();
+
+            if(slv == 9)
+            {
+              if(solverPetsc->initialise(numProc, PARDISO_STRUCT_SYM, totalDOF) != 0)
+                return;
+            }
+            if(slv == 10)
+            {
+              if(solverPetsc->initialise(numProc, PARDISO_UNSYM, totalDOF) != 0)
+                return;
+            }
 
             solverPetsc->SetSolverAndParameters();
 

@@ -49,7 +49,7 @@ StandardFEM::StandardFEM()
     tol = -2.0;
 
     solverEigen  = NULL;
-    solverPetsc = NULL;
+    solverPetsc  = NULL;
     elems  = NULL;
 
     localStiffnessError = 0;
@@ -509,14 +509,12 @@ void StandardFEM::prepareInputData()
     nElem = elemConn.size();
     npElem = elemConn[0].size()-3;
 
-    //cout << " nNode and nElem " << nNode << '\t' << nElem << '\t' << ElemProp[elemConn[0][0]].id << endl;
+    cout << " nNode and nElem " << nNode << '\t' << nElem << '\t' << SolnData.ElemProp[elemConn[0][0]].id << endl;
 
     elems = new LagrangeElement* [nElem];
 
     for(ee=0;ee<nElem;ee++)
     {
-      //elems[ee] = newSolidElement(ElemProp[elemConn[ee][0]].id);
-
       elems[ee] = NewLagrangeElement(SolnData.ElemProp[elemConn[ee][0]].id);
 
       elems[ee]->elmType  =  elemConn[ee][0];
@@ -588,6 +586,8 @@ void StandardFEM::prepareInputData()
     solidElems.push_back(27);
     solidElems.push_back(28);
     solidElems.push_back(29);
+    solidElems.push_back(30);
+    solidElems.push_back(31);
 
     fluidElems.push_back(10);
     fluidElems.push_back(11);
@@ -773,9 +773,9 @@ void StandardFEM::setInitialConditions()
 
       fact = 100.0*sin(PI*yy/12.0);
 
-      SolnData.var1Dot[ind]    =  fact*zz;
-      SolnData.var1Dot[ind+1]  =  0.0;
-      SolnData.var1Dot[ind+2]  = -fact*xx;
+      //SolnData.var1Dot[ind]    =  fact*zz;
+      //SolnData.var1Dot[ind+1]  =  0.0;
+      //SolnData.var1Dot[ind+2]  = -fact*xx;
 
       //SolnData.var1Dot[ind]    =  5.0*yy/3.0;
       //SolnData.var1Dot[ind+1]  =  0.0;
@@ -908,7 +908,7 @@ void StandardFEM::updateIterStep()
       }
     }
   }
-  
+
   return;
 }
 
@@ -941,7 +941,7 @@ void StandardFEM::addExternalForces()
 void StandardFEM::writeNodalData()
 {
     int ii, jj, bb, ee, type, nn1, nn2=0, dof;
-    double val, fact;
+    double val, fact=1.0;
     
     for(ee=0; ee<OutputData.size(); ee++)
     {

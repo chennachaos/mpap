@@ -1,6 +1,5 @@
 
 #include "AdaptiveBinarytree.h"
-
 #include "util.h"
 
 /*
@@ -155,7 +154,6 @@ void AdaptiveBinarytree<2>::computeGaussPoints(int refLev2, int inclDom, int chk
               {
                 quadTemp.gausspoints.push_back(param);
                 quadTemp.gaussweights.push_back(GeomData->gaussweights[gp]*JacMultElem);
-
                 count++;
               }
           } // for(gp=0; gp<GeomData->gausspoints.size(); gp++)

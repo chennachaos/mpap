@@ -8,15 +8,12 @@
 #include "ComputerTime.h"
 #include "MpapTime.h"
 #include "TimeFunction.h"
-#include "PlotVTK.h"
 #include "PropertyTypeEnum.h"
-
 #include "Global.h"
 #include "MyString.h"
 #include "FunctionsEssGrp.h"
-
 #include "UnixGlobal.h"
-
+#include "petsc.h"
 #include <omp.h>
 
 
@@ -24,7 +21,6 @@ extern DomainTree         domain;
 extern List<TimeFunction> timeFunction;
 extern MpapTime           mpapTime;
 extern ComputerTime       computerTime;
-extern PlotVTK  plotvtk;
 
 
 using namespace std;
@@ -34,6 +30,12 @@ using namespace std;
 //
 int main(int argc, char* argv[])
 {
+  PetscErrorCode ierr;
+
+  //PetscInitialize(NULL,NULL,(char *)0,NULL);
+
+  PetscInitialize(NULL, NULL, "petsc_options.dat", NULL);
+
   // FSI with standard elements
   // Example from the paper 
   // Stabilization of explicit coupling in fluid–structure interaction involving fluid incompressibility
@@ -42,7 +44,7 @@ int main(int argc, char* argv[])
   //
 
     int parm[5], ii, jj, iter, niter=10, solv=1;
-    parm[0] = 2;
+    parm[0] = 1;
 
     int  resln[]={1,1,1};
     int tis = 3 ;
@@ -52,7 +54,7 @@ int main(int argc, char* argv[])
     vector<double>  stagParams(3);
 
     stagParams[0] = 0;
-    stagParams[1] = 2;
+    stagParams[1] = 1;
     //stagParams[2] = 1.2/(1.0+1.2)/200.0;
     stagParams[2] = 0.1;
 
@@ -100,7 +102,7 @@ int main(int argc, char* argv[])
 
     sfemSolid.SolnData.SetStaggeredParams(stagParams);
     
-    sfemSolid.SetSolidOrFluid(1);
+    sfemSolid.SetPhysicsTypetoSolid();
 
     sfemSolid.SetVTKfilename("FSIsolid");
 
@@ -140,7 +142,7 @@ int main(int argc, char* argv[])
 
     sfemFluid.SolnData.SetRho(rho);
 
-    sfemFluid.SetSolidOrFluid(0);
+    sfemFluid.SetPhysicsTypetoFluid();
 
     sfemFluid.SetVTKfilename("FSIfluid");
 
@@ -181,7 +183,7 @@ int main(int argc, char* argv[])
 
     sfemMesh.SolnData.SetRho(rho);
 
-    sfemMesh.SetSolidOrFluid(1);
+    sfemMesh.SetPhysicsTypetoSolid();
 
     sfemMesh.SetVTKfilename("FSIMesh");
 
@@ -250,7 +252,7 @@ int main(int argc, char* argv[])
       timeFunction[ii].update();
 
 
-    double  dt=0.0001, tf=0.2, tCur;
+    double  dt=0.0001, tf=0.01, tCur;
 
 
 
@@ -295,7 +297,7 @@ int main(int argc, char* argv[])
         sfemSolid.postProcess(0, 0, 1, 0, 0.0, 1.0, resln);
 
 
-        /*
+        //
         // mesh solver
         ///////////////////////////
 
@@ -328,9 +330,7 @@ int main(int argc, char* argv[])
           sfemFluid.GeomData.NodePosNew[ii][0] = sfemMesh.GeomData.NodePosNew[ii][0];
           sfemFluid.GeomData.NodePosNew[ii][1] = sfemMesh.GeomData.NodePosNew[ii][1];
         }
-        */
-
-
+        //
         // update fluid mesh and 
         // velocity BCs for the fluid problem
         ///////////////////////////
@@ -341,12 +341,12 @@ int main(int argc, char* argv[])
           for(jj=0; jj<2; jj++)
           {
             //cout << ii << '\t' << sfemSolid.SolnData.var1DotCur[intfSolid[ii]*2+jj] << endl;
-            sfemFluid.SolnData.var1applied[intfFluid[ii]*3+jj] = sfemSolid.SolnData.var1Dot[intfSolid[ii]*2+jj];
+            sfemFluid.SolnData.var1[intfFluid[ii]*3+jj] = sfemSolid.SolnData.var1Dot[intfSolid[ii]*2+jj];
+            //sfemFluid.SolnData.var1applied[intfFluid[ii]*3+jj] = sfemSolid.SolnData.var1Dot[intfSolid[ii]*2+jj];
           }
         }
 
         cout << " kkkkkkkkkkk " << endl;
-
 
         // solve fluid problem
         ///////////////////////////
@@ -383,10 +383,11 @@ int main(int argc, char* argv[])
         tCur += dt;
     }
 
+    ierr = PetscFinalize();//CHKERRQ(ierr);
+
     cout << " \n\n\n Propgram successful ... \n\n\n " << endl;
 
-
-  return 0;
+    return 0;
 }
 
 

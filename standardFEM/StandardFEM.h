@@ -13,9 +13,6 @@
 #include <petscmat.h>
 #include <petscksp.h>
 
-//using namespace std;
-//using namespace Eigen;
-
 //class  SolutionData ;
 //class  GeomDataLagrange;
 class  SolverEigen;
@@ -54,8 +51,10 @@ class PropertyItem;
                                     "LagrangeElem2DStructSolidTria3NodeStab", \
                                     "LagrangeElem2DStructSolidQuad4NodeStab", \
                                     "LagrangeElem3DStructSolidTet4NodeStab", \
-                                    "LagrangeElem3DStructSolidHex8NodeStab", NULL}
-
+                                    "LagrangeElem3DStructSolidHex8NodeStab", \
+                                    "MindlinPlateElement", \
+                                    "KirchhoffPlateElement", \
+                                    "LagrangeElem3DShellQuad4Node",NULL}
 
 
 class StandardFEM: public Domain

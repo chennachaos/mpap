@@ -95,7 +95,7 @@ int LagrangeElem2DNavierStokesTria3Node::calcStiffnessAndResidual(MatrixXd& Kloc
     VectorXd  res(3), dp(2), Du(2), vel(2), velDot(2), force(2), res2(2), rStab(2), gradTvel(2), velPrev(2);
     MatrixXd  Dj(2, 3), grad(2,2), gradN(2,2), stress(2,2), matG(3,3), matJ(2,2), matJinv(2,2);
 
-    elmDat = &(SolnData->ElemProp.data[0]);
+    elmDat = &(SolnData->ElemProp[elmType].data[0]);
     //matDat = &(SolidSolnData->MatlProp.data[0]);
 
     rho = elmDat[4];
@@ -121,9 +121,9 @@ int LagrangeElem2DNavierStokesTria3Node::calcStiffnessAndResidual(MatrixXd& Kloc
     tau[1] = elmDat[9]*stabParam;  // PSPG
     tau[2] = elmDat[10]*stabParam; // LSIC
 
-    nGP1 = elmDat[0];
+    nGP = elmDat[0];
 
-    getGaussPointsTriangle(nGP1, GeomData->gausspoints1, GeomData->gausspoints2, GeomData->gaussweights1);
+    getGaussPointsTriangle(nGP, GeomData->gausspoints1, GeomData->gausspoints2, GeomData->gaussweights1);
 
     Klocal.setZero();
     Flocal.setZero();
@@ -131,7 +131,7 @@ int LagrangeElem2DNavierStokesTria3Node::calcStiffnessAndResidual(MatrixXd& Kloc
     //cout << " AAAAAAAAAA " << endl;
     //cout << nGP1 << '\t' << nGP2 << endl;
 
-    for(gp1=0;gp1<nGP1;gp1++)
+    for(gp1=0;gp1<nGP;gp1++)
     {
           param[0] = GeomData->gausspoints1[gp1];
           param[1] = GeomData->gausspoints2[gp1];
@@ -142,22 +142,22 @@ int LagrangeElem2DNavierStokesTria3Node::calcStiffnessAndResidual(MatrixXd& Kloc
           
           LagrangeBasisFunsTria(degree, param[0], param[1], &N(0), dN_du[0], dN_du[1]);
           
-          matJ.setZero();
-          for(ii=0;ii<npElem;ii++)
-          {
-            matJ(0,0) +=  (x[ii] * dN_du[0][ii]) ;
-            matJ(1,0) +=  (x[ii] * dN_du[1][ii]) ;
-            matJ(0,1) +=  (y[ii] * dN_du[0][ii]) ;
-            matJ(1,1) +=  (y[ii] * dN_du[1][ii]) ;
-          }
+          //matJ.setZero();
+          //for(ii=0;ii<npElem;ii++)
+          //{
+            //matJ(0,0) +=  (x[ii] * dN_du[0][ii]) ;
+            //matJ(1,0) +=  (x[ii] * dN_du[1][ii]) ;
+            //matJ(0,1) +=  (y[ii] * dN_du[0][ii]) ;
+            //matJ(1,1) +=  (y[ii] * dN_du[1][ii]) ;
+          //}
 
-          matJinv = matJ.inverse();
+          //matJinv = matJ.inverse();
 
-          matG.setZero();
-          matG(0,0) = matJinv(0,0);
-          matG(0,1) = matJinv(0,1);
-          matG(1,0) = matJinv(1,0);
-          matG(1,1) = matJinv(1,1);
+          //matG.setZero();
+          //matG(0,0) = matJinv(0,0);
+          //matG(0,1) = matJinv(0,1);
+          //matG(1,0) = matJinv(1,0);
+          //matG(1,1) = matJinv(1,1);
           
           //printf("%12.6f \t %12.6f \t %12.6f \n", volume, h, Jac);
           //printf("%12.6f \t %12.6f \t %12.6f \t %12.6f \n", matB(0,0), matB(0,1), matB(1,0), matB(1,1));
@@ -230,13 +230,13 @@ int LagrangeElem2DNavierStokesTria3Node::calcStiffnessAndResidual(MatrixXd& Kloc
 
           //evaluateStabParams_algo1(&velTemp(0), h, rho, mu, dt,  beta, tau);
 
-          evaluateStabParams_algo2(&velTemp(0), h, rho, mu, dt,  beta, tau);
+          //evaluateStabParams_algo2(&velTemp(0), h, rho, mu, dt,  beta, tau);
 
           //evaluateStabParams_algo3(velTemp, matG, dt, rho, mu, CI, tau);
 
-          tau[0] *= elmDat[8];  // SUPG
-          tau[1] *= elmDat[9];  // PSPG
-          tau[2] *= elmDat[10]; // LSIC
+          //tau[0] *= elmDat[8];  // SUPG
+          //tau[1] *= elmDat[9];  // PSPG
+          //tau[2] *= elmDat[10]; // LSIC
 
           for(ii=0;ii<nlbf;ii++)
           {
@@ -392,7 +392,7 @@ int LagrangeElem2DNavierStokesTria3Node::calcStiffnessAndResidual(MatrixXd& Kloc
 
 
 
-//
+/*
 int LagrangeElem2DNavierStokesTria3Node::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)
 {
 //   char fct[] = "LagrangeElem2DNavierStokes4Node::calcStiffnessAndResidual";
@@ -730,11 +730,11 @@ int LagrangeElem2DNavierStokesTria3Node::calcStiffnessAndResidual(MatrixXd& Kloc
 
   return 0;
 }
+*/
+
+
+
 //
-
-
-
-/*
 int LagrangeElem2DNavierStokesTria3Node::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)
 {
 //   char fct[] = "LagrangeElem2DNavierStokes4Node::calcStiffnessAndResidual";
@@ -764,7 +764,7 @@ int LagrangeElem2DNavierStokesTria3Node::calcStiffnessAndResidual(MatrixXd& Kloc
     VectorXd  res(3), dp(2), Du(2), vel(2), velDot(2), force(2), res2(2), rStab(2), gradTvel(2), velPrev(2);
     MatrixXd  Dj(2, 3), grad(2,2), gradN(2,2), stress(2,2), gradPrev(2,2), matG(3,3), matJ(2,2), matJinv(2,2);
 
-    elmDat = &(SolnData->ElemProp.data[0]);
+    elmDat = &(SolnData->ElemProp[elmType].data[0]);
     //matDat = &(SolidSolnData->MatlProp.data[0]);
 
     rho = elmDat[4];
@@ -790,17 +790,22 @@ int LagrangeElem2DNavierStokesTria3Node::calcStiffnessAndResidual(MatrixXd& Kloc
     tau[1] = elmDat[9]*stabParam;  // PSPG
     tau[2] = elmDat[10]*stabParam; // LSIC
 
-    nGP1 = elmDat[0];
+    nGP = elmDat[0];
 
-    getGaussPointsTriangle(nGP1, GeomData->gausspoints1, GeomData->gausspoints2, GeomData->gaussweights1);
+    getGaussPointsTriangle(nGP, GeomData->gausspoints1, GeomData->gausspoints2, GeomData->gaussweights1);
 
+    if(Klocal.rows() != nsize)
+    {
+      Klocal.resize(nsize, nsize);
+      Flocal.resize(nsize);
+    }
     Klocal.setZero();
     Flocal.setZero();
-    
-    //cout << " AAAAAAAAAA " << endl;
-    //cout << nGP1 << '\t' << nGP2 << endl;
 
-    for(gp1=0;gp1<nGP1;gp1++)
+    //cout << " AAAAAAAAAA " << endl;
+    //cout << nGP << '\t' << nGP << endl;
+
+    for(gp1=0;gp1<nGP;gp1++)
     {
           param[0] = GeomData->gausspoints1[gp1];
           param[1] = GeomData->gausspoints2[gp1];
@@ -811,28 +816,28 @@ int LagrangeElem2DNavierStokesTria3Node::calcStiffnessAndResidual(MatrixXd& Kloc
           
           LagrangeBasisFunsTria(degree, param[0], param[1], &N(0), dN_du[0], dN_du[1]);
           
-          matJ.setZero();
-          for(ii=0;ii<npElem;ii++)
-          {
-            matJ(0,0) +=  (x[ii] * dN_du[0][ii]) ;
-            matJ(1,0) +=  (x[ii] * dN_du[1][ii]) ;
-            matJ(0,1) +=  (y[ii] * dN_du[0][ii]) ;
-            matJ(1,1) +=  (y[ii] * dN_du[1][ii]) ;
-          }
+          //matJ.setZero();
+          //for(ii=0;ii<npElem;ii++)
+          //{
+            //matJ(0,0) +=  (x[ii] * dN_du[0][ii]) ;
+            //matJ(1,0) +=  (x[ii] * dN_du[1][ii]) ;
+            //matJ(0,1) +=  (y[ii] * dN_du[0][ii]) ;
+            //matJ(1,1) +=  (y[ii] * dN_du[1][ii]) ;
+          //}
 
-          matJinv = matJ.inverse();
+          //matJinv = matJ.inverse();
 
-          matG.setZero();
-          matG(0,0) = matJinv(0,0);
-          matG(0,1) = matJinv(0,1);
-          matG(1,0) = matJinv(1,0);
-          matG(1,1) = matJinv(1,1);
+          //matG.setZero();
+          //matG(0,0) = matJinv(0,0);
+          //matG(0,1) = matJinv(0,1);
+          //matG(1,0) = matJinv(1,0);
+          //matG(1,1) = matJinv(1,1);
           
           //printf("%12.6f \t %12.6f \t %12.6f \n", volume, h, Jac);
           //printf("%12.6f \t %12.6f \t %12.6f \t %12.6f \n", matB(0,0), matB(0,1), matB(1,0), matB(1,1));
           //printf("%12.6f \t %12.6f \t %12.6f \t %12.6f \n", matG(0,0), matG(0,1), matG(1,0), matG(1,1));
 
-          matG = matG.transpose()*matG;
+          //matG = matG.transpose()*matG;
 
           vel(0) = computeValueCur(0, N);
           vel(1) = computeValueCur(1, N);
@@ -904,13 +909,13 @@ int LagrangeElem2DNavierStokesTria3Node::calcStiffnessAndResidual(MatrixXd& Kloc
 
           //evaluateStabParams_algo1(&velTemp(0), h, rho, mu, dt,  beta, tau);
 
-          evaluateStabParams_algo2(&velTemp(0), h, rho, mu, dt,  beta, tau);
+          //evaluateStabParams_algo2(&velTemp(0), h, rho, mu, dt,  beta, tau);
 
           //evaluateStabParams_algo3(velTemp, matG, dt, rho, mu, CI, tau);
 
-          tau[0] *= elmDat[8];  // SUPG
-          tau[1] *= elmDat[9];  // PSPG
-          tau[2] *= elmDat[10]; // LSIC
+          //tau[0] *= elmDat[8];  // SUPG
+          //tau[1] *= elmDat[9];  // PSPG
+          //tau[2] *= elmDat[10]; // LSIC
 
           for(ii=0;ii<nlbf;ii++)
           {
@@ -1058,7 +1063,7 @@ int LagrangeElem2DNavierStokesTria3Node::calcStiffnessAndResidual(MatrixXd& Kloc
 
   return 0;
 }
-*/
+//
 
 
 

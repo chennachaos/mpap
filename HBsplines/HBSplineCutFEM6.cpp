@@ -19,23 +19,22 @@ void  HBSplineCutFEM::computeTotalBodyForce(int index)
 }
 
 
-
-
-
-
 //
 void  HBSplineCutFEM::solveSolidProblem()
 {
   IB_MOVED = false;
   for(int bb=0;bb<ImmersedBodyObjects.size();bb++)
   {
+    //computeTotalForce(bb);
     //ImmersedBodyObjects[bb]->updateForce(&(totalForce(0)));
 
     cout << " kkkkkkkkkkk " << endl;
     ImmersedBodyObjects[bb]->SolveTimeStep();
 
-    IB_MOVED = (IB_MOVED || ImmersedBodyObjects[bb]->updatePointPositions() );
+    //IB_MOVED = (IB_MOVED || ImmersedBodyObjects[bb]->updatePointPositions() );
   }
+  
+  updateImmersedPointPositions();
 
   return;
 }
@@ -1373,22 +1372,22 @@ void  HBSplineCutFEM::computeTotalForce2D(int bb)
       return;
     }
 
-    int  aa, ii, jj, nlb, nlf, nlocal, gp, nGauss;
+    int  aa, ii, jj, kk, nlb, nlf, nlocal, gp, nGauss;
 
     nlf = 1;
     for(ii=0; ii<DIM; ii++)
       nlf *= (degree[ii]+1);
 
-    double  dvol, PENALTY, detJ;
+    double  dvol, PENALTY, detJ, fact;
 
-    VectorXd  Nb;
-    myPoint   vel, velSpec, trac, FluidAcce, centroid;
+    VectorXd  Nb, fluidAcceOnSolid;
+    myPoint   vel, velSpec, acceSpec, trac, acceFluid, centroid;
     MatrixXd  stress(DIM, DIM);
 
     bool   axsy = (GeomData.FluidProps[2] == 1);
     double  rho = GeomData.FluidProps[3];
     double  mu  = GeomData.FluidProps[4];
-    double  rhoSolid = 0.1;
+    double  rhoSolid = 1.0;
 
     vector<double>  gausspoints, gaussweights;
 
@@ -1411,22 +1410,22 @@ void  HBSplineCutFEM::computeTotalForce2D(int bb)
 
           getGaussPoints1D(nGauss, gausspoints, gaussweights);
 
-          //printVector(gausspoints);          printf("\n\n\n\n");
-          //printVector(gaussweights);          printf("\n\n\n\n");
-
-        
           bool rigidflag = ImmersedBodyObjects[bb]->IsRigidBody() ;
 
           if(rigidflag)
+          {
             totalForce.resize(6);
+            fluidAcceOnSolid.resize(6);
+          }
           else
           {
             aa = ImmersedBodyObjects[bb]->GetNumNodes()*2;
-            //cout << " aa = " << aa << endl;
             totalForce.resize(aa);
+            fluidAcceOnSolid.resize(aa);
           }
 
           totalForce.setZero();
+          fluidAcceOnSolid.setZero();
 
           centroid = ImmersedBodyObjects[bb]->GetCentroid(2);
 
@@ -1460,6 +1459,7 @@ void  HBSplineCutFEM::computeTotalForce2D(int bb)
               }
 
               lme->computeVelocity(Nb, velSpec);
+              lme->computeAcceleration(Nb, acceSpec);
 
               //cout << " uuuuuuuuuuu " << endl;
 
@@ -1472,26 +1472,9 @@ void  HBSplineCutFEM::computeTotalForce2D(int bb)
               //printf("xx = %12.6f, yy = %12.6f, zz = %12.6f, dvol = %12.6f, \n", geom[0], geom[1], geom[2], dvol);
               //printf("xx = %12.6f, yy = %12.6f, zz = %12.6f, dvol = %12.6f, \n", param[0], param[1], param[2], dvol);
 
-              ndTemp->computeVelocityAndStress(param, vel, stress, FluidAcce);
+              ndTemp->computeVelocityAndStress(param, vel, stress, acceFluid);
 
               //printf("FluidAcce[0] = %12.6f, FluidAcce[1] = %12.6f \n", FluidAcce[0], FluidAcce[1]);
-
-              /*
-              for(ii=0; ii<DIM; ii++)
-              {
-                trac[ii] = 0.0;
-                for(jj=0; jj<DIM; jj++)
-                  trac[ii]  +=  stress(ii,jj)*normal[jj] ;
-
-                //totalForce[ii] += dvol*( trac[ii] + PENALTY*(vel[ii]-velSpec[ii]) + rho*FluidAcce[ii] );
-
-                trac[ii] += PENALTY*(vel[ii]-velSpec[ii]) ;
-                
-                trac[ii] *= dvol;
-
-                totalForce[ii] += trac[ii] ;
-              }
-              */
 
               trac[0] =  stress(0,0)*normal[0] + stress(0,1)*normal[1] ;
               trac[1] =  stress(1,0)*normal[0] + stress(1,1)*normal[1] ;
@@ -1502,15 +1485,26 @@ void  HBSplineCutFEM::computeTotalForce2D(int bb)
               //trac[0] -= (rho/rhoSolid)*FluidAcce[0];
               //trac[1] -= (rho/rhoSolid)*FluidAcce[1];
 
-              //trac[0] -= rhoSolid*FluidAcce[0];
-              //trac[1] -= rhoSolid*FluidAcce[1];
+              trac[0] += (stagParams[3]*rho)*acceFluid[0];
+              trac[1] += (stagParams[3]*rho)*acceFluid[1];
 
-              //cout << aa << '\t' << ImmersedBodyObjects[bb]->ImmIntgElems[aa]->pointNums0] ;
-              //cout << '\t' << ImmersedBodyObjects[bb]->ImmIntgElems[aa]->pointNums[1] << endl;
+              //trac[0] += (sqrt(stagParams[2])*rho)*acceFluid[0];
+              //trac[1] += (sqrt(stagParams[2])*rho)*acceFluid[1];
+
+              //trac[0] += stagParams[3]*rho*(acceFluid[0] - acceSpec[0]);
+              //trac[1] += stagParams[3]*rho*(acceFluid[1] - acceSpec[1]);
+
+              //trac[0] += stagParams[2]*(rhoSolid*acceSpec[0] - rho*acceFluid[0]);
+              //trac[1] += stagParams[2]*(rhoSolid*acceSpec[1] - rho*acceFluid[1]);
+
+              //trac[0] += rho*acceFluid[0];
+              //trac[1] += rho*acceFluid[1];
 
               trac *= dvol;
 
               //cout << trac[0] << '\t' << trac[1] << endl;
+
+              fact = rho*stagParams[3]*dvol;
 
               if(rigidflag)
               {
@@ -1526,10 +1520,17 @@ void  HBSplineCutFEM::computeTotalForce2D(int bb)
               {
                 for(ii=0;ii<nlb;ii++)
                 {
-                  jj = ImmersedBodyObjects[bb]->ImmIntgElems[aa]->pointNums[ii];
+                  jj = lme->pointNums[ii];
+                  kk = 2*jj;
 
-                  totalForce[2*jj]   += (Nb[ii]*trac[0]);
-                  totalForce[2*jj+1] += (Nb[ii]*trac[1]);
+                  totalForce[kk]   += (Nb[ii]*trac[0]);
+                  totalForce[kk+1] += (Nb[ii]*trac[1]);
+
+                  fluidAcceOnSolid[kk]   += (Nb[ii]*fact)*acceFluid[0];
+                  fluidAcceOnSolid[kk+1] += (Nb[ii]*fact)*acceFluid[1];
+
+                  //fluidAcceOnSolid[kk]   += (Nb[ii]*fact)*(acceFluid[0] - acceSpec[0]);
+                  //fluidAcceOnSolid[kk+1] += (Nb[ii]*fact)*(acceFluid[1] - acceSpec[1]);
                 }
               }
 
@@ -1537,12 +1538,8 @@ void  HBSplineCutFEM::computeTotalForce2D(int bb)
             }//for(gp=0...
           } // if( lme->IsActive() )
         }//for(aa=0...
-    
-    //totalForce *= rho;
 
-    //printf("Force in X-direction = %12.6f \n", totalForce[0]);
-    //printf("Force in Y-direction = %12.6f \n", totalForce[1]);
-    //printf("Force in Z-direction = %12.6f \n", totalForce[2]);
+  ImmersedBodyObjects[bb]->fluidAcce = stagParams[4]*fluidAcceOnSolid;
 
   return;
 }
@@ -1558,19 +1555,16 @@ void  HBSplineCutFEM::computeTotalForce3D(int bb)
       return;
     }
 
-    int  aa, ii, jj, nlb, nlf, nlocal, gp, nGauss;
+    int  aa, ii, jj, nlb, nlocal, gp, nGauss;
 
-    nlf = 1;
-    for(ii=0; ii<DIM; ii++)
-      nlf *= (degree[ii]+1);
+    int nlf = (degree[0]+1)*(degree[1]+1)*(degree[2]+1);
 
     double  dvol, PENALTY, detJ;
 
     VectorXd  Nb;
-    myPoint   vel, velSpec, trac, ptTemp, FluidAcce;
+    myPoint   vel, velSpec, trac, ptTemp, centroid, FluidAcce;
     MatrixXd  stress(DIM, DIM);
 
-    bool   axsy = (GeomData.FluidProps[2] == 1);
     double  rho = GeomData.FluidProps[3];
     double  mu  = GeomData.FluidProps[4];
 
@@ -1593,12 +1587,28 @@ void  HBSplineCutFEM::computeTotalForce3D(int bb)
 
           nGauss = (int) cutFEMparams[1];
 
-          getGaussPointsTriangle(nGauss, gausspoints1, gausspoints2, gaussweights);
+          if(nlb == 3)
+            getGaussPointsTriangle(nGauss, gausspoints1, gausspoints2, gaussweights);
+          else
+            getGaussPointsQuad(nGauss, gausspoints1, gausspoints2, gaussweights);
 
           //printVector(gausspoints);          printf("\n\n\n\n");
           //printVector(gaussweights);          printf("\n\n\n\n");
 
+          bool rigidflag = ImmersedBodyObjects[bb]->IsRigidBody() ;
+
+          if(rigidflag)
+            totalForce.resize(6);
+          else
+          {
+            aa = ImmersedBodyObjects[bb]->GetNumNodes()*DIM;
+            totalForce.resize(aa);
+          }
+
           totalForce.setZero();
+
+          centroid.setZero();
+          //centroid = ImmersedBodyObjects[bb]->GetCentroid(2);
 
           cout << " bb = " << bb << endl;
           cout << " ImmersedBodyObjects[bb]->ImmIntgElems.size() = " << ImmersedBodyObjects[bb]->ImmIntgElems.size() << endl;
@@ -1625,16 +1635,16 @@ void  HBSplineCutFEM::computeTotalForce3D(int bb)
               lme->computeVelocity(Nb, velSpec);
 
               //printf("xx = %12.6f, yy = %12.6f, zz = %12.6f, dvol = %12.6f, \n", geom[0], geom[1], geom[2], dvol);
-              
+
               //if(aa == 15734)
-	      //{
+              //{
                 //ptTemp = poly->GetPoint(0);
                 //printf("xx = %12.6f, yy = %12.6f, zz = %12.6f \n", ptTemp[0], ptTemp[1], ptTemp[2]);
                 //ptTemp = poly->GetPoint(1);
                 //printf("xx = %12.6f, yy = %12.6f, zz = %12.6f \n", ptTemp[0], ptTemp[1], ptTemp[2]);
                 //ptTemp = poly->GetPoint(2);
                 //printf("xx = %12.6f, yy = %12.6f, zz = %12.6f \n", ptTemp[0], ptTemp[1], ptTemp[2]);
-	      //}
+              //}
 
               ndTemp = elems[findCellNumber(geom)];
 
@@ -1650,38 +1660,53 @@ void  HBSplineCutFEM::computeTotalForce3D(int bb)
 
               ndTemp->computeVelocityAndStress(param, vel, stress, FluidAcce);
 
-              //
-              for(ii=0; ii<DIM; ii++)
+              //cout << " uuuuuuuuuuu " << endl;
+
+              trac[0] =  stress(0,0)*normal[0] + stress(0,1)*normal[1] + stress(0,2)*normal[2] ;
+              trac[1] =  stress(1,0)*normal[0] + stress(1,1)*normal[1] + stress(1,2)*normal[2] ;
+              trac[2] =  stress(2,0)*normal[0] + stress(2,1)*normal[1] + stress(2,2)*normal[2] ;
+
+              trac[0] += PENALTY*(vel[0]-velSpec[0]);
+              trac[1] += PENALTY*(vel[1]-velSpec[1]);
+              trac[2] += PENALTY*(vel[2]-velSpec[2]);
+
+              trac *= dvol;
+
+              if(rigidflag)
               {
-                trac[ii] = 0.0;
-                for(jj=0; jj<DIM; jj++)
-                  trac[ii]  +=  stress(ii,jj)*normal[jj] ;
+                totalForce[0] += trac[0];
+                totalForce[1] += trac[1];
+                totalForce[2] += trac[2];
 
-                totalForce[ii] += dvol*( trac[ii] + PENALTY*(vel[ii]-velSpec[ii]) );
+                geom[0] -= centroid[0] ;
+                geom[1] -= centroid[1] ;
+                geom[2] -= centroid[2] ;
+
+                totalForce[3] +=  (geom[1]*trac[2]-geom[2]*trac[1]) ;
+                totalForce[4] +=  (geom[2]*trac[0]-geom[0]*trac[2]) ;
+                totalForce[5] +=  (geom[0]*trac[1]-geom[1]*trac[0]) ;
               }
-              //
+              else
+              {
+                for(ii=0;ii<nlb;ii++)
+                {
+                  jj = lme->pointNums[ii];
+                  jj = jj*3;
 
-              //trac[0] =  stress(0,0)*normal[0] + stress(0,1)*normal[1] ;
-              //trac[1] =  stress(1,0)*normal[0] + stress(1,1)*normal[1] ;
-
-              //trac[0] -= PENALTY*(vel[0]-velSpec[0]);
-              //trac[1] -= PENALTY*(vel[1]-velSpec[1]);
-
-              //trac *= dvol;
-
-              //totalForce[0] += trac[0];
-              //totalForce[1] += trac[1];
+                  totalForce[jj]   += (Nb[ii]*trac[0]);
+                  totalForce[jj+1] += (Nb[ii]*trac[1]);
+                  totalForce[jj+2] += (Nb[ii]*trac[2]);
+                }
+              }
 
               //cout << " uuuuuuuuuuu " << endl;
             }//for(gp=0...
           } // if( lme->IsActive() )
         }//for(aa=0...
-    
-    //totalForce *= rho;
 
-    printf("Force in X-direction = %12.6f \n", totalForce[0]);
-    printf("Force in Y-direction = %12.6f \n", totalForce[1]);
-    printf("Force in Z-direction = %12.6f \n", totalForce[2]);
+    //printf("Force in X-direction = %12.6f \n", totalForce[0]);
+    //printf("Force in Y-direction = %12.6f \n", totalForce[1]);
+    //printf("Force in Z-direction = %12.6f \n", totalForce[2]);
 
   return;
 }

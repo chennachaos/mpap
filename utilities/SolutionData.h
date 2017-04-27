@@ -24,7 +24,7 @@ class  SolutionData
     VectorXd  var1, var1Prev, var1Cur, var1Dot, var1DotPrev, var1DotCur, var1DotDot, var1DotDotPrev, var1DotDotCur;
     VectorXd  var2, var2Prev, var2Cur, var2Dot, var2DotPrev, var2DotCur, var2DotDot, var2DotDotPrev, var2DotDotCur;
     VectorXd  var3, var3Prev, var3Cur, var4, var4Prev, var4Cur;
-    VectorXd  dDot, dDotPrev;
+    VectorXd  dDot, dDotPrev, var1PrevIter;
     VectorXd  var1Init, var2Init, vorticity, var1applied, var1Prev2, var1Prev3, var1Prev4, var1Extrap;
     
     vector<double>  FluidProps, stagParams;
@@ -80,6 +80,10 @@ class  SolutionData
     void  reset();
 
     void  interpolateForce();
+
+    void  perform_Aitken_accelerator_force();
+
+    void  perform_Aitken_accelerator_displacement();
 
 };
 

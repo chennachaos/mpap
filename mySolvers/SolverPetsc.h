@@ -25,14 +25,14 @@ class SolverPetsc
     Mat  mtx; // linear system matrix
     KSP  ksp; // linear solver context
     PC   pc; // preconditioner context
-    
+
     PetscInt nRow, nCol, nnz;
     
     MatInfo info;
 
     int currentStatus;
 
-    bool comprMtxFlg, checkIO;
+    bool  checkIO;
 
     PetscReal norm; // norm of solution error
     
@@ -72,8 +72,6 @@ class SolverPetsc
     virtual int AssembleMatrixAndVector(vector<int>& row, vector<int>& col, MatrixXd& Klocal, VectorXd& Flocal);
 
     virtual int AssembleMatrixAndVector(int r1, int c1, vector<int>& row, vector<int>& col, MatrixXd& Klocal, VectorXd& Flocal);
-    
-    virtual int AssembleMatrixAndVector(int r1, int c1, vector<int>& row, MatrixXd& Klocal, VectorXd& Flocal);
 
     virtual int AssembleMatrixAndVectorCutFEM(int r1, int c1, vector<int>& tempVec, vector<int>& forAssy, MatrixXd& Klocal, VectorXd& Flocal);
 
@@ -85,6 +83,7 @@ class SolverPetsc
 
     virtual int AssembleVector(int r1, int c1, vector<int>& row, VectorXd& Flocal);
 
+    virtual int AssembleMatrixAndVectorMixedFormulation(int r1, int c1, vector<int>& vec1, vector<int>& vec2, MatrixXd& Klocal, VectorXd& Flocal);
 
     //virtual double *solve(double*, int nrhs = 1);
     //virtual double *factoriseAndSolve(double*, int nrhs = 1);

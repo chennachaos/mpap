@@ -674,7 +674,7 @@ void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
 
 
 
-/*
+//
 template<>
 void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
 {
@@ -859,7 +859,7 @@ void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
     
     return;
 }
-*/
+//
 
 
 
@@ -1331,7 +1331,7 @@ double TreeNode<2>::getJacBoundary(int side)
 }
 
 
-/*
+//
 template<>
 void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
 {
@@ -1463,43 +1463,44 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
 
             specVal = DirichletData[aa][2];
 
-            //if(2 < 1)
-	    //
+            //
             if(side == 0 )
             {
               if(dir == 0)
               {
+                //y0=0.0; y1=1.61;
                 //specVal = DirichletData[aa][2]*(6.0/y1/y1)*(y1-geom[1])*(geom[1]-y0);
-                specVal = DirichletData[aa][2]*(y1-geom[1])*(geom[1]-y0);
+                //specVal = DirichletData[aa][2]*(y1-geom[1])*(geom[1]-y0);
                 //cout << " specVal =  " << specVal << endl;
                 
+                y0=0.0; y1=0.5;
                 //if(geom[1] <= 0.5)
-                  //specVal = DirichletData[aa][2]*(1.0-geom[1]*geom[1]/y1/y1);
+                  specVal = DirichletData[aa][2]*(1.0-geom[1]*geom[1]/y1/y1);
                 //else
                   //specVal = 0.0;
               }
             }
             //
             //
-            if(side == 3)
-            {
-              if(dir == 0)
-              {
+            //if(side == 3333)
+            //{
+              //if(dir == 0)
+              //{
                 //val = sin(PI*xx);
-                if(uu<0.5)
-                  specVal = tanh(20.0*uu);
-                else
-                  specVal = -tanh(20.0*(uu-1.0));
-              }
-            }
+                //if(uu<0.5)
+                  //specVal = tanh(20.0*uu);
+                //else
+                  //specVal = -tanh(20.0*(uu-1.0));
+              //}
+            //}
             //
             //
-            if(side == 0 || side == 11)
-            {
-              if(dir == 0)
-              {
+            //if(side == 1110 || side == 1111)
+            //{
+              //if(dir == 0)
+              //{
                 //specVal = DirichletData[aa][2]*(yy-0.25);
-                specVal = 1.5*yy*(2.0-yy);
+                //specVal = 1.5*yy*(2.0-yy);
                 //if(yy <= y0 || yy >= y1)
                 //if(xx > 1.5)
                   //specVal = 0.0;
@@ -1507,22 +1508,22 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
                   //specVal = DirichletData[aa][2]*(y1-yy)*(yy-y0);
                   //specVal = (y1-xx)*(xx-y0);
                   //specVal = 3600.0*(1.0-yy*yy/R/R);
-              }
-            }
+              //}
+            //}
             //
-            //
-            R = 0.5;
-            if(side == 2)
-            {
-              if(dir == 1)
-              {
-                if(xx >= R)
-                  specVal = 0.0;
-                else
+            
+            //if(side == 2222)
+            //{
+              //R = 0.5;
+              //if(dir == 1)
+              //{
+                //if(xx >= R)
+                  //specVal = 0.0;
+                //else
                   //specVal = 1.0*xx*(1.5-xx);
-                  specVal = 3600.0*(1.0-xx*xx/R/R);
-              }
-            }
+                  //specVal = 3600.0*(1.0-xx*xx/R/R);
+              //}
+            //}
             //
             //
 
@@ -1654,7 +1655,7 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
 
   return;
 }
-*/
+//
 
 
 

@@ -53,7 +53,7 @@ void prgCloseProject(void)
 
   counter.free();
   
-  plotvtk.reset();
+  //plotvtk.reset();
 
   return;
 }

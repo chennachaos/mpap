@@ -39,39 +39,58 @@ void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
     myPoint  param, geom;
     Dj.setZero();
 
-    volume = (bbox.maxBB[0]-bbox.minBB[0])*(bbox.maxBB[1]-bbox.minBB[1])*(bbox.maxBB[2]-bbox.minBB[2]);
-    //cout << " volume = " << volume << endl;
-    h2 = 3.0*volume/PI/4.0;
-    h2 = 4.0*volume/PI;
-
     double  rho = elmDat[3];
     double  mu  = elmDat[4];
-
-    //stabParam = h2/(12.0*mu)/degree[0]/degree[1]/degree[2];
-    stabParam = h2/(12.0*mu);
-    
-    //cout << " stabParam = " << stabParam << endl;
-
-    tau[0] = 0.0;
-    tau[1] = elmDat[9]*stabParam;//rho;  // PSPG
-    tau[2] = elmDat[10]*stabParam;//rho; // LSIC
+    bforce[0]   = elmDat[5];
+    bforce[1]   = elmDat[6];
+    bforce[2]   = elmDat[7];
 
     af = SolnData->td(2);
     am = SolnData->td(1);
     acceFact = am*SolnData->td(9);
+    dt = mpapTime.dt;
 
     double *gws;
     myPoint *gps;
-    
-    if(domNums.size() > 1)
+
+    double  hx = bbox.maxBB[0]-bbox.minBB[0];
+    double  hy = bbox.maxBB[1]-bbox.minBB[1];
+    double  hz = bbox.maxBB[2]-bbox.minBB[2];
+
+    volume = hx*hy*hz;
+
+    matG.setZero();
+    matG(0,0) = 4.0/hx/hx;
+    matG(1,1) = 4.0/hy/hy;
+    matG(2,2) = 4.0/hz/hz;
+
+
+    if(domNums.size() > 1) // cut-cell
     {
       nGauss = Quadrature.gausspoints.size();
       
       gps = &(Quadrature.gausspoints[0]);
       gws = &(Quadrature.gaussweights[0]);
       
-      tempId = domainCur;
+      //tempId = domainCur;
       JacTemp = 1.0;
+
+      volume = 0.0;
+      for(gp=0; gp<nGauss; gp++)
+        volume += gws[gp];
+
+      // For 2D problem
+      // fact = sqrt(Vc/V); and fact = fact*fact;  ---->  fact = Vc/V;
+      // For 3D problem
+      // fact = (Vc/V)^(1/3). So, do fact = fact*fact;
+
+      fact = volume/(hx*hy*hz);
+      fact = pow(fact, 1.0/3.0);
+      fact = fact*fact;
+
+      matG(0,0) /= fact;
+      matG(1,1) /= fact;
+      matG(2,2) /= fact;
     }
     else
     {
@@ -80,9 +99,21 @@ void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
       gps = &(GeomData->gausspoints[0]);
       gws = &(GeomData->gaussweights[0]);
       
-      tempId = domNums[0];
+      //tempId = domNums[0];
       JacTemp = JacMultElem;
     }
+
+    //cout << " volume = " << volume << endl;
+    //h2 = 3.0*volume/PI/4.0;
+    //h2 = 4.0*volume/PI;
+
+    //stabParam = h2/(12.0*mu)/degree[0]/degree[1]/degree[2];
+    stabParam = h2/(12.0*mu);
+    //cout << " stabParam = " << stabParam << endl;
+
+    tau[0] = 0.0;
+    tau[1] = elmDat[9]*stabParam;//rho;  // PSPG
+    tau[2] = elmDat[10]*stabParam;//rho; // LSIC
 
     //cout << " nGauss " << nGauss << '\t' << tempId << endl;
 
@@ -156,39 +187,39 @@ void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
             b3     = SolnData->var1Cur(TIp2);
             b4     = SolnData->var1(TIp3);
 
-            vel(0) += ( b1 * N(ii) );
-            vel(1) += ( b2 * N(ii) );
-            vel(2) += ( b3 * N(ii) );
+            vel(0) += ( b1 * N[ii] );
+            vel(1) += ( b2 * N[ii] );
+            vel(2) += ( b3 * N[ii] );
 
-            grad(0,0) += ( b1 * dN_dx(ii) );
-            grad(0,1) += ( b1 * dN_dy(ii) );
-            grad(0,2) += ( b1 * dN_dz(ii) );
+            grad(0,0) += ( b1 * dN_dx[ii] );
+            grad(0,1) += ( b1 * dN_dy[ii] );
+            grad(0,2) += ( b1 * dN_dz[ii] );
 
-            grad(1,0) += ( b2 * dN_dx(ii) );
-            grad(1,1) += ( b2 * dN_dy(ii) );
-            grad(1,2) += ( b2 * dN_dz(ii) );
+            grad(1,0) += ( b2 * dN_dx[ii] );
+            grad(1,1) += ( b2 * dN_dy[ii] );
+            grad(1,2) += ( b2 * dN_dz[ii] );
 
-            grad(2,0) += ( b3 * dN_dx(ii) );
-            grad(2,1) += ( b3 * dN_dy(ii) );
-            grad(2,2) += ( b3 * dN_dz(ii) );
+            grad(2,0) += ( b3 * dN_dx[ii] );
+            grad(2,1) += ( b3 * dN_dy[ii] );
+            grad(2,2) += ( b3 * dN_dz[ii] );
 
-            Du(0)  += ( b1 * d2N(ii) );
-            Du(1)  += ( b2 * d2N(ii) );
-            Du(2)  += ( b3 * d2N(ii) );
+            Du(0)  += ( b1 * d2N[ii] );
+            Du(1)  += ( b2 * d2N[ii] );
+            Du(2)  += ( b3 * d2N[ii] );
 
-            pres   += ( b4 * N(ii) );
+            pres   += ( b4 * N[ii] );
 
-            dp(0)  += ( b4 * dN_dx(ii) );
-            dp(1)  += ( b4 * dN_dy(ii) );
-            dp(2)  += ( b4 * dN_dz(ii) );
+            dp(0)  += ( b4 * dN_dx[ii] );
+            dp(1)  += ( b4 * dN_dy[ii] );
+            dp(2)  += ( b4 * dN_dz[ii] );
 
             b1     = SolnData->var1DotCur(TI);
             b2     = SolnData->var1DotCur(TIp1);
             b3     = SolnData->var1DotCur(TIp2);
 
-            velDot(0) += ( b1 * N(ii) );
-            velDot(1) += ( b2 * N(ii) );
-            velDot(2) += ( b3 * N(ii) );
+            velDot(0) += ( b1 * N[ii] );
+            velDot(1) += ( b2 * N[ii] );
+            velDot(2) += ( b3 * N[ii] );
           }
 
           // this is pseudo-stress
@@ -239,13 +270,13 @@ void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
               TJp2 = TJ+2;
               TJp3 = TJ+3;
 
-              fact2 = rho*acceFact*N(jj);
+              fact2 = rho*acceFact*N[jj];
 
               // time acceleration term
               fact = b4*fact2 ;
 
               // diffusion term
-              fact += (b5*dN_dx(jj) + b6*dN_dy(jj) + b7*dN_dz(jj));
+              fact += (b5*dN_dx[jj] + b6*dN_dy[jj] + b7*dN_dz[jj]);
 
               Klocal(TI,   TJ)   += fact;
               Klocal(TIp1, TJp1) += fact;
@@ -254,32 +285,32 @@ void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
               gradN.setZero();
 
               // pressure term
-              Klocal(TI,   TJp3) -= (b1*N(jj));
-              Klocal(TIp1, TJp3) -= (b2*N(jj));
-              Klocal(TIp2, TJp3) -= (b3*N(jj));
+              Klocal(TI,   TJp3) -= (b1*N[jj]);
+              Klocal(TIp1, TJp3) -= (b2*N[jj]);
+              Klocal(TIp2, TJp3) -= (b3*N[jj]);
 
               // continuity equation
-              Klocal(TIp3, TJ)   += (b8*dN_dx(jj));
-              Klocal(TIp3, TJp1) += (b8*dN_dy(jj));
-              Klocal(TIp3, TJp2) += (b8*dN_dz(jj));
+              Klocal(TIp3, TJ)   += (b8*dN_dx[jj]);
+              Klocal(TIp3, TJp1) += (b8*dN_dy[jj]);
+              Klocal(TIp3, TJp2) += (b8*dN_dz[jj]);
 
               // PSPG stabilisation terms
-              fact2 -= muTaf*d2N(jj);
+              fact2 -= muTaf*d2N[jj];
 
               Dj(0,0) = gradN(0,0) + fact2;
               Dj(0,1) = gradN(0,1);
               Dj(0,2) = gradN(0,2);
-              Dj(0,3) = dN_dx(jj);
+              Dj(0,3) = dN_dx[jj];
 
               Dj(1,0) = gradN(1,0);
               Dj(1,1) = gradN(1,1) + fact2;
               Dj(1,2) = gradN(1,2);
-              Dj(1,3) = dN_dy(jj);
+              Dj(1,3) = dN_dy[jj];
 
               Dj(2,0) = gradN(2,0);
               Dj(2,1) = gradN(2,1);
               Dj(2,2) = gradN(2,2) + fact2;
-              Dj(2,3) = dN_dz(jj);
+              Dj(2,3) = dN_dz[jj];
 
               // PSPG
               Klocal(TIp3, TJ)   += ( b1*Dj(0,0) + b2*Dj(1,0) + b3*Dj(2,0) )*tau[1];
@@ -289,17 +320,17 @@ void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
               // LSIC stabilisation
 
-              //Klocal(TI,   TJ)   += (b1*dN_dx(jj))*tau[2];
-              //Klocal(TI,   TJp1) += (b1*dN_dy(jj))*tau[2];
-              //Klocal(TI,   TJp2) += (b1*dN_dz(jj))*tau[2];
+              Klocal(TI,   TJ)   += (b1*dN_dx[jj])*tau[2];
+              Klocal(TI,   TJp1) += (b1*dN_dy[jj])*tau[2];
+              Klocal(TI,   TJp2) += (b1*dN_dz[jj])*tau[2];
 
-              //Klocal(TIp1, TJ)   += (b2*dN_dx(jj))*tau[2];
-              //Klocal(TIp1, TJp1) += (b2*dN_dy(jj))*tau[2];
-              //Klocal(TIp1, TJp2) += (b2*dN_dz(jj))*tau[2];
+              Klocal(TIp1, TJ)   += (b2*dN_dx[jj])*tau[2];
+              Klocal(TIp1, TJp1) += (b2*dN_dy[jj])*tau[2];
+              Klocal(TIp1, TJp2) += (b2*dN_dz[jj])*tau[2];
 
-              //Klocal(TIp2, TJ)   += (b3*dN_dx(jj))*tau[2];
-              //Klocal(TIp2, TJp1) += (b3*dN_dy(jj))*tau[2];
-              //Klocal(TIp2, TJp2) += (b3*dN_dz(jj))*tau[2];
+              Klocal(TIp2, TJ)   += (b3*dN_dx[jj])*tau[2];
+              Klocal(TIp2, TJp1) += (b3*dN_dy[jj])*tau[2];
+              Klocal(TIp2, TJp2) += (b3*dN_dz[jj])*tau[2];
             }
 
             Flocal(TI)   -= (b4*res2(0) + b1*stress(0,0) + b2*stress(0,1) + b3*stress(0,2) );
@@ -311,9 +342,9 @@ void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
             Flocal(TIp3) -= (tau[1]*( b1*rStab(0)+b2*rStab(1)+b3*rStab(2) ));
 
             // LSIC stabilisation terms
-            //Flocal(TI)   -= ( tau[2]*b1*grad.trace() );
-            //Flocal(TIp1) -= ( tau[2]*b2*grad.trace() );
-            //Flocal(TIp2) -= ( tau[2]*b3*grad.trace() );
+            Flocal(TI)   -= ( tau[2]*b1*grad.trace() );
+            Flocal(TIp1) -= ( tau[2]*b2*grad.trace() );
+            Flocal(TIp2) -= ( tau[2]*b3*grad.trace() );
 
           } // for(ii=0;ii<totnlbf2;ii++)
     }//gp
@@ -324,7 +355,7 @@ void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
 
 
-//
+/*
 template<>
 void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
 {
@@ -362,27 +393,43 @@ void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
     double *gws;
     myPoint *gps;
 
-    //volume = (bbox.maxBB[0]-bbox.minBB[0])*(bbox.maxBB[1]-bbox.minBB[1])*(bbox.maxBB[2]-bbox.minBB[2]);
-
     double  hx = bbox.maxBB[0]-bbox.minBB[0];
     double  hy = bbox.maxBB[1]-bbox.minBB[1];
     double  hz = bbox.maxBB[2]-bbox.minBB[2];
-    
+
     volume = hx*hy*hz;
 
-    if(domNums.size() > 1)
+    matG.setZero();
+    matG(0,0) = 4.0/hx/hx;
+    matG(1,1) = 4.0/hy/hy;
+    matG(2,2) = 4.0/hz/hz;
+
+    if(domNums.size() > 1) // cut-cell
     {
       nGauss = Quadrature.gausspoints.size();
       
       gps = &(Quadrature.gausspoints[0]);
       gws = &(Quadrature.gaussweights[0]);
       
-      tempId = domainCur;
+      //tempId = domainCur;
       JacTemp = 1.0;
 
       volume = 0.0;
       for(gp=0; gp<nGauss; gp++)
         volume += gws[gp];
+
+      // For 2D problem
+      // fact = sqrt(Vc/V); and fact = fact*fact;  ---->  fact = Vc/V;
+      // For 3D problem
+      // fact = (Vc/V)^(1/3). So, do fact = fact*fact;
+
+      fact = volume/(hx*hy*hz);
+      fact = pow(fact, 1.0/3.0);
+      fact = fact*fact;
+
+      matG(0,0) /= fact;
+      matG(1,1) /= fact;
+      matG(2,2) /= fact;
     }
     else
     {
@@ -391,47 +438,13 @@ void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
       gps = &(GeomData->gausspoints[0]);
       gws = &(GeomData->gaussweights[0]);
       
-      tempId = domNums[0];
+      //tempId = domNums[0];
       JacTemp = JacMultElem;
     }
-
-    //volume = hx*hy*hz;
-
-    //cout << " volume = " << volume << endl;
-    h = pow(6.0*volume/PI, 1.0/3.0);
-
-    h2 = h*h;
-
-    //h2 = 6.0*volume/PI;
-
-    //stabParam = h2/(12.0*mu);
-    //stabParam /= (degree[0]/degree[0]);
-    //stabParam *= rho;
-
-    //cout << " stabParam = " << stabParam << endl;
 
     //tau[0] = elmDat[8]*stabParam;  // SUPG
     //tau[1] = elmDat[9]*stabParam;  // PSPG
     //tau[2] = elmDat[10]*stabParam; // LSIC
-
-    fact = volume/(hx*hy*hz);
-
-    fact = pow(fact, 1.0/3.0); // fact^{0.5} in 2D
-
-    //fact = 1.0;
-
-    hx *= fact;
-    hy *= fact;
-    hz *= fact;
-
-    matJ.setZero();
-    matJ(0,0) = hx*0.5;
-    matJ(1,1) = hy*0.5;
-    matJ(2,2) = hz*0.5;
-
-    matJinv = matJ.inverse();
-
-    matG = matJinv.transpose() * matJinv;
 
     //cout << " nGauss " << nGauss << '\t' << tempId << endl;
 
@@ -505,48 +518,48 @@ void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
             b2     = SolnData->var1Prev(TIp1);
             b3     = SolnData->var1Prev(TIp2);
 
-            velPrev(0) += ( b1 * N(ii) );
-            velPrev(1) += ( b2 * N(ii) );
-            velPrev(2) += ( b3 * N(ii) );
+            velPrev(0) += ( b1 * N[ii] );
+            velPrev(1) += ( b2 * N[ii] );
+            velPrev(2) += ( b3 * N[ii] );
 
             b1     = SolnData->var1Cur(TI);
             b2     = SolnData->var1Cur(TIp1);
             b3     = SolnData->var1Cur(TIp2);
             b4     = SolnData->var1(TIp3);
 
-            vel(0) += ( b1 * N(ii) );
-            vel(1) += ( b2 * N(ii) );
-            vel(2) += ( b3 * N(ii) );
+            vel(0) += ( b1 * N[ii] );
+            vel(1) += ( b2 * N[ii] );
+            vel(2) += ( b3 * N[ii] );
 
-            grad(0,0) += ( b1 * dN_dx(ii) );
-            grad(0,1) += ( b1 * dN_dy(ii) );
-            grad(0,2) += ( b1 * dN_dz(ii) );
+            grad(0,0) += ( b1 * dN_dx[ii] );
+            grad(0,1) += ( b1 * dN_dy[ii] );
+            grad(0,2) += ( b1 * dN_dz[ii] );
 
-            grad(1,0) += ( b2 * dN_dx(ii) );
-            grad(1,1) += ( b2 * dN_dy(ii) );
-            grad(1,2) += ( b2 * dN_dz(ii) );
+            grad(1,0) += ( b2 * dN_dx[ii] );
+            grad(1,1) += ( b2 * dN_dy[ii] );
+            grad(1,2) += ( b2 * dN_dz[ii] );
 
-            grad(2,0) += ( b3 * dN_dx(ii) );
-            grad(2,1) += ( b3 * dN_dy(ii) );
-            grad(2,2) += ( b3 * dN_dz(ii) );
+            grad(2,0) += ( b3 * dN_dx[ii] );
+            grad(2,1) += ( b3 * dN_dy[ii] );
+            grad(2,2) += ( b3 * dN_dz[ii] );
 
-            Du(0)  += ( b1 * d2N(ii) );
-            Du(1)  += ( b2 * d2N(ii) );
-            Du(2)  += ( b3 * d2N(ii) );
+            Du(0)  += ( b1 * d2N[ii] );
+            Du(1)  += ( b2 * d2N[ii] );
+            Du(2)  += ( b3 * d2N[ii] );
 
-            pres   += ( b4 * N(ii) );
+            pres   += ( b4 * N[ii] );
 
-            dp(0)  += ( b4 * dN_dx(ii) );
-            dp(1)  += ( b4 * dN_dy(ii) );
-            dp(2)  += ( b4 * dN_dz(ii) );
+            dp(0)  += ( b4 * dN_dx[ii] );
+            dp(1)  += ( b4 * dN_dy[ii] );
+            dp(2)  += ( b4 * dN_dz[ii] );
 
             b1     = SolnData->var1DotCur(TI);
             b2     = SolnData->var1DotCur(TIp1);
             b3     = SolnData->var1DotCur(TIp2);
 
-            velDot(0) += ( b1 * N(ii) );
-            velDot(1) += ( b2 * N(ii) );
-            velDot(2) += ( b3 * N(ii) );
+            velDot(0) += ( b1 * N[ii] );
+            velDot(1) += ( b2 * N[ii] );
+            velDot(2) += ( b3 * N[ii] );
           }
 
           // this is pseudo-stress
@@ -621,13 +634,13 @@ void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
               TJp2 = TJ+2;
               TJp3 = TJ+3;
 
-              fact2 = rho*acceFact*N(jj);
+              fact2 = rho*acceFact*N[jj];
 
               // time acceleration term
               fact = b4*fact2 ;
 
               // diffusion term
-              fact += (b5*dN_dx(jj) + b6*dN_dy(jj) + b7*dN_dz(jj));
+              fact += (b5*dN_dx[jj] + b6*dN_dy[jj] + b7*dN_dz[jj]);
 
               Klocal(TI,   TJ)   += fact;
               Klocal(TIp1, TJp1) += fact;
@@ -635,9 +648,9 @@ void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
               // convection term
 
-              gradN = grad*(rho*N(jj));
+              gradN = grad*(rho*N[jj]);
 
-              Db = rho*(vel(0)*dN_dx(jj) + vel(1)*dN_dy(jj) + vel(2)*dN_dz(jj) );
+              Db = rho*(vel(0)*dN_dx[jj] + vel(1)*dN_dy[jj] + vel(2)*dN_dz[jj] );
 
               gradN(0,0) += Db;
               gradN(1,1) += Db;
@@ -657,32 +670,32 @@ void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
               Klocal(TIp2, TJp2) += (b4*gradN(2,2));
 
               // pressure term
-              Klocal(TI,   TJp3) -= (b1*N(jj));
-              Klocal(TIp1, TJp3) -= (b2*N(jj));
-              Klocal(TIp2, TJp3) -= (b3*N(jj));
+              Klocal(TI,   TJp3) -= (b1*N[jj]);
+              Klocal(TIp1, TJp3) -= (b2*N[jj]);
+              Klocal(TIp2, TJp3) -= (b3*N[jj]);
 
               // continuity equation
-              Klocal(TIp3, TJ)   += (b8*dN_dx(jj));
-              Klocal(TIp3, TJp1) += (b8*dN_dy(jj));
-              Klocal(TIp3, TJp2) += (b8*dN_dz(jj));
+              Klocal(TIp3, TJ)   += (b8*dN_dx[jj]);
+              Klocal(TIp3, TJp1) += (b8*dN_dy[jj]);
+              Klocal(TIp3, TJp2) += (b8*dN_dz[jj]);
 
               // SUPG and PSPG stabilisation terms
-              fact2 -= muTaf*d2N(jj);
+              fact2 -= muTaf*d2N[jj];
 
               Dj(0,0) = gradN(0,0) + fact2;
               Dj(0,1) = gradN(0,1);
               Dj(0,2) = gradN(0,2);
-              Dj(0,3) = dN_dx(jj);
+              Dj(0,3) = dN_dx[jj];
 
               Dj(1,0) = gradN(1,0);
               Dj(1,1) = gradN(1,1) + fact2;
               Dj(1,2) = gradN(1,2);
-              Dj(1,3) = dN_dy(jj);
+              Dj(1,3) = dN_dy[jj];
 
               Dj(2,0) = gradN(2,0);
               Dj(2,1) = gradN(2,1);
               Dj(2,2) = gradN(2,2) + fact2;
-              Dj(2,3) = dN_dz(jj);
+              Dj(2,3) = dN_dz[jj];
 
               // SUPG
               Klocal(TI, TJ)     += Da*Dj(0,0);
@@ -697,7 +710,7 @@ void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
               Klocal(TIp2, TJp1) += Da*Dj(2,1);
               Klocal(TIp2, TJp2) += Da*Dj(2,2);
 
-              c1 = tau[0] * af * rho * N(jj);
+              c1 = tau[0] * af * rho * N[jj];
 
               Klocal(TI,   TJ)   += ( c1 * b1 * rStab(0) );  
               Klocal(TI,   TJp1) += ( c1 * b2 * rStab(0) );
@@ -721,17 +734,17 @@ void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
               fact2 = rho*af*tau[2];
 
-              Klocal(TI,   TJ)   += (b1*dN_dx(jj))*fact2;
-              Klocal(TI,   TJp1) += (b1*dN_dy(jj))*fact2;
-              Klocal(TI,   TJp2) += (b1*dN_dz(jj))*fact2;
+              Klocal(TI,   TJ)   += (b1*dN_dx[jj])*fact2;
+              Klocal(TI,   TJp1) += (b1*dN_dy[jj])*fact2;
+              Klocal(TI,   TJp2) += (b1*dN_dz[jj])*fact2;
 
-              Klocal(TIp1, TJ)   += (b2*dN_dx(jj))*fact2;
-              Klocal(TIp1, TJp1) += (b2*dN_dy(jj))*fact2;
-              Klocal(TIp1, TJp2) += (b2*dN_dz(jj))*fact2;
+              Klocal(TIp1, TJ)   += (b2*dN_dx[jj])*fact2;
+              Klocal(TIp1, TJp1) += (b2*dN_dy[jj])*fact2;
+              Klocal(TIp1, TJp2) += (b2*dN_dz[jj])*fact2;
 
-              Klocal(TIp2, TJ)   += (b3*dN_dx(jj))*fact2;
-              Klocal(TIp2, TJp1) += (b3*dN_dy(jj))*fact2;
-              Klocal(TIp2, TJp2) += (b3*dN_dz(jj))*fact2;
+              Klocal(TIp2, TJ)   += (b3*dN_dx[jj])*fact2;
+              Klocal(TIp2, TJp1) += (b3*dN_dy[jj])*fact2;
+              Klocal(TIp2, TJp2) += (b3*dN_dz[jj])*fact2;
             }
 
             Flocal(TI)   -= (b4*res2(0) + b1*stress(0,0) + b2*stress(0,1) + b3*stress(0,2) );
@@ -759,12 +772,12 @@ void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
     return;
 }
+*/
+
+
+
+
 //
-
-
-
-
-/*
 template<>
 void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
 {
@@ -773,7 +786,7 @@ void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
     // semi-implicit formulation - type B
     ///////////////////////////////////////
 
-    int ii, jj, gp, nGauss, tempId;
+    int ii, jj, gp, nGauss;
     int TI, TIp1, TIp2, TIp3, TJ, TJp1, TJp2, TJp3;
 
     double  JacTemp, Jac, dvol, stabParam;
@@ -785,7 +798,7 @@ void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
     VectorXd  N, dN_dx, d2N_dx2, dN_dy, d2N_dy2, dN_dz, d2N_dz2, d2N, velTemp(3);
     VectorXd  res(4), res2(3), dp(3), Du(3), vel(3), velDot(3), force(3), gradTvel(3), rStab(4), velPrev(3);
     MatrixXd  Dj(3, 4), grad(3,3), gradN(3,3), stress(3,3), gradPrev(3,3);
-    MatrixXd  matJ(3,3), matJinv(3,3), matG(3,3);
+    MatrixXd  matG(3,3);
     myPoint  param, geom;
     Dj.setZero();
 
@@ -802,27 +815,43 @@ void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
     double *gws;
     myPoint *gps;
 
-    //volume = (bbox.maxBB[0]-bbox.minBB[0])*(bbox.maxBB[1]-bbox.minBB[1])*(bbox.maxBB[2]-bbox.minBB[2]);
-
     double  hx = bbox.maxBB[0]-bbox.minBB[0];
     double  hy = bbox.maxBB[1]-bbox.minBB[1];
     double  hz = bbox.maxBB[2]-bbox.minBB[2];
-    
+
     volume = hx*hy*hz;
 
-    if(domNums.size() > 1)
+    matG.setZero();
+    matG(0,0) = 4.0/hx/hx;
+    matG(1,1) = 4.0/hy/hy;
+    matG(2,2) = 4.0/hz/hz;
+
+    if(domNums.size() > 1) // cut-cell
     {
       nGauss = Quadrature.gausspoints.size();
       
       gps = &(Quadrature.gausspoints[0]);
       gws = &(Quadrature.gaussweights[0]);
       
-      tempId = domainCur;
+      //tempId = domainCur;
       JacTemp = 1.0;
 
       volume = 0.0;
       for(gp=0; gp<nGauss; gp++)
         volume += gws[gp];
+
+      // For 2D problem
+      // fact = sqrt(Vc/V); and fact = fact*fact;  ---->  fact = Vc/V;
+      // For 3D problem
+      // fact = (Vc/V)^(1/3). So, do fact = fact*fact;
+
+      fact = volume/(hx*hy*hz);
+      fact = pow(fact, 1.0/3.0);
+      fact = fact*fact;
+
+      matG(0,0) /= fact;
+      matG(1,1) /= fact;
+      matG(2,2) /= fact;
     }
     else
     {
@@ -830,44 +859,10 @@ void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
       gps = &(GeomData->gausspoints[0]);
       gws = &(GeomData->gaussweights[0]);
-      
-      tempId = domNums[0];
+
+      //tempId = domNums[0];
       JacTemp = JacMultElem;
     }
-
-    //cout << " volume = " << volume << endl;
-    h = pow(6.0*volume/PI, 1.0/3.0);
-
-    h2 = 6.0*volume/PI;
-
-    //stabParam = h2/(4.0*mu);
-    //stabParam /= (degree[0]/degree[0]);
-    //stabParam *= rho;
-
-    //cout << " stabParam = " << stabParam << endl;
-
-    //tau[0] = elmDat[8]*stabParam;  // SUPG
-    //tau[1] = elmDat[9]*stabParam;  // PSPG
-    //tau[2] = elmDat[10]*stabParam; // LSIC
-
-    fact = volume/(hx*hy*hz);
-
-    fact = pow(fact, 1.0/3.0); // fact^{0.5} in 2D
-
-    //fact = 1.0;
-
-    hx *= fact;
-    hy *= fact;
-    hz *= fact;
-
-    matJ.setZero();
-    matJ(0,0) = hx*0.5;
-    matJ(1,1) = hy*0.5;
-    matJ(2,2) = hz*0.5;
-
-    matJinv = matJ.inverse();
-
-    matG = matJinv.transpose() * matJinv;
 
     //cout << " nGauss " << nGauss << '\t' << tempId << endl;
 
@@ -882,9 +877,6 @@ void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
         geom[0] = GeomData->ComputeCoord(0, param[0]);
         geom[1] = GeomData->ComputeCoord(1, param[1]);
         geom[2] = GeomData->ComputeCoord(2, param[2]);
-
-        //cout << uu << '\t' << vv << endl;
-        //cout << xx << '\t' << yy << endl;
 
         //cout << gp << '\t' << gps[gp][0] << '\t' << gps[gp][1] << '\t' << gws[gp] << '\t' << dvol << endl;
 
@@ -942,60 +934,60 @@ void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
             b2     = SolnData->var1Prev(TIp1);
             b3     = SolnData->var1Prev(TIp2);
 
-            velPrev(0) += ( b1 * N(ii) );
-            velPrev(1) += ( b2 * N(ii) );
-            velPrev(2) += ( b3 * N(ii) );
+            velPrev(0) += ( b1 * N[ii] );
+            velPrev(1) += ( b2 * N[ii] );
+            velPrev(2) += ( b3 * N[ii] );
 
-            gradPrev(0,0) += ( b1 * dN_dx(ii) );
-            gradPrev(0,1) += ( b1 * dN_dy(ii) );
-            gradPrev(0,2) += ( b1 * dN_dz(ii) );
+            gradPrev(0,0) += ( b1 * dN_dx[ii] );
+            gradPrev(0,1) += ( b1 * dN_dy[ii] );
+            gradPrev(0,2) += ( b1 * dN_dz[ii] );
 
-            gradPrev(1,0) += ( b2 * dN_dx(ii) );
-            gradPrev(1,1) += ( b2 * dN_dy(ii) );
-            gradPrev(1,2) += ( b2 * dN_dz(ii) );
+            gradPrev(1,0) += ( b2 * dN_dx[ii] );
+            gradPrev(1,1) += ( b2 * dN_dy[ii] );
+            gradPrev(1,2) += ( b2 * dN_dz[ii] );
 
-            gradPrev(2,0) += ( b3 * dN_dx(ii) );
-            gradPrev(2,1) += ( b3 * dN_dy(ii) );
-            gradPrev(2,2) += ( b3 * dN_dz(ii) );
+            gradPrev(2,0) += ( b3 * dN_dx[ii] );
+            gradPrev(2,1) += ( b3 * dN_dy[ii] );
+            gradPrev(2,2) += ( b3 * dN_dz[ii] );
 
             b1     = SolnData->var1Cur(TI);
             b2     = SolnData->var1Cur(TIp1);
             b3     = SolnData->var1Cur(TIp2);
             b4     = SolnData->var1(TIp3);
 
-            vel(0) += ( b1 * N(ii) );
-            vel(1) += ( b2 * N(ii) );
-            vel(2) += ( b3 * N(ii) );
+            vel(0) += ( b1 * N[ii] );
+            vel(1) += ( b2 * N[ii] );
+            vel(2) += ( b3 * N[ii] );
 
-            grad(0,0) += ( b1 * dN_dx(ii) );
-            grad(0,1) += ( b1 * dN_dy(ii) );
-            grad(0,2) += ( b1 * dN_dz(ii) );
+            grad(0,0) += ( b1 * dN_dx[ii] );
+            grad(0,1) += ( b1 * dN_dy[ii] );
+            grad(0,2) += ( b1 * dN_dz[ii] );
 
-            grad(1,0) += ( b2 * dN_dx(ii) );
-            grad(1,1) += ( b2 * dN_dy(ii) );
-            grad(1,2) += ( b2 * dN_dz(ii) );
+            grad(1,0) += ( b2 * dN_dx[ii] );
+            grad(1,1) += ( b2 * dN_dy[ii] );
+            grad(1,2) += ( b2 * dN_dz[ii] );
 
-            grad(2,0) += ( b3 * dN_dx(ii) );
-            grad(2,1) += ( b3 * dN_dy(ii) );
-            grad(2,2) += ( b3 * dN_dz(ii) );
+            grad(2,0) += ( b3 * dN_dx[ii] );
+            grad(2,1) += ( b3 * dN_dy[ii] );
+            grad(2,2) += ( b3 * dN_dz[ii] );
 
-            Du(0)  += ( b1 * d2N(ii) );
-            Du(1)  += ( b2 * d2N(ii) );
-            Du(2)  += ( b3 * d2N(ii) );
+            Du(0)  += ( b1 * d2N[ii] );
+            Du(1)  += ( b2 * d2N[ii] );
+            Du(2)  += ( b3 * d2N[ii] );
 
-            pres   += ( b4 * N(ii) );
+            pres   += ( b4 * N[ii] );
 
-            dp(0)  += ( b4 * dN_dx(ii) );
-            dp(1)  += ( b4 * dN_dy(ii) );
-            dp(2)  += ( b4 * dN_dz(ii) );
+            dp(0)  += ( b4 * dN_dx[ii] );
+            dp(1)  += ( b4 * dN_dy[ii] );
+            dp(2)  += ( b4 * dN_dz[ii] );
 
             b1     = SolnData->var1DotCur(TI);
             b2     = SolnData->var1DotCur(TIp1);
             b3     = SolnData->var1DotCur(TIp2);
 
-            velDot(0) += ( b1 * N(ii) );
-            velDot(1) += ( b2 * N(ii) );
-            velDot(2) += ( b3 * N(ii) );
+            velDot(0) += ( b1 * N[ii] );
+            velDot(1) += ( b2 * N[ii] );
+            velDot(2) += ( b3 * N[ii] );
           }
 
           // this is pseudo-stress
@@ -1066,13 +1058,13 @@ void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
               TJp2 = TJ+2;
               TJp3 = TJ+3;
 
-              fact2 = rho*acceFact*N(jj);
+              fact2 = rho*acceFact*N[jj];
 
               // time acceleration term
               fact = b4*fact2 ;
 
               // diffusion term
-              fact += (b5*dN_dx(jj) + b6*dN_dy(jj) + b7*dN_dz(jj));
+              fact += (b5*dN_dx[jj] + b6*dN_dy[jj] + b7*dN_dz[jj]);
 
               Klocal(TI,   TJ)   += fact;
               Klocal(TIp1, TJp1) += fact;
@@ -1080,81 +1072,71 @@ void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
               // convection term
 
-              gradN = gradPrev*(rho*N(jj));
+              gradN = gradPrev*(rho*N[jj]);
 
-              Db = rho*(velPrev(0)*dN_dx(jj) + velPrev(1)*dN_dy(jj) + velPrev(2)*dN_dz(jj) );
+              Db = rho*(velPrev(0)*dN_dx[jj] + velPrev(1)*dN_dy[jj] + velPrev(2)*dN_dz[jj] );
 
               gradN(0,0) += Db;
               gradN(1,1) += Db;
               gradN(2,2) += Db;
-              gradN *= af;
 
-              Klocal(TI,   TJ)   += (b4*gradN(0,0));
-              Klocal(TI,   TJp1) += (b4*gradN(0,1));
-              Klocal(TI,   TJp2) += (b4*gradN(0,2));
+              Klocal(TI,   TJ)   += (b8*gradN(0,0));
+              Klocal(TI,   TJp1) += (b8*gradN(0,1));
+              Klocal(TI,   TJp2) += (b8*gradN(0,2));
 
-              Klocal(TIp1, TJ)   += (b4*gradN(1,0));
-              Klocal(TIp1, TJp1) += (b4*gradN(1,1));
-              Klocal(TIp1, TJp2) += (b4*gradN(1,2));
+              Klocal(TIp1, TJ)   += (b8*gradN(1,0));
+              Klocal(TIp1, TJp1) += (b8*gradN(1,1));
+              Klocal(TIp1, TJp2) += (b8*gradN(1,2));
 
-              Klocal(TIp2, TJ)   += (b4*gradN(2,0));
-              Klocal(TIp2, TJp1) += (b4*gradN(2,1));
-              Klocal(TIp2, TJp2) += (b4*gradN(2,2));
+              Klocal(TIp2, TJ)   += (b8*gradN(2,0));
+              Klocal(TIp2, TJp1) += (b8*gradN(2,1));
+              Klocal(TIp2, TJp2) += (b8*gradN(2,2));
 
               // pressure term
-              Klocal(TI,   TJp3) -= (b1*N(jj));
-              Klocal(TIp1, TJp3) -= (b2*N(jj));
-              Klocal(TIp2, TJp3) -= (b3*N(jj));
+              Klocal(TI,   TJp3) -= (b1*N[jj]);
+              Klocal(TIp1, TJp3) -= (b2*N[jj]);
+              Klocal(TIp2, TJp3) -= (b3*N[jj]);
 
               // continuity equation
-              Klocal(TIp3, TJ)   += (b8*dN_dx(jj));
-              Klocal(TIp3, TJp1) += (b8*dN_dy(jj));
-              Klocal(TIp3, TJp2) += (b8*dN_dz(jj));
+              Klocal(TIp3, TJ)   += (b8*dN_dx[jj]);
+              Klocal(TIp3, TJp1) += (b8*dN_dy[jj]);
+              Klocal(TIp3, TJp2) += (b8*dN_dz[jj]);
 
               // SUPG and PSPG stabilisation terms
-              fact2 -= muTaf*d2N(jj);
+              fact2 -= muTaf*d2N[jj];
+
+              gradN *= af;
 
               Dj(0,0) = gradN(0,0) + fact2;
               Dj(0,1) = gradN(0,1);
               Dj(0,2) = gradN(0,2);
-              Dj(0,3) = dN_dx(jj);
+              Dj(0,3) = dN_dx[jj];
 
               Dj(1,0) = gradN(1,0);
               Dj(1,1) = gradN(1,1) + fact2;
               Dj(1,2) = gradN(1,2);
-              Dj(1,3) = dN_dy(jj);
+              Dj(1,3) = dN_dy[jj];
 
               Dj(2,0) = gradN(2,0);
               Dj(2,1) = gradN(2,1);
               Dj(2,2) = gradN(2,2) + fact2;
-              Dj(2,3) = dN_dz(jj);
+              Dj(2,3) = dN_dz[jj];
 
               // SUPG
               Klocal(TI, TJ)     += Da*Dj(0,0);
               Klocal(TI, TJp1)   += Da*Dj(0,1);
               Klocal(TI, TJp2)   += Da*Dj(0,2);
+              Klocal(TI, TJp3)   += Da*Dj(0,3);
 
               Klocal(TIp1, TJ)   += Da*Dj(1,0);
               Klocal(TIp1, TJp1) += Da*Dj(1,1);
               Klocal(TIp1, TJp2) += Da*Dj(1,2);
+              Klocal(TIp1, TJp3) += Da*Dj(1,3);
 
               Klocal(TIp2, TJ)   += Da*Dj(2,0);
               Klocal(TIp2, TJp1) += Da*Dj(2,1);
               Klocal(TIp2, TJp2) += Da*Dj(2,2);
-
-              //c1 = tau[0] * af * rho * N(jj);
-
-              //Klocal(TI,   TJ)   += ( c1 * b1 * rStab(0) );  
-              //Klocal(TI,   TJp1) += ( c1 * b2 * rStab(0) );
-              //Klocal(TI,   TJp2) += ( c1 * b3 * rStab(0) );
-
-              //Klocal(TIp1, TJ)   += ( c1 * b1 * rStab(1) );
-              //Klocal(TIp1, TJp1) += ( c1 * b2 * rStab(1) );
-              //Klocal(TIp1, TJp2) += ( c1 * b3 * rStab(1) );
-
-              //Klocal(TIp2, TJ)   += ( c1 * b1 * rStab(2) );
-              //Klocal(TIp2, TJp1) += ( c1 * b2 * rStab(2) );
-              //Klocal(TIp2, TJp2) += ( c1 * b3 * rStab(2) );
+              Klocal(TIp2, TJp3) += Da*Dj(2,3);
 
               // PSPG
               Klocal(TIp3, TJ)   += ( b1*Dj(0,0) + b2*Dj(1,0) + b3*Dj(2,0) )*tau[1];
@@ -1166,17 +1148,17 @@ void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
               fact2 = rho*af*tau[2];
 
-              Klocal(TI,   TJ)   += (b1*dN_dx(jj))*fact2;
-              Klocal(TI,   TJp1) += (b1*dN_dy(jj))*fact2;
-              Klocal(TI,   TJp2) += (b1*dN_dz(jj))*fact2;
+              Klocal(TI,   TJ)   += (b1*dN_dx[jj])*fact2;
+              Klocal(TI,   TJp1) += (b1*dN_dy[jj])*fact2;
+              Klocal(TI,   TJp2) += (b1*dN_dz[jj])*fact2;
 
-              Klocal(TIp1, TJ)   += (b2*dN_dx(jj))*fact2;
-              Klocal(TIp1, TJp1) += (b2*dN_dy(jj))*fact2;
-              Klocal(TIp1, TJp2) += (b2*dN_dz(jj))*fact2;
+              Klocal(TIp1, TJ)   += (b2*dN_dx[jj])*fact2;
+              Klocal(TIp1, TJp1) += (b2*dN_dy[jj])*fact2;
+              Klocal(TIp1, TJp2) += (b2*dN_dz[jj])*fact2;
 
-              Klocal(TIp2, TJ)   += (b3*dN_dx(jj))*fact2;
-              Klocal(TIp2, TJp1) += (b3*dN_dy(jj))*fact2;
-              Klocal(TIp2, TJp2) += (b3*dN_dz(jj))*fact2;
+              Klocal(TIp2, TJ)   += (b3*dN_dx[jj])*fact2;
+              Klocal(TIp2, TJp1) += (b3*dN_dy[jj])*fact2;
+              Klocal(TIp2, TJp2) += (b3*dN_dz[jj])*fact2;
             }
 
             Flocal(TI)   -= (b4*res2(0) + b1*stress(0,0) + b2*stress(0,1) + b3*stress(0,2) );
@@ -1204,7 +1186,7 @@ void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
     return;
 }
-*/
+//
 
 
 
@@ -1339,7 +1321,7 @@ void TreeNode<3>::applyBoundaryConditionsAtApointCutFEMFluid(myDataIntegrateCutF
         bb1 = N[ii] * myData.dvol;
         bb2 = bb1 * myData.PENALTY ;
 
-        Ta1 = (myData.dvol*mu1)*( dN_dx(ii)*normal1[0] + dN_dy(ii)*normal1[1] + dN_dz(ii)*normal1[2]);
+        Ta1 = (myData.dvol*mu1)*( dN_dx[ii]*normal1[0] + dN_dy[ii]*normal1[1] + dN_dz[ii]*normal1[2]);
 
         for(jj=0;jj<totnlbf2;jj++)
         {
@@ -1355,28 +1337,28 @@ void TreeNode<3>::applyBoundaryConditionsAtApointCutFEMFluid(myDataIntegrateCutF
           myData.K1(TIp2, TJp2) += fact;
 
           // Nitsche terms
-          Tb1 = af*mu1*( dN_dx(jj)*normal1[0] + dN_dy(jj)*normal1[1] + dN_dz(jj)*normal1[2] );
+          Tb1 = af*mu1*( dN_dx[jj]*normal1[0] + dN_dy[jj]*normal1[1] + dN_dz[jj]*normal1[2] );
 
-          fact1 = -normal1[0]*N(jj);
-          fact2 = -normal1[1]*N(jj);
-          fact3 = -normal1[2]*N(jj);
+          fact1 = -normal1[0]*N[jj];
+          fact2 = -normal1[1]*N[jj];
+          fact3 = -normal1[2]*N[jj];
 
           myData.K1(TI, TJ)      -= (bb1*Tb1);
           myData.K1(TI, TJp3)    -= (bb1*fact1);
 
-          myData.K1(TI, TJ)      -= (Ta1*af*N(jj))*myData.NitscheFact;
+          myData.K1(TI, TJ)      -= (Ta1*af*N[jj])*myData.NitscheFact;
           myData.K1(TIp3, TJ)    -= (bb1*fact1*af*myData.NitscheFact);
 
           myData.K1(TIp1, TJp1)  -= (bb1*Tb1);
           myData.K1(TIp1, TJp3)  -= (bb1*fact2);
 
-          myData.K1(TIp1, TJp1)  -= (Ta1*af*N(jj))*myData.NitscheFact;
+          myData.K1(TIp1, TJp1)  -= (Ta1*af*N[jj])*myData.NitscheFact;
           myData.K1(TIp3, TJp1)  -= (bb1*fact2*af*myData.NitscheFact);
 
           myData.K1(TIp2, TJp2)  -= (bb1*Tb1);
           myData.K1(TIp2, TJp3)  -= (bb1*fact3);
 
-          myData.K1(TIp2, TJp2)  -= (Ta1*af*N(jj))*myData.NitscheFact;
+          myData.K1(TIp2, TJp2)  -= (Ta1*af*N[jj])*myData.NitscheFact;
           myData.K1(TIp3, TJp2)  -= (bb1*fact3*af*myData.NitscheFact);
         }
 
@@ -1568,7 +1550,7 @@ void TreeNode<3>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
   if(DirichletData.size() > 0)
   {
     int ii, jj, aa, gp, nGauss, TI, TIp1, TIp2, TIp3, index, TJ, TJp1, TJp2, TJp3, dir, side;
-    double  theta, y0, y1, Ta, Tb, res, JacTemp, NitscheFact, pres;
+    double  theta, y0, y1, z0, z1, Ta, Tb, res, JacTemp, NitscheFact, pres;
     double  dvol, specVal, PENALTY, Jac, fact, bb1, bb2, bb3;
     double  xc, yc, zc, R;
     bool  isNitsche;
@@ -1586,9 +1568,9 @@ void TreeNode<3>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
     double *gws;
     myPoint *gps;
     
-    y0 = 0.0;
-    y1 = 0.41;
-    y1 = 1.0;
+    //y0 = 0.0;     y1 = 0.41;
+    y0 =  0.0;     y1 = 0.6;
+    z0 = -0.6;     z1 = 0.6;
 
     xc = 0.0;
     yc = 0.5;
@@ -1687,17 +1669,20 @@ void TreeNode<3>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
 
               specVal = DirichletData[aa][2];
 
-              /*
+              //
               if(side == 0 )
               {
                 if(dir == 0)
                 {
-                  //specVal = DirichletData[aa][2]*16.0*(6.0/y1/y1)*(y1-yy)*(yy-y0);
+                  //fact = (16.0)*(1.0/(y1-y0)/(y1-y0))*(1.0/(z1-z0)/(z1-z0));
+                  fact = 10000.0/324.0;
+                  specVal = DirichletData[aa][2]*fact*(y1-geom[1])*(geom[1]-y0)*(z1-geom[2])*(geom[2]-z0);  // plate Wall
                   
-                  specVal = 16.0*DirichletData[aa][2]*geom[1]*geom[2]*(H-geom[1])*(H-geom[2])/pow(H,4.0);
+                  //specVal = DirichletData[aa][2]*16.0*(6.0/y1/y1)*(y1-yy)*(yy-y0);
+                  //specVal = 16.0*DirichletData[aa][2]*geom[1]*geom[2]*(H-geom[1])*(H-geom[2])/pow(H,4.0);
                 }
               }
-              */
+              //
               /*
             if(side == 3)
             {
@@ -1780,7 +1765,7 @@ void TreeNode<3>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
                     TIp2 = TI+2;
                     TIp3 = TI+3;
 
-                    Ta = mu*(normal[0]*dN_dx(ii) + normal[1]*dN_dy(ii) + normal[2]*dN_dz(ii))*dvol;
+                    Ta = mu*(normal[0]*dN_dx[ii] + normal[1]*dN_dy[ii] + normal[2]*dN_dz[ii])*dvol;
                     bb1 = N[ii]*dvol;
 
                     for(jj=0;jj<totnlbf2;jj++)
@@ -1790,15 +1775,15 @@ void TreeNode<3>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
                       TJp2 = TJ+2;
                       TJp3 = TJ+3;
 
-                      Tb = af*mu*( normal[0]*dN_dx(jj) + normal[1]*dN_dy(jj) + normal[2]*dN_dz(jj) );
+                      Tb = af*mu*( normal[0]*dN_dx[jj] + normal[1]*dN_dy[jj] + normal[2]*dN_dz[jj] );
 
-                      fact = bb1*(-normal[0]*N(jj));
+                      fact = bb1*(-normal[0]*N[jj]);
 
                       Klocal(TI, TJ)   -= (bb1*Tb);
                       Klocal(TI, TJp3) -= fact;
 
                       // Nitsche terms
-                      Klocal(TI, TJ)   -= (Ta*af*N(jj))*NitscheFact;
+                      Klocal(TI, TJ)   -= (Ta*af*N[jj])*NitscheFact;
                       Klocal(TIp3, TJ) -= fact*af*NitscheFact;
                     }
 
@@ -1819,7 +1804,7 @@ void TreeNode<3>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
                     TIp2 = TI+2;
                     TIp3 = TI+3;
 
-                    Ta = mu*(normal[0]*dN_dx(ii) + normal[1]*dN_dy(ii) + normal[2]*dN_dz(ii))*dvol;
+                    Ta = mu*(normal[0]*dN_dx[ii] + normal[1]*dN_dy[ii] + normal[2]*dN_dz[ii])*dvol;
                     bb1 = N[ii]*dvol;
 
                     for(jj=0;jj<totnlbf2;jj++)
@@ -1829,15 +1814,15 @@ void TreeNode<3>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
                       TJp2 = TJ+2;
                       TJp3 = TJ+3;
 
-                      Tb = af*mu*( normal[0]*dN_dx(jj) + normal[1]*dN_dy(jj) + normal[2]*dN_dz(jj) );
+                      Tb = af*mu*( normal[0]*dN_dx[jj] + normal[1]*dN_dy[jj] + normal[2]*dN_dz[jj] );
 
-                      fact = bb1*(-normal[1]*N(jj));
+                      fact = bb1*(-normal[1]*N[jj]);
 
                       Klocal(TIp1, TJp1)  -= (bb1*Tb);
                       Klocal(TIp1, TJp3)  -= fact;
 
                       // Nitsche terms
-                      Klocal(TIp1, TJp1)  -= (Ta*af*N(jj))*NitscheFact;
+                      Klocal(TIp1, TJp1)  -= (Ta*af*N[jj])*NitscheFact;
                       Klocal(TIp3, TJp1)  -= fact*af*NitscheFact;
                     }
 
@@ -1858,7 +1843,7 @@ void TreeNode<3>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
                     TIp2 = TI+2;
                     TIp3 = TI+3;
 
-                    Ta = mu*(normal[0]*dN_dx(ii) + normal[1]*dN_dy(ii) + normal[2]*dN_dz(ii))*dvol;
+                    Ta = mu*(normal[0]*dN_dx[ii] + normal[1]*dN_dy[ii] + normal[2]*dN_dz[ii])*dvol;
                     bb1 = N[ii]*dvol;
 
                     for(jj=0;jj<totnlbf2;jj++)
@@ -1868,15 +1853,15 @@ void TreeNode<3>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
                       TJp2 = TJ+2;
                       TJp3 = TJ+3;
 
-                      Tb = af*mu*( normal[0]*dN_dx(jj) + normal[1]*dN_dy(jj) + normal[2]*dN_dz(jj) );
+                      Tb = af*mu*( normal[0]*dN_dx[jj] + normal[1]*dN_dy[jj] + normal[2]*dN_dz[jj] );
 
-                      fact = bb1*(-normal[2]*N(jj));
+                      fact = bb1*(-normal[2]*N[jj]);
 
                       Klocal(TIp2, TJp2)  -= (bb1*Tb);
                       Klocal(TIp2, TJp3)  -= fact;
 
                       // Nitsche terms
-                      Klocal(TIp2, TJp2)  -= (Ta*af*N(jj))*NitscheFact;
+                      Klocal(TIp2, TJp2)  -= (Ta*af*N[jj])*NitscheFact;
                       Klocal(TIp3, TJp2)  -= fact*af*NitscheFact;
                     }
 
@@ -2006,7 +1991,7 @@ void TreeNode<3>::applyNeumannBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal,
 
             //cout << " yy " << yy << '\t' << res << endl;
             for(ii=0;ii<totnlbf2;ii++)
-              Flocal(ndof*ii+dir) += (res*N(ii));
+              Flocal(ndof*ii+dir) += (res*N[ii]);
 
         }// for(gp=0...
       } // for(aa=0;aa<NeumannData.size();aa++)

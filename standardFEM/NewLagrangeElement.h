@@ -35,6 +35,9 @@
 #include "LagrangeElem3DStructSolidTet4NodeStab.h"
 #include "LagrangeElem3DStructSolidHex8NodeStab.h"
 
+#include "MindlinPlateElement.h"
+#include "KirchhoffPlateElement.h"
+#include "LagrangeElem3DShellQuad4Node.h"
 
 
 inline  LagrangeElement*  NewLagrangeElement(int type)
@@ -100,6 +103,12 @@ inline  LagrangeElement*  NewLagrangeElement(int type)
     case 28: return (LagrangeElement*) new LagrangeElem3DStructSolidTet4NodeStab; break;
 
     case 29: return (LagrangeElement*) new LagrangeElem3DStructSolidHex8NodeStab; break;
+
+    case 30: return (LagrangeElement*) new MindlinPlateElement; break;
+
+    case 31: return (LagrangeElement*) new KirchhoffPlateElement; break;
+
+    case 32: return (LagrangeElement*) new LagrangeElem3DShellQuad4Node; break;
 
     default: prgError(1,"ImmersedFlexibleSolid::newElement","unknown element type name!"); return NULL;
   }

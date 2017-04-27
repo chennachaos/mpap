@@ -48,7 +48,7 @@ struct RunControl
   {
     mode = rm;
     if (mode == BATCH) 
-      int tt=2;
+       cout <<  " BATCH mode " << endl;
         //plot.suppressCopyPixmap = true;
     else 
     { 

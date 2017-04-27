@@ -15,21 +15,22 @@ class SolverPardisoPetsc: public SolverPetsc
 
     void   *PT[64];
 
-    double DPARM[64], *X, *val;
+    double DPARM[64], *val, ddum;
+    vector<double>  solnX;
 
-    PetscInt   *csr, *col;
+    PetscInt   *csr, *col, *perm;
 
     PetscScalar *array;
 
-    int    SOLVER, MTYPE, MAXFCT, MNUM, NRHS, MSGLVL, N, IPARM[64], nx;
+    int    phase, error, SOLVER, MTYPE, MAXFCT, MNUM, NRHS, MSGLVL, IPARM[64];
 
     virtual int initialise(int p1 = 0, int p2 = 0, int p3 = 0);
 
     virtual int  factorise();
 
-    virtual double *solve(double*, int nrhs = 1);
+    virtual int  solve();
 
-    virtual double *factoriseAndSolve(double*, int nrhs = 1);
+    virtual int  factoriseAndSolve();
 
     virtual int free();
 

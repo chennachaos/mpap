@@ -33,15 +33,20 @@ void  HBSplineBase::computeTotalBodyForce(int index)
 
 
 
+
 void  HBSplineBase::updateImmersedPointPositions()
 {
+  IB_MOVED = false;
   for(int bb=0; bb<nImmSolids; bb++)
   {
-    ImmersedBodyObjects[bb]->updatePointPositions();
+    IB_MOVED = (IB_MOVED || ImmersedBodyObjects[bb]->updatePointPositions() );
   }
+  //cout << " HBSplineFEM::updateImmersedPointPositions() " << endl;
 
   return;
 }
+
+
 
 
 void  HBSplineBase::writeNodalData()
@@ -219,7 +224,14 @@ bool HBSplineBase::converged()
   char fct[] = "HBSplineBase::converged";
 
   if (rNorm < tol && localStiffnessError == 0)
+  {
+    //if(STAGGERED && (SOLID_SOLVED == 0))
+    //{
+      //solveSolidProblem();
+      //SOLID_SOLVED = 1;
+    //}
     return true;
+  }
 
   return false;
 }

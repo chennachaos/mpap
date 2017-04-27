@@ -18,7 +18,7 @@ class SolverEigen
   public:
 
     VectorXd   rhsVec, soln, solnPrev, var1, var1Prev, var2, var2Prev, var3, var3Prev;
-    VectorXd   f1, f2, f3;
+    VectorXd   f1, f2, f3, reac;
 
     SparseMatrixXd  mtx, matA, matB, matC, matE, PreCondSchur;
 

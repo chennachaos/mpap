@@ -23,8 +23,16 @@ GaussQuadrature::~GaussQuadrature()
 
 void GaussQuadrature::reset()
 {
+  gausspoints.erase(gausspoints.begin(), gausspoints.begin()+gausspoints.size() );
+  gaussweights.erase(gaussweights.begin(), gaussweights.begin()+gaussweights.size() );
+
   gausspoints.clear();
   gaussweights.clear();
+  
+  //vector<myPoint>().swap(gausspoints);   // clear x reallocating
+  //vector<double>().swap(gaussweights);
+
+  return;
 }
 
 

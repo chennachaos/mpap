@@ -51,9 +51,11 @@ class ImmersedFlexibleSolid : public ImmersedSolid
 
         virtual void  calcForceVector();
 
-        virtual void  applyBoundaryConditions(int start, SparseMatrixXd& globalK, double* rhs);
+        virtual int  applyBoundaryConditions(int start1, int start2, SparseMatrixXd& globalK, double* rhs);
 
-        virtual void  applyExternalForces();
+        virtual int  applyBoundaryConditions(int start1, int start2, Mat mtxTemp, Vec rhsTemp);
+
+        virtual int  applyExternalForces();
 
         virtual void  SolveTimeStep();
 
@@ -79,7 +81,7 @@ class ImmersedFlexibleSolid : public ImmersedSolid
 
         virtual int AssembleGlobalMatrixAndVector(int ind1, int ind2, SparseMatrixXd& mtx, double* rhs);
 
-        virtual int AssembleGlobalMatrixAndVectorCutFEM(int ind1, int ind2, SparseMatrixXd& mtx, double* rhs);
+        virtual int AssembleGlobalMatrixAndVectorCutFEM(int ind1, int ind2, SolverPetsc* solverTemp);
 
         virtual void setSolver(int slv = 1, int *parm = NULL, bool cIO = false);
 

@@ -268,9 +268,9 @@ int  SolverEigen::solve()
   {
     //cout << " Solving with Eigen::SimplicialLDLT " << endl;
 
-    SimplicialLDLT<SparseMatrix<double> > solver;
+    //SimplicialLDLT<SparseMatrix<double> > solver;
 
-    //SuperLU<SparseMatrixXd > solver;
+    SuperLU<SparseMatrixXd > solver;
     tstart = time(0);
   
     solver.compute(mtx);
@@ -524,13 +524,14 @@ int  SolverEigen::solve()
 
 int SolverEigen::factoriseAndSolve()
 {
-  char fct[] = "SolverEigen::factoriseAndSolve";
-
-  if (currentStatus != ASSEMBLY_OK) { prgWarning(1,fct,"assemble matrix first!"); return 1; }
-  
-  //cout << mtx << endl;
+  if(currentStatus != ASSEMBLY_OK)
+  {
+    cerr << " assemble matrix first! " << endl;
+    return 1;
+  }
   
   factorise();
+
   return solve();
 }
 
@@ -544,8 +545,7 @@ int SolverEigen::AssembleMatrixAndVector(vector<int>& row, vector<int>& col, Mat
     rhsVec[row[ii]] += Flocal(ii);
     for(jj=0;jj<col.size();jj++)
     {
-       //cout << ii << '\t' << jj << endl;
-       mtx.coeffRef(row[ii], col[jj]) += Klocal(ii,jj);
+      mtx.coeffRef(row[ii], col[jj]) += Klocal(ii,jj);
     }
   }
 
@@ -557,6 +557,10 @@ int SolverEigen::AssembleMatrixAndVector(vector<int>& row, vector<int>& col, Mat
 
 int SolverEigen::AssembleMatrixAndVector(int start, int c1, vector<int>& vec1, vector<int>& vec2, MatrixXd& Klocal, VectorXd& Flocal)
 {
+  // subroutine for mixed formulation
+  // vec1 - for variable 'u'
+  // vec2 - for variable 'p'
+
   int ii, jj, aa, bb, size1, size2;
 
   //printVector(vec1);
@@ -588,15 +592,15 @@ int SolverEigen::AssembleMatrixAndVector(int start, int c1, vector<int>& vec1, v
 
   if(STABILISED)
   {
-  for(ii=0;ii<size2;ii++)
-  {
-    aa = start + vec2[ii];
-    bb = size1 + ii;
-    for(jj=0;jj<size2;jj++)
+    for(ii=0;ii<size2;ii++)
     {
-       mtx.coeffRef(aa, start+vec2[jj]) += Klocal(bb, size1+jj);
+      aa = start + vec2[ii];
+      bb = size1 + ii;
+      for(jj=0;jj<size2;jj++)
+      {
+        mtx.coeffRef(aa, start+vec2[jj]) += Klocal(bb, size1+jj);
+      }
     }
-  }
   }
 
   return 0;
@@ -605,28 +609,25 @@ int SolverEigen::AssembleMatrixAndVector(int start, int c1, vector<int>& vec1, v
 
 
 
-int SolverEigen::AssembleMatrixAndVector(int start, int c1, vector<int>& vec1, MatrixXd& Klocal, VectorXd& Flocal)
+int SolverEigen::AssembleMatrixAndVector(int start, int c1, vector<int>& forAssy, MatrixXd& Klocal, VectorXd& Flocal)
 {
   int ii, jj, aa, bb, size1, r, c;
 
-  //printVector(vec1);
-  //printVector(vec2);
-  
-  size1 = vec1.size();
+  size1 = forAssy.size();
 
   /*
   for(ii=0;ii<size1;ii++)
   {
-    rhsVec[vec1[ii]] += Flocal(ii);
+    rhsVec[forAssy[ii]] += Flocal(ii);
 
     for(jj=0;jj<size1;jj++)
-      mtx.coeffRef(vec1[ii], vec1[jj]) += Klocal(ii, jj);
+      mtx.coeffRef(forAssy[ii], forAssy[jj]) += Klocal(ii, jj);
   }
   */
 
   for(ii=0; ii<size1; ii++)
   {
-    aa = vec1[ii];
+    aa = forAssy[ii];
     if( aa != -1 )
     {
       r = start + aa;
@@ -634,7 +635,7 @@ int SolverEigen::AssembleMatrixAndVector(int start, int c1, vector<int>& vec1, M
 
       for(jj=0; jj<size1; jj++)
       {
-        bb = vec1[jj];
+        bb = forAssy[jj];
         if( bb != -1 )
           mtx.coeffRef(r, start+bb) += Klocal(ii,jj);
       }
@@ -660,7 +661,7 @@ int SolverEigen::AssembleVector(int start, int c1, vector<int>& vec1, VectorXd& 
 
 
 
-int SolverEigen::AssembleMatrixAndVectorCutFEM(int start, int c1, vector<int>& tempVec, vector<int>& forAssy, MatrixXd& Klocal, VectorXd& Flocal)
+int SolverEigen::AssembleMatrixAndVectorCutFEM(int start, int c1, vector<int>& grid2cutfem_DOF, vector<int>& forAssy, MatrixXd& Klocal, VectorXd& Flocal)
 {
   int ii, jj, size1, r;
 
@@ -668,34 +669,34 @@ int SolverEigen::AssembleMatrixAndVectorCutFEM(int start, int c1, vector<int>& t
   //printVector(vec2);
 
 /*
-  size1 = tempVec.size();
+  size1 = grid2cutfem_DOF.size();
 
   for(ii=0;ii<size1;ii++)
   {
-    r = start+forAssy[tempVec[ii]];
+    r = start+forAssy[grid2cutfem_DOF[ii]];
 
     rhsVec[r] += Flocal(ii);
 
     for(jj=0;jj<size1;jj++)
-      mtx.coeffRef(r, start+forAssy[tempVec[jj]]) += Klocal(ii, jj);
+      mtx.coeffRef(r, start+forAssy[grid2cutfem_DOF[jj]]) += Klocal(ii, jj);
   }
 */
 //
-  size1 = tempVec.size();
+  size1 = grid2cutfem_DOF.size();
 
   for(ii=0;ii<size1;ii++)
   {
-    r = forAssy[tempVec[ii]];
+    r = forAssy[grid2cutfem_DOF[ii]];
 
     rhsVec[r] += Flocal(ii);
 
     for(jj=0;jj<size1;jj++)
-      mtx.coeffRef(r, forAssy[tempVec[jj]]) += Klocal(ii, jj);
+      mtx.coeffRef(r, forAssy[grid2cutfem_DOF[jj]]) += Klocal(ii, jj);
   }
 //
 
 /*
-  size1 = tempVec.size();
+  size1 = grid2cutfem_DOF.size();
 
   for(ii=0;ii<size1;ii++)
   {
@@ -713,7 +714,7 @@ int SolverEigen::AssembleMatrixAndVectorCutFEM(int start, int c1, vector<int>& t
 
 
 
-int SolverEigen::AssembleMatrixAndVectorCutFEM2(int start1, int start2, vector<int>& tempVec, 
+int SolverEigen::AssembleMatrixAndVectorCutFEM2(int start1, int start2, vector<int>& grid2cutfem_DOF, 
      vector<int>& forAssy1, vector<int>& forAssy2, MatrixXd& Klocal, VectorXd& Flocal1, VectorXd& Flocal2)
 {
   // to assemble coupling matrices arriving from 
@@ -724,24 +725,24 @@ int SolverEigen::AssembleMatrixAndVectorCutFEM2(int start1, int start2, vector<i
   //printVector(vec1);
   //printVector(vec2);
   
-  size1 = tempVec.size();
+  size1 = grid2cutfem_DOF.size();
 
   for(ii=0;ii<size1;ii++)
   {
     // force vector for domain #2
-    r = start2 + forAssy2[tempVec[ii]];
+    r = start2 + forAssy2[grid2cutfem_DOF[ii]];
 
     rhsVec[r] += Flocal2(ii);
 
     // force vector for domain #1
-    r = start1 + forAssy1[tempVec[ii]];
+    r = start1 + forAssy1[grid2cutfem_DOF[ii]];
 
     rhsVec[r] += Flocal1(ii);
 
     // coupling matrix
     for(jj=0;jj<size1;jj++)
     {
-      c = start2 + forAssy2[tempVec[jj]];
+      c = start2 + forAssy2[grid2cutfem_DOF[jj]];
       mtx.coeffRef(r, c) += Klocal(ii, jj);
       mtx.coeffRef(c, r) += Klocal(ii, jj);
     }

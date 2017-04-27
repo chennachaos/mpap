@@ -4,7 +4,14 @@
 
 
 
-
+inline  void  get_stabilisation_beta_wulf(double* beta)
+{
+    beta[0] = 1.0;     beta[1] = 1.0/3.0;
+    beta[2] = 30.0;    beta[3] = 0.1;
+    beta[4] = 1.0;     beta[5] = 1.0;
+    
+    return;
+}
 
 
 

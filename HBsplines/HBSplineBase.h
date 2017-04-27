@@ -44,7 +44,7 @@ class HBSplineBase: public Domain
         int  DIM, CURRENT_LEVEL, MAX_LEVEL, numActiveElem, ndof, numActiveBasis, filecount, LSFEM_FLAG, numProc;
         int  degree[3], nlbf[3], nelem[3], totnumel, IterNum, iterCount;
         int  gridBF1, gridBF2, gridBFtotal, totalDOF;
-        int  nImmSolids, SOLVER_TYPE, slv_type;
+        int  nImmSolids, SOLVER_TYPE, slv_type, SOLID_SOLVED;
 
         PetscInt  nElem, nNode, nElem_local, nNode_local;
         PetscInt  n_mpi_procs, this_mpi_proc;
@@ -98,7 +98,7 @@ class HBSplineBase: public Domain
 
         SparseMatrixXd  globalK2;
 
-        VectorXd   soln, solnInit;
+        VectorXd   soln, solnInit, totalForce;
 
         SolutionData  SolnData;
 
@@ -431,12 +431,18 @@ class HBSplineBase: public Domain
         { cout << " postProcessFlow() ... is not defined for the class... " << endl; return; }
 
         void  computeTotalBodyForce(int );
-        void  IBpoints(int ii);
-        double* nd1(int arg1);
+
+        virtual  int  solveFluidProblem();
+
+        virtual  int  fsi_staggered_force_predictor(int max_iter, double tol_local);
+
+        virtual  int  fsi_staggered_displacement_predictor(int max_iter, double tol_local);
+
+        virtual  int  fsi_monolithic_fixedpoint_forcePred(int max_iter, double tol_local);
+
+        virtual  int  fsi_monolithic_fixedpoint_dispPred(int max_iter, double tol_local);
 
 };
-
-
 
 
 

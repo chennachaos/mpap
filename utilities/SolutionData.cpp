@@ -21,7 +21,7 @@ SolutionData::SolutionData()
   
   STAGGERED = true;
 
-  stagParams.resize(3);
+  stagParams.resize(10);
   stagParams[0] = 1;
   stagParams[1] = 1;
   stagParams[2] = 1.0;
@@ -52,8 +52,13 @@ void SolutionData::SetStaggeredParams(vector<double>&  vecTemp)
 }
 
 
-void SolutionData::initialise(int size1, int size2, int size3, int size4)
+void SolutionData::initialise(int s1, int s2, int s3, int s4)
 {
+  size1 = s1;
+  size2 = s2;
+  size3 = s3;
+  size4 = s4;
+
     /////////////////////// 
     // for solid domain
     //
@@ -194,8 +199,9 @@ void  SolutionData::timeUpdate()
   var3Prev = var3;
   var4Prev = var4;
   
+  var1Extrap = var1Prev;
   //var1Extrap = 2.0*var1Prev - var1Prev2;
-  var1Extrap = 3.0*var1Prev - 3.0*var1Prev2 + var1Prev3;
+  //var1Extrap = 3.0*var1Prev - 3.0*var1Prev2 + var1Prev3;
 
   var1DotPrev = var1Dot;
   var1DotDotPrev = var1DotDot;
@@ -247,6 +253,7 @@ void  SolutionData::timeUpdate()
         
       case 2:
         q1 =  2.0;  q2 = -1.0;  q3 =  0.0;  q4 =  0.0;
+        //q1 =  4.0/3.0;  q2 = -1.0/3.0;  q3 =  0.0;  q4 =  0.0;
         break;
       
       case 3:
@@ -267,8 +274,6 @@ void  SolutionData::timeUpdate()
     forcePred = q1*force + q2*forcePrev + q3*forcePrev2 + q4*forcePrev3;
 
     forceCur  = td[2]*forcePred + (1.0-td[2])*force;
-    //forceCur  = td[4]*forcePred + (1.0-td[4])*force;
-    //printVector(forceCur);
 
   }
 
@@ -310,7 +315,7 @@ void SolutionData::interpolateForce()
 
     force     =  beta*forceTemp + (1.0-beta)*forcePred;
 
-    //forceCur  =  td[2]*force + (1.0-td[2])*forcePrev;
+    forceCur  =  td[2]*force + (1.0-td[2])*forcePrev;
   }
   else
   {
@@ -330,20 +335,24 @@ void SolutionData::updateIterStep()
   
   if( PHYSICS_TYPE == PHYSICS_TYPE_SOLID )
   {
-    // displacement as the primary variable
-    //cout << "  SOLID SOLID SOLID " << endl;
+    //if(STAGGERED)
+    //{
+      // displacement as the primary variable
+      //cout << "  SOLID SOLID SOLID " << endl;
 
-    var1Dot     = td[10]*var1 + td[11]*var1Prev + td[12]*var1DotPrev + td[13]*var1DotDotPrev + td[14]*dDotPrev;
-    var1DotDot  = td[15]*var1 + td[16]*var1Prev + td[17]*var1DotPrev + td[18]*var1DotDotPrev + td[19]*dDotPrev;
-    dDot        = td[20]*var1 + td[21]*var1Prev + td[22]*var1DotPrev + td[23]*var1DotDotPrev + td[24]*dDotPrev;
+      var1Dot     = td[10]*var1 + td[11]*var1Prev + td[12]*var1DotPrev + td[13]*var1DotDotPrev + td[14]*dDotPrev;
+      var1DotDot  = td[15]*var1 + td[16]*var1Prev + td[17]*var1DotPrev + td[18]*var1DotDotPrev + td[19]*dDotPrev;
+      dDot        = td[20]*var1 + td[21]*var1Prev + td[22]*var1DotPrev + td[23]*var1DotDotPrev + td[24]*dDotPrev;
+    //}
+    //else
+    //{
+      // velocity as the primary variable
 
-    // velocity as the primary variable
-
-    //var1       = td[40]*var1Dot + td[41]*var1Prev + td[42]*var1DotPrev + td[43]*var1DotDotPrev + td[44]*dDotPrev;
-    //var1DotDot = td[45]*var1Dot + td[46]*var1Prev + td[47]*var1DotPrev + td[48]*var1DotDotPrev + td[49]*dDotPrev;
-
-    // ddot_{n+1} for modified state-space formulation
-    //dDot       = td[50]*var1Dot + td[51]*var1Prev + td[52]*var1DotPrev + td[53]*var1DotDotPrev + td[54]*dDotPrev;
+      //var1       = td[40]*var1Dot + td[41]*var1Prev + td[42]*var1DotPrev + td[43]*var1DotDotPrev + td[44]*dDotPrev;
+      //var1DotDot = td[45]*var1Dot + td[46]*var1Prev + td[47]*var1DotPrev + td[48]*var1DotDotPrev + td[49]*dDotPrev;
+      //// ddot_{n+1} for modified state-space formulation
+      //dDot       = td[50]*var1Dot + td[51]*var1Prev + td[52]*var1DotPrev + td[53]*var1DotDotPrev + td[54]*dDotPrev;
+    //}
 
     // compute Current values
 
@@ -411,3 +420,43 @@ void  SolutionData::reset()
 
 
 
+void  SolutionData::perform_Aitken_accelerator_force()
+{
+  double  num, denom;
+
+  for(int ii=0; ii<size1; ii++)
+  {
+    num = force[ii] - forcePrev[ii];
+    num = num*num;
+
+    denom = force[ii] - 2.0*forcePrev[ii] + forcePrev2[ii];
+
+    force[ii] -= num/denom;
+  }
+
+  return;
+}
+
+
+void  SolutionData::perform_Aitken_accelerator_displacement()
+{
+  double  num, denom;
+
+  for(int ii=0; ii<size1; ii++)
+  {
+    num = var1[ii] - var1Prev[ii];
+    num = num*num;
+
+    denom = var1[ii] - 2.0*var1Prev[ii] + var1Prev2[ii];
+
+    force[ii] -= num/denom;
+  }
+
+  return;
+}
+
+    
+    
+    
+    
+    

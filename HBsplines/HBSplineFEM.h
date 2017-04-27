@@ -52,8 +52,6 @@ class HBSplineFEM: public HBSplineBase
 
         virtual  void  solveSolidProblem();
 
-        virtual  void  updateImmersedPointPositions();
-
         virtual  void  writeNodalData();
 
         void  writeImmersedSolidOutput();
@@ -112,6 +110,8 @@ class HBSplineFEM: public HBSplineBase
         void  createPostProcessGrid3D(int, int, int, bool, double, double, int*);
 
         virtual  void  computeTotalBodyForce(int );
+
+        //virtual  int  solveFluidProblem();
 };
 
 

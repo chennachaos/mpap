@@ -66,10 +66,10 @@ void StandardFEM::setSolver(int slv, int *parm, bool cIO)
 
             prepareMatrixPattern();
 
-            //cout << " kkkkkkkkkk " << totalDOF << endl;
+            cout << " kkkkkkkkkk " << totalDOF << endl;
             if(solverEigen->initialise(0,0,totalDOF) != 0)
               return;
-
+            cout << " kkkkkkkkkk " << totalDOF << endl;
             //solver->SetSolverAndParameters();
 
             solverEigen->printInfo();
@@ -123,7 +123,7 @@ void StandardFEM::setSolver(int slv, int *parm, bool cIO)
             if(solverPetsc->initialise(nNode*ndof, 0, totalDOF) != 0)
               return;
 
-            solverPetsc->SetSolverAndParameters();
+            //solverPetsc->SetSolverAndParameters();
             //cout << " kkkkkkkkkk " << endl;
             solverPetsc->printInfo();
             //cout << " aaaaaaaaa " << endl;
@@ -145,10 +145,10 @@ void StandardFEM::setSolver(int slv, int *parm, bool cIO)
     if(solverPetsc != NULL)
       solverPetsc->checkIO = cIO;
 
-    if( (tis > 0) )
-      setInitialConditions();
+    //if( (tis > 0) )
+      //setInitialConditions();
 
-    //cout << " cIO " << cIO << endl;
+    cout << " cIO " << cIO << endl;
 
     return;
 }
@@ -832,7 +832,7 @@ int StandardFEM::SolveStep(int niter)
 
 int StandardFEM::calcStiffnessAndResidual(int printRes, bool zeroMtx, bool zeroRes)
 {
-  cout << "     StandardFEM: generating coefficient Matrices ...\n\n";
+  //cout << "     StandardFEM: generating coefficient Matrices ...\n\n";
 
   char fct[] = "StandardFEM::calcStiffnessAndResidual";
 
@@ -881,9 +881,9 @@ int StandardFEM::calcStiffnessAndResidual(int printRes, bool zeroMtx, bool zeroR
 
         //elems[ee]->AssembleElementMatrix(0, solver2->mtx);
         //cout << " ooooooooooooooo " << endl;
-        //elems[ee]->AssembleElementVector(0, 0, solver2->rhsVec, solver2->reac, 0, 0);
+        //elems[ee]->AssembleElementVector(0, 0, solverPetsc->rhsVec, solver2->reac, 0, 0);
         //cout << " MMMMMMMMMMM " << endl;
-        solverPetsc->AssembleMatrixAndVector(0, 0, elems[ee]->forAssyVec, Klocal, Flocal);
+        solverPetsc->AssembleMatrixAndVector(elems[ee]->forAssyVec, elems[ee]->forAssyVec, Klocal, Flocal);
       }
     }
   }
@@ -906,7 +906,7 @@ int StandardFEM::calcStiffnessAndResidual(int printRes, bool zeroMtx, bool zeroR
 
       //elems[ee]->AssembleElementMatrix(0, solver->mtx);
       //cout << " aaaaaaaaaaaaa " << endl;
-      //elems[ee]->AssembleElementVector(0, 0, &(solver->rhsVec(0)), &(SolnData.reac(0)), 0, 0);
+      //elems[ee]->AssembleElementVector(0, 0, &(solverEigen->rhsVec(0)), &(SolnData.reac(0)), 0, 0);
       //cout << " MMMMMMMMMMM " << endl;
       solverEigen->AssembleMatrixAndVector(0, 0, elems[ee]->forAssyVec, Klocal, Flocal);
     }
@@ -981,8 +981,8 @@ int StandardFEM::calcStiffnessAndResidual(int printRes, bool zeroMtx, bool zeroR
     solverEigen->currentStatus = ASSEMBLY_OK;
   }
 
-  if(printRes > 1)
-    { COUT << "StandardFEM"; printf("  %11.4e\n",rNorm);}
+  //if(printRes > 1)
+     COUT << "StandardFEM"; printf("  %11.4e\n",rNorm);
 
   //ctimCalcStiffRes += computerTime.stop(fct);
 
@@ -1066,6 +1066,13 @@ int StandardFEM::factoriseSolveAndUpdate()
   //else
     SolnData.var1 += soln;
 
+    //VectorXd  vecTemp(totalDOF);
+    //vecTemp = soln - SolnData.var1;
+    //double  dnorm = vecTemp.norm();
+    //cout << " dnorm = " << dnorm << endl;
+    //SolnData.var1Prev = SolnData.var1;
+    //SolnData.var1 = soln;
+
   //printVector(SolnData.var1);
 
 /*
@@ -1117,7 +1124,7 @@ void StandardFEM::applyBoundaryConditions()
 {   
   //cout <<  " applying boundary conditions .... " << endl;
   int ii, jj, nn, dof, aa, ind;
-  double specVal, PENALTY=1.0e3, af, val1, val2;
+  double specVal, PENALTY=1.0e6, af, val1, val2;
 
   af = SolnData.td(2);
 

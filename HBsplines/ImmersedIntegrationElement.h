@@ -112,6 +112,10 @@ class ImmersedIntegrationElement
         void  computeVelocity(const VectorXd& NN, myPoint&  velSpec);
 
         void  computeVelocityCur(const VectorXd& NN, myPoint&  velSpec);
+
+        void  computeAcceleration(const VectorXd& NN, myPoint&  velSpec);
+
+        void  computeAccelerationCur(const VectorXd& NN, myPoint&  velSpec);
 };
 
 

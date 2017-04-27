@@ -3,17 +3,11 @@
 #define incl_AdaptiveOctree_h
 
 
-
 #include "headersBasic.h"
 #include "util.h"
 #include "GeomDataHBSplines.h"
 #include "GaussQuadrature.h"
-
 #include "AABB.h"
-
-
-//using namespace std;
-//using namespace Eigen;
 
 
 enum NodeOrientation
@@ -50,7 +44,9 @@ class AdaptiveOctree
 
         myPoint  knotBegin, knotEnd, knotIncr;
 
-        AdaptiveOctree_PTR  *child, parent, *neighbours;
+        AdaptiveOctree_PTR  *child, parent;//, *neighbours;
+
+        AdaptiveOctree_PTR  neighbours[2*DIM];
 
         AABB  bbox;
 
@@ -216,7 +212,7 @@ template <int DIM>
 AdaptiveOctree<DIM>::AdaptiveOctree(): level(0), NUM_CHILDREN(0)
 {
     child = NULL;
-    neighbours = NULL;
+    //neighbours = NULL;
     parent = NULL;
     sideTemp = -1;
     coord3 = 0.0;
@@ -225,7 +221,7 @@ AdaptiveOctree<DIM>::AdaptiveOctree(): level(0), NUM_CHILDREN(0)
 
     NUM_NEIGHBOURS = 2*DIM;
 
-    neighbours = new AdaptiveOctree_PTR[NUM_NEIGHBOURS];
+    //neighbours = new AdaptiveOctree_PTR[NUM_NEIGHBOURS];
     for(int ii=0;ii<NUM_NEIGHBOURS;ii++)
       neighbours[ii] = NULL;
 
@@ -239,7 +235,7 @@ template <int DIM>
 AdaptiveOctree<DIM>::AdaptiveOctree(int lev):level(lev), NUM_CHILDREN(0)
 {
     child = NULL;
-    neighbours = NULL;
+    //neighbours = NULL;
     parent = NULL;
     sideTemp = -1;
     coord3 = 0.0;
@@ -251,7 +247,7 @@ AdaptiveOctree<DIM>::AdaptiveOctree(int lev):level(lev), NUM_CHILDREN(0)
 
     NUM_NEIGHBOURS = 2*DIM;
 
-    neighbours = new AdaptiveOctree_PTR[NUM_NEIGHBOURS];
+    //neighbours = new AdaptiveOctree_PTR[NUM_NEIGHBOURS];
     for(int ii=0;ii<NUM_NEIGHBOURS;ii++)
       neighbours[ii] = NULL;
 
@@ -277,11 +273,12 @@ AdaptiveOctree<DIM>::~AdaptiveOctree()
 
   //if(neighbours != NULL)
   //{
-    //for(int ii=0;ii<NUM_NEIGHBOURS;ii++)
+    for(int ii=0;ii<NUM_NEIGHBOURS;ii++)
+      neighbours[ii] = NULL;
       //delete neighbours[ii];
 
     //delete [] neighbours;
-    neighbours = NULL;
+    //neighbours = NULL;
   //}
 
   //if(parent != NULL)
@@ -289,6 +286,8 @@ AdaptiveOctree<DIM>::~AdaptiveOctree()
     //delete parent;
     parent = NULL;
   //}
+
+  Quadrature.reset();
 }
 
 

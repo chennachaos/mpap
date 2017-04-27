@@ -25,6 +25,8 @@ ImmersedSolid::ImmersedSolid()
   isNitsche = false;
   NitscheFact = 1.0;
 
+  solver = NULL;
+
   uGrid    =  vtkSmartPointer<vtkUnstructuredGrid>::New();
 
   polyDataVTK =  vtkSmartPointer<vtkPolyData>::New();
@@ -63,6 +65,8 @@ ImmersedSolid::~ImmersedSolid()
 
 void ImmersedSolid::setTimeParam()
 {
+  //SolnData.SetTimeIncrementType(4);
+
   SolnData.setTimeParam();
   
   return;
@@ -81,7 +85,16 @@ void ImmersedSolid::timeUpdate()
 
   //filecount++;
 
+  fluidAccePrev = fluidAcce;
+  
   SolnData.timeUpdate();
+
+  //SolnData.var1 = SolnData.var1Extrap;
+  //SolnData.var1.setZero();
+
+  //SolnData.var1  = SolnData.var1Prev;
+  //SolnData.var1 += mpapTime.dt * SolnData.var1DotPrev;
+  //SolnData.var1 += (0.5*mpapTime.dt * mpapTime.dt)*SolnData.var1DotDotPrev;
 
   if(STAGGERED)
     updateIterStep();
@@ -120,6 +133,9 @@ bool ImmersedSolid::converged()
 
   if (rNorm < tol && localStiffnessError == 0)
   {
+    //cout << " ImmersedSolid::converged()  " << endl;
+    //SolnData.var1 = 0.02*SolnData.var1 + (1.0-0.02)*SolnData.var1Extrap;
+    //updateIterStep();
     return true;
   }
 
@@ -181,7 +197,7 @@ void  ImmersedSolid::SetImmersedIntegrationElements(vector<vector<int> >& datate
 
       ImmIntgElems.push_back(lme);
   }
-  
+
   //cout << " nImmInt " << nImmInt << endl;
 
   return;
@@ -365,6 +381,23 @@ void  ImmersedSolid::computeTotalForce()
 
   return;
 }
+
+
+
+void ImmersedSolid::initialise_solid_state()
+{
+  SolnData.var1 = SolnData.var1Prev + mpapTime.dt*SolnData.var1DotPrev ;
+  SolnData.var1Dot = SolnData.var1DotPrev;
+  
+  updateIterStep();
+  
+  SolnData.var1PrevIter = SolnData.var1;
+
+  return;
+}
+
+
+
 
 
 

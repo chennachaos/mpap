@@ -113,7 +113,7 @@ int LagrangeElem3DNavierStokesHex8Node::calcStiffnessAndResidual(MatrixXd& Kloca
     dt = mpapTime.dt;
     af = SolnData->td(2);
     am = SolnData->td(3);
-    acceFact = rho*am*SolnData->td(9);
+    acceFact = am*SolnData->td(9);
     muTaf = mu*af;
 
     tCur = mpapTime.cur - (1.0-af)*dt;
@@ -421,7 +421,7 @@ int LagrangeElem3DNavierStokesHex8Node::calcStiffnessAndResidual(MatrixXd& Kloca
     dt = mpapTime.dt;
     af = SolnData->td(2);
     am = SolnData->td(3);
-    acceFact = rho*am*SolnData->td(9);
+    acceFact = am*SolnData->td(9);
     muTaf = mu*af;
 
     tCur = mpapTime.cur - (1.0-af)*dt;

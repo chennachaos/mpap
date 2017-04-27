@@ -21,6 +21,26 @@ using namespace myGeom;
 
 
 
+/*
+    fact = sqrt(volume/(hx*hy));
+
+    hx *= fact;
+    hy *= fact;
+
+    matJ.setZero();
+    matJ(0,0) = hx*0.5;
+    matJ(1,1) = hy*0.5;
+
+    matJinv = matJ.inverse();
+
+    matG.setZero();
+    matG(0,0) = matJinv(0,0);
+    matG(0,1) = matJinv(0,1);
+    matG(1,0) = matJinv(1,0);
+    matG(1,1) = matJinv(1,1);
+
+    matG = matG.transpose() * matG;
+*/
 
 template<>
 void TreeNode<1>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
@@ -44,11 +64,9 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
     double  JacTemp, Jac, dvol, stabParam, CI=4.0;
     double  fact, fact2, b1, b2, b3, b4, b5, b6, b7, b8, acceFact, dt, bforce[2];
-    double  pres, Da, Db, af, am, muTaf, rad, urdr, urdr2, h2, h, tau[3], beta[6];
+    double  pres, Da, Db, af, am, muTaf, rad, urdr, urdr2, h2, h, tau[3];
 
-    beta[0] = 1.0;     beta[1] = 1.0/3.0;
-    beta[2] = 30.0;    beta[3] = 0.1;
-    beta[4] = 1.0;     beta[5] = 1.0;
+    double  beta[6]; get_stabilisation_beta_wulf(beta);
 
     VectorXd  NN(totnlbf), dNN_dx(totnlbf), d2NN_dx2(totnlbf), dNN_dy(totnlbf), d2NN_dy2(totnlbf);
     VectorXd  N, dN_dx, d2N_dx2, dN_dy, d2N_dy2, d2N, velTemp(3);
@@ -148,7 +166,7 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
     //KimMoinFlow  analy(rho, mu);
     //Kovasznay  analy;
-    Stokes2DEx1  analy;
+    //Stokes2DEx1  analy;
 
     count=0;
     for(gp=0; gp<nGauss; gp++)
@@ -427,17 +445,14 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
     double  JacTemp, Jac, dvol, stabParam, CI=4.0;
     double  fact, fact2, b1, b2, b3, b4, b5, b6, b7, b8, acceFact, dt, bforce[2];
-    double  pres, Da, Db, af, am, muTaf, rad, urdr, urdr2, h2, h, tau[3], beta[6];
+    double  pres, Da, Db, af, am, muTaf, rad, urdr, urdr2, h2, h, tau[3];
 
-    beta[0] = 1.0;     beta[1] = 1.0/3.0;
-    beta[2] = 30.0;    beta[3] = 0.1;
-    beta[4] = 1.0;     beta[5] = 1.0;
+    double  beta[6]; get_stabilisation_beta_wulf(beta);
 
     VectorXd  NN(totnlbf), dNN_dx(totnlbf), d2NN_dx2(totnlbf), dNN_dy(totnlbf), d2NN_dy2(totnlbf);
     VectorXd  N, dN_dx, d2N_dx2, dN_dy, d2N_dy2, d2N, velTemp(3);
     VectorXd  res(3), res2(2), dp(2), Du(2), vel(2), velDot(2), force(2), gradTvel(2), rStab(3);
-    MatrixXd  Dj(2, 3), grad(2,2), gradN(2,2), stress(2,2);
-    MatrixXd  matB(2,2), matBinv(2,2), matG(3,3);
+    MatrixXd  Dj(2, 3), grad(2,2), gradN(2,2), stress(2,2), matG(3,3);
     myPoint  param, geom, velPrev;
     Dj.setZero();
 
@@ -459,12 +474,14 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
     double *gws;
     myPoint *gps;
 
-    //volume = (bbox.maxBB[0]-bbox.minBB[0])*(bbox.maxBB[1]-bbox.minBB[1]);
-
     double  hx = bbox.maxBB[0]-bbox.minBB[0];
     double  hy = bbox.maxBB[1]-bbox.minBB[1];
 
     volume = hx*hy;
+
+    matG.setZero();
+    matG(0,0) = 4.0/hx/hx;
+    matG(1,1) = 4.0/hy/hy;
 
     if(domNums.size() > 1)
     {
@@ -478,6 +495,16 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
       volume = 0.0;
       for(gp=0; gp<nGauss; gp++)
         volume += gws[gp];
+
+      // For 2D problem
+      // fact = sqrt(Vc/V); and fact = fact*fact;  ---->  fact = Vc/V;
+      // For 3D problem
+      // fact = (Vc/V)^(1/3). So, do fact = fact*fact;
+
+      fact = volume/(hx*hy);
+
+      matG(0,0) /= fact;
+      matG(1,1) /= fact;
     }
     else
     {
@@ -489,35 +516,9 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
       JacTemp = JacMultElem;
     }
 
-    //cout << " nGauss " << nGauss << '\t' << tempId << endl;
-
-    //volume = GeomData->GetGridLength(0) * knots[0][2] * GeomData->GetGridLength(1) * knots[1][2];
-
-    fact = volume/(hx*hy);
-
-    fact = sqrt(fact);
-
-    hx *= fact;
-    hy *= fact;
-    
-    matB.setZero();
-    matB(0,0) = hx*0.5;
-    matB(1,1) = hy*0.5;
-
-    matBinv = matB.inverse();
-
-    matG.setZero();
-    matG(0,0) = matBinv(0,0);
-    matG(0,1) = matBinv(0,1);
-    matG(1,0) = matBinv(1,0);
-    matG(1,1) = matBinv(1,1);
-
-    matG = matG.transpose() * matG;
-
-//    cout << volume << '\t' << volume << endl;
-    h2 = 4.0*volume/PI;
-    h = sqrt(h2);
-
+    //cout << volume << '\t' << volume << endl;
+    //h2 = 4.0*volume/PI;
+    //h = sqrt(h2);
     //stabParam = h2/(4.0*mu);
     //stabParam /= degree[0]/degree[1];
     ////stabParam /= rho;
@@ -527,9 +528,7 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
     //tau[1] = elmDat[9]*stabParam;  // PSPG
     //tau[2] = elmDat[10]*stabParam; // LSIC
 
-    //cout << tau[0] << '\t' << tau[1] << '\t' << tau[2] << endl;
-
-    KimMoinFlow  analy(rho, mu);
+    //KimMoinFlow  analy(rho, mu);
     //Kovasznay  analy;
 
     count=0;
@@ -726,10 +725,12 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
 
 
-//
+/*
 template<>
 void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
 {
+    // basis functions are computed based not computed everytime
+
     // GFEM for Navier-Stokes
     // with proper stabilisation
     // fully-implicit formulation
@@ -739,22 +740,20 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
     int ii, jj, gp, nGauss, tempId, count=0;
     int TI, TIp1, TIp2, TJ, TJp1, TJp2;
 
-    double  JacTemp, Jac, dvol, stabParam, CI=4.0;
+    double  JacTemp, Jac, dvol, CI=4.0;
     double  fact, fact2, b1, b2, b3, b4, b5, b6, b7, b8, acceFact, dt, bforce[2];
-    double  pres, Da, Db, af, am, muTaf, rad, urdr, urdr2, h2, h, tau[3], beta[6];
+    double  pres, Da, Db, af, am, muTaf, rad, urdr, urdr2, tau[3];
 
-    beta[0] = 1.0;     beta[1] = 1.0/3.0;
-    beta[2] = 30.0;    beta[3] = 0.1;
-    beta[4] = 1.0;     beta[5] = 1.0;
+    //double beta[6]; get_stabilisation_beta_wulf(beta);
 
     VectorXd  NN(totnlbf), dNN_dx(totnlbf), d2NN_dx2(totnlbf), dNN_dy(totnlbf), d2NN_dy2(totnlbf);
     VectorXd  N, dN_dx, d2N_dx2, dN_dy, d2N_dy2, d2N, velTemp(3);
     VectorXd  res(3), res2(2), dp(2), Du(2), vel(2), velDot(2), force(2), gradTvel(2), rStab(3);
     MatrixXd  Dj(2, 3), grad(2,2), gradN(2,2), stress(2,2);
-    MatrixXd  matB(2,2), matBinv(2,2), matG(3,3);
+    MatrixXd  matJ(2,2), matJinv(2,2), matG(3,3);
     myPoint  param, geom, velPrev;
-    Dj.setZero();
 
+    force.setZero();
 
     bool   axsy = ((int)elmDat[2] == 1);
     double  rho = elmDat[3];
@@ -773,14 +772,16 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
     double *gws;
     myPoint *gps;
 
-    //volume = (bbox.maxBB[0]-bbox.minBB[0])*(bbox.maxBB[1]-bbox.minBB[1]);
-
     double  hx = bbox.maxBB[0]-bbox.minBB[0];
     double  hy = bbox.maxBB[1]-bbox.minBB[1];
 
     volume = hx*hy;
 
-    if(domNums.size() > 1)
+    matG.setZero();
+    matG(0,0) = 4.0/hx/hx;
+    matG(1,1) = 4.0/hy/hy;
+
+    if(domNums.size() > 1) // cut cell
     {
       nGauss = Quadrature.gausspoints.size();
       
@@ -792,6 +793,16 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
       volume = 0.0;
       for(gp=0; gp<nGauss; gp++)
         volume += gws[gp];
+
+      // For 2D problem
+      // fact = sqrt(Vc/V); and fact = fact*fact;  ---->  fact = Vc/V;
+      // For 3D problem
+      // fact = (Vc/V)^(1/3). So, do fact = fact*fact;
+
+      fact = volume/(hx*hy);
+
+      matG(0,0) /= fact;
+      matG(1,1) /= fact;
     }
     else
     {
@@ -803,48 +814,21 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
       JacTemp = JacMultElem;
     }
 
-    //cout << " nGauss " << nGauss << '\t' << tempId << endl;
-
-    //volume = GeomData->GetGridLength(0) * knots[0][2] * GeomData->GetGridLength(1) * knots[1][2];
-
-    fact = volume/(hx*hy);
-
-    fact = sqrt(fact);
-
-    hx *= fact;
-    hy *= fact;
-    
-    matB.setZero();
-    matB(0,0) = hx*0.5;
-    matB(1,1) = hy*0.5;
-
-    matBinv = matB.inverse();
-
-    matG.setZero();
-    matG(0,0) = matBinv(0,0);
-    matG(0,1) = matBinv(0,1);
-    matG(1,0) = matBinv(1,0);
-    matG(1,1) = matBinv(1,1);
-
-    matG = matG.transpose() * matG;
-
-//    cout << volume << '\t' << volume << endl;
-    h2 = 4.0*volume/PI;
-    h = sqrt(h2);
-
-    stabParam = h2/(4.0*mu);
+    //double h2 = 4.0*volume/PI;
+    //double h = sqrt(h2);
+    //double stabParam = h2/(4.0*mu);
     //stabParam /= degree[0]/degree[1];
     ////stabParam /= rho;
     //stabParam *= rho;
 
-    tau[0] = elmDat[8]*stabParam;  // SUPG
-    tau[1] = elmDat[9]*stabParam;  // PSPG
-    tau[2] = elmDat[10]*stabParam; // LSIC
+    //tau[0] = elmDat[8]*stabParam;  // SUPG
+    //tau[1] = elmDat[9]*stabParam;  // PSPG
+    //tau[2] = elmDat[10]*stabParam; // LSIC
 
     //cout << tau[0] << '\t' << tau[1] << '\t' << tau[2] << endl;
 
     //KimMoinFlow  analy(rho, mu);
-    Kovasznay  analy;
+    //Kovasznay  analy;
 
     count=0;
     for(gp=0; gp<nGauss; gp++)
@@ -854,35 +838,48 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
         dvol = gws[gp] * JacTemp;
 
-        geom[0] = GeomData->ComputeCoord(0, param[0]);
-        geom[1] = GeomData->ComputeCoord(1, param[1]);
+        geom[0] = GeomData->ComputeCoord(0, param[0]); // radius for axsy problems
+        //geom[1] = GeomData->ComputeCoord(1, param[1]);
 
-        //cout << uu << '\t' << vv << endl;
-        //cout << xx << '\t' << yy << endl;
-
-        //cout << gp << '\t' << gps[gp][0] << '\t' << gps[gp][1] << '\t' << gws[gp] << '\t' << dvol << endl;
-
-          GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy, d2NN_dx2, d2NN_dy2);
-
+        if(domNums.size() > 1) // cut cell
+        {
           if(parent == NULL)
           {
-            //cout << " parent is NULL " << endl;
-            N = NN;
-            dN_dx = dNN_dx;
-            dN_dy = dNN_dy;
-            d2N_dx2 = d2NN_dx2;
-            d2N_dy2 = d2NN_dy2;
+            N.resize(totnlbf); dN_dx.resize(totnlbf); d2N_dx2.resize(totnlbf);
+            dN_dy.resize(totnlbf); d2N_dy2.resize(totnlbf);
+            GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, N, dN_dx, dN_dy, d2N_dx2, d2N_dy2);
           }
           else
           {
+            GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy, d2NN_dx2, d2NN_dy2);
+
             //cout << " parent is not NULL " << endl;
-            N = SubDivMat*NN;
-            dN_dx = SubDivMat*dNN_dx;
-            dN_dy = SubDivMat*dNN_dy;
+            N       = SubDivMat*NN;
+            dN_dx   = SubDivMat*dNN_dx;
+            dN_dy   = SubDivMat*dNN_dy;
             d2N_dx2 = SubDivMat*d2NN_dx2;
             d2N_dy2 = SubDivMat*d2NN_dy2;
           }
-
+        }
+        else
+        {
+          if(parent == NULL)
+          {
+            N       = GeomData->shpfns[level][gp].N;
+            dN_dx   = GeomData->shpfns[level][gp].dN_dx;
+            dN_dy   = GeomData->shpfns[level][gp].dN_dy;
+            d2N_dx2 = GeomData->shpfns[level][gp].d2N_dx2;
+            d2N_dy2 = GeomData->shpfns[level][gp].d2N_dy2;
+          }
+          else
+          {
+            N       = SubDivMat*GeomData->shpfns[level][gp].N;
+            dN_dx   = SubDivMat*GeomData->shpfns[level][gp].dN_dx;
+            dN_dy   = SubDivMat*GeomData->shpfns[level][gp].dN_dy;
+            d2N_dx2 = SubDivMat*GeomData->shpfns[level][gp].d2N_dx2;
+            d2N_dy2 = SubDivMat*GeomData->shpfns[level][gp].d2N_dy2;
+          }
+        }
         //cout <<  " gpDomainId = " << gpDomainId << '\t' << totnlbf2 << endl;
         //printVector(GlobalBasisFuncs);
 
@@ -940,7 +937,7 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
           stress(0,0) -= pres;
           stress(1,1) -= pres;
 
-          force.setZero();
+          //force.setZero();
 
           //force(0) = analy.computeForce(0, geom[0], geom[1]);
           //force(1) = analy.computeForce(1, geom[0], geom[1]);
@@ -987,11 +984,12 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
           evaluateStabParams_algo3(velTemp, matG, dt, rho, mu, CI, tau);
 
-          if( abs(mpapTime.cur - mpapTime.dt) < 1.0e-10 )
-            tau[0] = 0.0;
-          else
-            tau[0] *= elmDat[8];  // SUPG
+          //if( abs(mpapTime.cur - mpapTime.dt) < 1.0e-10 )
+            //tau[0] = 0.0;
+          //else
+            //tau[0] *= elmDat[8];  // SUPG
 
+          tau[0] *= elmDat[8];  // SUPG
           tau[1] *= elmDat[9];  // PSPG
           tau[2] *= elmDat[10]; // LSIC
 
@@ -1137,12 +1135,11 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
                 Flocal(TIp2) -= (b4 * vel(0)/rad);
             }
           } // for(ii=0;ii<totnlbf2;ii++)
-      //} //if(within)
     }//gp
 
     return;
 }
-//
+*/
 
 
 
@@ -1162,40 +1159,21 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
     double  JacTemp, Jac, dvol, stabParam, CI=4.0;
     double  fact, fact2, b1, b2, b3, b4, b5, b6, b7, b8, acceFact, dt;
-    double  pres, Da, Db, af, am, muTaf, rad, urdr, urdr2, h2, h, tau[3], beta[6];
-    
-    beta[0] = 1.0;     beta[1] = 1.0/3.0;
-    beta[2] = 30.0;    beta[3] = 0.1;
-    beta[4] = 0.0;     beta[5] = 0.0;
+    double  pres, Da, Db, af, am, muTaf, rad, urdr, urdr2, h2, h, tau[3];
+
+    //double beta[6]; get_stabilisation_beta_wulf(beta);
 
     VectorXd  NN(totnlbf), dNN_dx(totnlbf), d2NN_dx2(totnlbf), dNN_dy(totnlbf), d2NN_dy2(totnlbf);
     VectorXd  N, dN_dx, d2N_dx2, dN_dy, d2N_dy2, d2N;
     VectorXd  res(3), res2(2), dp(2), Du(2), vel(2), velDot(2), force(2), gradTvel(2), rStab(3);
     VectorXd  velPrev(2), velPrev2(2), velExt(2), velTemp(3);
-    MatrixXd  Dj(2, 3), grad(2,2), gradN(2,2), stress(2,2), gradPrev(2,2);
-    MatrixXd  matB(2,2), matBinv(2,2), matG(3,3);
+    MatrixXd  Dj(2, 3), grad(2,2), gradN(2,2), stress(2,2), gradPrev(2,2), matG(3,3);
     myPoint  param, geom;
     Dj.setZero();
-
-    volume = GeomData->GetGridLength(0) * knots[0][2] * GeomData->GetGridLength(1) * knots[1][2];
-//    cout << volume << '\t' << volume << endl;
-    h2 = 4.0*volume/PI;
-    h = sqrt(h2);
 
     bool   axsy = ((int)elmDat[2] == 1);
     double  rho = elmDat[3];
     double  mu  = elmDat[4];
-
-    //mu = mu/rho;
-    //rho = 0.1;
-
-    //stabParam = h2/(4.0*mu)/degree[0]/degree[1];
-    stabParam = h2/(12.0*mu);
-
-    tau[0] = elmDat[8]*stabParam;      // SUPG
-    tau[1] = elmDat[9]*stabParam;//rho;  // PSPG
-    tau[2] = elmDat[10]*stabParam;//rho; // LSIC
-    //cout << tau[0] << '\t' << tau[1] << '\t' << tau[2] << endl;
 
     af = SolnData->td(2);
     am = SolnData->td(1);
@@ -1207,25 +1185,37 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
     double *gws;
     myPoint *gps;
 
-    //volume = (bbox.maxBB[0]-bbox.minBB[0])*(bbox.maxBB[1]-bbox.minBB[1]);
-
     double  hx = bbox.maxBB[0]-bbox.minBB[0];
     double  hy = bbox.maxBB[1]-bbox.minBB[1];
 
     volume = hx*hy;
 
+    matG.setZero();
+    matG(0,0) = 4.0/hx/hx;
+    matG(1,1) = 4.0/hy/hy;
+
     if(domNums.size() > 1)
     {
       nGauss = Quadrature.gausspoints.size();
-      
+
       gps = &(Quadrature.gausspoints[0]);
       gws = &(Quadrature.gaussweights[0]);
-      
+
       JacTemp = 1.0;
 
       volume = 0.0;
       for(gp=0; gp<nGauss; gp++)
         volume += gws[gp];
+
+      // For 2D problem
+      // fact = sqrt(Vc/V); and fact = fact*fact;  ---->  fact = Vc/V;
+      // For 3D problem
+      // fact = (Vc/V)^(1/3). So, do fact = fact*fact;
+
+      fact = volume/(hx*hy);
+
+      matG(0,0) /= fact;
+      matG(1,1) /= fact;
     }
     else
     {
@@ -1237,35 +1227,11 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
       JacTemp = JacMultElem;
     }
 
-    //cout << " nGauss " << nGauss << '\t' << tempId << endl;
-
-    //volume = GeomData->GetGridLength(0) * knots[0][2] * GeomData->GetGridLength(1) * knots[1][2];
-
-    fact = volume/(hx*hy);
-
-    fact = sqrt(fact);
-
-    hx *= fact;
-    hy *= fact;
-    
-    matB.setZero();
-    matB(0,0) = hx*0.5;
-    matB(1,1) = hy*0.5;
-
-    matBinv = matB.inverse();
-
-    matG.setZero();
-    matG(0,0) = matBinv(0,0);
-    matG(0,1) = matBinv(0,1);
-    matG(1,0) = matBinv(1,0);
-    matG(1,1) = matBinv(1,1);
-
-    matG = matG.transpose() * matG;
-
-//    cout << volume << '\t' << volume << endl;
-    h2 = 4.0*volume/PI;
-    h = sqrt(h2);
-
+    // cout << volume << '\t' << volume << endl;
+    //h2 = 4.0*volume/PI;
+    //h = sqrt(h2);
+    //stabParam = h2/(4.0*mu)/degree[0]/degree[1];
+    //stabParam = h2/(12.0*mu);
     //stabParam = h2/(12.0*mu);
     //stabParam /= degree[0]/degree[1];
     ////stabParam /= rho;
@@ -1274,7 +1240,6 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
     //tau[0] = elmDat[8]*stabParam;  // SUPG
     //tau[1] = elmDat[9]*stabParam;  // PSPG
     //tau[2] = elmDat[10]*stabParam; // LSIC
-
     //cout << tau[0] << '\t' << tau[1] << '\t' << tau[2] << endl;
 
     count=0;
@@ -1561,7 +1526,7 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
 
 
-/*
+//
 template<>
 void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
 {
@@ -1577,18 +1542,15 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
     double  JacTemp, Jac, dvol, stabParam, CI=4.0, bforce[2];
     double  fact, fact2, b1, b2, b3, b4, b5, b6, b7, b8, acceFact, dt;
-    double  pres, Da, Db, af, am, muTaf, rad, urdr, urdr2, h2, h, tau[3], beta[6];
-    
-    beta[0] = 1.0;     beta[1] = 1.0/3.0;
-    beta[2] = 30.0;    beta[3] = 0.1;
-    beta[4] = 0.0;     beta[5] = 0.0;
+    double  pres, Da, Db, af, am, muTaf, rad, urdr, urdr2, h2, h, tau[3];
+
+    //double beta[6]; get_stabilisation_beta_wulf(beta);
 
     VectorXd  NN(totnlbf), dNN_dx(totnlbf), d2NN_dx2(totnlbf), dNN_dy(totnlbf), d2NN_dy2(totnlbf);
     VectorXd  N, dN_dx, d2N_dx2, dN_dy, d2N_dy2, d2N;
     VectorXd  res(3), res2(2), dp(2), Du(2), vel(2), velDot(2), velTemp(3);
     VectorXd  force(2), gradTvel(2), rStab(3), velPrev(2);
-    MatrixXd  Dj(2, 3), grad(2,2), gradN(2,2), stress(2,2), gradPrev(2,2);
-    MatrixXd  matB(2,2), matBinv(2,2), matG(3,3);
+    MatrixXd  Dj(2, 3), grad(2,2), gradN(2,2), stress(2,2), gradPrev(2,2), matG(3,3);
     myPoint  param, geom;
     Dj.setZero();
 
@@ -1610,12 +1572,14 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
     double *gws;
     myPoint *gps;
 
-    //volume = (bbox.maxBB[0]-bbox.minBB[0])*(bbox.maxBB[1]-bbox.minBB[1]);
-
     double  hx = bbox.maxBB[0]-bbox.minBB[0];
     double  hy = bbox.maxBB[1]-bbox.minBB[1];
 
     volume = hx*hy;
+
+    matG.setZero();
+    matG(0,0) = 4.0/hx/hx;
+    matG(1,1) = 4.0/hy/hy;
 
     if(domNums.size() > 1)
     {
@@ -1629,6 +1593,16 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
       volume = 0.0;
       for(gp=0; gp<nGauss; gp++)
         volume += gws[gp];
+
+      // For 2D problem
+      // fact = sqrt(Vc/V); and fact = fact*fact;  ---->  fact = Vc/V;
+      // For 3D problem
+      // fact = (Vc/V)^(1/3). So, do fact = fact*fact;
+
+      fact = volume/(hx*hy);
+
+      matG(0,0) /= fact;
+      matG(1,1) /= fact;
     }
     else
     {
@@ -1640,35 +1614,9 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
       JacTemp = JacMultElem;
     }
 
-    //cout << " nGauss " << nGauss << '\t' << tempId << endl;
-
-    //volume = GeomData->GetGridLength(0) * knots[0][2] * GeomData->GetGridLength(1) * knots[1][2];
-
-    fact = volume/(hx*hy);
-
-    fact = sqrt(fact);
-
-    hx *= fact;
-    hy *= fact;
-    
-    matB.setZero();
-    matB(0,0) = hx*0.5;
-    matB(1,1) = hy*0.5;
-
-    matBinv = matB.inverse();
-
-    matG.setZero();
-    matG(0,0) = matBinv(0,0);
-    matG(0,1) = matBinv(0,1);
-    matG(1,0) = matBinv(1,0);
-    matG(1,1) = matBinv(1,1);
-
-    matG = matG.transpose() * matG;
-
-//    cout << volume << '\t' << volume << endl;
-    h2 = 4.0*volume/PI;
-    h = sqrt(h2);
-
+    //cout << volume << '\t' << volume << endl;
+    //h2 = 4.0*volume/PI;
+    //h = sqrt(h2);
     //stabParam = h2/(12.0*mu);
     //stabParam /= degree[0]/degree[1];
     ////stabParam /= rho;
@@ -1677,7 +1625,6 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
     //tau[0] = elmDat[8]*stabParam;  // SUPG
     //tau[1] = elmDat[9]*stabParam;  // PSPG
     //tau[2] = elmDat[10]*stabParam; // LSIC
-
     //cout << tau[0] << '\t' << tau[1] << '\t' << tau[2] << endl;
 
     count=0;
@@ -1828,10 +1775,8 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
           evaluateStabParams_algo3(velTemp, matG, dt, rho, mu, CI, tau);
 
           tau[0] *= elmDat[8];  // SUPG
-          //tau[1] *= (elmDat[9]/degree[0]/degree[0]);  // PSPG
           tau[1] *= elmDat[9];  // PSPG
           tau[2] *= elmDat[10]; // LSIC
-
 
           //cout << " tau = " << tau[0] << '\t' << tau[1] << '\t' << tau[2] << endl;
 
@@ -1850,7 +1795,6 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
             b8 = af*b4;
 
             Da = rho*(velPrev(0)*b1 + velPrev(1)*b2)*tau[0];
-            //Da = rho*(vel(0)*b1 + vel(1)*b2)*tau[0];
 
             for(jj=0;jj<totnlbf2;jj++)
             {
@@ -1918,11 +1862,6 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
               Klocal(TIp1, TJp1) += Da*Dj(1,1);
               Klocal(TIp1, TJp2) += Da*Dj(1,2);
 
-              //Klocal(TI,   TJ)   += ( (tau[0]*af) * b1 * rStab(0) * N(jj) );
-              //Klocal(TI,   TJp1) += ( (tau[0]*af) * b2 * rStab(0) * N(jj) );
-              //Klocal(TIp1, TJ)   += ( (tau[0]*af) * b1 * rStab(1) * N(jj) );
-              //Klocal(TIp1, TJp1) += ( (tau[0]*af) * b2 * rStab(1) * N(jj) );
-
               // PSPG
               Klocal(TIp2, TJ)   += (b1*Dj(0,0) + b2*Dj(1,0))*tau[1];
               Klocal(TIp2, TJp1) += (b1*Dj(0,1) + b2*Dj(1,1))*tau[1];
@@ -1931,6 +1870,7 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
               // LSIC stabilisation
 
               fact2 = rho*af*tau[2];
+
               Klocal(TI,   TJ)   += (b1*dN_dx(jj))*fact2;
               Klocal(TI,   TJp1) += (b1*dN_dy(jj))*fact2;
 
@@ -1977,7 +1917,7 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
     return;
 }
-*/
+//
 
 
 
@@ -1998,11 +1938,9 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
     double  JacTemp, Jac, dvol, stabParam;
     double  fact, fact2, b1, b2, b3, b4, b5, b6, b7, b8, acceFact, dt;
-    double  pres, Da, Db, af, am, muTaf, rad, urdr, urdr2, h2, h, tau[3], beta[6];
-    
-    beta[0] = 1.0;     beta[1] = 1.0/3.0;
-    beta[2] = 30.0;    beta[3] = 0.1;
-    beta[4] = 0.0;     beta[5] = 0.0;
+    double  pres, Da, Db, af, am, muTaf, rad, urdr, urdr2, h2, h, tau[3];
+
+    //double beta[6]; get_stabilisation_beta_wulf(beta);
 
     VectorXd  NN(totnlbf), dNN_dx(totnlbf), d2NN_dx2(totnlbf), dNN_dy(totnlbf), d2NN_dy2(totnlbf);
     VectorXd  N, dN_dx, d2N_dx2, dN_dy, d2N_dy2, d2N;
@@ -2803,11 +2741,10 @@ void TreeNode<2>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
     double *gws;
     myPoint *gps;
     
-    y0 = 0.0;    y1 = 0.41;
-    y0 = -5.0;  y1 = 5.0;
+    //y0 = -5.0;  y1 = 5.0;
     //y0 = 0.90;  y1 = 1.30;
     //y0 = 0.5;  y1 = 1.50;
-    //y0 = 0.0;    y1 = 1.61;
+
 
     //KimMoinFlow  analy(rho, mu);
     Kovasznay  analy;
@@ -2924,11 +2861,29 @@ void TreeNode<2>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
               {
                 if(dir == 0)
                 {
+                  //y0 = 0.0;    y1 = 0.6;
+                  //specVal = DirichletData[aa][2]*(6.0/y1/y1)*(y1-geom[1])*(geom[1]-y0); // vertical beam - Wall
+
+                  //y0 = 0.0;    y1 = 0.41; // Turek beam
                   //specVal = DirichletData[aa][2]*(6.0/y1/y1)*(y1-geom[1])*(geom[1]-y0); // Turek beam
+
                   //specVal = DirichletData[aa][2]*(y1*y1-geom[1]*geom[1])/0.5625;
+
                   //specVal = DirichletData[aa][2]*(6.0/(y1-y0)/(y1-y0))*(y1-geom[1])*(geom[1]-y0); // throttle valve
                   //if(geom[1] >= y0 && geom[1] <= y1)
-                    //specVal = DirichletData[aa][2]*(y1-geom[1])*(geom[1]-y0);
+
+                  y0 = 0.0;    y1 = 1.61;
+                  specVal = DirichletData[aa][2]*(y1-geom[1])*(geom[1]-y0); // heart-valve benchmark
+
+                  //y0 = 0.0;    y1 = 2.0;
+                  //specVal = DirichletData[aa][2]*(y1-geom[1])*(geom[1]-y0); // single-leaf benchmark
+
+                  //y0 = 0.0;    y1 = 1.0;
+                  //specVal = DirichletData[aa][2]*(y1-geom[1])*(geom[1]-y0); // Neumann problem
+
+                  //y0 = 0.0;    y1 = 0.5;
+                  //specVal = DirichletData[aa][2]*(y1-geom[1])*(geom[1]-y0); // heart-valve benchmark
+
                   //else
                     //specVal = 0.0;
                     //specVal = DirichletData[aa][2]*(1.0-geom[1]*geom[1]);
@@ -3101,11 +3056,14 @@ void TreeNode<1>::applyNeumannBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal,
 template<>
 void TreeNode<2>::applyNeumannBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
 {
+  //if(mpapTime.cur > 0.005)
+    //return;
+
   if( NeumannData.size() > 0 )
   {
       int ii, jj, aa, gp, nGauss, TI, TIp1, TIp2, index, dir, side;
       double  y0, y1, res, JacTemp;
-      double  dvol, specVal, rad, freq, pres, PENALTY=1000.0;
+      double  dvol, specVal, rad, freq, pres, PENALTY=100.0;
 
       VectorXd  N(totnlbf), dN_dx(totnlbf), dN_dy(totnlbf);
       VectorXd  NN(totnlbf), dNN_dx(totnlbf), dNN_dy(totnlbf);
@@ -3125,10 +3083,13 @@ void TreeNode<2>::applyNeumannBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal,
         side    = (int) (NeumannData[aa][0] - 1);
         dir     = (int) (NeumannData[aa][1] - 1);
 
+
         normal = GeomData->boundaryNormals[side];
 
         if(domNums.size() > 1)
         {
+          //TreeNode<2>::computeGaussPointsAdapIntegrationBoundary(side, 0, 0, 0, 0);
+
           nGauss = BoundaryQuadrature[side].gausspoints.size() ;
 
           gps = &(BoundaryQuadrature[side].gausspoints[0]);
@@ -3146,6 +3107,7 @@ void TreeNode<2>::applyNeumannBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal,
           JacTemp = GeomData->boundaryJacobians[side][level];
         }
 
+
         for(gp=0; gp<nGauss; gp++)
         {
             param[1] = 0.5 * (knots[1][2] * gps[gp][1] + knots[1][3]);
@@ -3154,7 +3116,7 @@ void TreeNode<2>::applyNeumannBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal,
             dvol = JacTemp * gws[gp] ;
 
             geom[0] = GeomData->ComputeCoord(0, param[0]);
-            //yy = GeomData->ComputeCoord(1, param[1]);
+            geom[1] = GeomData->ComputeCoord(1, param[1]);
             //r = sqrt(xx*xx+yy*yy);
             //val = 1.0+log(2.0*r);
             //cout << xx << '\t' << yy << endl;
@@ -3190,11 +3152,11 @@ void TreeNode<2>::applyNeumannBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal,
             specVal = NeumannData[aa][2];
 
             /*
-            if(side == 110)
+            if(side == 10)
             {
               if(dir == 0)
               {
-                if(abs(yy) >= 0.75)
+                if(abs(geom[1]) > 0.5)
                   specVal = 0.0;
                 else
                   specVal = NeumannData[aa][2];
@@ -3214,12 +3176,12 @@ void TreeNode<2>::applyNeumannBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal,
             //res = dvol * specVal * sin(freq*mpapTime.cur);
             //res *= tanh(50.0*timeFunction[0].prop);
 
-            //cout << " yy " << yy << '\t' << res << endl;
+            //cout << " yy " << geom[1] << '\t' << res << endl;
             for(ii=0;ii<totnlbf2;ii++)
               Flocal(ndof*ii+dir) += (res*N(ii));
 
 
-          if(side == 22)
+          if(side == 110)
 	  {
             dvol *= PENALTY;
             

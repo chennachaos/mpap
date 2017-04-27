@@ -69,7 +69,7 @@ int LagrangeElem3DStokesHex8Node::calcLoadVector()
 int LagrangeElem3DStokesHex8Node::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)
 {
   double  dvol, b1, b2, b3, b4, b5, b6, b7, b8;
-  double  Jac, dt, totvol, pres, fact, fact2;
+  double  Jac, totvol, pres, fact, fact2;
   double  param[3], bforce[3], tau[3];
 
   VectorXd  N(nlbf), dN_dx(nlbf), dN_dy(nlbf), dN_dz(nlbf);
@@ -91,9 +91,10 @@ int LagrangeElem3DStokesHex8Node::calcStiffnessAndResidual(MatrixXd& Klocal, Vec
   //bforce[1]  = elmDat[7]*timeFunction[0].prop ;
   //bforce[2]  = elmDat[7]*timeFunction[0].prop ;
 
+  double  dt = mpapTime.dt;
   double  af = SolnData->td(2);
-  double  acceFact = SolnData->td(5);
-  
+  double  am = SolnData->td(1);
+  double  acceFact = am*SolnData->td(9);
   double  muTaf = mu*af;
 
   //printf(" %14.12f \t %14.12f \t %14.12f \t %14.12f \n ", BULK, mu, bforce[0], bforce[1]);
