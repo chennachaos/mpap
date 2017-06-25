@@ -63,7 +63,8 @@ void HBSplineCutFEM::timeUpdate()
 
   updateIterStep();
 
-  cout << " HBSplineCutFEM::timeUpdate() ... FINISHED " << endl;
+  //cout << " HBSplineCutFEM::timeUpdate() ... FINISHED " << endl;
+  //PetscPrintf(MPI_COMM_WORLD, "   WARNING! I could not remove the temporary input File!\n\n");
 
   return;
 }
@@ -72,7 +73,7 @@ void HBSplineCutFEM::timeUpdate()
 
 void HBSplineCutFEM::updateIterStep()
 {
-  cout << " HBSplineCutFEM::updateIterStep() ... STARTED " << endl;
+  //cout << " HBSplineCutFEM::updateIterStep() ... STARTED " << endl;
 
   int kk, bb, ee;
 
@@ -389,23 +390,22 @@ int  HBSplineCutFEM::prepareMatrixPattern()
     //tstart = time(0);
     auto tstart = Clock::now();
 
-    cout << " preparing cut elements " << endl;
+    PetscPrintf(MPI_COMM_WORLD, " preparing cut elements \n");
 
     prepareCutElements();
 
     auto tend = Clock::now();
-    cout << " preparing()   took " << std::chrono::duration_cast<std::chrono::milliseconds>(tend - tstart).count() << "   milliseconds " << endl;
 
-    //setCoveringUncovering();
+    //cout << " preparing()   took " << std::chrono::duration_cast<std::chrono::milliseconds>(tend - tstart).count() << "   milliseconds " << endl;
+    PetscPrintf(MPI_COMM_WORLD, " preparing cut elements took %12.6f  milliseconds \n", std::chrono::duration_cast<std::chrono::milliseconds>(tend - tstart).count());
 
-    //tend = time(0);
-    //printf("HBSplineCutFEM::prepareCutElements() took %8.4f second(s) \n ", difftime(tend, tstart) );
+    setCoveringUncovering();
 
     //cout << " activeElements.size () = "  << activeElements.size() << endl;
     //cout << " fluidElementIds.size () = "  << fluidElementIds.size() << endl;
 
-    PetscSynchronizedPrintf(MPI_COMM_WORLD, " nElem = %8d \n", nElem);
-    PetscSynchronizedPrintf(MPI_COMM_WORLD, " nNode = %8d \n", nNode);
+    //PetscSynchronizedPrintf(MPI_COMM_WORLD, " nElem = %8d \n", nElem);
+    //PetscSynchronizedPrintf(MPI_COMM_WORLD, " nNode = %8d \n", nNode);
 
 
     fluidDOF = nNode*ndof;
@@ -422,13 +422,12 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
     totalDOF = fluidDOF + solidDOF;
 
-    printf("\n \t   Fluid DOF in the model   =  %8d\n\n", fluidDOF);
-    printf("\n \t   Solid DOF in the model   =  %8d\n\n", solidDOF);
-    PetscSynchronizedPrintf(MPI_COMM_WORLD, "\n \t   Total DOF in the model   =  %8d\n\n", totalDOF);
+    //PetscPrintf(MPI_COMM_WORLD, "\n \t   Fluid DOF in the model   =  %8d\n\n", fluidDOF);
+    //PetscPrintf(MPI_COMM_WORLD, "\n \t   Solid DOF in the model   =  %8d\n\n", solidDOF);
+    PetscPrintf(MPI_COMM_WORLD, "\n \t   Total DOF in the model   =  %8d\n\n", totalDOF);
 
     proc_to_grid_BF.resize(nNode);
     proc_to_grid_DOF.resize(totalDOF);
-
 
 
     if(n_mpi_procs == 1)

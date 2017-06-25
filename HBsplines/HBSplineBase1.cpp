@@ -334,7 +334,7 @@ void HBSplineBase::prepareInputData()
       }
     }
 
-    cout << " Immersed solids preparation DONE ... " << endl;
+    PetscPrintf(MPI_COMM_WORLD, " Immersed solids preparation DONE ... ");
 
     geom.setZero();
     param.setZero();
@@ -487,7 +487,7 @@ void HBSplineBase::prepareInputData()
 
     //gridBFtotal = gridBF1 + gridBF2;
 
-    printf("\n \t   Number of basis functions in the background grid  =  %5d\n\n", gridBF1);
+    PetscPrintf(MPI_COMM_WORLD, "\n    Number of basis functions in the background grid  =  %5d\n\n", gridBF1);
 
     /////////////////////////////////////////
     // create contact elements
@@ -510,9 +510,7 @@ void HBSplineBase::prepareInputData()
       contactElementObjects[aa]->prepareElemData();
     }
 
-    //cout << " jjjjjjjjjjjjjjj  " << endl;
-
-    printf("     HBSplineBase::prepareInputData()  .... FINISHED ...\n\n");
+    PetscPrintf(MPI_COMM_WORLD, "     HBSplineBase::prepareInputData()  .... FINISHED ...\n\n");
 
     return;
 }
@@ -1199,6 +1197,8 @@ void HBSplineBase::prepareInteractions()
 
 void HBSplineBase::printInfo()
 {
+  if(this_mpi_proc == 0)
+  {
     printf("\n Background Fluid Grid information \n");
     printf("\n ----------------------------------------------------------------------------- \n");
     printf("\t   Problem   Dimension        =  %5d\n\n", DIM);
@@ -1210,8 +1210,9 @@ void HBSplineBase::printInfo()
     printf("\t   DOF at each Control Point  =  %5d\n\n", ndof);
     printf("\t   Total number of DOF        =  %5d\n\n", totalDOF);
     printf("\n ----------------------------------------------------------------------------- \n");
+  }
 
-    return;
+  return;
 }
 
 

@@ -169,7 +169,6 @@ void SolutionData::printSelf()
 void  SolutionData::setTimeParam()
 {
   //cout << PHYSICS_TYPE << endl;
-  
   //cout << tis << '\t' << rho << '\t' << mpapTime.dt << endl;
 
   if( PHYSICS_TYPE == PHYSICS_TYPE_SOLID )

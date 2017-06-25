@@ -225,11 +225,6 @@ bool HBSplineBase::converged()
 
   if (rNorm < tol && localStiffnessError == 0)
   {
-    //if(STAGGERED && (SOLID_SOLVED == 0))
-    //{
-      //solveSolidProblem();
-      //SOLID_SOLVED = 1;
-    //}
     return true;
   }
 

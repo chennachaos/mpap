@@ -355,7 +355,7 @@ void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
 
 
-/*
+//
 template<>
 void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
 {
@@ -588,13 +588,13 @@ void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
           // evaluate stabilisation parameters
           //
-          //velTemp(0) = velPrev(0);
-          //velTemp(1) = velPrev(1);
-          //velTemp(2) = velPrev(2);
+          velTemp(0) = velPrev(0);
+          velTemp(1) = velPrev(1);
+          velTemp(2) = velPrev(2);
 
-          velTemp(0) = vel(0);
-          velTemp(1) = vel(1);
-          velTemp(2) = vel(2);
+          //velTemp(0) = vel(0);
+          //velTemp(1) = vel(1);
+          //velTemp(2) = vel(2);
 
           //evaluateStabParams_algo1(&velTemp(0), h, rho, mu, dt,  beta, tau);
 
@@ -701,14 +701,17 @@ void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
               Klocal(TI, TJ)     += Da*Dj(0,0);
               Klocal(TI, TJp1)   += Da*Dj(0,1);
               Klocal(TI, TJp2)   += Da*Dj(0,2);
+              Klocal(TI, TJp3)   += Da*Dj(0,3);
 
               Klocal(TIp1, TJ)   += Da*Dj(1,0);
               Klocal(TIp1, TJp1) += Da*Dj(1,1);
               Klocal(TIp1, TJp2) += Da*Dj(1,2);
+              Klocal(TIp1, TJp3) += Da*Dj(1,3);
 
               Klocal(TIp2, TJ)   += Da*Dj(2,0);
               Klocal(TIp2, TJp1) += Da*Dj(2,1);
               Klocal(TIp2, TJp2) += Da*Dj(2,2);
+              Klocal(TIp2, TJp3) += Da*Dj(2,3);
 
               c1 = tau[0] * af * rho * N[jj];
 
@@ -772,12 +775,12 @@ void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
     return;
 }
-*/
-
-
-
-
 //
+
+
+
+
+/*
 template<>
 void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
 {
@@ -1186,7 +1189,7 @@ void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
     return;
 }
-//
+*/
 
 
 
@@ -1669,20 +1672,23 @@ void TreeNode<3>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
 
               specVal = DirichletData[aa][2];
 
-              //
+              /*
               if(side == 0 )
               {
                 if(dir == 0)
                 {
-                  //fact = (16.0)*(1.0/(y1-y0)/(y1-y0))*(1.0/(z1-z0)/(z1-z0));
-                  fact = 10000.0/324.0;
-                  specVal = DirichletData[aa][2]*fact*(y1-geom[1])*(geom[1]-y0)*(z1-geom[2])*(geom[2]-z0);  // plate Wall
+                  fact = (16.0)*(1.0/(y1-y0)/(y1-y0))*(1.0/(z1-z0)/(z1-z0));
+                  //fact = 10000.0/324.0;
+                  //specVal = DirichletData[aa][2]*fact*(y1-geom[1])*(geom[1]-y0)*(z1-geom[2])*(geom[2]-z0);  // plate Wall
                   
                   //specVal = DirichletData[aa][2]*16.0*(6.0/y1/y1)*(y1-yy)*(yy-y0);
                   //specVal = 16.0*DirichletData[aa][2]*geom[1]*geom[2]*(H-geom[1])*(H-geom[2])/pow(H,4.0);
+
+                  y0 = 0.0;    y1 = 0.41; // Turek beam
+                  specVal = DirichletData[aa][2]*(6.0/y1/y1)*(y1-geom[1])*(geom[1]-y0); // Turek beam
                 }
               }
-              //
+              */
               /*
             if(side == 3)
             {

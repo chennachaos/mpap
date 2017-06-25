@@ -51,22 +51,15 @@ void LagrangeElem3DBbarFbar::prepareElemData()
   ndof   = 3;
   nsize  = nlbf*ndof;
 
-
   // set the element property variables
 
   elmDat = &(SolnData->ElemProp[elmType].data[0]);
   matDat = &(SolnData->MatlProp[matType].data[0]);
 
-  int nGP1  = (int) elmDat[0] ;
-  int nGP2  = nGP1;
-  nGP   = nGP1 * nGP2;
   finiteInt  = (int) elmDat[2] ;
   matId      = SolnData->MatlProp[matType].id + 1;
   finite     = (finiteInt >= 1) ;
 
-  //Klocal.resize(nsize, nsize);
-  //Flocal.resize(nsize);
-  
   return;
 }
 
@@ -123,7 +116,6 @@ int LagrangeElem3DBbarFbar::calcStiffnessAndResidualSS(MatrixXd& Klocal, VectorX
   double  acceFact1 = SolnData->td(5);
   double  acceFact2 = acceFact1;
 
-
   double xNode[8], yNode[8], zNode[8], xx, yy, zz;
 
   for(ii=0;ii<npElem;ii++)
@@ -132,9 +124,6 @@ int LagrangeElem3DBbarFbar::calcStiffnessAndResidualSS(MatrixXd& Klocal, VectorX
     yNode[ii] = GeomData->NodePosOrig[nodeNums[ii]][1];
     zNode[ii] = GeomData->NodePosOrig[nodeNums[ii]][2];
   }
-
-  totvol = (xNode[1]-xNode[0])*(yNode[2]-yNode[0])*(zNode[5]-zNode[0]);
-
 
   //  compute determinant tr(F) in element centre 
 
@@ -181,14 +170,15 @@ int LagrangeElem3DBbarFbar::calcStiffnessAndResidualSS(MatrixXd& Klocal, VectorX
 
   getGaussPoints1D(nGP, gausspoints, gaussweights);
 
-    if(Klocal.rows() != nsize)
-    {
-      Klocal.resize(nsize, nsize);
-      Flocal.resize(nsize);
-    }
-    Klocal.setZero();
-    Flocal.setZero();
+  if(Klocal.rows() != nsize)
+  {
+    Klocal.resize(nsize, nsize);
+    Flocal.resize(nsize);
+  }
+  Klocal.setZero();
+  Flocal.setZero();
 
+  //cout << " AAAAAAAAAAAAAAA " << endl;
 
   totvol = 0.0;
   for(gp3=0;gp3<nGP;gp3++)
@@ -213,7 +203,6 @@ int LagrangeElem3DBbarFbar::calcStiffnessAndResidualSS(MatrixXd& Klocal, VectorX
         totvol += dvol;
 
         //GeomData->computeDeformationGradient(1, nodeNums, &dN_dx(0), &dN_dy(0), F, detF);
-
 
         F[0] = computeValueCur(0, dN_dx) + 1.0;
         F[3] = computeValueCur(0, dN_dy);
@@ -482,9 +471,13 @@ int LagrangeElem3DBbarFbar::calcStiffnessAndResidualFS(MatrixXd& Klocal, VectorX
 
   getGaussPoints1D(nGP, gausspoints, gaussweights);
 
+  if(Klocal.rows() != nsize)
+  {
+    Klocal.resize(nsize, nsize);
+    Flocal.resize(nsize);
+  }
   Klocal.setZero();
   Flocal.setZero();
-
 
   totvol = 0.0;
   for(gp3=0;gp3<nGP;gp3++)

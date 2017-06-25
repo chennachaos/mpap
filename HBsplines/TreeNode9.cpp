@@ -937,7 +937,7 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
           stress(0,0) -= pres;
           stress(1,1) -= pres;
 
-          //force.setZero();
+          force.setZero();
 
           //force(0) = analy.computeForce(0, geom[0], geom[1]);
           //force(1) = analy.computeForce(1, geom[0], geom[1]);
@@ -2856,40 +2856,43 @@ void TreeNode<2>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
               }
             }
              */
-              /*
+              //
               if(side == 0 )
               {
                 if(dir == 0)
                 {
-                  //y0 = 0.0;    y1 = 0.6;
-                  //specVal = DirichletData[aa][2]*(6.0/y1/y1)*(y1-geom[1])*(geom[1]-y0); // vertical beam - Wall
+                   // vertical beam - Wall
+                  y0 = 0.0;    y1 = 0.6;
+                  specVal = DirichletData[aa][2]*(6.0/y1/y1)*(y1-geom[1])*(geom[1]-y0);
 
-                  //y0 = 0.0;    y1 = 0.41; // Turek beam
-                  //specVal = DirichletData[aa][2]*(6.0/y1/y1)*(y1-geom[1])*(geom[1]-y0); // Turek beam
+                   // Turek beam
+                  //y0 = 0.0;    y1 = 0.41;
+                  //specVal = DirichletData[aa][2]*(6.0/y1/y1)*(y1-geom[1])*(geom[1]-y0);
 
                   //specVal = DirichletData[aa][2]*(y1*y1-geom[1]*geom[1])/0.5625;
 
-                  //specVal = DirichletData[aa][2]*(6.0/(y1-y0)/(y1-y0))*(y1-geom[1])*(geom[1]-y0); // throttle valve
+                  // throttle valve
+                  //specVal = DirichletData[aa][2]*(6.0/(y1-y0)/(y1-y0))*(y1-geom[1])*(geom[1]-y0);
                   //if(geom[1] >= y0 && geom[1] <= y1)
 
-                  y0 = 0.0;    y1 = 1.61;
-                  specVal = DirichletData[aa][2]*(y1-geom[1])*(geom[1]-y0); // heart-valve benchmark
+                  // heart-valve benchmark
+                  //y0 = 0.0;    y1 = 1.61;
+                  //specVal = DirichletData[aa][2]*(y1-geom[1])*(geom[1]-y0);
 
+                  // single-leaf benchmark
                   //y0 = 0.0;    y1 = 2.0;
-                  //specVal = DirichletData[aa][2]*(y1-geom[1])*(geom[1]-y0); // single-leaf benchmark
+                  //specVal = DirichletData[aa][2]*(y1-geom[1])*(geom[1]-y0);
 
+                  // Neumann problem
                   //y0 = 0.0;    y1 = 1.0;
-                  //specVal = DirichletData[aa][2]*(y1-geom[1])*(geom[1]-y0); // Neumann problem
-
-                  //y0 = 0.0;    y1 = 0.5;
-                  //specVal = DirichletData[aa][2]*(y1-geom[1])*(geom[1]-y0); // heart-valve benchmark
+                  //specVal = DirichletData[aa][2]*(y1-geom[1])*(geom[1]-y0);
 
                   //else
                     //specVal = 0.0;
                     //specVal = DirichletData[aa][2]*(1.0-geom[1]*geom[1]);
                 }
               }
-              */
+              //
 
               /*
               if(side == 3)

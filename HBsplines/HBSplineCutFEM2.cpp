@@ -164,8 +164,6 @@ void  HBSplineCutFEM::prepareCutElements()
     }
   }
 
-  cout << " aaaaaaaaaaaaaaaaaa " << endl;
-  
   nNode = 0;
   for(ee=0; ee<gridBF1; ee++)
   {
@@ -207,7 +205,252 @@ void  HBSplineCutFEM::prepareCutElements()
   return;
 }
 
+
+/*
+
+void  HBSplineCutFEM::prepareCutElements()
+{
+  //PetscPrintf(MPI_COMM_WORLD, "  HBSplineCutFEM::prepareCutElements() \n");
+
+  int  aa, bb, dd, ee, ii, jj, kk, nlb, gp, nGauss, domTemp, ind1, ind2, count;
+  bool  flag;
+
+  node  *nd1;
+
+  nElem = activeElements.size();
+  nNode = gridBF1;
+
+  totalDOF = nNode*ndof;
+
+  grid_to_cutfem_BFprev  = grid_to_cutfem_BF;
+  grid_to_cutfem_DOFprev = grid_to_cutfem_DOF;
+
+  grid_to_cutfem_BF.assign(gridBF1, -1);
+  grid_to_cutfem_DOF.assign(totalDOF, -1);
+
+  cutfem_to_grid_BF.clear();
+  cutfem_to_grid_DOF.clear();
+
+
+  if( ImmersedBodyObjects.size() == 0 )
+  {
+    fluidElementIds = activeElements;
+
+    cutfem_to_grid_BF.resize(gridBF1);
+    cutfem_to_grid_DOF.resize(totalDOF);
+
+    kk=0;
+    for(ii=0; ii<gridBF1; ii++)
+    {
+      cutfem_to_grid_BF[ii] = ii;
+      grid_to_cutfem_BF[ii] = ii;
+
+      for(dd=0; dd<ndof; dd++)
+      {
+        cutfem_to_grid_DOF[kk] = kk;
+        grid_to_cutfem_DOF[kk] = kk;
+        kk++;
+      }
+    }
+
+    for(ee=0; ee<activeElements.size(); ee++)
+    {
+      nd1 = elems[activeElements[ee]];
+      nd1->domNums.clear();
+      nd1->domNums.push_back(0);
+    }
+    return;
+  }
   
+  cutCellIds.clear();
+  fluidElementIds.clear();
+
+  for(bb=0; bb<ImmersedBodyObjects.size(); bb++)
+  {
+    ImmersedBodyObjects[bb]->UpdateImmersedFaces();
+    ImmersedBodyObjects[bb]->computeAABB(2);
+  }
+
+  //GeomData.domainFixedYesNo[0] = 0;
+  //GeomData.domainFixedYesNo[1] = 0;
+
+
+      node *ndTemp;
+
+
+  for(ee=0; ee<nElem; ee++)
+  {
+    ndTemp = elems[activeElements[ee]];
+
+    ndTemp->domNums.clear();
+  }
+
+
+      // go through all the Gauss points on the immersed faces of all immsersed solids
+      // and find the element in which each GP lies.
+      // Every element in which a GP lies is a cut cell.
+      // mark all the cut cells
+
+      double  dvol, detJ;
+
+      VectorXd  Nb;
+
+      vector<double>  gausspoints1, gausspoints2, gaussweights;
+
+      param.setZero();
+      geom.setZero();
+      normal.setZero();
+
+      ImmersedIntegrationElement  *lme;
+      myPoly*  poly;
+
+      for(bb=0; bb<ImmersedBodyObjects.size(); bb++)
+      {
+        //cout << " uuuuuuuuuuu " << endl;
+
+        nlb = ImmersedBodyObjects[bb]->ImmIntgElems[0]->pointNums.size();
+
+        nGauss = (int) cutFEMparams[1];
+
+        Nb.resize(nlb);
+
+        if(nlb == 3)
+          getGaussPointsTriangle(nGauss, gausspoints1, gausspoints2, gaussweights);
+        else
+          getGaussPointsQuad(nGauss, gausspoints1, gausspoints2, gaussweights);
+
+        for(aa=0;aa<ImmersedBodyObjects[bb]->ImmIntgElems.size();aa++)
+        {
+          lme  = ImmersedBodyObjects[bb]->ImmIntgElems[aa];
+          poly = ImmersedBodyObjects[bb]->ImmersedFaces[aa];
+
+          if( lme->IsActive() )
+          {
+            for(gp=0;gp<nGauss;gp++)
+            {
+              param[0] = gausspoints1[gp];
+              param[1] = gausspoints2[gp];
+
+              poly->computeBasisFunctions(param, geom, Nb, detJ);
+
+              ndTemp = elems[findCellNumber(geom)];
+
+              ndTemp->domNums.push_back(bb+1);
+              
+            }//for(gp=0...
+          } // if( lme->IsActive() )
+        }//for(aa=0...
+      }//for(bb=0;...
+      
+      
+      // remove duplicate immsered solid numbers from 'domNums' of cut cells
+      //
+      //
+
+
+  for(ee=0; ee<nElem; ee++)
+  {
+    ndTemp = elems[activeElements[ee]];
+
+    if(ndTemp->domNums.size() > 0)
+    {
+      ndTemp->domNums.push_back(0);
+      findUnique(ndTemp->domNums);
+    }
+  }
+
+
+
+  //////
+  // adjust the cut cells
+  // check whether a cell is completely inside solid domains
+
+  for(ee=0; ee<nElem; ee++)
+  {
+    nd1 = elems[activeElements[ee]];
+    //cout << ee << '\t' << nd1->GetID() << endl;
+
+    flag = true;
+
+    //if( flag )
+    //{
+
+      if( !(nd1->IsCutElement()) )
+      {
+        kk = nd1->prepareCutCell(cutFEMparams);
+
+        if( kk != 1)
+        {
+          cerr << " Error in prepareCutCell() for TreeNode<>::prepareCutCell() " << kk << endl;
+          exit(kk);
+        }
+      }
+
+      if( nd1->IsCutElement() )
+      {
+        cutCellIds.push_back(activeElements[ee]);
+
+        if(cutFEMparams[0] == 1)
+          nd1->computeGaussPointsSubTrias(cutFEMparams[2], false);
+        else
+          nd1->computeGaussPointsAdapIntegration(cutFEMparams[3], cutFEMparams[4], false, true);
+      }
+    //}
+
+    if( nd1->GetDomainNumber() <= 0 )
+    {
+      fluidElementIds.push_back( nd1->GetID() );
+
+      //printVector(nd1->GlobalBasisFuncs);
+
+      for(ii=0; ii<nd1->GlobalBasisFuncs.size(); ii++)
+        grid_to_cutfem_BF[nd1->GlobalBasisFuncs[ii]] = 1;
+    }
+  }
+
+  nNode = 0;
+  for(ee=0; ee<gridBF1; ee++)
+  {
+    if(grid_to_cutfem_BF[ee] == 1)
+    {
+      grid_to_cutfem_BF[ee] = nNode;
+      cutfem_to_grid_BF.push_back(ee);
+
+      ind1 = ndof*ee;
+      ind2 = ndof*nNode;
+      for(dd=0; dd<ndof; dd++)
+      {
+        grid_to_cutfem_DOF[ind1+dd] = ind2+dd;
+        cutfem_to_grid_DOF.push_back(ind1+dd);
+      }
+      nNode++;
+    }
+  }
+
+  //for(ee=0; ee<gridBF1; ee++)
+    //cout << ee << '\t' << grid_to_cutfem_DOF[ee] << endl;
+  //printVector(grid_to_cutfem_DOF);
+
+  nElem     =  fluidElementIds.size();
+  fluidDOF  =  nNode*ndof;
+
+  //PetscPrintf(MPI_COMM_WORLD, "  nNode    = %d \n", nNode);
+  //PetscPrintf(MPI_COMM_WORLD, "  fluidDOF = %d \n", fluidDOF);
+  //PetscPrintf(MPI_COMM_WORLD, "  HBSplineCutFEM::prepareCutElements() \n\n");
+
+  //if(this_mpi_proc==0)
+  //{
+    //for(ii=0; ii<grid_to_cutfem_BF.size(); ii++)
+      //cout << ii << '\t' << grid_to_cutfem_BF[ii] << endl;
+  //}
+
+  //MPI_Barrier(MPI_COMM_WORLD);
+
+  return;
+}
+*/
+
+
 void  HBSplineCutFEM::prepareCutElementsAdapIntegration1D()
 {
   return;
@@ -267,10 +510,6 @@ void  HBSplineCutFEM::prepareCutElementsSubTrias2D()
       }
     }
 
-    //if( !std::any_of(domTemp.begin(), domTemp.end(), [](int i){return i==-1;}) )
-    //{
-      //nd1->SetDomainNumber( *std::max_element(domTemp.begin(), domTemp.end()) );
-    
     //nd1->SetDomainNumber(domTemp);
 
     if(domTemp == -1)

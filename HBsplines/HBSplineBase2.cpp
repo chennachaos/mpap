@@ -1,8 +1,6 @@
 
 #include "HBSplineBase.h"
 
-//using namespace std;
-
 
 
 void  HBSplineBase::BuildBase()

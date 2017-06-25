@@ -47,18 +47,18 @@ void HBSplineCutFEM::setInitialConditions()
 
 void  HBSplineCutFEM::applyBoundaryConditions()
 {
-    //cout << "     HBSplineCutFEM: applyBoundaryConditions ... STARTED  \n\n";
-    //firstIter = true;
+  //cout << "     HBSplineCutFEM: applyBoundaryConditions ... STARTED  \n\n";
+  //firstIter = true;
 
-    //cout << "     HBSplineCutFEM: applyBoundaryConditions ...DONE  \n\n";
-    return;
+  //cout << "     HBSplineCutFEM: applyBoundaryConditions ...DONE  \n\n";
+  return;
 }
 
 
 
 void HBSplineCutFEM::addExternalForces()
 {
-//  cout << "HBSplineCutFEM::addExternalForces() " << endl;
+  //  cout << "HBSplineCutFEM::addExternalForces() " << endl;
   // if(firstIter)     calcAndAssyLoadVector(1.0, 0.0);
 
   return;
@@ -72,13 +72,11 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
 
     assert( SOLVER_TYPE == SOLVER_TYPE_PETSC );
 
-    char fct[] = "HBSplineCutFEM::calcStiffnessAndResidual";
-    computerTime.go(fct);
+    //char fct[] = "HBSplineCutFEM::calcStiffnessAndResidual";
+    //computerTime.go(fct);
 
-    int  ee, nr, nc, dd, start=0, pp, dof, dir, domTemp=0, bb, kk;
+    int  ii, ee, nr, nc, dd, start=0, pp, dof, dir, domTemp=0, bb, kk;
     double  PENALTY;
-
-    //time_t tstart, tend;
 
     IterNum   = (iterCount == 1);
 
@@ -146,15 +144,6 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
       }
     }
 
-    auto tend = Clock::now();
-    //tend = time(0);
-    //tend = MPI_Wtime();
-    //printf("HBSplineCutFEM::calcStiffnessAndResidual() took %8.4f millisecond(s) \n ", difftime(tend, tstart) );
-    //printf("HBSplineCutFEM::calcStiffnessAndResidual() took %8.4f millisecond(s) \n ", std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count() );
-    cout << "HBSplineCutFEM::calcStiffnessAndResidual() took " << std::chrono::duration_cast<std::chrono::milliseconds>(tend - tstart).count() << "   milliseconds " << endl;
-
-
-
     //cout << " MMMMMMMMMMMMMMMM " << endl;
     //printVector(pointBCs[0]);
 
@@ -205,6 +194,7 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
         solverPetsc->AssembleMatrixAndVector(0, 0, nd->forAssyVec, nd->forAssyVec, myData.K1, myData.F1);
       }
     }
+
 
     //cout << " rhsVec " << endl;
     //       printVector(&(solver->rhsVec(0)), totalDOF);
@@ -261,17 +251,15 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
 
     PetscPrintf(MPI_COMM_WORLD, "  %5d \t %11.4e\n", iterCount, rNorm);
 
-    ctimCalcStiffRes += computerTime.stop(fct);
+    //ctimCalcStiffRes += computerTime.stop(fct);
     //computerTime.stopAndPrint(fct);
 
-    PetscPrintf(MPI_COMM_WORLD, "     HBSplineCutFEM: generating coefficient Matrices ...DONE  \n\n");
+    //PetscPrintf(MPI_COMM_WORLD, "     HBSplineCutFEM: generating coefficient Matrices ...DONE  \n\n");
 
-    //auto tend = Clock::now();
+    auto tend = Clock::now();
     //tend = time(0);
     //tend = MPI_Wtime();
-    //printf("HBSplineCutFEM::calcStiffnessAndResidual() took %8.4f millisecond(s) \n ", difftime(tend, tstart) );
-    //printf("HBSplineCutFEM::calcStiffnessAndResidual() took %8.4f millisecond(s) \n ", std::chrono::duration_cast<std::chrono::nanoseconds>(tend - tstart).count() );
-    //cout << "HBSplineCutFEM::calcStiffnessAndResidual() took " << std::chrono::duration_cast<std::chrono::milliseconds>(tend - tstart).count() << "   milliseconds " << endl;
+    PetscPrintf(MPI_COMM_WORLD, "HBSplineCutFEM::calcStiffnessAndResidual() took %d millisecond(s) \n\n ", std::chrono::duration_cast<std::chrono::milliseconds>(tend - tstart).count());
 
     iterCount++;
 
@@ -285,11 +273,7 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
 
 int HBSplineCutFEM::factoriseSolveAndUpdate()
 {
-  cout << "     HBSplineCutFEM: solving the matrix system ...  \n\n";
-  char fct[] = "HBSplineCutFEM::factoriseSolveAndUpdate";
-  computerTime.go(fct);
-
-  time_t tstart, tend;
+  //cout << "     HBSplineCutFEM: solving the matrix system ...  \n\n";
 
   int  bb, ii, jj, dd, kk=0;
 
@@ -297,50 +281,47 @@ int HBSplineCutFEM::factoriseSolveAndUpdate()
 
   //cout << " rhsVec " << endl;        printVector(&(solver->rhsVec(0)), totalDOF);
 
-  tstart = time(0);
+  //auto tstart = Clock::now();
+  Clock::time_point tstart = Clock::now();
 
-    //VecView(solverPetsc->rhsVec, PETSC_VIEWER_STDOUT_WORLD);
 
-    //cout << " PetscSolver " << endl;
+  //VecView(solverPetsc->rhsVec, PETSC_VIEWER_STDOUT_WORLD);
 
-    //tstart = time(0);
+  //tstart = time(0);
 
-    solverPetsc->factoriseAndSolve();
+  solverPetsc->factoriseAndSolve();
 
-    tend = time(0);
-    printf("HBSplineCutFEM::factoriseSolveAndUpdate() took %8.4f second(s) \n ", difftime(tend, tstart) );
+  //VecView(solver2->soln, PETSC_VIEWER_STDOUT_WORLD);
 
-    //VecView(solver2->soln, PETSC_VIEWER_STDOUT_WORLD);
-
-    /////////////////////////////////////////////////////////////////////////////
-    // get the solution vector onto all the processors
-    /////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////
+  // get the solution vector onto all the processors
+  /////////////////////////////////////////////////////////////////////////////
   
-    Vec            vec_SEQ;
-    VecScatter     ctx;
-    PetscScalar *arrayTemp;
+  Vec            vec_SEQ;
+  VecScatter     ctx;
+  PetscScalar *arrayTemp;
 
-    VecScatterCreateToAll(solverPetsc->soln, &ctx, &vec_SEQ);
-    VecScatterBegin(ctx, solverPetsc->soln, vec_SEQ, INSERT_VALUES, SCATTER_FORWARD);
-    VecScatterEnd(ctx, solverPetsc->soln, vec_SEQ, INSERT_VALUES, SCATTER_FORWARD);
-    VecScatterDestroy(&ctx);
+  VecScatterCreateToAll(solverPetsc->soln, &ctx, &vec_SEQ);
+  VecScatterBegin(ctx, solverPetsc->soln, vec_SEQ, INSERT_VALUES, SCATTER_FORWARD);
+  VecScatterEnd(ctx, solverPetsc->soln, vec_SEQ, INSERT_VALUES, SCATTER_FORWARD);
+  VecScatterDestroy(&ctx);
 
-    VecGetArray(vec_SEQ, &arrayTemp);
+  VecGetArray(vec_SEQ, &arrayTemp);
 
-    // update solution vector
+  // update solution vector
 
-    kk=0;
-    for(ii=0; ii<nNode; ii++)
-    {
-      //cout << ii << '\t' << node_map_old_to_new[ii] << '\t' << node_map_new_to_old[ii] << endl;
-      //jj = node_map_old_to_new[ii]*ndof;
-      jj = ii*ndof;
-      for(dd=0; dd<ndof; dd++)
-        soln[kk++] = arrayTemp[jj+dd];
-    }
+  kk=0;
+  for(ii=0; ii<nNode; ii++)
+  {
+    //cout << ii << '\t' << node_map_old_to_new[ii] << '\t' << node_map_new_to_old[ii] << endl;
+    //jj = node_map_old_to_new[ii]*ndof;
+    jj = ii*ndof;
+    for(dd=0; dd<ndof; dd++)
+      soln[kk++] = arrayTemp[jj+dd];
+  }
 
-    for(ii=0; ii<fluidDOF; ii++)
-      SolnData.var1[proc_to_grid_DOF[ii]] += soln[ii];
+  for(ii=0; ii<fluidDOF; ii++)
+    SolnData.var1[proc_to_grid_DOF[ii]] += soln[ii];
 
     if(!STAGGERED)
     {
@@ -358,18 +339,23 @@ int HBSplineCutFEM::factoriseSolveAndUpdate()
       }
     }
 
-    VecRestoreArray(vec_SEQ, &arrayTemp);
+  VecRestoreArray(vec_SEQ, &arrayTemp);
 
   //printVector(SolnData.var1);
   //printf("\n\n\n");
 
   //computerTime.stopAndPrint(fct);
-
-  ctimFactSolvUpdt += computerTime.stop(fct);
+  //ctimFactSolvUpdt += computerTime.stop(fct);
 
   //cout << " result " << endl;        printVector(&(soln(0)), totalDOF);
 
-  cout << "     HBSplineCutFEM: solving the matrix system ...DONE  \n\n";
+  //cout << "     HBSplineCutFEM: solving the matrix system ...DONE  \n\n";
+
+  //auto tend = Clock::now();
+  Clock::time_point tend = Clock::now();
+  //tend = MPI_Wtime();
+  //cout << " HBSplineCutFEM::factoriseSolveAndUpdate() took " << std::chrono::duration_cast<std::chrono::milliseconds>(tend - tstart).count() << " millisecond(s) " << endl;
+  PetscPrintf(MPI_COMM_WORLD, "HBSplineCutFEM::factoriseSolveAndUpdate() took %d millisecond(s) \n ", std::chrono::duration_cast<std::chrono::milliseconds>(tend - tstart).count());
 
   //computerTime.stopAndPrint(fct);
 

@@ -117,7 +117,6 @@ void ImmersedIntegrationElement::computePointAtGP(int ind, myPoint& pt)
   pt.setZero();
   for(ii=0;ii<nlb;ii++)
   {
-    //cout << ii << '\t' << pointNumsLocal[ii] << endl;
     for(jj=0;jj<DIM;jj++)
       pt[jj] += (GeomDataLag->NodePosCur[pointNums[ii]][jj] * N[ii] );
   }
@@ -147,8 +146,6 @@ void ImmersedIntegrationElement::computeVelocity(const VectorXd& NN, myPoint&  v
 void ImmersedIntegrationElement::computeVelocityCur(const VectorXd& NN, myPoint&  velSpec)
 {
   assert(NN.rows() == pointNums.size());
-
-  //cout << " pointNums ...  " << pointNums[0] << '\t' << pointNums[1] << endl;
 
   int  ii, jj;
   velSpec.setZero();
@@ -185,8 +182,6 @@ void ImmersedIntegrationElement::computeAcceleration(const VectorXd& NN, myPoint
 void ImmersedIntegrationElement::computeAccelerationCur(const VectorXd& NN, myPoint&  velSpec)
 {
   assert(NN.rows() == pointNums.size());
-
-  //cout << " pointNums ...  " << pointNums[0] << '\t' << pointNums[1] << endl;
 
   int  ii, jj;
   velSpec.setZero();

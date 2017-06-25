@@ -91,105 +91,109 @@ bool prgReadFile(void)
   do {
      key = prgNextDomainKey(*Ifile);
      
-     if (debug) cout << " key = " << key << "\n\n";
+    if (debug) cout << " key = " << key << "\n\n";
   
-     switch (key)
-       {
-	  case -2   : // read TIME_FUNCTIONS part
-		  
-		 if (timeFunctionsFlag) 
-	           { cout << "   WARNING! multiple definition of TIME_FUNCTIONS!\n\n"; break; }
-		 
-                 cout << "   loading TIME_FUNCTIONS ...\n\n";
-		 
-                 prgReadTimeFunctions(*Ifile);
-		 
-		 timeFunctionsFlag = true; 
-		 
-		 break;
-		 
-	  case -1   : // read RUN_CONTROL part
-		  
-		 if (runControlFlag) 
-	           { cout << "   WARNING! multiple definition of RUN_CONTROL part!\n\n"; 
-	             break; }
-		 
-                 cout << "   loading RUN_CONTROL ...\n\n";
-		 
-                 prgReadRunControl(*Ifile);
-		 
-		 runControlFlag = true; 
-		 
-		 break;
+    switch (key)
+    {
+        case -2 : // read TIME_FUNCTIONS part
 
-          case  HBSPLINEFEM:
-
-                domain.newDom(new HBSplineFEM);
-
-                //cout << " AAAAAAAAAAAAAAA  " << HBSPLINEFEM << endl;
-
-                n = domain[HBSPLINEFEM].dom.n;
-
-                cout << "   loading HBSPLINEFEM " << n << " ...\n\n"; 
-
-                domain(HBSPLINEFEM,n-1).readFile(*Ifile);
-
+              if (timeFunctionsFlag) 
+              {
+                PetscPrintf(MPI_COMM_WORLD, "   WARNING! multiple definition of TIME_FUNCTIONS!\n\n");
                 break;
+              }
 
-          case  HBSPLINECUTFEM:
+              //cout << "   loading TIME_FUNCTIONS ...\n\n";
+              PetscPrintf(MPI_COMM_WORLD, "   loading TIME_FUNCTIONS ...\n\n");
+              prgReadTimeFunctions(*Ifile);
 
-                domain.newDom(new HBSplineCutFEM);
+              timeFunctionsFlag = true; 
 
-                //cout << " AAAAAAAAAAAAAAA  " << HBSPLINEFEM << endl;
+              break;
 
-                n = domain[HBSPLINECUTFEM].dom.n;
+        case -1 : // read RUN_CONTROL part
 
-                cout << "   loading HBSPLINECUTFEM " << n << " ...\n\n"; 
-
-                domain(HBSPLINECUTFEM,n-1).readFile(*Ifile);
-
+              if (runControlFlag) 
+              {
+                PetscPrintf(MPI_COMM_WORLD, "   WARNING! multiple definition of RUN_CONTROL part!\n\n");
                 break;
+              }
 
-          case  STANDARDFEM:
+              PetscPrintf(MPI_COMM_WORLD, "   loading RUN_CONTROL ...\n\n");
 
-                domain.newDom(new StandardFEM);
+              prgReadRunControl(*Ifile);
 
-          //cout << " AAAAAAAAAAAAAAA  " << StandardFEM << endl;
+              runControlFlag = true; 
 
-		 n = domain[STANDARDFEM].dom.n;
+              break;
 
-                 cout << "   loading STANDARDFEM " << n << " ...\n\n"; 
-	    
-		 domain(STANDARDFEM,n-1).readFile(*Ifile);
-		 
-                 break;
+        case  HBSPLINEFEM:
 
-	  // case OTHERS: .....
+              domain.newDom(new HBSplineFEM);
 
+              n = domain[HBSPLINEFEM].dom.n;
+
+              //cout << "   loading HBSPLINEFEM " << n << " ...\n\n";
+              PetscPrintf(MPI_COMM_WORLD, "   loading HBSPLINEFEM  %5d ...\n\n", n);
+
+              domain(HBSPLINEFEM,n-1).readFile(*Ifile);
+
+              break;
+
+        case  HBSPLINECUTFEM:
+
+              domain.newDom(new HBSplineCutFEM);
+
+              //cout << " AAAAAAAAAAAAAAA  " << HBSPLINEFEM << endl;
+
+              n = domain[HBSPLINECUTFEM].dom.n;
+
+              PetscPrintf(MPI_COMM_WORLD, "   loading HBSPLINECUTFEM  %5d ...\n\n", n);
+
+              domain(HBSPLINECUTFEM,n-1).readFile(*Ifile);
+
+              break;
+
+        case  STANDARDFEM:
+
+              domain.newDom(new StandardFEM);
+
+              n = domain[STANDARDFEM].dom.n;
+
+              PetscPrintf(MPI_COMM_WORLD, "   loading STANDARDFEM  %5d ...\n\n", n);
+
+              domain(STANDARDFEM,n-1).readFile(*Ifile);
+
+              break;
+
+        // case OTHERS: .....
       }
   
   } while (key > -3 && Ifile); 
 
-  
   // close file ...................................................................................
 
   Ifile->close(); delete Ifile;
   
   if (tmpIfileFlag && !keep) 
-    {  
-       tmpPathAndFile.insert(0," ").insert(0,DELETE_FILE_COMMAND);
-       if (system(tmpPathAndFile.asCharArray()) != 0)
-	 cout << "   WARNING! I could not remove the temporary input File!\n\n"; 
+  {  
+    tmpPathAndFile.insert(0," ").insert(0,DELETE_FILE_COMMAND);
+
+    if(system(tmpPathAndFile.asCharArray()) != 0)
+    {
+      PetscPrintf(MPI_COMM_WORLD, "   WARNING! I could not remove the temporary input File!\n\n");
     }
+  }
   
-  if (!runControlFlag) prgError(1,"prgReadFile","You must define the RUN_CONTROL section!");
+  if(!runControlFlag)
+    prgError(1,"prgReadFile","You must define the RUN_CONTROL section!");
 
   
   // prepare eventual domain interactions ........................................................
 
-  for (i=0; i<domain.ndom; i++)  
+  for(i=0; i<domain.ndom; i++)
   {
-    cout << "   preparing interactions for " << domain.key(&(domain(i))) << " ...\n\n"; 
+    PetscPrintf(MPI_COMM_WORLD, "   preparing interactions for %s ...\n\n", domain.key(&(domain(i))));
 
     domain(i).prepareInteractions();
 
@@ -200,17 +204,23 @@ bool prgReadFile(void)
 
   // print info and finish ........................................................................
 
-  if (domain.ndom > 0)
-  {
-    cout << "\n   inheritance of domain types loaded:\n\n";  domain.print(); 
-  
-    cout << "\n   number of domains:\n\n";
-    for (int j, i=0; i<prgListCharArrayLength(domType);i++)
-      {  j = domain.nDomainOfType(i);
-         if (j > 0) printf("    %-11s : %i\n",domType[i],j); } cout << "\n\n";
-  }
-  cout << "   The file " << files.Ifile << " has been read successfully.\n\n";
- 
+  //if (domain.ndom > 0)
+  //{
+    //cout << "\n   inheritance of domain types loaded:\n\n";  domain.print(); 
+
+    //cout << "\n   number of domains:\n\n";
+    //for (int j, i=0; i<prgListCharArrayLength(domType);i++)
+    //{
+      //j = domain.nDomainOfType(i);
+      //if(j > 0)
+        //printf("    %-11s : %i\n",domType[i],j);
+    //}
+    //cout << "\n\n";
+  //}
+
+  //cout << "   The file " << files.Ifile << " has been read successfully.\n\n";
+  PetscPrintf(MPI_COMM_WORLD, "   The file %s has been read successfully. \n\n", files.Ifile.asCharArray());
+
   // create empty Tfile (overwriting existing one!)
 
   pathAndFile.free().append(files.projDir).append(SLASH).append(files.Tfile);

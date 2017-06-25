@@ -233,7 +233,7 @@ void HBSplineBase::setSolver(int slv, int *parm, bool cIO)
 {
     slv_type = slv;
     
-    cout << " slv_type = " << slv << '\t' << slv_type << endl;
+    //PetscPrintf(MPI_COMM_WORLD, " slv_type = %5d \t  %5d. \n", slv, slv_type);
 
     //Eigen::initParallel();
     Eigen::setNbThreads(0);

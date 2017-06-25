@@ -589,10 +589,15 @@ void StandardFEM::prepareInputData()
     solidElems.push_back(30);
     solidElems.push_back(31);
 
-    fluidElems.push_back(10);
     fluidElems.push_back(11);
     fluidElems.push_back(12);
     fluidElems.push_back(13);
+    fluidElems.push_back(14);
+    fluidElems.push_back(22);
+    fluidElems.push_back(23);
+    fluidElems.push_back(24);
+    fluidElems.push_back(25);
+
 
 
     int ttt = SolnData.ElemProp[elemConn[0][0]].id;

@@ -6,7 +6,7 @@
 #include "Global.h"
 #include "MyString.h"
 #include "FunctionsEssGrp.h"
-#include "UnixGlobal.h"
+//#include "UnixGlobal.h"
 #include "petscmat.h"
 //#include "conditionalOStream.h"
 

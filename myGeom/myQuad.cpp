@@ -137,12 +137,19 @@ int  myQuad::computeGeometry(myPoint&  param, myPoint&  _geom)
 
 void myQuad::computeNormal()
 {
+  // P2------P3
+  // |       |
+  // |       |
+  // |       |
+  // |       |
+  // P0------P1
+  //
   // normal to a plane passing through 4 points defined by 
-  // the conrners (P0, P1, P2, P3) of a quadrilateral
+  // the conrners (P0, P1, P3, P2) of a quadrilateral
   // 
-  // normal = (P1-P0) X (P3-P0)
+  // normal = (P1-P0) X (P2-P0)
 
-  normal = (ptList[1]-ptList[0]).cross(ptList[3]-ptList[0]);
+  normal = (ptList[1]-ptList[0]).cross(ptList[2]-ptList[0]);
 
   normal.normalize();
 }
@@ -161,7 +168,6 @@ int  myQuad::computeNormal(myPoint&  param, myPoint&  _normal)
 
 int  myQuad::computeBasisFunctions(myPoint& param, myPoint& geom, VectorXd&  Nb, double& Jac)
 {
-    int quad_map_temp[] = {0,1,3,2};
     vector<double>  dN_dxi(nVert), dN_dzeta(nVert) ;
 
     LagrangeBasisFunsQuad(1, param[0], param[1], &Nb[0], &dN_dxi[0], &dN_dzeta[0]);
@@ -173,18 +179,18 @@ int  myQuad::computeBasisFunctions(myPoint& param, myPoint& geom, VectorXd&  Nb,
 
     for(int ii=0; ii<nVert; ii++)
     {
-      geom[0] +=  (ptList[quad_map_temp[ii]][0] * Nb[ii]);
-      geom[1] +=  (ptList[quad_map_temp[ii]][1] * Nb[ii]);
-      geom[2] +=  (ptList[quad_map_temp[ii]][2] * Nb[ii]);
+      geom[0] +=  (ptList[ii][0] * Nb[ii]);
+      geom[1] +=  (ptList[ii][1] * Nb[ii]);
+      geom[2] +=  (ptList[ii][2] * Nb[ii]);
       
-      dx1(0) +=  (ptList[quad_map_temp[ii]][0] * dN_dxi[ii]);
-      dx2(0) +=  (ptList[quad_map_temp[ii]][0] * dN_dzeta[ii]);
+      dx1(0) +=  (ptList[ii][0] * dN_dxi[ii]);
+      dx2(0) +=  (ptList[ii][0] * dN_dzeta[ii]);
 
-      dx1(1) +=  (ptList[quad_map_temp[ii]][1] * dN_dxi[ii]);
-      dx2(1) +=  (ptList[quad_map_temp[ii]][1] * dN_dzeta[ii]);
+      dx1(1) +=  (ptList[ii][1] * dN_dxi[ii]);
+      dx2(1) +=  (ptList[ii][1] * dN_dzeta[ii]);
 
-      dx1(2) +=  (ptList[quad_map_temp[ii]][2] * dN_dxi[ii]);
-      dx2(2) +=  (ptList[quad_map_temp[ii]][2] * dN_dzeta[ii]);
+      dx1(2) +=  (ptList[ii][2] * dN_dxi[ii]);
+      dx2(2) +=  (ptList[ii][2] * dN_dzeta[ii]);
     }
     dx1 = dx1.cross(dx2);
     Jac = dx1.norm();
@@ -201,8 +207,6 @@ int  myQuad::computeBasisFunctions(myPoint& param, myPoint& geom, VectorXd&  Nb,
 
 
 }
-
-
 
 
 

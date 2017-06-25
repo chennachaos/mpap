@@ -1443,8 +1443,6 @@ void  HBSplineCutFEM::computeTotalForce2D(int bb)
           {
             for(gp=0; gp<nGauss; gp++)
             {
-              //computeLagrangeBFs1D2(nlb-1, gausspoints[gp], &xx(0), &yy(0), &Nb(0), &dNb_dx(0), detJ);
-              
               param[0] = gausspoints[gp];
 
               poly->computeBasisFunctions(param, geom, Nb, detJ);
@@ -1479,17 +1477,14 @@ void  HBSplineCutFEM::computeTotalForce2D(int bb)
               trac[0] =  stress(0,0)*normal[0] + stress(0,1)*normal[1] ;
               trac[1] =  stress(1,0)*normal[0] + stress(1,1)*normal[1] ;
 
-              trac[0] += PENALTY*(vel[0]-velSpec[0]);
-              trac[1] += PENALTY*(vel[1]-velSpec[1]);
+              trac[0] += PENALTY*(velSpec[0]-vel[0]);
+              trac[1] += PENALTY*(velSpec[1]-vel[1]);
 
               //trac[0] -= (rho/rhoSolid)*FluidAcce[0];
               //trac[1] -= (rho/rhoSolid)*FluidAcce[1];
 
               trac[0] += (stagParams[3]*rho)*acceFluid[0];
               trac[1] += (stagParams[3]*rho)*acceFluid[1];
-
-              //trac[0] += (sqrt(stagParams[2])*rho)*acceFluid[0];
-              //trac[1] += (sqrt(stagParams[2])*rho)*acceFluid[1];
 
               //trac[0] += stagParams[3]*rho*(acceFluid[0] - acceSpec[0]);
               //trac[1] += stagParams[3]*rho*(acceFluid[1] - acceSpec[1]);
@@ -1610,8 +1605,7 @@ void  HBSplineCutFEM::computeTotalForce3D(int bb)
           centroid.setZero();
           //centroid = ImmersedBodyObjects[bb]->GetCentroid(2);
 
-          cout << " bb = " << bb << endl;
-          cout << " ImmersedBodyObjects[bb]->ImmIntgElems.size() = " << ImmersedBodyObjects[bb]->ImmIntgElems.size() << endl;
+          //cout << " ImmersedBodyObjects[bb]->ImmIntgElems.size() = " << ImmersedBodyObjects[bb]->ImmIntgElems.size() << endl;
 
         for(aa=0; aa<ImmersedBodyObjects[bb]->ImmIntgElems.size(); aa++)
         {
@@ -1648,13 +1642,9 @@ void  HBSplineCutFEM::computeTotalForce3D(int bb)
 
               ndTemp = elems[findCellNumber(geom)];
 
-              //cout << " uuuuuuuuuuu " << endl;
-
               geometryToParametric(geom, param);
 
               poly->computeNormal(geom, normal);
-
-              //normal *= -1.0;
 
               //printf("xx = %12.6f, yy = %12.6f, zz = %12.6f, dvol = %12.6f, \n", param[0], param[1], param[2], dvol);
 
@@ -1666,9 +1656,9 @@ void  HBSplineCutFEM::computeTotalForce3D(int bb)
               trac[1] =  stress(1,0)*normal[0] + stress(1,1)*normal[1] + stress(1,2)*normal[2] ;
               trac[2] =  stress(2,0)*normal[0] + stress(2,1)*normal[1] + stress(2,2)*normal[2] ;
 
-              trac[0] += PENALTY*(vel[0]-velSpec[0]);
-              trac[1] += PENALTY*(vel[1]-velSpec[1]);
-              trac[2] += PENALTY*(vel[2]-velSpec[2]);
+              trac[0] += PENALTY*(velSpec[0]-vel[0]);
+              trac[1] += PENALTY*(velSpec[1]-vel[1]);
+              trac[2] += PENALTY*(velSpec[2]-vel[2]);
 
               trac *= dvol;
 

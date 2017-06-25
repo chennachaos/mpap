@@ -65,7 +65,7 @@ int LagrangeElem2DNavierStokesTria3Node::calcLoadVector()
 }
 
 
-/*
+//
 int LagrangeElem2DNavierStokesTria3Node::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)
 {
 //   char fct[] = "LagrangeElem2DNavierStokes4Node::calcStiffnessAndResidual";
@@ -124,6 +124,12 @@ int LagrangeElem2DNavierStokesTria3Node::calcStiffnessAndResidual(MatrixXd& Kloc
     nGP = elmDat[0];
 
     getGaussPointsTriangle(nGP, GeomData->gausspoints1, GeomData->gausspoints2, GeomData->gaussweights1);
+
+    if(Klocal.rows() != nsize)
+    {
+      Klocal.resize(nsize, nsize);
+      Flocal.resize(nsize);
+    }
 
     Klocal.setZero();
     Flocal.setZero();
@@ -388,7 +394,7 @@ int LagrangeElem2DNavierStokesTria3Node::calcStiffnessAndResidual(MatrixXd& Kloc
 
   return 0;
 }
-*/
+//
 
 
 
@@ -734,7 +740,7 @@ int LagrangeElem2DNavierStokesTria3Node::calcStiffnessAndResidual(MatrixXd& Kloc
 
 
 
-//
+/*
 int LagrangeElem2DNavierStokesTria3Node::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)
 {
 //   char fct[] = "LagrangeElem2DNavierStokes4Node::calcStiffnessAndResidual";
@@ -1063,7 +1069,7 @@ int LagrangeElem2DNavierStokesTria3Node::calcStiffnessAndResidual(MatrixXd& Kloc
 
   return 0;
 }
-//
+*/
 
 
 

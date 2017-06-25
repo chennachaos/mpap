@@ -238,9 +238,6 @@ int  myLine::computeBasisFunctions(myPoint& param, myPoint& geom, VectorXd&  Nb,
 
 
 
-
-
-
 }
 
 

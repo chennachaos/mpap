@@ -230,9 +230,6 @@ void ImmersedRigidSolid::SetStiffness(vector<double>& tempVec)
 
 void ImmersedRigidSolid::SetBoundaryConditions(vector<int>& vectemp)
 {
-  //for(int ii=0; ii<vectemp.size(); ii++)
-    //dofData.push_back(vectemp[ii+1]);
-
   dofData = vectemp;
 
   //cout << " rigid body boundary conditions " << endl;  printVector(dofData);
@@ -334,7 +331,7 @@ void ImmersedRigidSolid::setSolver(int slv, int *parm, bool cIO)
 
 void ImmersedRigidSolid::prepareMatrixPattern()
 {
-  printf("\n     ImmersedRigidSolid::prepareMatrixPattern()  .... STARTED ...\n");
+  //printf("\n     ImmersedRigidSolid::prepareMatrixPattern()  .... STARTED ...\n");
 
   //if( std::any_of(PrescMotionTimeFuncs.begin(), PrescMotionTimeFuncs.end(), [](int i){return (i!=-1);}) )
   if(PRESC_MOTION)
@@ -343,12 +340,10 @@ void ImmersedRigidSolid::prepareMatrixPattern()
   }
   else
   {
-    char fct[] = "ImmersedRigidSolid::prepareMatrixPattern";
-
     int  ii, jj, kk, ll, ind;
   
-    cout << " dofData " << endl;
-    printVector(dofData);
+    //cout << " dofData " << endl;
+    //printVector(dofData);
 
     totalDOF = 0;
     for(ii=0;ii<dofData.size();ii++)
@@ -368,10 +363,10 @@ void ImmersedRigidSolid::prepareMatrixPattern()
       }
     }
 
-    cout << " size     " << size << endl;
-    cout << " totalDOF " << totalDOF << endl;
-    cout << " assy4r " << endl;
-    printVector(assy4r);
+    //cout << " size     " << size << endl;
+    //cout << " totalDOF " << totalDOF << endl;
+    //cout << " assy4r " << endl;
+    //printVector(assy4r);
 
     bool pp1=0;
     //pp1=1;
@@ -415,7 +410,7 @@ void ImmersedRigidSolid::prepareMatrixPattern()
         printVector(forAssyCoupledHorz[ii]);
     }
   }
-  printf("\n     ImmersedRigidSolid::prepareMatrixPattern()  .... FINISHED ...\n\n");
+  //printf("\n     ImmersedRigidSolid::prepareMatrixPattern()  .... FINISHED ...\n\n");
 
   return;
 }
@@ -528,8 +523,8 @@ void  ImmersedRigidSolid::updatePointPositions2D()
       RotNew(0,0) =  ct; RotNew(0,1) = -st;
       RotNew(1,0) =  st; RotNew(1,1) = ct;
 
-      cout << " disp    " << dCentCur[0] << '\t' << dCentCur[1] << '\t' << thetaCur << endl;
-      cout << " velo    " << vCentCur[0] << '\t' << vCentCur[1] << '\t' << omegaCur << endl;
+      //cout << " disp    " << dCentCur[0] << '\t' << dCentCur[1] << '\t' << thetaCur << endl;
+      //cout << " velo    " << vCentCur[0] << '\t' << vCentCur[1] << '\t' << omegaCur << endl;
 
       computeCentroid(0);
 
@@ -767,9 +762,9 @@ void  ImmersedRigidSolid::updatePointPositions2D()
       //cout << " disp    " << dCentNew[0] << '\t' << dCentNew[1] << '\t' << thetaNew << endl;
       //cout << " velo    " << vCentNew[0] << '\t' << vCentNew[1] << '\t' << omegaNew << endl;
 
-      printf("\t %12.6f \t %12.6f \t %12.6f \n",tNew, tCur, wn);
-      printf("\t %12.6f \t %12.6f \t %12.6f \n",dCentCur[0], dCentCur[1], thetaCur);
-      printf("\t %12.6f \t %12.6f \t %12.6f \n",vCentCur[0], vCentCur[1], omegaCur);
+      //printf("\t %12.6f \t %12.6f \t %12.6f \n",tNew, tCur, wn);
+      //printf("\t %12.6f \t %12.6f \t %12.6f \n",dCentCur[0], dCentCur[1], thetaCur);
+      //printf("\t %12.6f \t %12.6f \t %12.6f \n",vCentCur[0], vCentCur[1], omegaCur);
       //cout << " disp    " << dCentCur[0] << '\t' << dCentCur[1] << '\t' << thetaCur << endl;
       //cout << " velo    " << vCentCur[0] << '\t' << vCentCur[1] << '\t' << omegaCur << endl;
 
@@ -898,8 +893,8 @@ void  ImmersedRigidSolid::updatePointPositions3D()
       RotNew(0,0) =  ct; RotNew(0,1) = st;
       RotNew(1,0) = -st; RotNew(1,1) = ct;
 
-      cout << " disp    " << dCentCur[0] << '\t' << dCentCur[1] << '\t' << thetaCur << endl;
-      cout << " velo    " << vCentCur[0] << '\t' << vCentCur[1] << '\t' << omegaCur << endl;
+      //cout << " disp    " << dCentCur[0] << '\t' << dCentCur[1] << '\t' << thetaCur << endl;
+      //cout << " velo    " << vCentCur[0] << '\t' << vCentCur[1] << '\t' << omegaCur << endl;
 
       computeCentroid(0);
 
@@ -1096,8 +1091,8 @@ void  ImmersedRigidSolid::updatePointPositions3D()
       //cout << " disp    " << dCentNew[0] << '\t' << dCentNew[1] << '\t' << thetaNew << endl;
       //cout << " velo    " << vCentNew[0] << '\t' << vCentNew[1] << '\t' << omegaNew << endl;
 
-      cout << " disp    " << dCentCur[0] << '\t' << dCentCur[1] << '\t' << thetaCur << endl;
-      cout << " velo    " << vCentCur[0] << '\t' << vCentCur[1] << '\t' << omegaCur << endl;
+      //cout << " disp    " << dCentCur[0] << '\t' << dCentCur[1] << '\t' << thetaCur << endl;
+      //cout << " velo    " << vCentCur[0] << '\t' << vCentCur[1] << '\t' << omegaCur << endl;
 
       ct = cos(thetaNew);
       st = sin(thetaNew);
@@ -1113,7 +1108,7 @@ void  ImmersedRigidSolid::updatePointPositions3D()
 
       computeCentroid(0);
 
-      cout << " centroid    " << centroid[0] << '\t' << centroid[1] << '\t' << centroid[2] << endl;
+      //cout << " centroid    " << centroid[0] << '\t' << centroid[1] << '\t' << centroid[2] << endl;
 
       for(bb=0; bb<nNode; bb++)
       {
@@ -1339,7 +1334,7 @@ int ImmersedRigidSolid::calcStiffnessAndResidual(int solver_type, bool zeroMtx, 
 
   //Kglobal(0,0) /= SolnData.td[10];
   
-  cout << Kglobal(0,0) << '\t' << rhsVec(0) << endl;
+  //cout << Kglobal(0,0) << '\t' << rhsVec(0) << endl;
 
   //////////////////////////////////////////
   // terms related to contact
@@ -1369,11 +1364,11 @@ if(totalDOF > 1)
   //lamn = 0.0;
   //lamn = SolnData.var1DotCur[1];
 
-  cout << " penetration = " << gn << '\t' << lamn << endl;
+  //cout << " penetration = " << gn << '\t' << lamn << endl;
 
   if( (lamn + cn*gn) > tol)
   {
-    cout << " Contact 1 is active " << endl;
+    //cout << " Contact 1 is active " << endl;
 
     Kglobal(0,1) -= af*beta;
     Kglobal(1,0) -= af*beta*fact;
@@ -1386,7 +1381,7 @@ if(totalDOF > 1)
   }
   else
   {
-    cout << " Contact 1 is inactive " << endl;
+    //cout << " Contact 1 is inactive " << endl;
     
     Kglobal(1,1) += af;
     rhsVec(1)    -= lamn;
@@ -1402,11 +1397,11 @@ if(totalDOF > 1)
   double lamn2 = SolnData.var1Cur[2];
   //lamn2 = 0.0;
 
-  cout << " penetration = " << gn << '\t' << lamn2 << endl;
+  //cout << " penetration = " << gn << '\t' << lamn2 << endl;
 
   if( (lamn2 + cn*gn) > tol)
   {
-    cout << " Contact 2 is active " << endl;
+    //cout << " Contact 2 is active " << endl;
 
     Kglobal(0,2) += af*beta;
     Kglobal(2,0) += af*beta*fact;
@@ -1419,7 +1414,7 @@ if(totalDOF > 1)
   }
   else
   {
-    cout << " Contact 2 is inactive " << endl;
+    //cout << " Contact 2 is inactive " << endl;
 
     Kglobal(2,2) += af;
     rhsVec(2)    -= lamn2;
@@ -1828,7 +1823,8 @@ void ImmersedRigidSolid::writeOutput()
 
 void ImmersedRigidSolid::postProcess(int index)
 {
-  vtkSmartPointer<vtkXMLPolyDataWriter>  writerPolyData =     vtkSmartPointer<vtkXMLPolyDataWriter>::New();
+/*
+  vtkSmartPointer<vtkXMLPolyDataWriter>  writerPolyData =   vtkSmartPointer<vtkXMLPolyDataWriter>::New();
 
   char fname1[50];
   sprintf(fname1,"%s%d%s", "immersedpoly-", id,".vtp");
@@ -1842,7 +1838,7 @@ void ImmersedRigidSolid::postProcess(int index)
 #endif
 
   writerPolyData->Write();
-
+*/
   return;
 }
 

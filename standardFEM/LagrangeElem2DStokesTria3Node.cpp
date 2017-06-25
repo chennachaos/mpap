@@ -74,7 +74,7 @@ int LagrangeElem2DStokesTria3Node::calcStiffnessAndResidual(MatrixXd& Klocal, Ve
     //Kovasznay  analy;
     //analy.SetPressure(0.0);
 
-    int ii, jj, gp1, gp2, TI, TIp1, TIp2, count, TJ, TJp1, TJp2;
+    int ii, jj, gp, TI, TIp1, TIp2, count, TJ, TJp1, TJp2;
 
     double  uu, vv, Jac, dvol, b1, b2, b3, b4, b5, b6, b7, b8, xx, yy, acceFact, HH, dist, rho, mu;
     double  pres, Da, Db, af, am, d1, c1, muTaf, rad, urdr, urdr2, tau[3], volume;
@@ -92,17 +92,16 @@ int LagrangeElem2DStokesTria3Node::calcStiffnessAndResidual(MatrixXd& Klocal, Ve
     MatrixXd  grad(2,2), stress(2,2), Dj(2,3);
 
     elmDat = &(SolnData->ElemProp[elmType].data[0]);
-    //matDat = &(SolnData->MatlProp[matType].data[0]);
 
-    rho = elmDat[4];
-    mu  = elmDat[5];
+    rho = elmDat[3];
+    mu  = elmDat[4];
 
     bool axsy = false;
     axsy = ((int)elmDat[2] == 1);
 
     af = SolnData->td(2);
     am = SolnData->td(3);
-    acceFact = rho*am*SolnData->td(9);
+    acceFact = am*SolnData->td(9);
     muTaf = mu*af;
 
     volume = 0.5*(x[0]*(y[1]-y[2]) + x[1]*(y[2]-y[0]) + x[2]*(y[0]-y[1]));
@@ -115,9 +114,11 @@ int LagrangeElem2DStokesTria3Node::calcStiffnessAndResidual(MatrixXd& Klocal, Ve
     tau[1] = elmDat[9]*stabParam;  // PSPG
     tau[2] = elmDat[10]*stabParam; // LSIC
 
-    int nGP1 = 1;
+    int nGP = 1;
 
-    getGaussPointsTriangle(nGP1, GeomData->gausspoints1, GeomData->gausspoints2, GeomData->gaussweights1);
+    vector<double>  gausspoints1, gausspoints2, gaussweights;
+
+    getGaussPointsTriangle(nGP, gausspoints1, gausspoints2, gaussweights);
 
     if(Klocal.rows() != nsize)
     {
@@ -128,18 +129,15 @@ int LagrangeElem2DStokesTria3Node::calcStiffnessAndResidual(MatrixXd& Klocal, Ve
     Flocal.setZero();
     
     //cout << " AAAAAAAAAA " << endl;
-    //cout << nGP1 << '\t' << nGP2 << endl;
-    //cout << " AAAAAAAAAA " << endl;
-    //cout << nGP1 << '\t' << nGP2 << endl;
 
-    for(gp1=0;gp1<nGP1;gp1++)
+    for(gp=0; gp<nGP; gp++)
     {
-          param[0] = GeomData->gausspoints1[gp1];
-          param[1] = GeomData->gausspoints2[gp1];
+          param[0] = gausspoints1[gp];
+          param[1] = gausspoints2[gp];
 
           GeomData->computeBasisFunctions2D(0, 1, degree, param, nodeNums, &N(0), &dN_dx(0), &dN_dy(0), Jac);
 
-          dvol = GeomData->gaussweights1[gp1] * Jac;
+          dvol = gaussweights[gp] * Jac;
           
           //printf("%12.6f \t %12.6f \t %12.6f \n", volume, h, Jac);
           //printf("%12.6f \t %12.6f \t %12.6f \t %12.6f \n", matB(0,0), matB(0,1), matB(1,0), matB(1,1));
@@ -198,9 +196,9 @@ int LagrangeElem2DStokesTria3Node::calcStiffnessAndResidual(MatrixXd& Klocal, Ve
             rStab(1) -= mu*(grad(1,0)/rad );
           }
 
-          tau[0] *= elmDat[8];  // SUPG
-          tau[1] *= elmDat[9];  // PSPG
-          tau[2] *= elmDat[10]; // LSIC
+          //tau[0] *= elmDat[8];  // SUPG
+          //tau[1] *= elmDat[9];  // PSPG
+          //tau[2] *= elmDat[10]; // LSIC
 
           for(ii=0;ii<nlbf;ii++)
           {
@@ -246,6 +244,7 @@ int LagrangeElem2DStokesTria3Node::calcStiffnessAndResidual(MatrixXd& Klocal, Ve
               Dj(0,0) = fact2;
               Dj(0,1) = 0.0;
               Dj(0,2) = dN_dx(jj);
+
               Dj(1,0) = 0.0;
               Dj(1,1) = fact2;
               Dj(1,2) = dN_dy(jj);

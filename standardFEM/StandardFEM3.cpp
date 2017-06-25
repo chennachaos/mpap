@@ -377,7 +377,7 @@ else
     }
     else
     {
-      vecVTK->SetName("error");
+      vecVTK->SetName("acce");
       vecVTK2->SetName("vel");
       scaVTK->SetName("pres");
       scaVTK2->SetName("vortz");
@@ -492,6 +492,12 @@ else
           //vec[1] = SolnData.var1DotCur[ii*ndof+1];
 	}
       }
+
+      //for(jj=0; jj<DirichletBCs.size(); jj++)
+      //{
+        //vec[0] = 1; vec[1] = 0.0; vec[2]=0.0;
+        //vecVTK->InsertTuple(DirichletBCs[jj][0], vec);
+      //}
 
       if(elems[0]->nodeNums.size() == 4) // tet
       {

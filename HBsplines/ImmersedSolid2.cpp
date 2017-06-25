@@ -19,7 +19,7 @@ using namespace myGeom;
 void ImmersedSolid::adjustBoundaryPoints(double* minVal, double* maxVal)
 {
   int ii, jj;
-  double  tol1=1.0e-8, tol2=1.0e-4;
+  double  tol1=1.0e-8, tol2=1.0e-6;
 
   myPoint  pt1, pt2;
 
@@ -203,8 +203,8 @@ void  ImmersedSolid::SetImmersedFaces()
 
         quadVTK->GetPointIds()->SetId(0, ImmIntgElems[ii]->pointNums[0]);
         quadVTK->GetPointIds()->SetId(1, ImmIntgElems[ii]->pointNums[1]);
-        quadVTK->GetPointIds()->SetId(2, ImmIntgElems[ii]->pointNums[2]);
-        quadVTK->GetPointIds()->SetId(3, ImmIntgElems[ii]->pointNums[3]);
+        quadVTK->GetPointIds()->SetId(2, ImmIntgElems[ii]->pointNums[3]);
+        quadVTK->GetPointIds()->SetId(3, ImmIntgElems[ii]->pointNums[2]);
 
         polyList->InsertNextCell(quadVTK);
 
@@ -313,7 +313,7 @@ void ImmersedSolid::UpdateImmersedFaces()
 
 void  ImmersedSolid::SetImmersedFaces()
 {
-  cout << "  ImmersedSolid::SetImmersedFaces()  " << endl;
+  //cout << "  ImmersedSolid::SetImmersedFaces()  " << endl;
 
   // set the immersed faces for cutFEM purposes
 
@@ -334,7 +334,7 @@ void  ImmersedSolid::SetImmersedFaces()
 
   vtkIdType  pts[10];
 
-  cout << " nImmInt = " << nImmInt << '\t' << GeomData.NodePosOrig.size() << '\t' << DIM << endl;
+  //cout << " nImmInt = " << nImmInt << '\t' << GeomData.NodePosOrig.size() << '\t' << DIM << endl;
 
   if(DIM == 2)
   {
@@ -404,7 +404,7 @@ void  ImmersedSolid::SetImmersedFaces()
 
     area = 0.5*area;
 
-    printf("\n Polygon # %d area = %16.12f \n\n", id, area );
+    //printf("\n Polygon # %d area = %16.12f \n\n", id, area );
   }
 
   if(DIM == 3)
@@ -475,16 +475,16 @@ void  ImmersedSolid::SetImmersedFaces()
         CGAL_Point  ptc(pt3[0], pt3[1], pt3[2]);
         CGAL_Point  ptd(pt4[0], pt4[1], pt4[2]);
 
-        trianglesCGAL.push_back(CGAL_Triangle(pta, ptb, ptc));
-        trianglesCGAL.push_back(CGAL_Triangle(pta, ptc, ptd));
+        trianglesCGAL.push_back(CGAL_Triangle(pta, ptb, ptd));
+        trianglesCGAL.push_back(CGAL_Triangle(pta, ptd, ptc));
 
         //treeCGAL.insert(CGAL_Triangle(pta, ptb, ptc));
         //treeCGAL.insert(CGAL_Triangle(pta, ptc, ptd));
 
         quadVTK->GetPointIds()->SetId(0, ImmIntgElems[ii]->pointNums[0]);
         quadVTK->GetPointIds()->SetId(1, ImmIntgElems[ii]->pointNums[1]);
-        quadVTK->GetPointIds()->SetId(2, ImmIntgElems[ii]->pointNums[2]);
-        quadVTK->GetPointIds()->SetId(3, ImmIntgElems[ii]->pointNums[3]);
+        quadVTK->GetPointIds()->SetId(2, ImmIntgElems[ii]->pointNums[3]);
+        quadVTK->GetPointIds()->SetId(3, ImmIntgElems[ii]->pointNums[2]);
 
         polyList->InsertNextCell(quadVTK);
 
@@ -506,7 +506,7 @@ void  ImmersedSolid::SetImmersedFaces()
 
     // constructs AABB tree
     treeCGAL.insert(trianglesCGAL.begin(), trianglesCGAL.end());
-    //treeCGAL.accelerate_distance_queries();
+    treeCGAL.accelerate_distance_queries();
 
     polyDataVTK->SetPoints(pointsVTK);
     polyDataVTK->SetPolys(polyList);
@@ -610,19 +610,19 @@ void ImmersedSolid::UpdateImmersedFaces()
         CGAL_Point  ptd(pt4[0], pt4[1], pt4[2]);
 
         trianglesCGAL.push_back(CGAL_Triangle(pta, ptb, ptd));
-        trianglesCGAL.push_back(CGAL_Triangle(ptb, ptc, ptd));
+        trianglesCGAL.push_back(CGAL_Triangle(pta, ptd, ptc));
       }
       else
       {
         cout << " Error in ImmersedSolid::SetImmersedFaces()  " << endl;
       }
     }
-  }
 
-  treeCGAL.insert(trianglesCGAL.begin(), trianglesCGAL.end());
-  treeCGAL.accelerate_distance_queries();
+    treeCGAL.insert(trianglesCGAL.begin(), trianglesCGAL.end());
+    treeCGAL.accelerate_distance_queries();
+  } // if(DIM == 3)
 
-  cout << " treeCGAL size = " << treeCGAL.size() << endl;
+  //cout << " treeCGAL size = " << treeCGAL.size() << endl;
 
   for(ii=0; ii<nImmInt; ii++)
   {
@@ -981,35 +981,35 @@ int  ImmersedSolid::doIntersect3D(AABB&  bbTemp, bool flag, vector<int>& vecTemp
 
     vecTemp[0] = treeCGAL.number_of_intersected_primitives(CGAL_Ray(
                     CGAL_Point(bbTemp.minBB[0], bbTemp.minBB[1], bbTemp.minBB[2]), 
-                    CGAL_Point(100.0,          bbTemp.minBB[1], bbTemp.minBB[2]))) % 2;
+                    CGAL_Point(100.0,           bbTemp.minBB[1], bbTemp.minBB[2]))) % 2;
 
     vecTemp[1] = treeCGAL.number_of_intersected_primitives(CGAL_Ray(
                     CGAL_Point(bbTemp.maxBB[0], bbTemp.minBB[1], bbTemp.minBB[2]), 
-                    CGAL_Point(100.0,          bbTemp.minBB[1], bbTemp.minBB[2]))) % 2;
+                    CGAL_Point(100.0,           bbTemp.minBB[1], bbTemp.minBB[2]))) % 2;
 
     vecTemp[2] = treeCGAL.number_of_intersected_primitives(CGAL_Ray(
                     CGAL_Point(bbTemp.minBB[0], bbTemp.maxBB[1], bbTemp.minBB[2]), 
-                    CGAL_Point(100.0,          bbTemp.maxBB[1], bbTemp.minBB[2]))) % 2;
+                    CGAL_Point(100.0,           bbTemp.maxBB[1], bbTemp.minBB[2]))) % 2;
 
     vecTemp[3] = treeCGAL.number_of_intersected_primitives(CGAL_Ray(
                     CGAL_Point(bbTemp.maxBB[0], bbTemp.maxBB[1], bbTemp.minBB[2]), 
-                    CGAL_Point(100.0,          bbTemp.maxBB[1], bbTemp.minBB[2]))) % 2;
+                    CGAL_Point(100.0,           bbTemp.maxBB[1], bbTemp.minBB[2]))) % 2;
 
     vecTemp[4] = treeCGAL.number_of_intersected_primitives(CGAL_Ray(
                     CGAL_Point(bbTemp.minBB[0], bbTemp.minBB[1], bbTemp.maxBB[2]), 
-                    CGAL_Point(100.0,          bbTemp.minBB[1], bbTemp.maxBB[2]))) % 2;
+                    CGAL_Point(100.0,           bbTemp.minBB[1], bbTemp.maxBB[2]))) % 2;
 
     vecTemp[5] = treeCGAL.number_of_intersected_primitives(CGAL_Ray(
                     CGAL_Point(bbTemp.maxBB[0], bbTemp.minBB[1], bbTemp.maxBB[2]), 
-                    CGAL_Point(100.0,          bbTemp.minBB[1], bbTemp.maxBB[2]))) % 2;
+                    CGAL_Point(100.0,           bbTemp.minBB[1], bbTemp.maxBB[2]))) % 2;
 
     vecTemp[6] = treeCGAL.number_of_intersected_primitives(CGAL_Ray(
                     CGAL_Point(bbTemp.minBB[0], bbTemp.maxBB[1], bbTemp.maxBB[2]), 
-                    CGAL_Point(100.0,          bbTemp.maxBB[1], bbTemp.maxBB[2]))) % 2;
+                    CGAL_Point(100.0,           bbTemp.maxBB[1], bbTemp.maxBB[2]))) % 2;
 
     vecTemp[7] = treeCGAL.number_of_intersected_primitives(CGAL_Ray(
                     CGAL_Point(bbTemp.maxBB[0], bbTemp.maxBB[1], bbTemp.maxBB[2]), 
-                    CGAL_Point(100.0,          bbTemp.maxBB[1], bbTemp.maxBB[2]))) % 2;
+                    CGAL_Point(100.0,           bbTemp.maxBB[1], bbTemp.maxBB[2]))) % 2;
 
 
     //printVector(vecTemp);

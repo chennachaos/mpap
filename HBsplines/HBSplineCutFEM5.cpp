@@ -107,8 +107,6 @@ void  HBSplineCutFEM::applyInterfaceTerms2D()
           {
             for(gp=0;gp<nGauss;gp++)
             {
-              //computeLagrangeBFs1D2(nlb-1, gausspoints[gp], &xx(0), &yy(0), &Nb(0), &dNb(0), detJ);
-
               param[0] = gausspoints[gp];
               poly->computeBasisFunctions(param, geom, Nb, detJ);
 
@@ -140,6 +138,8 @@ void  HBSplineCutFEM::applyInterfaceTerms2D()
 
               nd2 = elems[elnum];
 
+              if( nd2->get_subdomain_id() == this_mpi_proc )
+              {
               bbTemp = nd2->GetAABB();
               hx = bbTemp.maxBB[0]-bbTemp.minBB[0];
               hy = bbTemp.maxBB[1]-bbTemp.minBB[1];
@@ -345,7 +345,26 @@ void  HBSplineCutFEM::applyInterfaceTerms2D()
               } // for(ii=0;ii<totnlbf2;ii++)
 
               solverPetsc->AssembleMatrixAndVectorCutFEM(0, 0, nd->forAssyVec, grid_to_proc_DOF, K1, F1);
+              } //if( nd2->get_subdomain_id() == this_mpi_proc )
+            
+            }//for(gp=0...
+          } // if( lme->IsActive() )
+        }//for(aa=0...
+        start1 += ImmersedBodyObjects[bb]->GetTotalDOF();
+      }//for(bb=0;...
 
+  //cout << " HBSplineCutFEM::applyInterfaceTerms2D() ... FINISHED  " << endl;
+
+  if(cutFEMparams[6] > 1.0e-8)
+    applyGhostPenalty2D();
+
+  return;
+}
+//
+
+
+
+/*
               if(!STAGGERED)
               {
                   //trac[0] =  stress(0,0)*normal[0] + stress(0,1)*normal[1] ;
@@ -433,24 +452,6 @@ void  HBSplineCutFEM::applyInterfaceTerms2D()
                   } // for(ii=0; ii<nr1; ii++)
               } //if(!STAGGERED)
 
-            }//for(gp=0...
-          } // if( lme->IsActive() )
-        }//for(aa=0...
-        start1 += ImmersedBodyObjects[bb]->GetTotalDOF();
-      }//for(bb=0;...
-
-  //cout << " HBSplineCutFEM::applyInterfaceTerms2D() ... FINISHED  " << endl;
-
-  if(cutFEMparams[6] > 1.0e-8)
-    applyGhostPenalty2D();
-
-  return;
-}
-//
-
-
-
-/*
               if(bb==-222)
               {
                 if(CompareDoubles(geom[0],-1.1))
@@ -560,7 +561,7 @@ void  HBSplineCutFEM::applyInterfaceTerms3D()
         else
           getGaussPointsQuad(nGauss, gausspoints1, gausspoints2, gaussweights);
 
-        cout << " nGauss = " << nGauss << endl;
+        //cout << " nGauss = " << nGauss << endl;
 
         //printVector(gausspoints);          printf("\n\n\n\n");
         //printVector(gaussweights);          printf("\n\n\n\n");
@@ -587,12 +588,12 @@ void  HBSplineCutFEM::applyInterfaceTerms3D()
               poly->computeNormal();
               poly->computeNormal(param, normal);
 
-              //normal *= -1.0;
-
               lme->computeVelocityCur(Nb, velSpec );
 
               ndTemp = elems[findCellNumber(geom)];
 
+              if( ndTemp->get_subdomain_id() == this_mpi_proc )
+              {
               geometryToParametric(geom, param);
 
               nr = ndTemp->forAssyVec.size();
@@ -793,6 +794,7 @@ void  HBSplineCutFEM::applyInterfaceTerms3D()
               //cout << " uuuuuuuuuuu \n\n " << endl;
 
               solverPetsc->AssembleMatrixAndVectorCutFEM(0, 0, ndTemp->forAssyVec, grid_to_proc_DOF, K1, F1);
+              } //if( ndTemp->get_subdomain_id() == this_mpi_proc )
 
             }//for(gp=0...
           } // if( lme->IsActive() )
@@ -883,6 +885,8 @@ void  HBSplineCutFEM::applyGhostPenalty2D()
       nd1 = elems[cutCellIds[ee]];
 
       //if( nd1->IsCutElement() && !(nd1->IsBoundary()) )
+      if( nd1->get_subdomain_id() == this_mpi_proc )
+      {
       if( nd1->IsCutElement() )
       {
         //cout << " nd1->GetID() " <<  nd1->GetID() << '\t' <<  nd1->GetLevel() << endl;
@@ -1139,6 +1143,7 @@ void  HBSplineCutFEM::applyGhostPenalty2D()
         } // for(side=0; side<NUM_NEIGHBOURS
 
       } //if( nd1->IsCutElement() )
+      } //if( nd1->get_subdomain_id() == this_mpi_proc )
     } //for(ee=0; ee<activeElements.size(); ee++)
 
     //cout << " HBSplineCutFEM::applyGhostPenalty2D() ... FINISHED  " << endl;
@@ -1232,7 +1237,7 @@ void  HBSplineCutFEM::applyGhostPenalty3D()
         knotBegin1 = nd1->GetKnotBegin();
         knotIncr1  = nd1->GetKnotIncrement();
 
-        /*
+        //
         //if( nd1->IsLeftBoundary() || nd1->IsRightBoundary() )
         if( nd1->IsBoundary() )
         {
@@ -1240,7 +1245,6 @@ void  HBSplineCutFEM::applyGhostPenalty3D()
           gammGP[1]  = gammGP[0];
           gammGP[2]  = gammGP[0];
           gammGP[3]  = cutFEMparams[7] * h1*h1*h1/mu;
-          //gammGP[3]  = gammGP[0];
         }
         else
         {
@@ -1248,7 +1252,6 @@ void  HBSplineCutFEM::applyGhostPenalty3D()
           gammGP[1]  = gammGP[0];
           gammGP[2]  = gammGP[0];
           gammGP[3]  = cutFEMparams[7] * h1*h1*h1/mu;
-          //gammGP[3]  = gammGP[0];
         }
 
         bb1 = 1.0;
@@ -1260,7 +1263,7 @@ void  HBSplineCutFEM::applyGhostPenalty3D()
         gammGP[1] *= bb1;
         gammGP[2] *= bb1;
         gammGP[3] *= bb1;
-        */
+        //
 
         for(side=0; side<NUM_NEIGHBOURS; side++)
         {
@@ -1302,34 +1305,7 @@ void  HBSplineCutFEM::applyGhostPenalty3D()
 
               JacTemp = GeomData.boundaryJacobians[side][nd2->GetLevel()];
 
-              //
-              h1 = abs(hElem.dot(normal1));
-
-              //if( nd1->IsBoundary() )
-              //{
-                //gammGP[0]  = cutFEMparams[6] * mu*h1;
-                //gammGP[1]  = gammGP[0];
-                //gammGP[2]  = gammGP[0];
-                //gammGP[3]  = cutFEMparams[7] * h1/mu;
-              //}
-              //else
-              //{
-                gammGP[0]  = cutFEMparams[6] * mu*h1;
-                gammGP[1]  = gammGP[0];
-                gammGP[2]  = gammGP[0];
-                gammGP[3]  = cutFEMparams[7] * h1*h1*h1/mu;
-              //}
-
-              bb1 = 1.0;
-              for(ii=1; ii<degree[0]; ii++)
-              {
-                bb1 *= h1*h1;
-              }
-              gammGP[0] *= bb1;
-              gammGP[1] *= bb1;
-              gammGP[2] *= bb1;
-              gammGP[3] *= bb1;
-              //
+              //h1 = abs(hElem.dot(normal1));
 
               for(gp=0; gp<nGauss; gp++)
               {

@@ -15,7 +15,8 @@ extern  MpapTime  mpapTime;
 
 int  HBSplineBase::fsi_monolithic_fixedpoint_forcePred(int max_iter, double tol_local)
 {
-  cout << " HBSplineBase::fsi_monolithic_fixedpoint_forcePred() " << endl;
+  //cout << " HBSplineBase::fsi_monolithic_fixedpoint_forcePred() " << endl;
+  PetscPrintf(MPI_COMM_WORLD, " HBSplineBase::fsi_monolithic_fixedpoint_forcePred() \n");
 
   //
   // Thesis by Sudhakar Yogaraj @TUM, Germany

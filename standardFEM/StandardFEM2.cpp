@@ -1122,7 +1122,13 @@ int StandardFEM::factoriseSolveAndUpdate()
 
 void StandardFEM::applyBoundaryConditions()
 {   
-  //cout <<  " applying boundary conditions .... " << endl;
+  cout <<  " applying boundary conditions .... " << endl;
+  cout << " tis = " << tis << endl;
+  if(PHYSICS_TYPE == PHYSICS_TYPE_FLUID)
+    cout << " PHYSICS_TYPE = " << PHYSICS_TYPE_FLUID << endl;
+
+  //printVector(SolnData.td);
+
   int ii, jj, nn, dof, aa, ind;
   double specVal, PENALTY=1.0e6, af, val1, val2;
 

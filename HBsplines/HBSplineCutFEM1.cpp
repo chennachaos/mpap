@@ -44,10 +44,10 @@ HBSplineCutFEM::HBSplineCutFEM()
 
     // add new type
 
-    DomainType *hbsplinecutfem = domain.newType(HBSPLINECUTFEM, ROOTDOMAIN);
+  DomainType *hbsplinecutfem = domain.newType(HBSPLINECUTFEM, ROOTDOMAIN);
 
-    if(hbsplinecutfem == NULL)
-      return;  // domain type already exists
+  if(hbsplinecutfem == NULL)
+    return;  // domain type already exists
 
   hbsplinecutfem->key.addNew("origin", //0 
                           "grid dimensions", //1
@@ -821,7 +821,6 @@ void HBSplineCutFEM::prepareInputData()
   }
 
 
-
   /*
   // subroutines using VTK library
   ////////////////////////////////////////////////////////////////
@@ -935,8 +934,7 @@ void HBSplineCutFEM::prepareInputData()
     ImmersedBodyObjects[bb]->SetImmersedFaces();
   }
 
-
-  printf("\n     HBSplineCutFEM::prepareInputData()  .... FINISHED ...\n\n");
+  PetscPrintf(MPI_COMM_WORLD, "\n     HBSplineCutFEM::prepareInputData()  .... FINISHED ...\n\n");
 
   return;
 }

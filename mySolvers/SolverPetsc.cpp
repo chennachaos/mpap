@@ -30,10 +30,10 @@ SolverPetsc::~SolverPetsc()
 {
   if (debug)  cout << " SolverPetsc destructor\n\n";
   //PetscPrintf(MPI_COMM_WORLD, "SolverPetsc::~SolverPetsc() \n");
-  cout << "SolverPetsc::~SolverPetsc() " << endl;
+  //cout << "SolverPetsc::~SolverPetsc() " << endl;
   //free();
   //PetscPrintf(MPI_COMM_WORLD, "SolverPetsc::~SolverPetsc() \n");
-  cout << "SolverPetsc::~SolverPetsc() " << endl;
+  //cout << "SolverPetsc::~SolverPetsc() " << endl;
 }
 
 

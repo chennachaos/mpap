@@ -4,7 +4,7 @@
 #include "MpapTime.h"
 #include "TimeFunction.h"
 #include "ImmersedIntegrationElement.h"
-#include "../utilities/SolutionData.h"
+#include "SolutionData.h"
 #include "NewLagrangeElement.h"
 #include "Files.h"
 #include "StandardFEM.h"
@@ -137,8 +137,8 @@ void  ImmersedFlexibleSolid::SetSolidElements(vector<vector<int> >& elemConn)
 
   int   ee, ii, jj, kk, ind;
 
-  cout << " nelem and  ndof " << nElem << '\t' << ndof << '\t' << npElem << endl;
-  cout << " SolnData.ElemProp.id = " << SolnData.ElemProp[0].id << endl;
+  //cout << " nelem and  ndof " << nElem << '\t' << ndof << '\t' << npElem << endl;
+  //cout << " SolnData.ElemProp.id = " << SolnData.ElemProp[0].id << endl;
 
   elems = new LagrangeElement* [nElem];
 
@@ -189,8 +189,6 @@ void  ImmersedFlexibleSolid::SetSolidElements(vector<vector<int> >& elemConn)
     GeomData.SetNdof(ndof);
     GeomData.SetNGP(1);
     GeomData.build();
-
-    cout << " AAAAAAAAAAAAAAAAA " << endl;
 
     ///////////////////////////////////////////////////////////////////
     //
@@ -293,8 +291,8 @@ void  ImmersedFlexibleSolid::SetBoundaryConditions(vector<vector<double> >& data
   int ii, jj, val;
   
   DirichletBCs = datatemp;
-  
-  cout << " DirichletBCs.size() = " << DirichletBCs.size() << endl;
+
+  //cout << " DirichletBCs.size() = " << DirichletBCs.size() << endl;
   
   for(ii=0;ii<datatemp.size();ii++)
   {

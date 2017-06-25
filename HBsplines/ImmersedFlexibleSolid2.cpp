@@ -34,10 +34,8 @@ void ImmersedFlexibleSolid::setSolver(int slv, int *parm, bool cIO)
      //delete solver;
    //solver = NULL;
 
-    char fct[] = "ImmersedFlexibleSolid::setSolver";
-    
     int numProc;
-    
+
     switch(slv)
     {
         case  1: // MA41 ..........................
@@ -95,9 +93,7 @@ void ImmersedFlexibleSolid::setSolver(int slv, int *parm, bool cIO)
 
 void ImmersedFlexibleSolid::prepareMatrixPattern()
 {
-  printf("\n     ImmersedFlexibleSolid::prepareMatrixPattern()  .... STARTED ...\n");
-
-  char fct[] = "ImmersedFlexibleSolid::prepareMatrixPattern";
+    //printf("\n     ImmersedFlexibleSolid::prepareMatrixPattern()  .... STARTED ...\n");
 
     int  r, c, r1, c1, count=0, count1=0, count2=0, ii, jj, iii, e, ee, ind;
     int *tt, *tt1, *tt2,  val1, val2, n1, n2, kk, e1, a, b, ll, pp, nnz;
@@ -133,10 +129,8 @@ void ImmersedFlexibleSolid::prepareMatrixPattern()
     GeomData.node_map_new_to_old = node_map_new_to_old;
     GeomData.node_map_old_to_new = node_map_old_to_new;
 
-    cout << " nelem and  ndof " << nElem << '\t' << ndof << '\t' << npElem << endl;
-
-    cout << " ImmersedFlexibleSolid.... nNode and  ndof " << nNode << '\t' << ndof << endl;
-
+    //cout << " nelem and  ndof " << nElem << '\t' << ndof << '\t' << npElem << endl;
+    //cout << " ImmersedFlexibleSolid.... nNode and  ndof " << nNode << '\t' << ndof << endl;
 
     totalDOF = 0;
     for(ii=0;ii<nNode;ii++)
@@ -149,7 +143,7 @@ void ImmersedFlexibleSolid::prepareMatrixPattern()
       }
     }
 
-    cout << " totalDOF " << totalDOF << endl;
+    //cout << " totalDOF " << totalDOF << endl;
     assy4r.resize(totalDOF);
 
     ind = ndof*npElem;
@@ -162,7 +156,7 @@ void ImmersedFlexibleSolid::prepareMatrixPattern()
       LM[ee].resize(ind);
     }
 
-    cout << ndof << '\t' << npElem << '\t' << ind << '\t' << nElem << endl;
+    //cout << ndof << '\t' << npElem << '\t' << ind << '\t' << nElem << endl;
 
     for(ee=0;ee<nElem;ee++)
     {
@@ -182,7 +176,6 @@ void ImmersedFlexibleSolid::prepareMatrixPattern()
       }
     }
 
-    cout << " totalDOF " << totalDOF << endl;
     count = 0;
     for(ii=0;ii<nNode;ii++)
     {
@@ -193,14 +186,14 @@ void ImmersedFlexibleSolid::prepareMatrixPattern()
           assy4r[count++] = ii*ndof + jj;
       }
     }
-    cout << " totalDOF " << totalDOF << endl;
-    cout << " nElem " << nElem << endl;
+    //cout << " totalDOF " << totalDOF << endl;
+    //cout << " nElem " << nElem << endl;
     for(ii=0;ii<nElem;ii++)
     {
       elems[ii]->forAssyVec = LM[ii];
     }
 
-    cout << " totalDOF " << totalDOF << endl;
+    //cout << " totalDOF " << totalDOF << endl;
     pp=false;
     //pp=true;
     if(pp)
@@ -240,8 +233,8 @@ void ImmersedFlexibleSolid::prepareMatrixPattern()
        printf("\n\n\n");
     }
 
-    printf("\n element DOF values initialised \n\n");
-    printf("\n Preparing matrix pattern \n\n");
+    //printf("\n element DOF values initialised \n\n");
+    //printf("\n Preparing matrix pattern \n\n");
 
     vector<int>::const_iterator location;
     set<int>::iterator it;
@@ -283,7 +276,7 @@ void ImmersedFlexibleSolid::prepareMatrixPattern()
        printf("\n\n\n");
     }
 
-    printf("\n Preparing matrix pattern DONE \n\n");
+    //printf("\n Preparing matrix pattern DONE \n\n");
 
     VectorXd  nnzVec(totalDOF);
 
@@ -295,11 +288,11 @@ void ImmersedFlexibleSolid::prepareMatrixPattern()
       nnzVec[ii] = forAssyMat[ii].size();
       nnz += nnzVec[ii];
     }
-    cout << " nnz " << nnz << endl;
+    //cout << " nnz " << nnz << endl;
 
     nRow = nCol = totalDOF;
 
-    cout << " AAAAAAAAAA " << endl;
+    //cout << " AAAAAAAAAA " << endl;
     solver->mtx.setZero();
 
     solver->mtx.resize(nRow, nCol);
@@ -339,7 +332,7 @@ void ImmersedFlexibleSolid::prepareMatrixPattern()
         //printVector(forAssyCoupledHorz[ii]);
     }
 
-    printf("\n     ImmersedFlexibleSolid::prepareMatrixPattern()  .... FINISHED ...\n\n");
+    //printf("\n     ImmersedFlexibleSolid::prepareMatrixPattern()  .... FINISHED ...\n\n");
 
     return;
 }
@@ -370,10 +363,6 @@ void ImmersedFlexibleSolid::SolveTimeStep()
 
     updateIterStep();
   }
-
-  //updateIterStep();
-
-  //cout << " solid disp ...  = " << SolnData.var1[502*2+0] << '\t' << SolnData.var1[502*2+1] << endl;
 
   printf("\n Solving Immersed Flexible Solid ..... DONE  \n\n");
 
@@ -487,7 +476,7 @@ int  ImmersedFlexibleSolid::applyExternalForces()
   for(int ii=0;ii<totalDOF;ii++)
   {
     solver->rhsVec[ii] += SolnData.forceCur[assy4r[ii]];
-    solver->rhsVec[ii] += fluidAcceCur[assy4r[ii]];
+    //solver->rhsVec[ii] += fluidAcceCur[assy4r[ii]];
   }
 
   /*
@@ -566,7 +555,7 @@ void ImmersedFlexibleSolid::calcForceVector()
 
 int ImmersedFlexibleSolid::factoriseSolveAndUpdate()
 {
-  char fct[] = "ImmersedFlexibleSolid::factoriseSolveAndUpdate";
+  //char fct[] = "ImmersedFlexibleSolid::factoriseSolveAndUpdate";
   //computerTime.go(fct);
 
   //cout << " residue_new " << endl;        printVector(&(solver->rhsVec[0]), totalDOF);

@@ -23,8 +23,8 @@ using namespace myGeom;
 
 void HBSplineCutFEM::plotGeom(int val1, bool flag2, int col, bool PLOT_KNOT_LINES, int* resln)
 {
-  if(this_mpi_proc != 0)
-    return;
+    if(this_mpi_proc != 0)
+      return;
 
     PetscPrintf(MPI_COMM_WORLD, "     HBSplineCutFEM: plotgeometry ...\n\n");
 
@@ -56,7 +56,7 @@ void HBSplineCutFEM::plotGeom(int val1, bool flag2, int col, bool PLOT_KNOT_LINE
     //cout << "uGridVTK->GetPointData()->GetNumberOfArrays() = " << '\t' << uGridVTK->GetPointData()->GetNumberOfArrays() << endl;
     //cout << "uGridVTK->GetCellData()->GetNumberOfArrays() = " << '\t' << uGridVTK->GetCellData()->GetNumberOfArrays() << endl;
 
-  cout << " CUTCELL_INTEGRATION_TYPE = " << CUTCELL_INTEGRATION_TYPE << endl;
+    //cout << " CUTCELL_INTEGRATION_TYPE = " << CUTCELL_INTEGRATION_TYPE << endl;
 
     cellDataVTK->SetNumberOfComponents(1);
     cellDataVTK2->SetNumberOfComponents(1);
@@ -306,8 +306,8 @@ void HBSplineCutFEM::plotGeomSubTrias3D(int val1, bool flag2, int col, bool PLOT
 
 void  HBSplineCutFEM::postProcessFlow(int vartype, int vardir, int nCol, bool umnxflag, double umin, double umax, int* resln)
 {
-  if(this_mpi_proc != 0)
-    return;
+    if(this_mpi_proc != 0)
+      return;
 
     uGridVTK->Reset();
     pointsVTK->Reset();

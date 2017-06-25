@@ -69,7 +69,7 @@ int LagrangeElem3DStokesTet4Node::calcLoadVector()
 int LagrangeElem3DStokesTet4Node::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)
 {
   double  dvol, b1, b2, b3, b4, b5, b6, b7, b8;
-  double  Jac, totvol, pres, fact, fact2;
+  double  Jac, totvol, pres, fact, fact2, *elmDat;
   double  param[3], bforce[3], tau[3];
 
   VectorXd  N(nlbf), dN_dx(nlbf), dN_dy(nlbf), dN_dz(nlbf);
@@ -80,8 +80,8 @@ int LagrangeElem3DStokesTet4Node::calcStiffnessAndResidual(MatrixXd& Klocal, Vec
 
   elmDat = &(SolnData->ElemProp[elmType].data[0]);
 
-  double rho  = elmDat[3] ;
-  double  mu  = elmDat[4] ;
+  double rho = elmDat[3] ;
+  double mu  = elmDat[4] ;
 
   bforce[0]  = 0.0;
   bforce[1]  = 0.0;
@@ -91,14 +91,14 @@ int LagrangeElem3DStokesTet4Node::calcStiffnessAndResidual(MatrixXd& Klocal, Vec
   //bforce[1]  = elmDat[7]*timeFunction[0].prop ;
   //bforce[2]  = elmDat[7]*timeFunction[0].prop ;
 
-  double  dt = mpapTime.dt;
-  double  af = SolnData->td(2);
-  double  am = SolnData->td(1);
-  double  acceFact = am*SolnData->td(9);
-  double  muTaf = mu*af;
+  double dt = mpapTime.dt;
+  double af = SolnData->td(2);
+  double am = SolnData->td(3);
+  double acceFact = am*SolnData->td(9);
+  double muTaf = mu*af;
 
   //printf(" %14.12f \t %14.12f \t %14.12f \t %14.12f \n ", BULK, mu, bforce[0], bforce[1]);
-  //printf(" %14.12f \t %14.12f \t %14.12f \t %14.12f \n ", rho, af, d1, aa);
+  //printf(" %14.12f \t  %14.12f \t %14.12f \t %14.12f \t %14.12f \n ", rho, mu, af, am, acceFact);
   //printf(" %5d \t %5d \t %5d \t %5d \n ", nodeNums[0], nodeNums[1], nodeNums[2], nodeNums[3]);
 
   double xNode[4], yNode[4], zNode[4], xx, yy, zz;
@@ -122,20 +122,12 @@ int LagrangeElem3DStokesTet4Node::calcStiffnessAndResidual(MatrixXd& Klocal, Vec
 
   totvol = forVolume.determinant()/6.0;
 
-  //double  h2  = totvol*4.0/PI;
-  double h = pow(3.0*totvol/PI/4.0, 1.0/3.0);
-  //double h = 1.0/6.0;
-  //h = sqrt(3.0*h*h);
+  //if(elenum < 100)
+    //cout << " volume = " << totvol << endl;
+
+  double h = pow(6.0*totvol/PI, 1.0/3.0);
   
-  double  alpha = 1.0/12.0, stabParam;
-
-  //tau = elmDat[8]*alpha*h*h/sqrt(mu);
-  //tau = elmDat[8]*alpha*h*h/mu/dt;
-
-    //cout << " volume = " << volume << endl;
-  //double  h2 = 4.0*totvol/PI;
-
-  stabParam = h*h/(12.0*mu);
+  double stabParam = h*h/(4.0*mu);
   tau[0] = elmDat[8]*stabParam;  // SUPG
   tau[1] = elmDat[9]*stabParam;  // PSPG
   tau[2] = elmDat[10]*stabParam; // LSIC
@@ -145,28 +137,22 @@ int LagrangeElem3DStokesTet4Node::calcStiffnessAndResidual(MatrixXd& Klocal, Vec
   //printf(" %14.12f \t %14.12f \t %14.12f \t %14.12f \n ", xNode[0], xNode[1], xNode[2], xNode[3]);
   //printf(" %14.12f \t %14.12f \t %14.12f \t %14.12f \n\n\n ", yNode[0], yNode[1], yNode[2], yNode[3]);
 
-    if(Klocal.rows() != nsize)
-    {
-      Klocal.resize(nsize, nsize);
-      Flocal.resize(nsize);
-    }
-    Klocal.setZero();
-    Flocal.setZero();
+  if(Klocal.rows() != nsize)
+  {
+    Klocal.resize(nsize, nsize);
+    Flocal.resize(nsize);
+  }
+  Klocal.setZero();
+  Flocal.setZero();
 
   //cout << " finite = " << finite << endl;
 
-  nGP = (int) elmDat[0] ;
+  //nGP = (int) elmDat[0] ;
+  nGP = 1;
 
   vector<double>  gausspoints1, gausspoints2, gausspoints3, gaussweights;
 
   getGaussPointsTet(nGP, gausspoints1, gausspoints2, gausspoints3, gaussweights);
-
-
-  Klocal.setZero();
-  Flocal.setZero();
-
-  //cout << " AAAAAAAAAA " << endl;
-  //cout << nGP1 << '\t' << nGP2 << endl;
 
   for(gp=0;gp<nGP;gp++)
   {
@@ -252,6 +238,7 @@ int LagrangeElem3DStokesTet4Node::calcStiffnessAndResidual(MatrixXd& Klocal, Vec
               TJp3 = TJ+3;
 
               fact2 = rho*acceFact*N(jj);
+              //cout << " fact2 = " << fact2 << endl;
 
               // time acceleration term
               fact = b4*fact2 ;

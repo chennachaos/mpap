@@ -76,8 +76,6 @@ void ImmersedSolid::setTimeParam()
 
 void ImmersedSolid::timeUpdate()
 {
-  char fct[] = "ImmersedSolid::timeUpdate";
-
   firstIter = true;
   SolnData.firstIter = firstIter;
   localStiffnessError = 0;
@@ -127,15 +125,10 @@ void ImmersedSolid::reset()
 
 bool ImmersedSolid::converged()
 {
-  char fct[] = "ImmersedSolid::converged";
-  
   tol=1.0e-6;
 
   if (rNorm < tol && localStiffnessError == 0)
   {
-    //cout << " ImmersedSolid::converged()  " << endl;
-    //SolnData.var1 = 0.02*SolnData.var1 + (1.0-0.02)*SolnData.var1Extrap;
-    //updateIterStep();
     return true;
   }
 
