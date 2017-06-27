@@ -13,7 +13,9 @@ class  LagrangeElem3DStokesTet4Node : public LagrangeElement
     LagrangeElem3DStokesTet4Node();
 
     virtual ~LagrangeElem3DStokesTet4Node();
-    virtual void  resetMatrixAndVector();
+
+    virtual int getElmTypeNameNum()
+    {  return 22; }
 
     virtual void prepareElemData();
 

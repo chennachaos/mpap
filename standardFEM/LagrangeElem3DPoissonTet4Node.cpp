@@ -37,9 +37,6 @@ void LagrangeElem3DPoissonTet4Node::prepareElemData()
 {
   LagrangeElement::prepareElemData();
 
-  //Klocal.resize(nsize, nsize);
-  //Flocal.resize(nsize);
-
   return;
 }
 
@@ -48,15 +45,6 @@ void LagrangeElem3DPoissonTet4Node::prepareElemData2()
 {
   return;
 }
-
-
-
-
-void LagrangeElem3DPoissonTet4Node::resetMatrixAndVector()
-{
-  return;
-}
-
 
 
 int LagrangeElem3DPoissonTet4Node::calcLoadVector()

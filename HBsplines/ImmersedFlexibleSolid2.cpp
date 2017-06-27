@@ -97,11 +97,12 @@ void ImmersedFlexibleSolid::prepareMatrixPattern()
 
     int  r, c, r1, c1, count=0, count1=0, count2=0, ii, jj, iii, e, ee, ind;
     int *tt, *tt1, *tt2,  val1, val2, n1, n2, kk, e1, a, b, ll, pp, nnz;
-    int nRow, nCol, ind1, ind2;
+    int nRow, nCol, ind1, ind2, ndof_temp1;
 
+    ndof = elems[0]->getNdofPerNode();
+    ndof_temp1 = ndof;
 
-    totalDOF = nNode*ndof;
-    soln.resize(totalDOF);
+    //totalDOF = nNode*ndof;     totalDOF += nElem_Constraint;
 
     node_map_new_to_old.resize(nNode, 0);
     node_map_old_to_new.resize(nNode, 0);
@@ -139,88 +140,134 @@ void ImmersedFlexibleSolid::prepareMatrixPattern()
       {
         //cout << ii << '\t' << jj << '\t' << NodeType[ii][jj] << endl;
         if(NodeType[ii][jj] == (int) -7777)
-          ID[ii][jj] = totalDOF++;
-      }
-    }
-
-    //cout << " totalDOF " << totalDOF << endl;
-    assy4r.resize(totalDOF);
-
-    ind = ndof*npElem;
-
-    IEN.resize(nElem);
-    LM.resize(nElem);
-    for(ee=0; ee<nElem; ee++)
-    {
-      IEN[ee] = elems[ee]->nodeNums;
-      LM[ee].resize(ind);
-    }
-
-    //cout << ndof << '\t' << npElem << '\t' << ind << '\t' << nElem << endl;
-
-    for(ee=0;ee<nElem;ee++)
-    {
-      for(ii=0;ii<npElem;ii++)
-      {
-        ind = ndof*ii;
-
-        kk = IEN[ee][ii];
-
-        for(jj=0;jj<ndof;jj++)
         {
-          //cout << ee << '\t' << ii << '\t' << jj << '\t' << ind << '\t' << ID[kk][jj] << endl;
-          //cout << ee << '\t' << ii << '\t' << jj << '\t' << ind << '\t' << LM[ee][ind+jj] << '\t' << ID[IEN[ee][ii]][jj] << endl;
-          LM[ee][ind+jj] = ID[kk][jj];
-          //cout << " IIIIIIIII " << endl;
+          ID[ii][jj] = totalDOF++;
+
+          assy4r.push_back(ii*ndof + jj);
         }
       }
     }
 
-    count = 0;
-    for(ii=0;ii<nNode;ii++)
+    // adjust assy4r array to account for the constraints
+
+    ind = nNode*ndof_temp1;
+    for(ii=0; ii<nElem_Constraint; ii++)
     {
-      for(jj=0;jj<ndof;jj++)
+      assy4r.push_back(ind+ii);
+    }
+
+    GeomData.assy4r = assy4r;
+
+    // adjust ID array to account for the constraints
+
+    for(ee=0; ee<nElem; ee++)
+    {
+      ii = elems[ee]->nodeNums[0];
+
+      pp = elems[ee]->getElmTypeNameNum();
+
+      if( pp == 33 )
       {
-        //cout << ii << '\t' << jj << '\t' << ID[ii][jj] << endl;
-        if( ID[ii][jj] != -1)
-          assy4r[count++] = ii*ndof + jj;
+        jj = ndof_temp1 + 1;
+        ID[ii][jj] = totalDOF++;
+      }
+
+      if( pp == 34 )
+      {
+        jj = ndof_temp1 + 0;
+        ID[ii][jj] = totalDOF++;
       }
     }
-    //cout << " totalDOF " << totalDOF << endl;
-    //cout << " nElem " << nElem << endl;
-    for(ii=0;ii<nElem;ii++)
+
+    cout << " totalDOF " << totalDOF << endl;
+    //assy4r.resize(totalDOF);
+
+
+    for(ee=0; ee<nElem; ee++)
     {
-      elems[ii]->forAssyVec = LM[ii];
+      //cout << " ee = " << ee << endl;
+      npElem     = elems[ee]->getNodesPerElement();
+      ndof_temp1 = elems[ee]->getNdofPerNode();
+      ind        = ndof_temp1*npElem;
+
+      //printVector(IEN[ee]);
+
+      pp = elems[ee]->getElmTypeNameNum();
+
+      if( pp == 33 ) // constaint element with rigid X-axis
+      {
+        LM[ee].resize(2);  // to account for the Lagrange multiplier
+
+        kk = IEN[ee][0];
+
+        LM[ee][0] = ID[kk][1];
+        LM[ee][1] = ID[kk][3];
+      }
+      else if( pp == 34 ) // constaint element with rigid Y-axis
+      {
+        LM[ee].resize(2);  // to account for the Lagrange multiplier
+
+        kk = IEN[ee][0];
+
+        LM[ee][0] = ID[kk][0];
+        LM[ee][1] = ID[kk][2];
+      }
+      else // standard elements
+      {
+        LM[ee].resize(ind);
+        for(ii=0;ii<npElem;ii++)
+        {
+          ind = ndof_temp1*ii;
+
+          kk = IEN[ee][ii];
+
+          for(jj=0;jj<ndof_temp1;jj++)
+          {
+            //cout << ee << '\t' << ii << '\t' << jj << '\t' << ind << '\t' << ID[kk][jj] << endl;
+            //cout << ee << '\t' << ii << '\t' << jj << '\t' << ind << '\t' << LM[ee][ind+jj] << '\t' << ID[IEN[ee][ii]][jj] << endl;
+            LM[ee][ind+jj] = ID[kk][jj];
+            //cout << " IIIIIIIII " << endl;
+          }
+        }
+      }
+      //cout << " ee = " << ee << endl;    
     }
 
     //cout << " totalDOF " << totalDOF << endl;
+    cout << " nElem " << nElem << endl;
+    for(ee=0; ee<nElem; ee++)
+    {
+      elems[ee]->forAssyVec = LM[ee];
+    }
+
     pp=false;
     //pp=true;
     if(pp)
     {
        printf("   IEN array \n\n");
-       for(ii=0;ii<nElem;ii++)
+       for(ee=0; ee<nElem; ee++)
        {
-          for(jj=0;jj<npElem;jj++)
-            cout << '\t' << IEN[ii][jj];
+          npElem = elems[ee]->getNodesPerElement();
+          for(ii=0; ii<npElem; ii++)
+            cout << '\t' << IEN[ee][ii];
           cout << endl;
        }
        printf("\n\n\n");
 
        printf("   ID array \n\n");
-       for(ii=0;ii<nNode;ii++)
+       for(ii=0; ii<nNode; ii++)
        {
-          for(jj=0;jj<ndof;jj++)
+          for(jj=0; jj<ID[ii].size(); jj++)
             cout << '\t' << ID[ii][jj];
           cout << endl;
        }
        printf("\n\n\n");
 
        printf("   LM array \n\n");
-       for(ii=0;ii<nElem;ii++)
+       for(ee=0; ee<nElem; ee++)
        {
-          for(jj=0;jj<nsize;jj++)
-            cout << '\t' << LM[ii][jj];
+          for(jj=0; jj<LM[ee].size(); jj++)
+            cout << '\t' << LM[ee][jj];
           cout << endl;
        }
        printf("\n\n\n");
@@ -228,7 +275,7 @@ void ImmersedFlexibleSolid::prepareMatrixPattern()
        printf("  assy4r array \n\n");
        for(ii=0;ii<totalDOF;ii++)
        {
-          cout << assy4r[ii] << endl;
+          cout << ii << '\t' << assy4r[ii] << endl;
        }
        printf("\n\n\n");
     }
@@ -244,6 +291,7 @@ void ImmersedFlexibleSolid::prepareMatrixPattern()
     for(ee=0;ee<nElem;ee++)
     {
        tt = &(LM[ee][0]);
+       nsize = LM[ee].size();
 
        for(ii=0;ii<nsize;ii++)
        {
@@ -314,12 +362,12 @@ void ImmersedFlexibleSolid::prepareMatrixPattern()
 
     if(!STAGGERED)
     {
-      forAssyCoupledHorz.resize(nNode*ndof);
+      forAssyCoupledHorz.resize(nNode*ndof_temp1);
       forAssyCoupledVert.resize(nNode*DIM);
 
       for(ii=0;ii<nNode;ii++)
       {
-        ind1 = ii*ndof;
+        ind1 = ii*ndof_temp1;
         ind2 = ii*DIM;
 
         for(jj=0;jj<DIM;jj++)
@@ -399,11 +447,11 @@ int ImmersedFlexibleSolid::calcStiffnessAndResidual(int printRes, bool zeroMtx, 
       elems[ee]->calcStiffnessAndResidual(Klocal, Flocal);
 
       //cout << " MMMMMMMMMMM " << endl;
-      //elems[ee]->AssembleElementMatrixAndVector(0, solver->mtx, &(solver->rhsVec(0)));
+      //elems[ee]->assembleElementMatrixAndVector(0, solver->mtx, &(solver->rhsVec(0)));
 
-      //elems[ee]->AssembleElementMatrix(0, solver->mtx);
+      //elems[ee]->assembleElementMatrix(0, solver->mtx);
       //cout << " MMMMMMMMMMM " << endl;
-      //elems[ee]->AssembleElementVector(false, false, &(solver->rhsVec(0)), &(SolnData.reac(0)), 0, 0);
+      //elems[ee]->assembleElementVector(false, false, &(solver->rhsVec(0)), &(SolnData.reac(0)), 0, 0);
 
       solver->AssembleMatrixAndVector(0, 0, elems[ee]->forAssyVec, Klocal, Flocal);
   }
@@ -508,8 +556,8 @@ int  ImmersedFlexibleSolid::applyExternalForces()
       lme  = ImmIntgElems[aa];
       poly = ImmersedFaces[aa];
 
-      //cout << " aa = " << aa << '\t' << lme->IsActive() << endl;
-      //if( lme->IsActive() )
+      //cout << " aa = " << aa << '\t' << lme->isActive() << endl;
+      //if( lme->isActive() )
       //{
           for(gp=0; gp<nGauss; gp++)
           {
@@ -670,7 +718,7 @@ int ImmersedFlexibleSolid::AssembleGlobalMatrixAndVector(int start1, int start2,
     elems[ee]->calcStiffnessAndResidual();
 
     //cout << " MMMMMMMMMMM " << endl;
-    elems[ee]->AssembleElementMatrixAndVector(start2, mtx, rhs);
+    elems[ee]->assembleElementMatrixAndVector(start2, mtx, rhs);
   }
 
   //cout << " aaaaaaaaaaaaaaa " << endl;

@@ -14,7 +14,8 @@ class  LagrangeElem3DNavierStokesTet4Node : public LagrangeElement
 
     virtual ~LagrangeElem3DNavierStokesTet4Node();
 
-    virtual void  resetMatrixAndVector();
+    virtual int getElmTypeNameNum()
+    {  return 24; }
 
     virtual void prepareElemData();
 

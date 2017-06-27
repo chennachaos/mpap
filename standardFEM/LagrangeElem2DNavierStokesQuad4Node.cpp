@@ -40,9 +40,6 @@ void LagrangeElem2DNavierStokesQuad4Node::prepareElemData()
 {
   LagrangeElement::prepareElemData();
 
-  //Klocal.resize(nsize, nsize);
-  //Flocal.resize(nsize);
-
   return;
 }
 
@@ -52,12 +49,6 @@ void LagrangeElem2DNavierStokesQuad4Node::prepareElemData2()
   return;
 }
 
-
-
-void LagrangeElem2DNavierStokesQuad4Node::resetMatrixAndVector()
-{
-  return;
-}
 
 int LagrangeElem2DNavierStokesQuad4Node::calcLoadVector()
 {

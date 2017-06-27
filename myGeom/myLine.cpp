@@ -88,7 +88,7 @@ int myLine::IntersectWithLine(myLine& lnTemp, vector<myPoint>& ptOut)
   // check if the bounding boxes of the two lines intersect
   // if the bounding boxes do not intersect then the two line segments do not intersect
 
-  if( ! bbox.doIntersect(lnTemp.GetAABB()) )
+  if( ! bbox.doIntersect(lnTemp.getAABB()) )
     return 0;
 
   // if the bounding boxes of the two line segments intersect then find the intersection point

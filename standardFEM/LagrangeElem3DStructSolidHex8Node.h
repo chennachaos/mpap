@@ -14,7 +14,8 @@ class  LagrangeElem3DStructSolidHex8Node : public LagrangeElement
 
     virtual ~LagrangeElem3DStructSolidHex8Node();
 
-    virtual void  resetMatrixAndVector();
+    virtual int getElmTypeNameNum()
+    {  return 19; }
 
     virtual void prepareElemData();
 

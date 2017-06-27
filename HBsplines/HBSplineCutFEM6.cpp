@@ -1419,7 +1419,7 @@ void  HBSplineCutFEM::computeTotalForce2D(int bb)
           }
           else
           {
-            aa = ImmersedBodyObjects[bb]->GetNumNodes()*2;
+            aa = ImmersedBodyObjects[bb]->SolnData.var1.rows();
             totalForce.resize(aa);
             fluidAcceOnSolid.resize(aa);
           }
@@ -1438,8 +1438,8 @@ void  HBSplineCutFEM::computeTotalForce2D(int bb)
           lme  = ImmersedBodyObjects[bb]->ImmIntgElems[aa];
           poly = ImmersedBodyObjects[bb]->ImmersedFaces[aa];
 
-          //cout << " aa = " << aa << '\t' << lme->IsActive() << endl;
-          if( lme->IsActive() )
+          //cout << " aa = " << aa << '\t' << lme->isActive() << endl;
+          if( lme->isActive() )
           {
             for(gp=0; gp<nGauss; gp++)
             {
@@ -1480,11 +1480,8 @@ void  HBSplineCutFEM::computeTotalForce2D(int bb)
               trac[0] += PENALTY*(velSpec[0]-vel[0]);
               trac[1] += PENALTY*(velSpec[1]-vel[1]);
 
-              //trac[0] -= (rho/rhoSolid)*FluidAcce[0];
-              //trac[1] -= (rho/rhoSolid)*FluidAcce[1];
-
-              trac[0] += (stagParams[3]*rho)*acceFluid[0];
-              trac[1] += (stagParams[3]*rho)*acceFluid[1];
+              //trac[0] += (stagParams[3]*rho)*acceFluid[0];
+              //trac[1] += (stagParams[3]*rho)*acceFluid[1];
 
               //trac[0] += stagParams[3]*rho*(acceFluid[0] - acceSpec[0]);
               //trac[1] += stagParams[3]*rho*(acceFluid[1] - acceSpec[1]);
@@ -1492,14 +1489,11 @@ void  HBSplineCutFEM::computeTotalForce2D(int bb)
               //trac[0] += stagParams[2]*(rhoSolid*acceSpec[0] - rho*acceFluid[0]);
               //trac[1] += stagParams[2]*(rhoSolid*acceSpec[1] - rho*acceFluid[1]);
 
-              //trac[0] += rho*acceFluid[0];
-              //trac[1] += rho*acceFluid[1];
-
               trac *= dvol;
 
               //cout << trac[0] << '\t' << trac[1] << endl;
 
-              fact = rho*stagParams[3]*dvol;
+              fact = rho*dvol;
 
               if(rigidflag)
               {
@@ -1531,7 +1525,7 @@ void  HBSplineCutFEM::computeTotalForce2D(int bb)
 
               //cout << " uuuuuuuuuuu " << endl;
             }//for(gp=0...
-          } // if( lme->IsActive() )
+          } // if( lme->isActive() )
         }//for(aa=0...
 
   ImmersedBodyObjects[bb]->fluidAcce = stagParams[4]*fluidAcceOnSolid;
@@ -1612,8 +1606,8 @@ void  HBSplineCutFEM::computeTotalForce3D(int bb)
           lme  = ImmersedBodyObjects[bb]->ImmIntgElems[aa];
           poly = ImmersedBodyObjects[bb]->ImmersedFaces[aa];
 
-          //cout << " aa = " << aa << '\t' << lme->IsActive() << '\t' << bb << endl;
-          if( lme->IsActive() )
+          //cout << " aa = " << aa << '\t' << lme->isActive() << '\t' << bb << endl;
+          if( lme->isActive() )
           {
             for(gp=0; gp<nGauss; gp++)
             {
@@ -1691,7 +1685,7 @@ void  HBSplineCutFEM::computeTotalForce3D(int bb)
 
               //cout << " uuuuuuuuuuu " << endl;
             }//for(gp=0...
-          } // if( lme->IsActive() )
+          } // if( lme->isActive() )
         }//for(aa=0...
 
     //printf("Force in X-direction = %12.6f \n", totalForce[0]);

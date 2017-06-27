@@ -180,7 +180,7 @@ void  ImmersedSolid::SetImmersedFaces()
 
         polyList->InsertNextCell(triaVTK);
 
-        triaStatus->InsertNextValue(ImmIntgElems[ii]->IsActive());
+        triaStatus->InsertNextValue(ImmIntgElems[ii]->isActive());
 
         poly->computeNormal();
 
@@ -208,7 +208,7 @@ void  ImmersedSolid::SetImmersedFaces()
 
         polyList->InsertNextCell(quadVTK);
 
-        triaStatus->InsertNextValue(ImmIntgElems[ii]->IsActive());
+        triaStatus->InsertNextValue(ImmIntgElems[ii]->isActive());
 
         poly->computeNormal();
 
@@ -258,7 +258,7 @@ void  ImmersedSolid::SetImmersedFaces()
 
     //massProp->Update();
 
-    //printf("\n Polyhedron # %d volume = %12.8f \n\n", id, massProp->GetVolume() );
+    //printf("\n Polyhedron # %d volume = %12.8f \n\n", id, massProp->getVolume() );
     //printf("\n Polyhedron # %d Surface area = %12.8f \n\n", id, massProp->GetSurfaceArea() );
   }
 
@@ -449,7 +449,7 @@ void  ImmersedSolid::SetImmersedFaces()
 
         polyList->InsertNextCell(triaVTK);
 
-        triaStatus->InsertNextValue(ImmIntgElems[ii]->IsActive());
+        triaStatus->InsertNextValue(ImmIntgElems[ii]->isActive());
 
         poly->computeNormal();
 
@@ -488,7 +488,7 @@ void  ImmersedSolid::SetImmersedFaces()
 
         polyList->InsertNextCell(quadVTK);
 
-        triaStatus->InsertNextValue(ImmIntgElems[ii]->IsActive());
+        triaStatus->InsertNextValue(ImmIntgElems[ii]->isActive());
 
         poly->computeNormal();
 

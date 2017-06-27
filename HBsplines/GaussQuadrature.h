@@ -31,7 +31,7 @@ class GaussQuadrature
 
       ~GaussQuadrature();
 
-      //int GetDimension()
+      //int getDimension()
       //{ return DIM;}
 
       void SetGaussPoints(int nn);

@@ -332,14 +332,14 @@ void TreeNode<2>::applyDirichletBCsCutFEMPoisson(MatrixXd& Klocal, VectorXd& Flo
 {
   if(DirichletData.size() > 0)
   {
-    if( IsCutElement() )
+    if( isCutElement() )
     {
       vector<int>  domTemp;
       std::vector<int>::iterator  itTemp;
 
       for(vector<myPoly*>::iterator poly = subTrias.begin() ; poly != subTrias.end(); ++poly)
       {
-        domTemp.push_back( (*poly)->GetDomainNumber() );
+        domTemp.push_back( (*poly)->getDomainNumber() );
       }
       //printVector(domTemp);
 

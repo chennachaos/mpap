@@ -40,7 +40,7 @@ void HBSplineCutFEM::setTimeParam()
 
 void HBSplineCutFEM::timeUpdate()
 {
-  //cout << " HBSplineCutFEM::timeUpdate() ... STARTED " << endl;
+  //PetscPrintf(MPI_COMM_WORLD, "   HBSplineCutFEM::timeUpdate() ... STARTED \n\n");
 
   IB_MOVED = false;
 
@@ -63,8 +63,7 @@ void HBSplineCutFEM::timeUpdate()
 
   updateIterStep();
 
-  //cout << " HBSplineCutFEM::timeUpdate() ... FINISHED " << endl;
-  //PetscPrintf(MPI_COMM_WORLD, "   WARNING! I could not remove the temporary input File!\n\n");
+  //PetscPrintf(MPI_COMM_WORLD, "   HBSplineCutFEM::timeUpdate() ... FINISHED \n\n");
 
   return;
 }
@@ -73,7 +72,7 @@ void HBSplineCutFEM::timeUpdate()
 
 void HBSplineCutFEM::updateIterStep()
 {
-  //cout << " HBSplineCutFEM::updateIterStep() ... STARTED " << endl;
+  //PetscPrintf(MPI_COMM_WORLD, "   HBSplineCutFEM::updateIterStep() ... STARTED \n\n");
 
   int kk, bb, ee;
 
@@ -84,6 +83,7 @@ void HBSplineCutFEM::updateIterStep()
   for(bb=0;bb<ImmersedBodyObjects.size();bb++)
   {
     computeTotalForce(bb);
+    //cout << " bbbbbbbbbbbbbbbb " << endl;
     ImmersedBodyObjects[bb]->updateForce(&(totalForce(0)));
   }
 
@@ -188,7 +188,7 @@ void HBSplineCutFEM::updateIterStep()
         solverPetsc->checkIO = true;
   }
 
-  //cout << " HBSplineCutFEM::updateIterStep() ... FINISHED " << endl;
+  //PetscPrintf(MPI_COMM_WORLD, "   HBSplineCutFEM::updateIterStep() ... FINISHED \n\n");
 
   return;
 }
@@ -261,17 +261,17 @@ int  HBSplineCutFEM::setCoveringUncovering2D()
 
           ndTemp = elems[findCellNumber(geom)];
 
-          if( ndTemp->GetDomainNumber() > 0 )
+          if( ndTemp->getDomainNumber() > 0 )
           {
             geometryToParametric(geom, param);
 
-            knotBegin = ndTemp->GetKnotBegin();
-            knotIncr  = ndTemp->GetKnotIncrement();
+            knotBegin = ndTemp->getKnotBegin();
+            knotIncr  = ndTemp->getKnotIncrement();
             bfTemp    = ndTemp->GlobalBasisFuncs;
 
             GeomData.computeBasisFunctions2D(knotBegin, knotIncr, param, NN);
 
-            if(ndTemp->GetParent() == NULL)
+            if(ndTemp->getParent() == NULL)
             {
               N = NN;
             }
@@ -327,17 +327,17 @@ int  HBSplineCutFEM::setCoveringUncovering3D()
 
           ndTemp = elems[findCellNumber(geom)];
 
-          if( ndTemp->GetDomainNumber() > 0 )
+          if( ndTemp->getDomainNumber() > 0 )
           {
             geometryToParametric(geom, param);
 
-            knotBegin = ndTemp->GetKnotBegin();
-            knotIncr  = ndTemp->GetKnotIncrement();
+            knotBegin = ndTemp->getKnotBegin();
+            knotIncr  = ndTemp->getKnotIncrement();
             bfTemp    = ndTemp->GlobalBasisFuncs;
 
             GeomData.computeBasisFunctions2D(knotBegin, knotIncr, param, NN);
 
-            if(ndTemp->GetParent() == NULL)
+            if(ndTemp->getParent() == NULL)
             {
               N = NN;
             }
@@ -609,7 +609,7 @@ int  HBSplineCutFEM::prepareMatrixPattern()
       //cout << " nNode_local = " << nNode_local << endl;
 
       for(e1=0; e1<nElem; e1++)
-        elems[fluidElementIds[e1]]->set_subdomain_id(epart[e1]);
+        elems[fluidElementIds[e1]]->setSubdomainId(epart[e1]);
 
 
       std::vector<std::vector<int> >  locally_owned_nodes_total;
@@ -692,7 +692,7 @@ int  HBSplineCutFEM::prepareMatrixPattern()
       //for(e1=0; e1<nElem; e1++)
       //{
         //ee = fluidElementIds[e1];
-        ////if(elems[ee]->get_subdomain_id() == this_mpi_proc)
+        ////if(elems[ee]->getSubdomainId() == this_mpi_proc)
         ////{
           //for(ii=0; ii<elems[ee]->GlobalBasisFuncs.size(); ii++)
           //{
@@ -740,9 +740,9 @@ int  HBSplineCutFEM::prepareMatrixPattern()
     {
         nd1 = elems[fluidElementIds[ee]];
 
-        //PetscPrintf(MPI_COMM_WORLD, " %d \t %d \t %d \n", ee, fluidElementIds[ee], nd1->GetID());
+        //PetscPrintf(MPI_COMM_WORLD, " %d \t %d \t %d \n", ee, fluidElementIds[ee], nd1->getID());
 
-        val1 =  nd1->GetNsize();
+        val1 =  nd1->getNsize2();
         tt1  =  &(nd1->forAssyVec[0]);
 
         //if(this_mpi_proc == 0)
@@ -762,13 +762,13 @@ int  HBSplineCutFEM::prepareMatrixPattern()
         //PetscPrintf(MPI_COMM_WORLD, " aaaaaaaaaaaaa \n");
 
       // connectivity for ghost-penalty terms
-      if( nd1->IsCutElement() )
+      if( nd1->isCutElement() )
       {
         for(side=0; side<NUM_NEIGHBOURS; side++)
         {
-          nd2 = nd1->GetNeighbour(side);
+          nd2 = nd1->getNeighbour(side);
 
-          if( (nd2 != NULL) && !(nd2->IsGhost()) && nd2->IsLeaf() && (nd2->IsCutElement() || nd2->domNums[0] == 0) )
+          if( (nd2 != NULL) && !(nd2->isGhost()) && nd2->isLeaf() && (nd2->isCutElement() || nd2->domNums[0] == 0) )
           {
               nr1 = nd1->forAssyVec.size();
               nr2 = nd2->forAssyVec.size();
@@ -787,7 +787,7 @@ int  HBSplineCutFEM::prepareMatrixPattern()
               } // for(ii=0; ii<nr1; ii++)
           }
         } //for(side=0; side<NUM_NEIGHBOURS; side++)
-      } //if( nd1->IsCutElement() )
+      } //if( nd1->isCutElement() )
       //PetscPrintf(MPI_COMM_WORLD, " aaaaaaaaaaaaa \n");
     } // for(e=0;e<fluidElementIds.size();e++)
 
@@ -830,12 +830,12 @@ int  HBSplineCutFEM::prepareMatrixPattern()
           lme = ImmersedBodyObjects[bb]->ImmIntgElems[aa];
           poly = ImmersedBodyObjects[bb]->ImmersedFaces[aa];
 
-          //cout << bb << '\t' << aa << '\t' << lme->IsActive() << endl;
+          //cout << bb << '\t' << aa << '\t' << lme->isActive() << endl;
 
           nr1 = lme->pointNums.size();
           tt1 =  &(lme->pointNums[0]);
 
-          if( lme->IsActive() )
+          if( lme->isActive() )
           {
             for(gp=0;gp<nGauss;gp++)
             {
@@ -848,7 +848,7 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
               nd2 = elems[elnum];
 
-              nr2  =  nd2->GetNsize();
+              nr2  =  nd2->getNsize2();
               tt2  =  &(nd2->forAssyVec[0]);
 
               for(ii=0; ii<nr1; ii++)
@@ -1227,7 +1227,7 @@ int  HBSplineCutFEM::prepareMatrixPattern()
       //cout << " nNode_local = " << nNode_local << endl;
 
       for(e1=0; e1<nElem; e1++)
-        elems[activeElements[e1]]->set_subdomain_id(epart[e1]);
+        elems[activeElements[e1]]->setSubdomainId(epart[e1]);
 
 
       std::vector<std::vector<int> >  locally_owned_nodes_total;
@@ -1303,7 +1303,7 @@ int  HBSplineCutFEM::prepareMatrixPattern()
       for(e1=0; e1<nElem; e1++)
       {
         ee = activeElements[e1];
-        //if(elems[ee]->get_subdomain_id() == this_mpi_proc)
+        //if(elems[ee]->getSubdomainId() == this_mpi_proc)
         //{
           for(ii=0; ii<elems[ee]->GlobalBasisFuncs.size(); ii++)
           {
@@ -1338,7 +1338,7 @@ int  HBSplineCutFEM::prepareMatrixPattern()
     {
         nd1 = elems[activeElements[ee]];
 
-        val1 =  nd1->GetNsize();
+        val1 =  nd1->getNsize2();
         tt1  =  &(nd1->forAssyVec[0]);
 
         if( nd1->domNums[0] == 0 )
@@ -1353,13 +1353,13 @@ int  HBSplineCutFEM::prepareMatrixPattern()
         }
 
       // connectivity for ghost-penalty terms
-      if( nd1->IsCutElement() )
+      if( nd1->isCutElement() )
       {
         for(side=0; side<NUM_NEIGHBOURS; side++)
         {
-          nd2 = nd1->GetNeighbour(side);
+          nd2 = nd1->getNeighbour(side);
 
-          if( (nd2 != NULL) && !(nd2->IsGhost()) && nd2->IsLeaf() && (nd2->IsCutElement() || nd2->domNums[0] == 0) )
+          if( (nd2 != NULL) && !(nd2->isGhost()) && nd2->isLeaf() && (nd2->isCutElement() || nd2->domNums[0] == 0) )
           {
               nr1 = nd1->forAssyVec.size();
               nr2 = nd2->forAssyVec.size();
@@ -1378,7 +1378,7 @@ int  HBSplineCutFEM::prepareMatrixPattern()
               } // for(ii=0; ii<nr1; ii++)
           }
         } //for(side=0; side<NUM_NEIGHBOURS; side++)
-      } //if( nd1->IsCutElement() )
+      } //if( nd1->isCutElement() )
     } // for(e=0;e<activeElements.size();e++)
 
     PetscSynchronizedPrintf(MPI_COMM_WORLD, "\n    Global positions DONE for individual domains \n\n");
@@ -1627,7 +1627,7 @@ int HBSplineCutFEM::prepareMatrixPattern()
     {
         nd1 = elems[activeElements[e]];
 
-        val1 =  nd1->GetNsize();
+        val1 =  nd1->getNsize2();
         tt1  =  &(nd1->forAssyVec[0]);
         //cout << e << '\t' << val1 << endl;
 
@@ -1646,13 +1646,13 @@ int HBSplineCutFEM::prepareMatrixPattern()
 
       // connectivity for ghost-penalty terms
 
-      if( nd1->IsCutElement() )
+      if( nd1->isCutElement() )
       {
         for(side=0; side<NUM_NEIGHBOURS; side++)
         {
-          nd2 = nd1->GetNeighbour(side);
+          nd2 = nd1->getNeighbour(side);
 
-          if( (nd2 != NULL) && !(nd2->IsGhost()) && nd2->IsLeaf() && (nd2->IsCutElement() || nd2->domNums[0] == 0) )
+          if( (nd2 != NULL) && !(nd2->isGhost()) && nd2->isLeaf() && (nd2->isCutElement() || nd2->domNums[0] == 0) )
           {
               //cout << " side = " << side << endl;
 
@@ -1673,7 +1673,7 @@ int HBSplineCutFEM::prepareMatrixPattern()
               } // for(ii=0; ii<nr1; ii++)
           }
         } //for(side=0; side<NUM_NEIGHBOURS; side++)
-      } //if( nd1->IsCutElement() )
+      } //if( nd1->isCutElement() )
       //
     } // for(e=0;e<activeElements.size();e++)
 
@@ -1743,7 +1743,7 @@ int HBSplineCutFEM::prepareMatrixPattern()
       {
           nd1 = elems[activeElements[e]];
 
-          if( nd1->IsCutElement() )
+          if( nd1->isCutElement() )
           {
               nr2 = nd1->forAssyVec.size();
               tt2 = &(nd1->forAssyVec[0]);
@@ -1762,7 +1762,7 @@ int HBSplineCutFEM::prepareMatrixPattern()
               
                 DDconn[r].push_back(r);
               } // for(ii=0; ii<nr1; ii++)
-          } //if( nd1->IsCutElement() )
+          } //if( nd1->isCutElement() )
       } // for(e=0;e<activeElements.size();e++)
     } // if(!STAGGERED)
 
@@ -1890,14 +1890,14 @@ void HBSplineCutFEM::prepareMatrixPatternCutFEM()
     {
       ee = activeElements[e];
 
-      val1 =  elems[ee]->GetNsize();
+      val1 =  elems[ee]->getNsize2();
       tt1  =  &(elems[ee]->forAssyVec[0]);
       //cout << e << '\t' << ee << '\t' << val1 << endl;
       //printVector(elems[ee]->forAssyVec);
 
       elems[ee]->findCutElemType();
 
-      if( elems[ee]->IsCutElement() )
+      if( elems[ee]->isCutElement() )
       {
           for(ii=0;ii<val1;ii++)
           {
@@ -1909,10 +1909,10 @@ void HBSplineCutFEM::prepareMatrixPatternCutFEM()
               DDconn2[r].push_back(tt1[jj]);
             }
           }
-      } // if( !elems[ee]->IsCutElement() )
+      } // if( !elems[ee]->isCutElement() )
       else
       {
-        if( elems[ee]->GetDomainNumber() == 0 )
+        if( elems[ee]->getDomainNumber() == 0 )
         {
           for(ii=0;ii<val1;ii++)
           {
@@ -2064,9 +2064,9 @@ void HBSplineCutFEM::prepareMatrixPatternCutFEM()
     {
       ee = activeElements[e];
 
-      if( elems[ee]->IsCutElement() )
+      if( elems[ee]->isCutElement() )
       {
-        val1 =  elems[ee]->GetNsize();
+        val1 =  elems[ee]->getNsize2();
         tt1  =  &(elems[ee]->forAssyVec[0]);
         //cout << e << '\t' << ee << '\t' << val1 << endl;
         //printVector(elems[ee]->forAssyVec);
@@ -2084,7 +2084,7 @@ void HBSplineCutFEM::prepareMatrixPatternCutFEM()
             DDconn[c].push_back(r);
           }
         }
-      } // if( !elems[ee]->IsCutElement() )
+      } // if( !elems[ee]->isCutElement() )
     } //for(e=0;e<activeElements.size();e++)
 
 

@@ -53,10 +53,10 @@ void  HBSplineFEM::ImmersedBoundaryBodyForce1D()
 
             ndtmp = elems[ee];
 
-            knots[0] = ndtmp->GetKnots(0);
+            knots[0] = ndtmp->getKnots(0);
 
-            knotBegin = ndtmp->GetKnotBegin();
-            knotIncr  = ndtmp->GetKnotIncrement();
+            knotBegin = ndtmp->getKnotBegin();
+            knotIncr  = ndtmp->getKnotIncrement();
 
 
             bfs = ndtmp->GlobalBasisFuncs;
@@ -67,7 +67,7 @@ void  HBSplineFEM::ImmersedBoundaryBodyForce1D()
 
             GeomData.computeBasisFunctions1D(knotBegin, knotIncr, param, N, dN_dx, d2N_dx2);
 
-            if(ndtmp->GetParent() == NULL )
+            if(ndtmp->getParent() == NULL )
               NN = N;
             else
             {
@@ -393,8 +393,8 @@ void  HBSplineFEM::ImmersedBoundaryBodyForce2D()
 
             ndtmp = elems[ee];
 
-            knots[0] = ndtmp->GetKnots(0);
-            knots[1] = ndtmp->GetKnots(1);
+            knots[0] = ndtmp->getKnots(0);
+            knots[1] = ndtmp->getKnots(1);
 
             bfs = ndtmp->GlobalBasisFuncs;
 
@@ -406,7 +406,7 @@ void  HBSplineFEM::ImmersedBoundaryBodyForce2D()
 
             FluidSolnData.computeBasisFunctions2D(knots[0][0], knots[1][0], knots[0][2], knots[1][2], param[0], param[1], &N(0));
 
-            if(ndtmp->GetParent() == NULL )
+            if(ndtmp->getParent() == NULL )
               NN = N;
             else
               NN = ndtmp->SubDivMat * N;
@@ -569,15 +569,15 @@ void  HBSplineFEM::applyInterfaceTerms2D()
 
               geometryToParametric(geom, param);
 
-              knots[0] = nd->GetKnots(0);
-              knots[1] = nd->GetKnots(1);
+              knots[0] = nd->getKnots(0);
+              knots[1] = nd->getKnots(1);
 
-              knotBegin = nd->GetKnotBegin();
-              knotIncr  = nd->GetKnotIncrement();
+              knotBegin = nd->getKnotBegin();
+              knotIncr  = nd->getKnotIncrement();
 
               GeomData.computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy);
 
-              if(nd->GetParent() == NULL )
+              if(nd->getParent() == NULL )
               {
                 Nf = NN;
                 dN_dx = dNN_dx;
@@ -872,16 +872,16 @@ void  HBSplineFEM::applyInterfaceTerms3D()
 
               geometryToParametric(geom, param);
 
-              knots[0] = nd->GetKnots(0);
-              knots[1] = nd->GetKnots(1);
-              knots[2] = nd->GetKnots(2);
+              knots[0] = nd->getKnots(0);
+              knots[1] = nd->getKnots(1);
+              knots[2] = nd->getKnots(2);
 
-              knotBegin = nd->GetKnotBegin();
-              knotIncr  = nd->GetKnotIncrement();
+              knotBegin = nd->getKnotBegin();
+              knotIncr  = nd->getKnotIncrement();
 
               GeomData.computeBasisFunctions3D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy, dNN_dz);
 
-              if(nd->GetParent() == NULL )
+              if(nd->getParent() == NULL )
               {
                 Nf = NN;
                 dN_dx = dNN_dx;

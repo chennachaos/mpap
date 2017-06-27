@@ -13,7 +13,9 @@ class  LagrangeElem2DStokesTria3Node : public LagrangeElement
     LagrangeElem2DStokesTria3Node();
 
     virtual ~LagrangeElem2DStokesTria3Node();
-    virtual void  resetMatrixAndVector();
+
+    virtual int getElmTypeNameNum()
+    {  return 11; }
 
     virtual void prepareElemData();
 

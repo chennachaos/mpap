@@ -14,8 +14,9 @@ class  ElementGeomExactBeam2D : public LagrangeElement
     ElementGeomExactBeam2D();
 
     virtual ~ElementGeomExactBeam2D();
-    
-    virtual void  resetMatrixAndVector();
+
+    virtual int getElmTypeNameNum()
+    {  return 4;     }
 
     virtual void prepareElemData();
 

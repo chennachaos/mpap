@@ -93,8 +93,8 @@ void  HBSplineBase::printResultAtPoint(int index, double u1, double v1, double w
     
     outp2.resize(4);
 
-    tmp1 = elems[0]->GetKnots(0);
-    tmp2 = elems[0]->GetKnots(1);
+    tmp1 = elems[0]->getKnots(0);
+    tmp2 = elems[0]->getKnots(1);
 
     incr1 = tmp1[1] - tmp1[0];
     incr2 = tmp2[1] - tmp2[0];

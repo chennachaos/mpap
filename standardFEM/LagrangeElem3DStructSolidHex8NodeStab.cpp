@@ -62,9 +62,6 @@ void LagrangeElem3DStructSolidHex8NodeStab::prepareElemData()
   matId      = SolnData->MatlProp[matType].id + 1;
   finite     = (finiteInt >= 1) ;
 
-  //Klocal.resize(nsize, nsize);
-  //Flocal.resize(nsize);
-  
   return;
 }
 
@@ -75,14 +72,6 @@ void LagrangeElem3DStructSolidHex8NodeStab::prepareElemData2()
   cout << " LagrangeElem3DStructSolidHex8NodeStab::prepareElemData2() " << endl;
   return;
 }
-
-
-
-void LagrangeElem3DStructSolidHex8NodeStab::resetMatrixAndVector()
-{
-  return;
-}
-
 
 
 int LagrangeElem3DStructSolidHex8NodeStab::calcLoadVector()

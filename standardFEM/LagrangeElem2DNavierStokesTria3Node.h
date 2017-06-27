@@ -14,9 +14,10 @@ class  LagrangeElem2DNavierStokesTria3Node : public LagrangeElement
 
     virtual ~LagrangeElem2DNavierStokesTria3Node();
 
-    virtual int calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal);
+    virtual int getElmTypeNameNum()
+    {  return 13; }
 
-    virtual void  resetMatrixAndVector();
+    virtual int calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal);
 
     virtual void prepareElemData();
 

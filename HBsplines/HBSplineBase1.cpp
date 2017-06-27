@@ -229,7 +229,7 @@ void HBSplineBase::prepareInputData()
 
     for(ii=0;ii<DIM;ii++)
     {
-      GeomData.SetDegree(ii, degree[ii]);
+      GeomData.setDegree(ii, degree[ii]);
       GeomData.SetNelem(ii, nelem[ii]);
       GeomData.SetGridLength(ii, gridLEN[ii]);
       GeomData.SetOrigin(ii, origin[ii]);
@@ -238,7 +238,7 @@ void HBSplineBase::prepareInputData()
     GeomData.FluidProps = fluidProps;
     //printVector(GeomData.FluidProps);
 
-    GeomData.SetNDOF(ndf);
+    GeomData.setNdof(ndf);
     GeomData.build();
     
     //cout << " BBBBBBBBBBBBBBB " << endl;
@@ -269,7 +269,7 @@ void HBSplineBase::prepareInputData()
     /*
     for(ee=0;ee<elems.size();ee++)
     {
-      if( !(elems[ee]->IsGhost()) )
+      if( !(elems[ee]->isGhost()) )
       {
         //cout << " uuuuuuuuuuuuu " << endl;
         elems[ee]->calcSubdivisionMatrix();
@@ -419,7 +419,7 @@ void HBSplineBase::prepareInputData()
             for(jj=0;jj<=ii;jj++)
             {
               nodetmp2->LocalBasisFuncs[degree[0]+jj-ii] = val;
-              nodetmp2 = nodetmp2->GetNeighbour(LEFT);
+              nodetmp2 = nodetmp2->getNeighbour(LEFT);
             }
            gridBF1 -= 1;
          }
@@ -440,8 +440,8 @@ void HBSplineBase::prepareInputData()
     tstart = time(0);
     for(ee=0;ee<elems.size();ee++)
     {
-      if( !(elems[ee]->IsGhost()) &&  elems[ee]->IsLeaf() )
-        activeElements.push_back(elems[ee]->GetID());
+      if( !(elems[ee]->isGhost()) &&  elems[ee]->isLeaf() )
+        activeElements.push_back(elems[ee]->getID());
     }
 
     /*
@@ -464,8 +464,8 @@ void HBSplineBase::prepareInputData()
     {
       ee = activeElements[ii];
 
-      //cout << " elems[ee]->IsProcessed() " << '\t' << elems[ee]->GetID() << '\t' << elems[ee]->IsProcessed() << endl;
-      //cout << " elems[ee]->GetID() " << '\t' << elems[ee]->GetID() << '\t' << elems[ee]->GetLevel() << endl;
+      //cout << " elems[ee]->isProcessed() " << '\t' << elems[ee]->getID() << '\t' << elems[ee]->isProcessed() << endl;
+      //cout << " elems[ee]->getID() " << '\t' << elems[ee]->getID() << '\t' << elems[ee]->getLevel() << endl;
       elems[ee]->prepareElemData();
       //cout << " uuuuuuuuuuuuu " << endl;
       elems[ee]->calcSubdivisionMatrix();
@@ -563,12 +563,12 @@ void HBSplineBase::refinementforAdvDiff1D()
       elemsToRefine.clear();
 
       nd2=elems[boundaryNodes[1][0]];
-      elemsToRefine.push_back(nd2->GetID());
+      elemsToRefine.push_back(nd2->getID());
     
       for(ii=0;ii<degree[2];ii++)
       {
-        nd2 = nd2->GetNeighbour(LEFT);
-        elemsToRefine.push_back(nd2->GetID());
+        nd2 = nd2->getNeighbour(LEFT);
+        elemsToRefine.push_back(nd2->getID());
       }
     }
 
@@ -594,17 +594,17 @@ void HBSplineBase::refinementforAdvDiff2D()
       {
           nd = elems[NodeNumsAtLevel[kk][ee]];
           
-          //cout << " nd->GetID() " << nd->GetID() << '\t' << nd->IsGhost() << endl;
+          //cout << " nd->getID() " << nd->getID() << '\t' << nd->isGhost() << endl;
           //nd->printSelf();
-          if(nd->IsLeftBoundary() && nd->IsBottomBoundary())
+          if(nd->isLeftBoundary() && nd->isBottomBoundary())
           {
-             while(!nd->IsGhost())
+             while(!nd->isGhost())
              {
-                //cout << " nd->GetID() " << nd->GetID() << endl;
-                elemsToRefine.push_back(nd->GetID());
-                nd = nd->GetNeighbour(EAST);
-                nd = nd->GetNeighbour(NORTH);
-                //cout << " AAAAAAAAAAAAAAAAAAAAA " << nd->GetID() << '\t' << nd->IsGhost() << endl;
+                //cout << " nd->getID() " << nd->getID() << endl;
+                elemsToRefine.push_back(nd->getID());
+                nd = nd->getNeighbour(EAST);
+                nd = nd->getNeighbour(NORTH);
+                //cout << " AAAAAAAAAAAAAAAAAAAAA " << nd->getID() << '\t' << nd->isGhost() << endl;
              }
           }
        }
@@ -620,43 +620,43 @@ void HBSplineBase::refinementforAdvDiff2D()
          nodes2divide.push_back(elemsToRefine[ii]);
          nd = elems[elemsToRefine[ii]];
    
-         //cout << nd->GetID() << endl;
+         //cout << nd->getID() << endl;
    
-         nd1 = nd->GetNeighbour(WEST);
+         nd1 = nd->getNeighbour(WEST);
          if(nd1 != NULL)
          {
-            nodes2divide.push_back(nd1->GetID());
+            nodes2divide.push_back(nd1->getID());
 
-            nd2 = nd1->GetNeighbour(NORTH);
+            nd2 = nd1->getNeighbour(NORTH);
             if(nd2 != NULL)
-              nodes2divide.push_back(nd2->GetID());
+              nodes2divide.push_back(nd2->getID());
 
-            nd2 = nd1->GetNeighbour(SOUTH);
+            nd2 = nd1->getNeighbour(SOUTH);
             if(nd2 != NULL)
-              nodes2divide.push_back(nd2->GetID());
+              nodes2divide.push_back(nd2->getID());
          }
 
-         nd1 = nd->GetNeighbour(EAST);
+         nd1 = nd->getNeighbour(EAST);
          if(nd1 != NULL)
          {
-           nodes2divide.push_back(nd1->GetID());
+           nodes2divide.push_back(nd1->getID());
 
-           nd2 = nd1->GetNeighbour(NORTH);
+           nd2 = nd1->getNeighbour(NORTH);
            if(nd2 != NULL)
-             nodes2divide.push_back(nd2->GetID());
+             nodes2divide.push_back(nd2->getID());
 
-           nd2 = nd1->GetNeighbour(SOUTH);
+           nd2 = nd1->getNeighbour(SOUTH);
            if(nd2 != NULL)
-             nodes2divide.push_back(nd2->GetID());
+             nodes2divide.push_back(nd2->getID());
          }
 
-         nd1 = nd->GetNeighbour(NORTH);
+         nd1 = nd->getNeighbour(NORTH);
          if(nd1 != NULL)
-           nodes2divide.push_back(nd1->GetID());
+           nodes2divide.push_back(nd1->getID());
    
-         nd1 = nd->GetNeighbour(SOUTH);
+         nd1 = nd->getNeighbour(SOUTH);
          if(nd1 != NULL)
-           nodes2divide.push_back(nd1->GetID());
+           nodes2divide.push_back(nd1->getID());
        }
 
       findUnique(nodes2divide);
@@ -684,7 +684,7 @@ void HBSplineBase::LimitBasedRefinement(int kk)
         {
           nd = elems[NodeNumsAtLevel[kk][ee]];
 
-          tmp1 = nd->GetKnots(Dir1);
+          tmp1 = nd->getKnots(Dir1);
 
           param[0] = tmp1[0];
           ComputeGeometry(param, geom);
@@ -695,7 +695,7 @@ void HBSplineBase::LimitBasedRefinement(int kk)
             if(refineLimitVals[mm][0] == (kk+1))
             {
               if( (geom[0] >= refineLimitVals[mm][1] && geom[0] <= refineLimitVals[mm][2]) )
-                elemsToRefine.push_back(nd->GetID());
+                elemsToRefine.push_back(nd->getID());
             }
           }
         }
@@ -706,8 +706,8 @@ void HBSplineBase::LimitBasedRefinement(int kk)
         {
           nd = elems[NodeNumsAtLevel[kk][ee]];
 
-          tmp1 = nd->GetKnots(Dir1);
-          tmp2 = nd->GetKnots(Dir2);
+          tmp1 = nd->getKnots(Dir1);
+          tmp2 = nd->getKnots(Dir2);
 
           param[0] = tmp1[0];  param[1] = tmp2[0];
           ComputeGeometry(param, geom);
@@ -718,8 +718,8 @@ void HBSplineBase::LimitBasedRefinement(int kk)
             {
               if( (geom[0] >= refineLimitVals[mm][1] && geom[0] <= refineLimitVals[mm][2]) && (geom[1] >= refineLimitVals[mm][3] && geom[1] < refineLimitVals[mm][4]) )
               {
-               // printf("xx = %12.6f, yy = %12.6f, zz = %12.6f, cell = %5d, \n", geom[0], geom[1], geom[2], nd->GetID());
-                elemsToRefine.push_back(nd->GetID());
+               // printf("xx = %12.6f, yy = %12.6f, zz = %12.6f, cell = %5d, \n", geom[0], geom[1], geom[2], nd->getID());
+                elemsToRefine.push_back(nd->getID());
               }
             }
           }
@@ -731,11 +731,11 @@ void HBSplineBase::LimitBasedRefinement(int kk)
         {
           nd = elems[NodeNumsAtLevel[kk][ee]];
 
-          if(!nd->IsGhost())
+          if(!nd->isGhost())
           {
-            tmp1 = nd->GetKnots(Dir1);
-            tmp2 = nd->GetKnots(Dir2);
-            tmp3 = nd->GetKnots(Dir3);
+            tmp1 = nd->getKnots(Dir1);
+            tmp2 = nd->getKnots(Dir2);
+            tmp3 = nd->getKnots(Dir3);
 
             param[0] = 0.5*(tmp1[0]+tmp1[1]);  param[1] = 0.5*(tmp2[0]+tmp2[1]);  param[2] = 0.5*(tmp3[0]+tmp3[1]);
             ComputeGeometry(param, geom);
@@ -756,8 +756,8 @@ void HBSplineBase::LimitBasedRefinement(int kk)
                 {
                   //printf("%12.6f \t %12.6f \t %12.6f \t %12.6f \t %12.6f \t %12.6f \n", tmp1[0], tmp1[1], tmp2[0], tmp2[1], tmp3[0], tmp3[1]);
                   //printf("%12.6f \t %12.6f \t %12.6f \t %12.6f \t %12.6f \t %12.6f \n", val[0], val[1], val[2], val[3], val[4], val[5]);
-                  //printf("xx = %12.6f, yy = %12.6f, zz = %12.6f, cell = %5d, \n", geom[0], geom[1], geom[2], nd->GetID());
-                  elemsToRefine.push_back(nd->GetID());
+                  //printf("xx = %12.6f, yy = %12.6f, zz = %12.6f, cell = %5d, \n", geom[0], geom[1], geom[2], nd->getID());
+                  elemsToRefine.push_back(nd->getID());
                 }
               }
             }
@@ -804,23 +804,23 @@ void  HBSplineBase::addNeighbourElements2D(int depth)
 
        nd = elems[elemsToRefine[ii]];
    
-       //cout << nd->GetID() << endl;
+       //cout << nd->getID() << endl;
 
        nd4=nd;
        for(bb=0;bb<depth;bb++)
        {
-          nd4 = nd4->GetNeighbour(NORTH);
+          nd4 = nd4->getNeighbour(NORTH);
           if(nd4 != NULL)
-            nodes2divide.push_back(nd4->GetID());
+            nodes2divide.push_back(nd4->getID());
           else
             break;
        }
        nd4=nd;
        for(bb=0;bb<depth;bb++)
        {
-          nd4 = nd4->GetNeighbour(SOUTH);
+          nd4 = nd4->getNeighbour(SOUTH);
           if(nd4 != NULL)
-            nodes2divide.push_back(nd4->GetID());
+            nodes2divide.push_back(nd4->getID());
           else
             break;
        }
@@ -833,30 +833,30 @@ void  HBSplineBase::addNeighbourElements2D(int depth)
           {
             if(cc==0)
             {
-              nd1 = nd1->GetNeighbour(EAST);
+              nd1 = nd1->getNeighbour(EAST);
               nd3 = nd1;
             }
             if(cc==1)
             {
-              nd2 = nd2->GetNeighbour(WEST);
+              nd2 = nd2->getNeighbour(WEST);
               nd3 = nd2;
             }
 
             nd4=nd3;
             for(bb=0;bb<depth;bb++)
             {
-              nd4 = nd4->GetNeighbour(NORTH);
+              nd4 = nd4->getNeighbour(NORTH);
               if(nd4 != NULL)
-                nodes2divide.push_back(nd4->GetID());
+                nodes2divide.push_back(nd4->getID());
               else
                 break;
             }
             nd4=nd3;
             for(bb=0;bb<depth;bb++)
             {
-              nd4 = nd4->GetNeighbour(SOUTH);
+              nd4 = nd4->getNeighbour(SOUTH);
               if(nd4 != NULL)
-                nodes2divide.push_back(nd4->GetID());
+                nodes2divide.push_back(nd4->getID());
               else
                 break;
             }
@@ -887,21 +887,21 @@ void  HBSplineBase::addNeighbourElements3D(int depth)
 
        nd = elems[elemsToRefine[ee]];
    
-       //cout << nd->GetID() << endl;
+       //cout << nd->getID() << endl;
 
        nd1=nd;
        aa=0;bb=0;cc=0;
        for(jj=0;jj<depth;jj++)
        {
-         nd1 = nd1->GetNeighbour(BACK);
+         nd1 = nd1->getNeighbour(BACK);
          if(nd1 != NULL)
          {
            cc++;
-           nd1 = nd1->GetNeighbour(SOUTH);
+           nd1 = nd1->getNeighbour(SOUTH);
            if(nd1 != NULL)
            {
              bb++;
-             nd1 = nd1->GetNeighbour(WEST);
+             nd1 = nd1->getNeighbour(WEST);
              if(nd1 != NULL)
                aa++;
              else
@@ -927,9 +927,9 @@ void  HBSplineBase::addNeighbourElements3D(int depth)
                nd4 = nd3;
                for(ii=0;ii<=(depth+aa);ii++)
                {
-                 nd4 = nd4->GetNeighbour(EAST);
+                 nd4 = nd4->getNeighbour(EAST);
                  if(nd4 != NULL)
-                   nodes2divide.push_back(nd4->GetID());
+                   nodes2divide.push_back(nd4->getID());
                  else
                    break;
                }
@@ -937,13 +937,13 @@ void  HBSplineBase::addNeighbourElements3D(int depth)
              else
                break;
 
-             nd3 = nd3->GetNeighbour(NORTH);
+             nd3 = nd3->getNeighbour(NORTH);
            }
          }
          else
            break;
 
-         nd2 = nd2->GetNeighbour(FRONT);
+         nd2 = nd2->getNeighbour(FRONT);
        }
     }
 
@@ -981,21 +981,21 @@ void HBSplineBase::PointBasedRefinement(int kk)
 
         //printf("xx = %12.6f, yy = %12.6f, zz = %12.6f, cell = %5d, \n", geom[0], geom[1], geom[2], cc);
 
-        if(!nd->IsGhost())
+        if(!nd->isGhost())
         {
-          elemsToRefine.push_back(nd->GetID());
+          elemsToRefine.push_back(nd->getID());
 
           /*
           if(bb == 1)
           {
-            nd1 = nd->GetNeighbour(NORTH);
-            nd2 = nd->GetNeighbour(SOUTH);
+            nd1 = nd->getNeighbour(NORTH);
+            nd2 = nd->getNeighbour(SOUTH);
             for(ll=0;ll<4;ll++)
             {
-              elemsToRefine.push_back(nd1->GetID());
-              elemsToRefine.push_back(nd2->GetID());
-              nd1 = nd1->GetNeighbour(NORTH);
-              nd2 = nd2->GetNeighbour(SOUTH);
+              elemsToRefine.push_back(nd1->getID());
+              elemsToRefine.push_back(nd2->getID());
+              nd1 = nd1->getNeighbour(NORTH);
+              nd2 = nd2->getNeighbour(SOUTH);
             }
           }
           */
@@ -1044,11 +1044,11 @@ void  HBSplineBase::Refine(int kk)
        {
           nd = elems[NodeNumsAtLevel[CURRENT_LEVEL][ee]];
 
-          if(!nd->IsGhost())
+          if(!nd->isGhost())
           {
 
-          tmp1 = nd->GetKnots(Dir1);
-          tmp2 = nd->GetKnots(Dir2);
+          tmp1 = nd->getKnots(Dir1);
+          tmp2 = nd->getKnots(Dir2);
           
           //cout << tmp1[0] << '\t' << tmp1[1] << '\t' << tmp2[0] << '\t' << tmp2[1] << endl;
 
@@ -1081,7 +1081,7 @@ void  HBSplineBase::Refine(int kk)
           //cout << ee << '\t' << f1 << '\t' << f2 << '\t' << f3 << '\t' << f4 << endl;
 
           //if( (f1 || f2 || f3 || f4) && !(f1 && f2 && f3 && f4))
-            //elemsToRefine.push_back(nd->GetID());
+            //elemsToRefine.push_back(nd->getID());
 
           /*
           ComputeGeometry2D(tmp1[0], tmp2[0], val);
@@ -1101,7 +1101,7 @@ void  HBSplineBase::Refine(int kk)
           //f4 = (f4 || profile4.checkPointLocation(val[0], val[1]));
 
           if( (f1 || f2 || f3 || f4) && !(f1 && f2 && f3 && f4))
-            elemsToRefine.push_back(nd->GetID());
+            elemsToRefine.push_back(nd->getID());
           */
 
           //
@@ -1126,7 +1126,7 @@ void  HBSplineBase::Refine(int kk)
           f4 = profile.checkPointLocation(geom[0], geom[1]);
 
           if( (f1 || f2 || f3 || f4) && !(f1 && f2 && f3 && f4))
-            elemsToRefine.push_back(nd->GetID());
+            elemsToRefine.push_back(nd->getID());
 
           /*
           ComputeGeometry2D(tmp1[0], tmp2[0], val);
@@ -1142,7 +1142,7 @@ void  HBSplineBase::Refine(int kk)
           f4 = profile5.checkPointLocation(val[0], val[1]);
 
           if( (f1 || f2 || f3 || f4) && !(f1 && f2 && f3 && f4))
-            elemsToRefine.push_back(nd->GetID());
+            elemsToRefine.push_back(nd->getID());
           */
 
           /*
@@ -1159,7 +1159,7 @@ void  HBSplineBase::Refine(int kk)
           f4 = profile6.checkPointLocation(val[0], val[1]);
 
           if( (f1 || f2 || f3 || f4) && !(f1 && f2 && f3 && f4))
-            elemsToRefine.push_back(nd->GetID());
+            elemsToRefine.push_back(nd->getID());
           */
         }
        }
@@ -1280,7 +1280,7 @@ void  HBSplineBase::createImmersedBoundaryPoints()
 
         //bpoint->SolnData = &(SolnData);
 
-        //bpoint->Setndof2(IBDOF);
+        //bpoint->setNdof2(IBDOF);
 
         bpoint->findElements();
 
@@ -1342,12 +1342,12 @@ void HBSplineBase::ProcessBoundaryConditionsRefinedLevels()
       {
         nd = elems[boundaryNodes[bb][aa]];
 
-        if(nd->IsLeaf())
-          bnodes.push_back(nd->GetID());
+        if(nd->isLeaf())
+          bnodes.push_back(nd->getID());
         else
         {
           for(ii=0;ii<ind;ii++)
-            bnodes.push_back(nd->GetChild(tmpvec[bb][ii])->GetID());
+            bnodes.push_back(nd->getChild(tmpvec[bb][ii])->getID());
         }
       }
       findUnique(bnodes);

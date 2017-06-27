@@ -52,19 +52,19 @@ class ImmersedIntegrationElement
 
         ~ImmersedIntegrationElement();
 
-        int GetID()
+        int getID()
         {  return id; }
 
-        static int  GetCount()
+        static int  getCount()
         { return pointcount; }
 
         void SetDimension(int dd)
         {  DIM = dd; return;  }
 
-        int GetDimension()
+        int getDimension()
         {  return DIM;  }
 
-        bool IsActive()
+        bool isActive()
         {  return (IS_ACTIVE == true);  }
 
         void TurnIsActiveON()
@@ -93,9 +93,9 @@ class ImmersedIntegrationElement
 
         void  calcStiffnessAndResidual(int ind1=0, int ind2=0, double inp1=0.0, double inp2=0.0);
 
-        void  AssembleElementMatrix(int, SparseMatrixXd&);
+        void  assembleElementMatrix(int, SparseMatrixXd&);
 
-        void  AssembleElementVector(int ind, bool flag, double* rhs);
+        void  assembleElementVector(int ind, bool flag, double* rhs);
 
         void  AssembleMatrixAndVector(int, SparseMatrixXd&, double*);
 

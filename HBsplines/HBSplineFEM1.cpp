@@ -778,12 +778,12 @@ void HBSplineFEM::prepareInputData()
       {
         lme = ImmersedBodyObjects[bb]->ImmIntgElems[aa];
 
-        //cout << bb << '\t' << aa << '\t' << lme->IsActive() << '\t' << lme->gausspoints.size() << endl;
+        //cout << bb << '\t' << aa << '\t' << lme->isActive() << '\t' << lme->gausspoints.size() << endl;
 
         lme->SolnData = &(SolnData);
         lme->GeomDataHBS = &(GeomData);
 
-        if( lme->IsActive() )
+        if( lme->isActive() )
         {
         //lme->elem.resize(lme->gausspoints.size());
         for(gp=0;gp<lme->gausspoints.size();gp++)

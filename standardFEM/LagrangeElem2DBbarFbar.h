@@ -14,7 +14,11 @@ class  LagrangeElem2DBbarFbar : public LagrangeElement
 
     virtual ~LagrangeElem2DBbarFbar();
 
+    virtual int getElmTypeNameNum()
+    {  return 10; }
+
     virtual  void prepareElemData();
+
     virtual  void prepareElemData2();
 
     virtual int calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal);

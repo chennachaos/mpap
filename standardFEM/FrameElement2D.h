@@ -14,7 +14,8 @@ class  FrameElement2D : public LagrangeElement
 
     virtual ~FrameElement2D();
 
-    virtual void  resetMatrixAndVector();
+    virtual int getElmTypeNameNum()
+    {  return 2; }
 
     virtual void prepareElemData();
 
@@ -33,7 +34,6 @@ class  FrameElement2D : public LagrangeElement
     virtual int calcInternalForces();
 
     virtual int calcLoadVector();
-
 
     virtual int calcOutput(double u1, double v1);
 

@@ -58,12 +58,12 @@ void HBSplineFEM::plotGeom1D(int val1, bool flag2, int col, bool PLOT_KNOT_LINES
 
     for(ii=0;ii<elems.size();ii++)
     {
-       //if( elems[ii]->IsLeaf() && !(elems[ii]->IsGhost()) &&  elems[ii]->IsActive())
-       if( elems[ii]->IsActive() )
+       //if( elems[ii]->isLeaf() && !(elems[ii]->isGhost()) &&  elems[ii]->isActive())
+       if( elems[ii]->isActive() )
        {
-          //cout << " Node # " << elems[ii]->GetID() << '\t' << elems[ii]->IsLeaf() << '\t' << elems[ii]->IsGhost() << endl;
+          //cout << " Node # " << elems[ii]->getID() << '\t' << elems[ii]->isLeaf() << '\t' << elems[ii]->isGhost() << endl;
 
-          tmp = elems[ii]->GetKnots(0);
+          tmp = elems[ii]->getKnots(0);
 
           param[0] = tmp[0];
           ComputeGeometry(param, geom);
@@ -104,12 +104,12 @@ void HBSplineFEM::plotGeom2D(int val1, bool flag2, int col, bool PLOT_KNOT_LINES
 
     for(ee=0;ee<elems.size();ee++)
     {
-       //cout << " Node # " << elems[ee]->GetID() << '\t' << elems[ee]->IsLeaf() << endl;
-       if( elems[ee]->IsLeaf() && !(elems[ee]->IsGhost()) )
-       //if( elems[ee]->IsLeaf() )
+       //cout << " Node # " << elems[ee]->getID() << '\t' << elems[ee]->isLeaf() << endl;
+       if( elems[ee]->isLeaf() && !(elems[ee]->isGhost()) )
+       //if( elems[ee]->isLeaf() )
        {
-          tmp1 = elems[ee]->GetKnots(Dir1);
-          tmp2 = elems[ee]->GetKnots(Dir2);
+          tmp1 = elems[ee]->getKnots(Dir1);
+          tmp2 = elems[ee]->getKnots(Dir2);
           
           //cout << tmp1[0] << '\t' << tmp1[1] << '\t' << tmp2[0] << '\t' << tmp2[1] << endl;
 
@@ -129,7 +129,7 @@ void HBSplineFEM::plotGeom2D(int val1, bool flag2, int col, bool PLOT_KNOT_LINES
              quadVTK->GetPointIds()->SetId(ll, pt[ll]);
 
           //cellDataVTK->InsertNextValue(typetemp);
-          //cellDataVTK2->InsertNextValue(elems[ee]->IsGhost());
+          //cellDataVTK2->InsertNextValue(elems[ee]->isGhost());
 
           uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
        }
@@ -153,13 +153,13 @@ void HBSplineFEM::plotGeom3D(int val1, bool flag2, int col, bool PLOT_KNOT_LINES
 
     for(ee=0;ee<elems.size();ee++)
     {
-       //cout << " Node # " << elems[ee]->GetID() << '\t' << elems[ee]->IsLeaf() << endl;
-       if( elems[ee]->IsLeaf() && !(elems[ee]->IsGhost()) )
+       //cout << " Node # " << elems[ee]->getID() << '\t' << elems[ee]->isLeaf() << endl;
+       if( elems[ee]->isLeaf() && !(elems[ee]->isGhost()) )
        {
           //elems[ee]->printSelf();
-          tmp1 = elems[ee]->GetKnots(Dir1);
-          tmp2 = elems[ee]->GetKnots(Dir2);
-          tmp3 = elems[ee]->GetKnots(Dir3);
+          tmp1 = elems[ee]->getKnots(Dir1);
+          tmp2 = elems[ee]->getKnots(Dir2);
+          tmp3 = elems[ee]->getKnots(Dir3);
           
           //cout << tmp1[0] << '\t' << tmp1[1] << '\t' << tmp2[0] << '\t' << tmp2[1] << '\t' << tmp3[0] << '\t' << tmp3[1]<< endl;
 
@@ -183,7 +183,7 @@ void HBSplineFEM::plotGeom3D(int val1, bool flag2, int col, bool PLOT_KNOT_LINES
           for(ll=0;ll<8;ll++)
             hexVTK->GetPointIds()->SetId(ll, pt[ll]);
           
-          cellDataVTK->InsertNextValue(elems[ee]->GetLevel());
+          cellDataVTK->InsertNextValue(elems[ee]->getLevel());
           
           uGridVTK->InsertNextCell(hexVTK->GetCellType(), hexVTK->GetPointIds());
        }
@@ -273,7 +273,7 @@ void  HBSplineFEM::createPostProcessGrid2D(int vartype, int vardir, int nCol, bo
     globalK2 *= 0.0;
     for(e=0;e<activeElements.size();e++)
     {
-       //cout << elems[ee]->GetID() << endl;
+       //cout << elems[ee]->getID() << endl;
        elems[activeElements[e]]->MatrixToMapResult(1,1, globalK2);
     }
     
@@ -295,10 +295,10 @@ void  HBSplineFEM::createPostProcessGrid2D(int vartype, int vardir, int nCol, bo
        ee = activeElements[e];
 
            nd1 = elems[ee];
-           //cout << " Node # " << nd1->GetID() << endl;
+           //cout << " Node # " << nd1->getID() << endl;
 
-           tmp1 = nd1->GetKnots(0);
-           tmp2 = nd1->GetKnots(1);
+           tmp1 = nd1->getKnots(0);
+           tmp2 = nd1->getKnots(1);
 
            //printf("\t tmp[0] and tmp[1]  ... : %12.8f\t%12.8f\n", tmp[0], tmp[1] );
                
@@ -454,13 +454,13 @@ void  HBSplineFEM::postProcess1D(int vartype, int vardir, int nCol, bool umnxfla
 
     while(nd1 != NULL)
     {
-       //cout << " Node # " << nd1->GetID() << '\t' << nd1->IsGhost() << '\t' << nd1->IsLeaf() << endl;
-       if( !(nd1->IsGhost()) &&  nd1->IsLeaf() )
+       //cout << " Node # " << nd1->getID() << '\t' << nd1->isGhost() << '\t' << nd1->isLeaf() << endl;
+       if( !(nd1->isGhost()) &&  nd1->isLeaf() )
        {
-           tmp = nd1->GetKnots(0);
+           tmp = nd1->getKnots(0);
 
-           knotBegin = nd1->GetKnotBegin();
-           knotIncr  = nd1->GetKnotIncrement();
+           knotBegin = nd1->getKnotBegin();
+           knotIncr  = nd1->getKnotIncrement();
            //printf("\t tmp[0] and tmp[1]  ... : %12.8f\t%12.8f\n", tmp[0], tmp[1] );
                
            fact = (tmp[1] - tmp[0])/resln[0];
@@ -486,7 +486,7 @@ void  HBSplineFEM::postProcess1D(int vartype, int vardir, int nCol, bool umnxfla
                  param[0] = uu[kk];
                  GeomData.computeBasisFunctions1D(knotBegin, knotIncr, param, NN, dNN_dx, d2NN_dx2);
                  
-                 if(nd1->GetParent() == NULL)
+                 if(nd1->getParent() == NULL)
                  {
                    N = NN;
                    dN_dx = dNN_dx;
@@ -510,15 +510,15 @@ void  HBSplineFEM::postProcess1D(int vartype, int vardir, int nCol, bool umnxfla
                  outp3.push_back(analy.computeValue(0, uu[kk], 0.0));
               }
 
-          while(nd1->GetNeighbour(RIGHT) == NULL  && (nd1->GetLevel() > 0) )
+          while(nd1->getNeighbour(RIGHT) == NULL  && (nd1->getLevel() > 0) )
           {
-            nd1 = nd1->GetParent();
+            nd1 = nd1->getParent();
           }
-          nd1 = nd1->GetNeighbour(RIGHT);
+          nd1 = nd1->getNeighbour(RIGHT);
        }
-       else if( !(nd1->IsLeaf()) )
+       else if( !(nd1->isLeaf()) )
        {
-            nd1 = nd1->GetChild(LEFT);
+            nd1 = nd1->getChild(LEFT);
        }
        else
          nd1 = NULL;
@@ -637,13 +637,13 @@ void  HBSplineFEM::postProcess2D(int vartype, int vardir, int nCol, bool umnxfla
     for(e=0;e<activeElements.size();e++)
     {
            nd1 = elems[activeElements[e]];
-           //cout << " Node # " << nd1->GetID() << endl;
+           //cout << " Node # " << nd1->getID() << endl;
 
-           tmp1 = nd1->GetKnots(0);
-           tmp2 = nd1->GetKnots(1);
+           tmp1 = nd1->getKnots(0);
+           tmp2 = nd1->getKnots(1);
 
-           knotBegin = nd1->GetKnotBegin();
-           knotIncr  = nd1->GetKnotIncrement();
+           knotBegin = nd1->getKnotBegin();
+           knotIncr  = nd1->getKnotIncrement();
            //printf("\t tmp[0] and tmp[1]  ... : %12.8f\t%12.8f\n", tmp[0], tmp[1] );
                
            fact = (tmp1[1] - tmp1[0])/resln[0];
@@ -668,7 +668,7 @@ void  HBSplineFEM::postProcess2D(int vartype, int vardir, int nCol, bool umnxfla
                  param[0] = uu[ii];
                  GeomData.computeBasisFunctions2D(knotBegin, knotIncr, param, NN);
 
-                 if(nd1->GetParent() == NULL)
+                 if(nd1->getParent() == NULL)
                    N = NN;
                  else
                    N = nd1->SubDivMat*NN;
@@ -707,13 +707,13 @@ void  HBSplineFEM::postProcess2D(int vartype, int vardir, int nCol, bool umnxfla
     for(e=0;e<activeElements.size();e++)
     {
            nd1 = elems[activeElements[e]];
-           //cout << " Node # " << nd1->GetID() << endl;
+           //cout << " Node # " << nd1->getID() << endl;
 
-           tmp1 = nd1->GetKnots(0);
-           tmp2 = nd1->GetKnots(1);
+           tmp1 = nd1->getKnots(0);
+           tmp2 = nd1->getKnots(1);
 
-           knotBegin = nd1->GetKnotBegin();
-           knotIncr  = nd1->GetKnotIncrement();
+           knotBegin = nd1->getKnotBegin();
+           knotIncr  = nd1->getKnotIncrement();
            //printf("\t tmp[0] and tmp[1]  ... : %12.8f\t%12.8f\n", tmp1[0], tmp1[1] );
                
            fact = (tmp1[1] - tmp1[0])/resln[0];
@@ -736,7 +736,7 @@ void  HBSplineFEM::postProcess2D(int vartype, int vardir, int nCol, bool umnxfla
                  param[0] = uu[ii];
                  GeomData.computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy);
 
-                 if(nd1->GetParent() == NULL)
+                 if(nd1->getParent() == NULL)
                  {
                    N = NN;
                    dN_dx = dNN_dx;
@@ -875,9 +875,9 @@ void  HBSplineFEM::createPostProcessGrid3D(int vartype, int vardir, int nCol, bo
     {
            nd1 = elems[activeElements[e]];
 
-           tmp1 = nd1->GetKnots(0);
-           tmp2 = nd1->GetKnots(1);
-           tmp3 = nd1->GetKnots(2);
+           tmp1 = nd1->getKnots(0);
+           tmp2 = nd1->getKnots(1);
+           tmp3 = nd1->getKnots(2);
 
            //printf("\t tmp[0] and tmp[1]  ... : %12.8f\t%12.8f\n", tmp[0], tmp[1] );
                
@@ -1059,14 +1059,14 @@ void  HBSplineFEM::postProcess3D(int vartype, int vardir, int nCol, bool umnxfla
     {
            nd1 = elems[activeElements[e]];
 
-           //cout << " Node # " << nd1->GetID() << endl;
+           //cout << " Node # " << nd1->getID() << endl;
 
-           tmp1 = nd1->GetKnots(0);
-           tmp2 = nd1->GetKnots(1);
-           tmp3 = nd1->GetKnots(2);
+           tmp1 = nd1->getKnots(0);
+           tmp2 = nd1->getKnots(1);
+           tmp3 = nd1->getKnots(2);
 
-           knotBegin = nd1->GetKnotBegin();
-           knotIncr  = nd1->GetKnotIncrement();
+           knotBegin = nd1->getKnotBegin();
+           knotIncr  = nd1->getKnotIncrement();
            //printf("\t tmp[0] and tmp[1]  ... : %12.8f\t%12.8f\n", tmp[0], tmp[1] );
                
            fact = (tmp1[1] - tmp1[0])/resln[0];
@@ -1099,7 +1099,7 @@ void  HBSplineFEM::postProcess3D(int vartype, int vardir, int nCol, bool umnxfla
                  param[0] = uu[ii];
                  GeomData.computeBasisFunctions3D(knotBegin, knotIncr, param, NN);
 
-                 if(nd1->GetParent() == NULL)
+                 if(nd1->getParent() == NULL)
                    N = NN;
                  else
                    N = nd1->SubDivMat*NN;
@@ -1139,14 +1139,14 @@ void  HBSplineFEM::postProcess3D(int vartype, int vardir, int nCol, bool umnxfla
     {
            nd1 = elems[activeElements[e]];
 
-           //cout << " Node # " << nd1->GetID() << endl;
+           //cout << " Node # " << nd1->getID() << endl;
 
-           tmp1 = nd1->GetKnots(0);
-           tmp2 = nd1->GetKnots(1);
-           tmp3 = nd1->GetKnots(2);
+           tmp1 = nd1->getKnots(0);
+           tmp2 = nd1->getKnots(1);
+           tmp3 = nd1->getKnots(2);
 
-           knotBegin = nd1->GetKnotBegin();
-           knotIncr  = nd1->GetKnotIncrement();
+           knotBegin = nd1->getKnotBegin();
+           knotIncr  = nd1->getKnotIncrement();
            //printf("\t tmp[0] and tmp[1]  ... : %12.8f\t%12.8f\n", tmp[0], tmp[1] );
                
            fact = (tmp1[1] - tmp1[0])/resln[0];
@@ -1178,7 +1178,7 @@ void  HBSplineFEM::postProcess3D(int vartype, int vardir, int nCol, bool umnxfla
                  param[0] = uu[ii];
                  GeomData.computeBasisFunctions3D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy, dNN_dz);
 
-                 if(nd1->GetParent() == NULL)
+                 if(nd1->getParent() == NULL)
                  {
                    N = NN;
                    dN_dx = dNN_dx;
@@ -1298,9 +1298,9 @@ void HBSplineFEM::plotGaussPoints()
     {
       nd1 = elems[activeElements[ee]];
 
-          tmp0 = nd1->GetKnots(Dir1);
-          tmp1 = nd1->GetKnots(Dir2);
-          tmp2 = nd1->GetKnots(Dir3);
+          tmp0 = nd1->getKnots(Dir1);
+          tmp1 = nd1->getKnots(Dir2);
+          tmp2 = nd1->getKnots(Dir3);
 
           //getGaussPoints1D(nGP, gausspoints1, gaussweights1);
           //getGaussPoints1D(nGP, gausspoints2, gaussweights2);

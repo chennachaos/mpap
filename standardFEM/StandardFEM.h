@@ -6,17 +6,16 @@
 #include "headersEigen.h"
 #include "util.h"
 #include "Domain.h"
-#include "headersVTK.h"
 #include "GeomDataLagrange.h"
 #include "SolutionData.h"
 
+#include "headersVTK.h"
+
+#include "SolverEigen.h"
+#include "SolverPetsc.h"
 #include <petscmat.h>
 #include <petscksp.h>
 
-//class  SolutionData ;
-//class  GeomDataLagrange;
-class  SolverEigen;
-class  SolverPetsc;
 
 class LagrangeElement;
 class PropertyItem;
@@ -54,7 +53,9 @@ class PropertyItem;
                                     "LagrangeElem3DStructSolidHex8NodeStab", \
                                     "MindlinPlateElement", \
                                     "KirchhoffPlateElement", \
-                                    "LagrangeElem3DShellQuad4Node",NULL}
+                                    "LagrangeElem3DShellQuad4Node", \
+                                    "ContactElement2D1nodedContactWithXaxis", \
+                                    "ContactElement2D1nodedContactWithYaxis",NULL}
 
 
 class StandardFEM: public Domain
@@ -153,7 +154,7 @@ class StandardFEM: public Domain
         void SetDimension(int dd)
         {  ndm = DIM = dd;        }
 
-        void SetNDOF(int dd)
+        void setNdof(int dd)
         {  ndf = ndof = dd;        }
 
         void  SetPhysicsTypetoSolid()

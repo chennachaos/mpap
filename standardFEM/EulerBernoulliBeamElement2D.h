@@ -14,7 +14,8 @@ class  EulerBernoulliBeamElement2D : public LagrangeElement
 
     virtual ~EulerBernoulliBeamElement2D();
 
-    virtual void  resetMatrixAndVector();
+    virtual int getElmTypeNameNum()
+    {  return 1;     }
 
     virtual void prepareElemData();
 

@@ -14,7 +14,8 @@ class  LagrangeElem3DShellQuad4Node : public LagrangeElement
 
     virtual ~LagrangeElem3DShellQuad4Node();
 
-    virtual void  resetMatrixAndVector();
+    virtual int getElmTypeNameNum()
+    {  return 32; }
 
     virtual void prepareElemData();
 

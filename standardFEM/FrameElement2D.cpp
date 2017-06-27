@@ -6,13 +6,11 @@
 #include "BasisFunctionsLagrange.h"
 #include "GeomDataLagrange.h"
 #include "SolutionData.h"
-//#include "FunctionsElement.h"
 #include "FunctionsMaterial.h"
 
 
 using namespace std;
 
-//extern ComputerTime       computerTime;
 extern MpapTime mpapTime;
 
 
@@ -68,12 +66,6 @@ void FrameElement2D::prepareElemData2()
     }
   }
   
-  return;
-}
-
-
-void FrameElement2D::resetMatrixAndVector()
-{
   return;
 }
 

@@ -37,21 +37,11 @@ void LagrangeElem2DStokesTria3Node::prepareElemData()
 {
   LagrangeElement::prepareElemData();
 
-//  Klocal.resize(nsize, nsize);
-//  Flocal.resize(nsize);
-
   return;
 }
 
 
 void LagrangeElem2DStokesTria3Node::prepareElemData2()
-{
-  return;
-}
-
-
-
-void LagrangeElem2DStokesTria3Node::resetMatrixAndVector()
 {
   return;
 }

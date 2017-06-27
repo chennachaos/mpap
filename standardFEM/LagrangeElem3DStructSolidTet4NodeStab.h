@@ -14,7 +14,8 @@ class  LagrangeElem3DStructSolidTet4NodeStab : public LagrangeElement
 
     virtual ~LagrangeElem3DStructSolidTet4NodeStab();
 
-    virtual void  resetMatrixAndVector();
+    virtual int getElmTypeNameNum()
+    {  return 28;     }
 
     virtual void prepareElemData();
 

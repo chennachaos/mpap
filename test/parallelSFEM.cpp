@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
     //cout << " llllllllllll " << endl;
     femObject.SetDimension(2);
 
-    femObject.SetNDOF(3);
+    femObject.setNdof(3);
 
     femObject.readFile( infile );
     //cout << " llllllllllll " << endl;

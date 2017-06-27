@@ -14,7 +14,8 @@ class  LagrangeElem2DPoissonTria3Node : public LagrangeElement
 
     virtual ~LagrangeElem2DPoissonTria3Node();
 
-    virtual void  resetMatrixAndVector();
+    virtual int getElmTypeNameNum()
+    {  return 5; }
 
     virtual void  prepareElemData();
 

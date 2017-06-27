@@ -14,7 +14,8 @@ class  ElementGeomExactTruss2D : public LagrangeElement
 
     virtual ~ElementGeomExactTruss2D();
 
-    virtual void  resetMatrixAndVector();
+    virtual int getElmTypeNameNum()
+    {  return 3;     }
 
     virtual void prepareElemData();
 

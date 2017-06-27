@@ -10,7 +10,6 @@
 
 using namespace std;
 
-//extern ComputerTime       computerTime;
 extern MpapTime mpapTime;
 
 
@@ -44,7 +43,6 @@ void LagrangeElem3DShellQuad4Node::prepareElemData()
 
 
 
-
 void LagrangeElem3DShellQuad4Node::prepareElemData2()
 {
   int ii, jj, ind, kk, ind2;
@@ -72,10 +70,6 @@ void LagrangeElem3DShellQuad4Node::prepareElemData2()
 }
 
 
-void LagrangeElem3DShellQuad4Node::resetMatrixAndVector()
-{
-  return;
-}
 
 int LagrangeElem3DShellQuad4Node::calcLoadVector()
 {

@@ -14,7 +14,8 @@ class  MindlinPlateElement : public LagrangeElement
 
     virtual ~MindlinPlateElement();
 
-    virtual void  resetMatrixAndVector();
+    virtual int getElmTypeNameNum()
+    {  return 30;     }
 
     virtual void prepareElemData();
 
@@ -25,7 +26,6 @@ class  MindlinPlateElement : public LagrangeElement
     virtual int calcInternalForces();
 
     virtual int calcLoadVector();
-
 
     virtual int calcOutput(double u1, double v1);
 

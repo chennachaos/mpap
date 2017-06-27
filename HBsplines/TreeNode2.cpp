@@ -15,7 +15,7 @@ extern  MpapTime  mpapTime;
 
 
 template<>
-double TreeNode<1>::GetVolume()
+double TreeNode<1>::getVolume()
 {
   volume = 1.0;
   for(int ii=0; ii<1; ii++)
@@ -26,7 +26,7 @@ double TreeNode<1>::GetVolume()
 
 
 template<>
-double TreeNode<2>::GetVolume()
+double TreeNode<2>::getVolume()
 {
   volume = 1.0;
   for(int ii=0; ii<2; ii++)
@@ -37,7 +37,7 @@ double TreeNode<2>::GetVolume()
 
 
 template<>
-double TreeNode<3>::GetVolume()
+double TreeNode<3>::getVolume()
 {
   volume = 1.0;
   for(int ii=0; ii<3; ii++)
@@ -48,7 +48,7 @@ double TreeNode<3>::GetVolume()
 
 
 template<>
-double TreeNode<1>::GetVolumeGaussPoints(int domTemp)
+double TreeNode<1>::getVolumeGaussPoints(int domTemp)
 {
   volume = 1.0;
   for(int ii=0; ii<1; ii++)
@@ -59,7 +59,7 @@ double TreeNode<1>::GetVolumeGaussPoints(int domTemp)
 
 
 template<>
-double TreeNode<2>::GetVolumeGaussPoints(int domTemp)
+double TreeNode<2>::getVolumeGaussPoints(int domTemp)
 {
   if(domNums.size() > 1)
   {
@@ -81,7 +81,7 @@ double TreeNode<2>::GetVolumeGaussPoints(int domTemp)
 
 
 template<>
-double TreeNode<3>::GetVolumeGaussPoints(int domTemp)
+double TreeNode<3>::getVolumeGaussPoints(int domTemp)
 {
   volume = 1.0;
   for(int ii=0; ii<2; ii++)
@@ -2096,7 +2096,7 @@ void TreeNode<1>::calcSubdivisionMatrix()
              if(nd->LocalBasisFuncs[ii] != -1)
                GlobalBasisFuncs.push_back(nd->LocalBasisFuncs[ii]);
           }
-          nd = nd->GetParent();
+          nd = nd->getParent();
        }
        
        // new number of basis functions
@@ -2112,7 +2112,7 @@ void TreeNode<1>::calcSubdivisionMatrix()
 
        SubDivMat = MatrixXd::Zero(totnlbf2, totnlbf);
        
-       //cout << this->GetID() << '\t' << this->orientation << endl;
+       //cout << this->getID() << '\t' << this->orientation << endl;
 
        if( orientation == LEFT)
           mat = GeomData->coeffLeft;
@@ -2140,13 +2140,13 @@ void TreeNode<1>::calcSubdivisionMatrix()
              }
           }
           
-          //cout << nd->GetID() << '\t' << nd->orientation << endl;
+          //cout << nd->getID() << '\t' << nd->orientation << endl;
           if( nd->orientation == LEFT)
             mat = GeomData->coeffLeft * mat;
           else
             mat = GeomData->coeffRight * mat;
 
-          nd = nd->GetParent();
+          nd = nd->getParent();
        }
        
        //printf("\n\n");
@@ -2215,7 +2215,7 @@ void TreeNode<1>::calcSubdivisionMatrix()
 
       SubDivMat = MatrixXd::Zero(totnlbf2, totnlbf);
        
-      //cout << this->GetID() << '\t' << this->orientation << endl;
+      //cout << this->getID() << '\t' << this->orientation << endl;
 
       if( orientation == LEFT)
         mat = GeomData->coeffLeft;
@@ -2306,7 +2306,7 @@ void TreeNode<1>::calcSubdivisionMatrix()
           if(nd->LocalBasisFuncs[ii] != -1)
             GlobalBasisFuncs.push_back(nd->LocalBasisFuncs[ii]);
         }
-        nd = nd->GetParent();
+        nd = nd->getParent();
       }
       cout << " id " << id << endl;
       cout << " GlobalBasisFuncs.size() " << GlobalBasisFuncs.size() << endl;
@@ -2340,7 +2340,7 @@ void TreeNode<1>::calcSubdivisionMatrix()
           bfstmp.push_back(parent->LocalBasisFuncs[ii]);
       }
 
-      nd = parent->GetParent();
+      nd = parent->getParent();
       while(nd != NULL)
       {
         for(ii=0;ii<size2;ii++)
@@ -2348,14 +2348,14 @@ void TreeNode<1>::calcSubdivisionMatrix()
           if(nd->LocalBasisFuncs[ii] != -1)
             bfstmp.push_back(nd->LocalBasisFuncs[ii]);
         }
-        nd = nd->GetParent();
+        nd = nd->getParent();
       }
 
       cout << " bfstmp.size() " << bfstmp.size() << endl;
       printVector(bfstmp);
       printf("\n\n");
 
-      //cout << this->GetID() << '\t' << this->orientation << endl;
+      //cout << this->getID() << '\t' << this->orientation << endl;
       //cout << " flag " << flag << endl;
       cout << " ind1 " << ind1 << endl;
       cout << " totnlbf2 " << totnlbf2 << endl;
@@ -2367,7 +2367,7 @@ void TreeNode<1>::calcSubdivisionMatrix()
 
       printMatrix(mat);       printf("\n\n");
 
-      if( parent->GetLevel() > 0 )
+      if( parent->getLevel() > 0 )
         mat = parent->SubDivMat*mat;
 
       printMatrix(mat);       printf("\n\n");
@@ -2414,7 +2414,7 @@ void TreeNode<1>::calcSubdivisionMatrix()
     PROCESSED = true;
     
     /*
-    cout << " elem # " << GetID() << endl;
+    cout << " elem # " << getID() << endl;
     cout << " nsize2   and  GlobalBasisFuncs " << nsize2 << endl;
     printVector(GlobalBasisFuncs);
     printf("\n\n");
@@ -2436,7 +2436,7 @@ void TreeNode<2>::calcSubdivisionMatrix()
     totnlbf2 = totnlbf;
     nsize2   = nsize;
     
-    //cout << this->GetID() << '\t' << this->orientation << endl;
+    //cout << this->getID() << '\t' << this->orientation << endl;
     //cout << " level  = " << level << endl;
 
     if(parent == NULL)
@@ -2466,7 +2466,7 @@ void TreeNode<2>::calcSubdivisionMatrix()
              if(jj != -1)
                GlobalBasisFuncs.push_back(jj);
           }
-          nd = nd->GetParent();
+          nd = nd->getParent();
        }
        
        // new number of basis functions
@@ -2481,7 +2481,7 @@ void TreeNode<2>::calcSubdivisionMatrix()
 
        SubDivMat = MatrixXd::Zero(totnlbf2, totnlbf);
 
-       //cout << this->GetID() << '\t' << this->orientation << endl;
+       //cout << this->getID() << '\t' << this->orientation << endl;
        //cout << totnlbf2 << '\t' << nsize2 << endl;
 
        switch(this->orientation)
@@ -2526,7 +2526,7 @@ void TreeNode<2>::calcSubdivisionMatrix()
                SubDivMat.row(count++) = mat.row(ii);
           }
           
-          //cout << nd->GetID() << '\t' << nd->orientation << endl;
+          //cout << nd->getID() << '\t' << nd->orientation << endl;
 
           switch(nd->orientation)
           {
@@ -2554,7 +2554,7 @@ void TreeNode<2>::calcSubdivisionMatrix()
                   cerr << " TreeNode<2>::calcSubdivisionMatrix() .... WRONG orientation " << nd->orientation << endl;
              break;
           }
-          nd = nd->GetParent();
+          nd = nd->getParent();
        }
 
        
@@ -2628,7 +2628,7 @@ void TreeNode<2>::calcSubdivisionMatrix()
           if(nd->LocalBasisFuncs[ii] != -1)
             GlobalBasisFuncs.push_back(nd->LocalBasisFuncs[ii]);
         }
-        nd = nd->GetParent();
+        nd = nd->getParent();
       }
       //cout << " id " << id << endl;
       //cout << " GlobalBasisFuncs.size() " << GlobalBasisFuncs.size() << endl;
@@ -2661,7 +2661,7 @@ void TreeNode<2>::calcSubdivisionMatrix()
           bfstmp.push_back(parent->LocalBasisFuncs[ii]);
       }
 
-      nd = parent->GetParent();
+      nd = parent->getParent();
       while(nd != NULL)
       {
         for(ii=0;ii<size2;ii++)
@@ -2669,14 +2669,14 @@ void TreeNode<2>::calcSubdivisionMatrix()
           if(nd->LocalBasisFuncs[ii] != -1)
             bfstmp.push_back(nd->LocalBasisFuncs[ii]);
         }
-        nd = nd->GetParent();
+        nd = nd->getParent();
       }
 
       //cout << " bfstmp.size() " << bfstmp.size() << endl;
       //printVector(bfstmp);
       //printf("\n\n");
 
-      //cout << this->GetID() << '\t' << this->orientation << endl;
+      //cout << this->getID() << '\t' << this->orientation << endl;
       //cout << " flag " << flag << endl;
       //cout << " ind1 " << ind1 << endl;
       //cout << " totnlbf2 " << totnlbf2 << endl;
@@ -2706,7 +2706,7 @@ void TreeNode<2>::calcSubdivisionMatrix()
 
       //printMatrix(mat);       printf("\n\n");
 
-      if( parent->GetLevel() > 0 )
+      if( parent->getLevel() > 0 )
         mat = parent->SubDivMat*mat;
 
       //printMatrix(mat);       printf("\n\n");
@@ -2830,7 +2830,7 @@ void TreeNode<3>::calcSubdivisionMatrix()
              if(jj != -1)
                GlobalBasisFuncs.push_back(jj);
           }
-          nd = nd->GetParent();
+          nd = nd->getParent();
        }
        
        // new number of basis functions
@@ -2847,7 +2847,7 @@ void TreeNode<3>::calcSubdivisionMatrix()
 
        SubDivMat = MatrixXd::Zero(totnlbf2, totnlbf);
        
-       //cout << this->GetID() << '\t' << this->orientation << endl;
+       //cout << this->getID() << '\t' << this->orientation << endl;
 
        switch(this->orientation)
        {
@@ -2905,7 +2905,7 @@ void TreeNode<3>::calcSubdivisionMatrix()
                SubDivMat.row(count++) = mat.row(ii);
           }
           
-          //cout << nd->GetID() << '\t' << nd->orientation << endl;
+          //cout << nd->getID() << '\t' << nd->orientation << endl;
 
           switch(nd->orientation)
           {
@@ -2949,7 +2949,7 @@ void TreeNode<3>::calcSubdivisionMatrix()
                   cerr << " TreeNode<2>::calcSubdivisionMatrix() .... WRONG orientation " << nd->orientation << endl;
              break;
           }
-          nd = nd->GetParent();
+          nd = nd->getParent();
        }
 
        //printf("\n\n");
@@ -3008,7 +3008,7 @@ void TreeNode<3>::calcSubdivisionMatrix()
           if(nd->LocalBasisFuncs[ii] != -1)
             GlobalBasisFuncs.push_back(nd->LocalBasisFuncs[ii]);
         }
-        nd = nd->GetParent();
+        nd = nd->getParent();
       }
       //cout << " id " << id << endl;
       //cout << " GlobalBasisFuncs.size() " << GlobalBasisFuncs.size() << endl;
@@ -3041,7 +3041,7 @@ void TreeNode<3>::calcSubdivisionMatrix()
           bfstmp.push_back(parent->LocalBasisFuncs[ii]);
       }
 
-      nd = parent->GetParent();
+      nd = parent->getParent();
       while(nd != NULL)
       {
         for(ii=0;ii<size2;ii++)
@@ -3049,14 +3049,14 @@ void TreeNode<3>::calcSubdivisionMatrix()
           if(nd->LocalBasisFuncs[ii] != -1)
             bfstmp.push_back(nd->LocalBasisFuncs[ii]);
         }
-        nd = nd->GetParent();
+        nd = nd->getParent();
       }
 
       //cout << " bfstmp.size() " << bfstmp.size() << endl;
       //printVector(bfstmp);
       //printf("\n\n");
 
-      //cout << this->GetID() << '\t' << this->orientation << endl;
+      //cout << this->getID() << '\t' << this->orientation << endl;
       //cout << " flag " << flag << endl;
       //cout << " ind1 " << ind1 << endl;
       //cout << " totnlbf2 " << totnlbf2 << endl;
@@ -3102,7 +3102,7 @@ void TreeNode<3>::calcSubdivisionMatrix()
 
       //printMatrix(mat);       printf("\n\n");
 
-      if( parent->GetLevel() > 0 )
+      if( parent->getLevel() > 0 )
         mat = parent->SubDivMat*mat;
 
       //printMatrix(mat);       printf("\n\n");
@@ -3141,7 +3141,7 @@ void TreeNode<3>::calcSubdivisionMatrix()
           printf("\n\n");
           printVector(LocalBasisFuncs);
           printf("\n\n");
-          cout << this->GetID() << '\t' << this->orientation << endl;
+          cout << this->getID() << '\t' << this->orientation << endl;
           cout << " ind1 " << ind1 << endl;
           cout << " totnlbf2 " << totnlbf2 << endl;
           printf("\n\n");

@@ -22,9 +22,9 @@ void HBSplineCutFEM::setInitialConditions()
 
     for(int ee=0;ee<elems.size();ee++)
     {
-       if( !(elems[ee]->IsGhost()) &&  elems[ee]->IsLeaf() )
+       if( !(elems[ee]->isGhost()) &&  elems[ee]->isLeaf() )
        {
-           //cout << " elems[ee]->GetID() " <<  elems[ee]->GetID() << '\t' <<  elems[ee]->GetLevel() << endl;
+           //cout << " elems[ee]->getID() " <<  elems[ee]->getID() << '\t' <<  elems[ee]->getLevel() << endl;
 
            elems[ee]->resetMatrixAndVector();
            elems[ee]->setInitialProfile();
@@ -103,11 +103,11 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
     {
       node *nd = elems[fluidElementIds[ee]];
 
-      //cout << " nd->GetID() " <<  nd->GetID() << '\t' <<  nd->GetLevel() << '\t' << nd->GetDomainNumber() << endl;
+      //cout << " nd->getID() " <<  nd->getID() << '\t' <<  nd->getLevel() << '\t' << nd->getDomainNumber() << endl;
 
-      if( nd->get_subdomain_id() == this_mpi_proc )
+      if( nd->getSubdomainId() == this_mpi_proc )
       {
-        domTemp = nd->GetDomainNumber() ;
+        domTemp = nd->getDomainNumber() ;
 
         if( domTemp <= 0 )
         {
@@ -329,7 +329,7 @@ int HBSplineCutFEM::factoriseSolveAndUpdate()
       kk = fluidDOF;
       for(bb=0; bb<ImmersedBodyObjects.size(); bb++)
       {
-        //if(ImmersedBodyObjects[bb]->GetNdof() > 0)
+        //if(ImmersedBodyObjects[bb]->getNdof() > 0)
         //{
           cout << " AAAAAAAAAAA " << bb << endl;
           ImmersedBodyObjects[bb]->updateDisplacement(&arrayTemp[kk]);
@@ -387,14 +387,14 @@ void HBSplineCutFEM::computeElementErrors(int index)
           //for(dd=0; dd<nd->domainNums.size(); dd++)
           //{
             //domTemp = nd->domainNums[dd] ;
-            domTemp = nd->GetDomainNumber() ;
+            domTemp = nd->getDomainNumber() ;
             //if(domTemp == 1)
             //{
               nd->calcError(index, domTemp);
             
-              //cout << ee << '\t' << elems[ee]->GetError() << endl;
-              //totalError += ( elems[ee]->GetError() * elems[ee]->GetError() );
-              totalError +=  nd->GetError();
+              //cout << ee << '\t' << elems[ee]->getError() << endl;
+              //totalError += ( elems[ee]->getError() * elems[ee]->getError() );
+              totalError +=  nd->getError();
             //}
           //}
        }
@@ -408,7 +408,7 @@ void HBSplineCutFEM::computeElementErrors(int index)
 
           nd->calcError(index);
             
-          totalError += nd->GetError();
+          totalError += nd->getError();
 
           count++;
        }

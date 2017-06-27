@@ -34,6 +34,8 @@
 #include "LagrangeElem2DStructSolidQuad4NodeStab.h"
 #include "LagrangeElem3DStructSolidTet4NodeStab.h"
 #include "LagrangeElem3DStructSolidHex8NodeStab.h"
+#include "ContactElement2D1nodedContactWithXaxis.h"
+#include "ContactElement2D1nodedContactWithYaxis.h"
 
 #include "MindlinPlateElement.h"
 #include "KirchhoffPlateElement.h"
@@ -109,6 +111,10 @@ inline  LagrangeElement*  NewLagrangeElement(int type)
     case 31: return (LagrangeElement*) new KirchhoffPlateElement; break;
 
     case 32: return (LagrangeElement*) new LagrangeElem3DShellQuad4Node; break;
+
+    case 33: return (LagrangeElement*) new ContactElement2D1nodedContactWithXaxis; break;
+
+    case 34: return (LagrangeElement*) new ContactElement2D1nodedContactWithYaxis; break;
 
     default: prgError(1,"ImmersedFlexibleSolid::newElement","unknown element type name!"); return NULL;
   }

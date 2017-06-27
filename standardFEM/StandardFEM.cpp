@@ -543,7 +543,7 @@ void StandardFEM::prepareInputData()
     ///////////////////////////////////////////////////////////////////
 
     GeomData.SetDimension(DIM);
-    GeomData.SetNdof(ndof);
+    GeomData.setNdof(ndof);
 
     if(SolnData.ElemProp[elemConn[0][1]].id == 4 || SolnData.ElemProp[elemConn[0][1]].id ==  6 || 
        SolnData.ElemProp[elemConn[0][1]].id == 9 || SolnData.ElemProp[elemConn[0][1]].id == 12 || 

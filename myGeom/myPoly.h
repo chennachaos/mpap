@@ -66,7 +66,7 @@ class  myPoly
 
     virtual  void  computeAABB();
     
-    virtual AABB&  GetAABB()
+    virtual AABB&  getAABB()
     { return bbox; }
 
     void  centroid(myPoint& cent);
@@ -74,7 +74,7 @@ class  myPoly
     void SetDomainNumber(int dd)
     { domainNum = dd;      }
 
-    int GetDomainNumber()
+    int getDomainNumber()
     { return domainNum ;   }
 
     virtual void  computeNormal();

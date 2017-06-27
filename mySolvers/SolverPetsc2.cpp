@@ -182,8 +182,8 @@ int SolverPetsc::solveSerial(SparseMatrixXd& matEigen, VectorXd& rhsEigen, Vecto
     //ierr = PCSetType(pc,PCCholesky);CHKERRQ(ierr);
     //ierr = PCSetType(pc,PCNONE);CHKERRQ(ierr);
     //
-    PCFactorSetFill(pc, 8);
-    PCFactorSetLevels(pc, 5);
+    //PCFactorSetFill(pc, 8);
+    //PCFactorsetLevels(pc, 5);
 
     ierr = KSPSetTolerances(ksp,1.0e-16,PETSC_DEFAULT,PETSC_DEFAULT,PETSC_DEFAULT);CHKERRQ(ierr);
 
@@ -416,8 +416,8 @@ int SolverPetsc::solveParallel(SparseMatrixXd& matEigen, VectorXd& rhsEigen, Vec
     //ierr = PCSetType(pc,PCCholesky);CHKERRQ(ierr);
     //ierr = PCSetType(pc,PCNONE);CHKERRQ(ierr);
     //
-    PCFactorSetFill(pc, 8);
-    PCFactorSetLevels(pc, 5);
+    //PCFactorSetFill(pc, 8);
+    //PCFactorsetLevels(pc, 5);
 
     ierr = KSPSetTolerances(ksp,1.0e-16,PETSC_DEFAULT,PETSC_DEFAULT,PETSC_DEFAULT);CHKERRQ(ierr);
 

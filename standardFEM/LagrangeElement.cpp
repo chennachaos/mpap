@@ -331,7 +331,7 @@ double  LagrangeElement::computeForceCur(int dir, VectorXd& NN)
 
 
 /*
-void  LagrangeElement::AssembleElementVector(int ind, bool flag, double* rhs, double* reac, int start1, int start2)
+void  LagrangeElement::assembleElementVector(int ind, bool flag, double* rhs, double* reac, int start1, int start2)
 {
   for(int ii=0;ii<nsize;ii++)
   {
@@ -344,7 +344,7 @@ void  LagrangeElement::AssembleElementVector(int ind, bool flag, double* rhs, do
 */
 
 
-void  LagrangeElement::AssembleElementMatrix(int start, SparseMatrixXd& mtx)
+void  LagrangeElement::assembleElementMatrix(int start, SparseMatrixXd& mtx)
 {
 /*
   int aa, bb, ii, jj, r;
@@ -368,7 +368,7 @@ void  LagrangeElement::AssembleElementMatrix(int start, SparseMatrixXd& mtx)
 }
 
 
-void  LagrangeElement::AssembleElementMatrix(int start, Mat mtx)
+void  LagrangeElement::assembleElementMatrix(int start, Mat mtx)
 {
 /*
   PetscErrorCode ierr;
@@ -394,7 +394,7 @@ void  LagrangeElement::AssembleElementMatrix(int start, Mat mtx)
 
 
 
-void LagrangeElement::AssembleElementMatrixAndVector(int start, SparseMatrixXd& mtx, double* rhs)
+void LagrangeElement::assembleElementMatrixAndVector(int start, SparseMatrixXd& mtx, double* rhs)
 {
 /*
   int aa, bb, ii, jj, r;
@@ -422,7 +422,7 @@ void LagrangeElement::AssembleElementMatrixAndVector(int start, SparseMatrixXd& 
 
 
 
-void LagrangeElement::AssembleElementVector(bool firstIter, bool flag, double* rhs, double* reac, int start1, int start2)
+void LagrangeElement::assembleElementVector(bool firstIter, bool flag, double* rhs, double* reac, int start1, int start2)
 {
   // flag == true  ---> just external force vector
   // flag == false ---> internal load vector + contributions from nodes with specified displacement BCs
@@ -503,7 +503,7 @@ void LagrangeElement::AssembleElementVector(bool firstIter, bool flag, double* r
 
 
 
-void LagrangeElement::AssembleElementVector(bool firstIter, bool flag, Vec rhs, Vec reac, int start1, int start2)
+void LagrangeElement::assembleElementVector(bool firstIter, bool flag, Vec rhs, Vec reac, int start1, int start2)
 {
 /*
   // flag == true  ---> just external force vector

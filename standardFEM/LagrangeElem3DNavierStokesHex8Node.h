@@ -14,7 +14,8 @@ class  LagrangeElem3DNavierStokesHex8Node : public LagrangeElement
 
     virtual ~LagrangeElem3DNavierStokesHex8Node();
 
-    virtual void  resetMatrixAndVector();
+    virtual int getElmTypeNameNum()
+    {  return 25; }
 
     virtual void prepareElemData();
 

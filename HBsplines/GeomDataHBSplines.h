@@ -98,10 +98,10 @@ class  GeomDataHBSplines
     void  SetDimension(int dim_)
     {  DIM = dim_;    }
 
-    void  SetNDOF(int d)
+    void  setNdof(int d)
     {  ndof = d;     }
 
-    void  SetDegree(int ind, int deg)
+    void  setDegree(int ind, int deg)
     {   degree[ind] = deg;  }
 
     void  SetNGP(int ind, int nn)
@@ -119,7 +119,7 @@ class  GeomDataHBSplines
     void  SetOrigin(int ind, double L1)
     {       origin[ind] = L1;     }
 
-    int  GetNDOF()
+    int  getNdof()
     {       return  ndof;     }
 
     int GetDegree(int ind)

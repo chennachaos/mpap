@@ -34,8 +34,8 @@ void HBSplineFEM::setInitialConditions()
        //printf("\n\n");
        //printVector(Flocal);
 
-        nd->AssembleElementMatrix2(0, solverEigen->mtx);
-        nd->AssembleElementVector(0, 0, &(solverEigen->rhsVec(0)));
+        nd->assembleElementMatrix2(0, solverEigen->mtx);
+        nd->assembleElementVector(0, 0, &(solverEigen->rhsVec(0)));
     }
 
     solverEigen->currentStatus = ASSEMBLY_OK;
@@ -115,10 +115,10 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
        //cout << ii << '\t' << omp_get_thread_num() << '\t' << omp_get_num_threads() << '\t' << omp_get_max_threads() << endl;
        node *nd;
        nd = elems[activeElements[ii]];
-       //cout << " nd->GetID() " <<  nd->GetID() << '\t' <<  nd->GetLevel() << endl;
+       //cout << " nd->getID() " <<  nd->getID() << '\t' <<  nd->getLevel() << endl;
 
        //nd->resetMatrixAndVector();
-       //FluidSolnData.resetMatrixAndVector(nd->GetNsize());
+       //FluidSolnData.resetMatrixAndVector(nd->getNsize2());
        int nr, nc;
 
        //printVector(nd->forAssyVec);
@@ -152,8 +152,8 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
        //printVector(Flocal);
        
        //nd->AssembleMatrixAndVector(1, ((SolverEigen*)solver)->mtx, &(rhsVec(0)));
-       //nd->AssembleElementMatrix(1, ((SolverEigen*)solver)->mtx);
-       //nd->AssembleElementVector(firstIter, 1, &(rhsVec(0)));
+       //nd->assembleElementMatrix(1, ((SolverEigen*)solver)->mtx);
+       //nd->assembleElementVector(firstIter, 1, &(rhsVec(0)));
        //cout << " AAAAAAAAAAAAAAAAA " << endl;
        //#pragma omp critical
         //solver->AssembleMatrixAndVector(nd->forAssyVec, nd->forAssyVec, Klocal, Flocal);
@@ -204,7 +204,7 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
           {
             //cout << bb << '\t' << aa << '\t' << ii << endl;
 
-            //nr = nd->GetNsize();
+            //nr = nd->getNsize2();
             //nc = nr;
 
             //Klocal = MatrixXd::Zero(nr, nc);
@@ -235,7 +235,7 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
 
             //cout << aa << '\t' << ee << '\t' << param[0] << '\t' << param[1] << '\t' << val[0] << '\t' << val[1] << endl;
 
-            nr = nd->GetNsize();
+            nr = nd->getNsize2();
             nc = nr;
 
             Klocal = MatrixXd::Zero(nr, nc);
@@ -327,7 +327,7 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
     {
       //cout << ii << '\t' << omp_get_thread_num() << '\t' << omp_get_num_threads() << '\t' << omp_get_max_threads() << endl;
       node *nd = elems[activeElements[ii]];
-      //cout << " nd->GetID() " <<  nd->GetID() << '\t' <<  nd->GetLevel() << endl;
+      //cout << " nd->getID() " <<  nd->getID() << '\t' <<  nd->getLevel() << endl;
 
       //printVector(nd->forAssyVec);
       //printVector(nd->forAssyVec2);
@@ -659,9 +659,9 @@ void HBSplineFEM::computeElementErrors(int index)
 
           elems[ee]->calcError(index);
             
-          //cout << ee << '\t' << elems[ee]->GetError() << endl;
-          //totalError += ( elems[ee]->GetError() * elems[ee]->GetError() );
-          totalError +=  elems[ee]->GetError();
+          //cout << ee << '\t' << elems[ee]->getError() << endl;
+          //totalError += ( elems[ee]->getError() * elems[ee]->getError() );
+          totalError +=  elems[ee]->getError();
        }
        totalError = sqrt(totalError);
     }
@@ -673,7 +673,7 @@ void HBSplineFEM::computeElementErrors(int index)
 
           nd->calcError(index);
             
-          totalError += nd->GetError();
+          totalError += nd->getError();
 
           count++;
        }

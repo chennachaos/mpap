@@ -14,7 +14,8 @@ class  LagrangeElem2DStructSolidTria3Node : public LagrangeElement
 
     virtual ~LagrangeElem2DStructSolidTria3Node();
 
-    virtual void  resetMatrixAndVector();
+    virtual int getElmTypeNameNum()
+    {  return 7; }
 
     virtual void prepareElemData();
 

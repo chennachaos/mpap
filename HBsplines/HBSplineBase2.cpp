@@ -37,19 +37,19 @@ void  HBSplineBase::BuildBase1D()
     {
         nodetmp = new node(0);
         
-        //nodetmp->SetDegree(degree);
+        //nodetmp->setDegree(degree);
         
         elems.push_back(nodetmp);
         
         //elems.push_back(std::tr1::unqiue_ptr<node> node(0));
         
-        elems[ii]->SetDegree(degree);
+        elems[ii]->setDegree(degree);
         
-        NodeNumsAtLevel[0].push_back(nodetmp->GetID());
+        NodeNumsAtLevel[0].push_back(nodetmp->getID());
 
         val2 = val1 + du;
 
-        elems[ii]->SetKnots(Dir1, val1, val2);
+        elems[ii]->setKnots(Dir1, val1, val2);
         
         val1 = val2;
     }
@@ -59,18 +59,18 @@ void  HBSplineBase::BuildBase1D()
     
     nn -= 1;
 
-    elems[0]->SetNeighbour(RIGHT, elems[1]);
+    elems[0]->setNeighbour(RIGHT, elems[1]);
     elems[0]->SolnData = &(SolnData);
     elems[0]->GeomData = &(GeomData);
 
-    elems[nn]->SetNeighbour(LEFT, elems[nn-1]);
+    elems[nn]->setNeighbour(LEFT, elems[nn-1]);
     elems[nn]->SolnData = &(SolnData);
     elems[nn]->GeomData = &(GeomData);
 
     for(ii=1;ii<nn;ii++)
     {
-       elems[ii]->SetNeighbour(LEFT,  elems[ii-1]);
-       elems[ii]->SetNeighbour(RIGHT, elems[ii+1]);
+       elems[ii]->setNeighbour(LEFT,  elems[ii-1]);
+       elems[ii]->setNeighbour(RIGHT, elems[ii+1]);
         
        elems[ii]->SolnData = &(SolnData);
        elems[ii]->GeomData = &(GeomData);
@@ -81,8 +81,8 @@ void  HBSplineBase::BuildBase1D()
 
     for(ii=0;ii<degree[0];ii++)
     {
-       elems[ii]->SetGhostOn();
-       elems[nn-ii]->SetGhostOn();
+       elems[ii]->setGhostOn();
+       elems[nn-ii]->setGhostOn();
     }
 
     // identify the boundary nodes
@@ -127,19 +127,19 @@ void  HBSplineBase::BuildBase2D()
 
             //nodetmp = std::make_unique<node>(0); // won't leak, frees itself
 
-            nodetmp->SetDegree(degree);
+            nodetmp->setDegree(degree);
         
             u2 = u1 + du;
 
-            nodetmp->SetKnots(Dir1, u1, u2);
-            nodetmp->SetKnots(Dir2, v1, v2);
+            nodetmp->setKnots(Dir1, u1, u2);
+            nodetmp->setKnots(Dir2, v1, v2);
 
             nodetmp->SolnData = &(SolnData);
             nodetmp->GeomData = &(GeomData);
 
             elems.push_back(nodetmp);
             
-            NodeNumsAtLevel[0].push_back(nodetmp->GetID());
+            NodeNumsAtLevel[0].push_back(nodetmp->getID());
         
             u1 = u2;
             count++;
@@ -166,15 +166,15 @@ void  HBSplineBase::BuildBase2D()
            {
               ind2 = ind1 + ii;
               
-              elems[ind2]->SetNeighbour(NORTH, elems[nor+ii]);
+              elems[ind2]->setNeighbour(NORTH, elems[nor+ii]);
               if(ii == 0)
-                elems[ind2]->SetNeighbour(EAST,  elems[ind2+1]);
+                elems[ind2]->setNeighbour(EAST,  elems[ind2+1]);
               else if(ii == (nn0-1))
-                elems[ind2]->SetNeighbour(WEST,  elems[ind2-1]);
+                elems[ind2]->setNeighbour(WEST,  elems[ind2-1]);
               else
               {
-                elems[ind2]->SetNeighbour(EAST,  elems[ind2+1]);
-                elems[ind2]->SetNeighbour(WEST,  elems[ind2-1]);
+                elems[ind2]->setNeighbour(EAST,  elems[ind2+1]);
+                elems[ind2]->setNeighbour(WEST,  elems[ind2-1]);
               }
            }
         }
@@ -184,15 +184,15 @@ void  HBSplineBase::BuildBase2D()
            {
               ind2 = ind1 + ii;
 
-              elems[ind2]->SetNeighbour(SOUTH, elems[sou+ii]);
+              elems[ind2]->setNeighbour(SOUTH, elems[sou+ii]);
               if(ii == 0)
-                elems[ind2]->SetNeighbour(EAST,  elems[ind2+1]);
+                elems[ind2]->setNeighbour(EAST,  elems[ind2+1]);
               else if(ii == (nn0-1))
-                elems[ind2]->SetNeighbour(WEST,  elems[ind2-1]);
+                elems[ind2]->setNeighbour(WEST,  elems[ind2-1]);
               else
               {
-                elems[ind2]->SetNeighbour(EAST,  elems[ind2+1]);
-                elems[ind2]->SetNeighbour(WEST,  elems[ind2-1]);
+                elems[ind2]->setNeighbour(EAST,  elems[ind2+1]);
+                elems[ind2]->setNeighbour(WEST,  elems[ind2-1]);
               }
            }
         }
@@ -201,16 +201,16 @@ void  HBSplineBase::BuildBase2D()
            for(ii=0;ii<nn0;ii++)
            {
               ind2 = ind1 + ii;
-              elems[ind2]->SetNeighbour(NORTH, elems[nor+ii]);
-              elems[ind2]->SetNeighbour(SOUTH, elems[sou+ii]);
+              elems[ind2]->setNeighbour(NORTH, elems[nor+ii]);
+              elems[ind2]->setNeighbour(SOUTH, elems[sou+ii]);
               if(ii == 0)
-                elems[ind2]->SetNeighbour(EAST,  elems[ind2+1]);
+                elems[ind2]->setNeighbour(EAST,  elems[ind2+1]);
               else if(ii == (nn0-1))
-                elems[ind2]->SetNeighbour(WEST,  elems[ind2-1]);
+                elems[ind2]->setNeighbour(WEST,  elems[ind2-1]);
               else
               {
-                elems[ind2]->SetNeighbour(EAST,  elems[ind2+1]);
-                elems[ind2]->SetNeighbour(WEST,  elems[ind2-1]);
+                elems[ind2]->setNeighbour(EAST,  elems[ind2+1]);
+                elems[ind2]->setNeighbour(WEST,  elems[ind2-1]);
               }
            }
         }
@@ -228,8 +228,8 @@ void  HBSplineBase::BuildBase2D()
 
         for(ii=0;ii<nn0;ii++)
         {
-           elems[ind1+ii]->SetGhostOn();
-           elems[ind2+ii]->SetGhostOn();
+           elems[ind1+ii]->setGhostOn();
+           elems[ind2+ii]->setGhostOn();
         }
     }
     
@@ -242,8 +242,8 @@ void  HBSplineBase::BuildBase2D()
 
         for(ii=0;ii<degree[0];ii++)
         {
-          elems[ind1+ii]->SetGhostOn();
-          elems[ind2-ii]->SetGhostOn();
+          elems[ind1+ii]->setGhostOn();
+          elems[ind2-ii]->setGhostOn();
         }
     }
 
@@ -322,20 +322,20 @@ void  HBSplineBase::BuildBase3D()
           {
              nodetmp = new node(0);
         
-             nodetmp->SetDegree(degree);
+             nodetmp->setDegree(degree);
         
              u2 = u1 + du;
 
-             nodetmp->SetKnots(Dir1, u1, u2);
-             nodetmp->SetKnots(Dir2, v1, v2);
-             nodetmp->SetKnots(Dir3, w1, w2);
+             nodetmp->setKnots(Dir1, u1, u2);
+             nodetmp->setKnots(Dir2, v1, v2);
+             nodetmp->setKnots(Dir3, w1, w2);
 
              nodetmp->SolnData = &(SolnData);
              nodetmp->GeomData = &(GeomData);
 
              elems.push_back(nodetmp);
             
-             NodeNumsAtLevel[0].push_back(nodetmp->GetID());
+             NodeNumsAtLevel[0].push_back(nodetmp->getID());
         
              u1 = u2;
           }
@@ -360,7 +360,7 @@ void  HBSplineBase::BuildBase3D()
       else
       {
         wes = ee - 1;
-        elems[ee]->SetNeighbour(WEST,   elems[wes]);
+        elems[ee]->setNeighbour(WEST,   elems[wes]);
       }
 
       if( (ee+1) % nn0 == 0)
@@ -368,7 +368,7 @@ void  HBSplineBase::BuildBase3D()
       else
       {
         eas = ee + 1;
-        elems[ee]->SetNeighbour(EAST,   elems[eas]);
+        elems[ee]->setNeighbour(EAST,   elems[eas]);
       }
 
       if( (ee%(nn0*nn1)-nn0) < 0 )
@@ -376,7 +376,7 @@ void  HBSplineBase::BuildBase3D()
       else
       {
         sou = ee - nn0;
-        elems[ee]->SetNeighbour(SOUTH,  elems[sou]);
+        elems[ee]->setNeighbour(SOUTH,  elems[sou]);
       }
 
       if( (ee%(nn0*nn1)+nn0) >= nn0*nn1 )
@@ -384,7 +384,7 @@ void  HBSplineBase::BuildBase3D()
       else
       {
         nor = ee + nn0;
-        elems[ee]->SetNeighbour(NORTH,  elems[nor]);
+        elems[ee]->setNeighbour(NORTH,  elems[nor]);
       }
 
       if( (ee - nn0*nn1) < 0 )
@@ -392,7 +392,7 @@ void  HBSplineBase::BuildBase3D()
       else
       {
         bac = ee - nn0*nn1;
-        elems[ee]->SetNeighbour(BACK,   elems[bac]);
+        elems[ee]->setNeighbour(BACK,   elems[bac]);
       }
 
       if( (ee + nn0*nn1) >= nelm )
@@ -400,7 +400,7 @@ void  HBSplineBase::BuildBase3D()
       else
       {
         fro = ee + nn0*nn1;
-        elems[ee]->SetNeighbour(FRONT,   elems[fro]);
+        elems[ee]->setNeighbour(FRONT,   elems[fro]);
       }
 
       //printf("%5d \t %5d \t %5d \t %5d \t %5d \t %5d \t %5d \n",ee,wes,eas,sou,nor,bac,fro);
@@ -418,7 +418,7 @@ void  HBSplineBase::BuildBase3D()
       {
         ind1 = ind2 + nn0 * jj;
         for(ii=0;ii<degree[0];ii++)
-          elems[ind1+ii]->SetGhostOn();
+          elems[ind1+ii]->setGhostOn();
       }
     }
 
@@ -431,7 +431,7 @@ void  HBSplineBase::BuildBase3D()
       {
         ind1 = ind2 + nn0 * jj;
         for(ii=(nn0-degree[0]);ii<nn0;ii++)
-          elems[ind1+ii]->SetGhostOn();
+          elems[ind1+ii]->setGhostOn();
       }
     }
 
@@ -444,7 +444,7 @@ void  HBSplineBase::BuildBase3D()
       {
         ind1 = ind2 + nn0 * jj;
         for(ii=0;ii<nn0;ii++)
-          elems[ind1+ii]->SetGhostOn();
+          elems[ind1+ii]->setGhostOn();
       }
     }
 
@@ -457,7 +457,7 @@ void  HBSplineBase::BuildBase3D()
       {
         ind1 = ind2 + nn0 * jj;
         for(ii=0;ii<nn0;ii++)
-          elems[ind1+ii]->SetGhostOn();
+          elems[ind1+ii]->setGhostOn();
       }
     }
 
@@ -470,7 +470,7 @@ void  HBSplineBase::BuildBase3D()
       {
         ind1 = ind2 + nn0 * jj;
         for(ii=0;ii<nn0;ii++)
-          elems[ind1+ii]->SetGhostOn();
+          elems[ind1+ii]->setGhostOn();
       }
     }
 
@@ -483,7 +483,7 @@ void  HBSplineBase::BuildBase3D()
       {
         ind1 = ind2 + nn0 * jj;
         for(ii=0;ii<nn0;ii++)
-          elems[ind1+ii]->SetGhostOn();
+          elems[ind1+ii]->setGhostOn();
       }
     }
 

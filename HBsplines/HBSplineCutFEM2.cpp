@@ -8,14 +8,13 @@
 #include "myGeomUtilities.h"
 #include "myTria.h"
 #include "myTet.h"
-
+#include <omp.h>
 
 //#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 //#include <CGAL/Triangulation_3.h>
 //#include <CGAL/Delaunay_triangulation_3.h>
 //#include <CGAL/Triangulation_vertex_base_with_info_3.h>
 
-#include <omp.h>
 
 extern ComputerTime       computerTime;
 extern MpapTime mpapTime;
@@ -97,7 +96,7 @@ void  HBSplineCutFEM::prepareCutElements()
   for(ee=0; ee<nElem; ee++)
   {
     nd1 = elems[activeElements[ee]];
-    //cout << ee << '\t' << nd1->GetID() << endl;
+    //cout << ee << '\t' << nd1->getID() << endl;
 
     flag = false;
 
@@ -141,7 +140,7 @@ void  HBSplineCutFEM::prepareCutElements()
         exit(kk);
       }
 
-      if( nd1->IsCutElement() )
+      if( nd1->isCutElement() )
       {
         cutCellIds.push_back(activeElements[ee]);
 
@@ -153,9 +152,9 @@ void  HBSplineCutFEM::prepareCutElements()
     }
     //cout << " iiiiiii " << endl;
 
-    if( nd1->GetDomainNumber() <= 0 )
+    if( nd1->getDomainNumber() <= 0 )
     {
-      fluidElementIds.push_back( nd1->GetID() );
+      fluidElementIds.push_back( nd1->getID() );
 
       //printVector(nd1->GlobalBasisFuncs);
 
@@ -324,7 +323,7 @@ void  HBSplineCutFEM::prepareCutElements()
           lme  = ImmersedBodyObjects[bb]->ImmIntgElems[aa];
           poly = ImmersedBodyObjects[bb]->ImmersedFaces[aa];
 
-          if( lme->IsActive() )
+          if( lme->isActive() )
           {
             for(gp=0;gp<nGauss;gp++)
             {
@@ -338,7 +337,7 @@ void  HBSplineCutFEM::prepareCutElements()
               ndTemp->domNums.push_back(bb+1);
               
             }//for(gp=0...
-          } // if( lme->IsActive() )
+          } // if( lme->isActive() )
         }//for(aa=0...
       }//for(bb=0;...
       
@@ -368,14 +367,14 @@ void  HBSplineCutFEM::prepareCutElements()
   for(ee=0; ee<nElem; ee++)
   {
     nd1 = elems[activeElements[ee]];
-    //cout << ee << '\t' << nd1->GetID() << endl;
+    //cout << ee << '\t' << nd1->getID() << endl;
 
     flag = true;
 
     //if( flag )
     //{
 
-      if( !(nd1->IsCutElement()) )
+      if( !(nd1->isCutElement()) )
       {
         kk = nd1->prepareCutCell(cutFEMparams);
 
@@ -386,7 +385,7 @@ void  HBSplineCutFEM::prepareCutElements()
         }
       }
 
-      if( nd1->IsCutElement() )
+      if( nd1->isCutElement() )
       {
         cutCellIds.push_back(activeElements[ee]);
 
@@ -397,9 +396,9 @@ void  HBSplineCutFEM::prepareCutElements()
       }
     //}
 
-    if( nd1->GetDomainNumber() <= 0 )
+    if( nd1->getDomainNumber() <= 0 )
     {
-      fluidElementIds.push_back( nd1->GetID() );
+      fluidElementIds.push_back( nd1->getID() );
 
       //printVector(nd1->GlobalBasisFuncs);
 
@@ -496,7 +495,7 @@ void  HBSplineCutFEM::prepareCutElementsSubTrias2D()
   {
     nd1 = elems[activeElements[ee]];
 
-    bbTemp = nd1->GetAABB();
+    bbTemp = nd1->getAABB();
     
     ptOut.clear();
 
@@ -662,7 +661,7 @@ void  HBSplineCutFEM::prepareCutElements3D()
 
     nd1 = elems[activeElements[cellId]];
 
-    bbTemp = nd1->GetAABB();
+    bbTemp = nd1->getAABB();
 
     cellVTK = uGridVTKfluid->GetCell(cellId);
 
@@ -966,7 +965,7 @@ void  HBSplineCutFEM::prepareCutElements3D()
 
     nd1 = elems[activeElements[cellId]];
 
-    bbTemp = nd1->GetAABB();
+    bbTemp = nd1->getAABB();
 
     cellVTK = uGridVTKfluid->GetCell(cellId);
 
@@ -1032,7 +1031,7 @@ void  HBSplineCutFEM::prepareCutElements3D()
   {
     nd1 = elems[activeElements[ee]];
 
-    bbTemp = nd1->GetAABB();
+    bbTemp = nd1->getAABB();
     
     //cout << " ee = " << ee << endl;
 
@@ -1067,7 +1066,7 @@ void  HBSplineCutFEM::prepareCutElementsSubTrias3D()
   {
     ndTemp = elems[activeElements[ee]];
 
-    bbTemp = ndTemp->GetAABB();
+    bbTemp = ndTemp->getAABB();
 
     ptOut.clear();
 

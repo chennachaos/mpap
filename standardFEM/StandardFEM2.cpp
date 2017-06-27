@@ -344,7 +344,7 @@ int StandardFEM::prepareMatrixPattern()
 
       for(ee=0; ee<nElem; ee++)
       {
-        elems[ee]->set_subdomain_id(epart[ee]);
+        elems[ee]->setSubdomainId(epart[ee]);
       }
 
       ierr = PetscFree(eptr); CHKERRQ(ierr);
@@ -424,7 +424,7 @@ int StandardFEM::prepareMatrixPattern()
 
       for(ee=0; ee<nElem; ee++)
       {
-        //if(elems[ee]->get_subdomain_id() == this_mpi_proc)
+        //if(elems[ee]->getSubdomainId() == this_mpi_proc)
         //{
           for(ii=0; ii<elems[ee]->nodeNums.size(); ii++)
           {
@@ -873,15 +873,15 @@ int StandardFEM::calcStiffnessAndResidual(int printRes, bool zeroMtx, bool zeroR
     for(int ee=0;ee<nElem;ee++)  // loop over all the elements
     {
       //cout << "       elem... : " << (ee+1) << endl;
-      if(elems[ee]->get_subdomain_id() == this_mpi_proc)
+      if(elems[ee]->getSubdomainId() == this_mpi_proc)
       {
         //elems[ee]->resetMatrixAndVector();
         //cout << " MMMMMMMMMMM " << endl;
         elems[ee]->calcStiffnessAndResidual(Klocal, Flocal);
 
-        //elems[ee]->AssembleElementMatrix(0, solver2->mtx);
+        //elems[ee]->assembleElementMatrix(0, solver2->mtx);
         //cout << " ooooooooooooooo " << endl;
-        //elems[ee]->AssembleElementVector(0, 0, solverPetsc->rhsVec, solver2->reac, 0, 0);
+        //elems[ee]->assembleElementVector(0, 0, solverPetsc->rhsVec, solver2->reac, 0, 0);
         //cout << " MMMMMMMMMMM " << endl;
         solverPetsc->AssembleMatrixAndVector(elems[ee]->forAssyVec, elems[ee]->forAssyVec, Klocal, Flocal);
       }
@@ -902,11 +902,11 @@ int StandardFEM::calcStiffnessAndResidual(int printRes, bool zeroMtx, bool zeroR
       elems[ee]->calcStiffnessAndResidual(Klocal, Flocal);
 
       //cout << " MMMMMMMMMMM " << endl;
-      //elems[ee]->AssembleElementMatrixAndVector(0, solver->mtx, &(solver->rhsVec(0)));
+      //elems[ee]->assembleElementMatrixAndVector(0, solver->mtx, &(solver->rhsVec(0)));
 
-      //elems[ee]->AssembleElementMatrix(0, solver->mtx);
+      //elems[ee]->assembleElementMatrix(0, solver->mtx);
       //cout << " aaaaaaaaaaaaa " << endl;
-      //elems[ee]->AssembleElementVector(0, 0, &(solverEigen->rhsVec(0)), &(SolnData.reac(0)), 0, 0);
+      //elems[ee]->assembleElementVector(0, 0, &(solverEigen->rhsVec(0)), &(SolnData.reac(0)), 0, 0);
       //cout << " MMMMMMMMMMM " << endl;
       solverEigen->AssembleMatrixAndVector(0, 0, elems[ee]->forAssyVec, Klocal, Flocal);
     }
@@ -1291,7 +1291,7 @@ void  StandardFEM::computeElementErrors(int index)
         //cout << " MMMMMMMMMMM " << endl;
         elems[ee]->calcError(index);
 
-        totalError += elems[ee]->GetError();
+        totalError += elems[ee]->getError();
         //cout << " MMMMMMMMMMM " << endl;
       }
 

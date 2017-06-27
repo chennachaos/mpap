@@ -42,13 +42,13 @@ class ContactElementPointToPoint2D
 
         ~ContactElementPointToPoint2D();
 
-        int GetID()
+        int getID()
         {  return id; }
 
-        //static int  GetCount()
+        //static int  getCount()
         //{ return pointcount; }
 
-        int GetDimension()
+        int getDimension()
         {  return DIM;  }
 
         void  printSelf();
@@ -59,9 +59,9 @@ class ContactElementPointToPoint2D
 
         void  calcStiffnessAndResidual(int ind1=0, int ind2=0, double inp1=0.0, double inp2=0.0);
 
-        void  AssembleElementMatrix(int, SparseMatrixXd&);
+        void  assembleElementMatrix(int, SparseMatrixXd&);
 
-        void  AssembleElementVector(int ind, bool flag, double* rhs);
+        void  assembleElementVector(int ind, bool flag, double* rhs);
 
         void  AssembleMatrixAndVector(int, SparseMatrixXd&, double*);
 

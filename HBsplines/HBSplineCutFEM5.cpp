@@ -98,12 +98,12 @@ void  HBSplineCutFEM::applyInterfaceTerms2D()
           lme = ImmersedBodyObjects[bb]->ImmIntgElems[aa];
           poly = ImmersedBodyObjects[bb]->ImmersedFaces[aa];
 
-          //cout << bb << '\t' << aa << '\t' << lme->IsActive() << endl;
+          //cout << bb << '\t' << aa << '\t' << lme->isActive() << endl;
 
           val1 = lme->pointNums.size();
           tt1  =  &(lme->pointNums[0]);
 
-          if( lme->IsActive() )
+          if( lme->isActive() )
           {
             for(gp=0;gp<nGauss;gp++)
             {
@@ -138,9 +138,9 @@ void  HBSplineCutFEM::applyInterfaceTerms2D()
 
               nd2 = elems[elnum];
 
-              if( nd2->get_subdomain_id() == this_mpi_proc )
+              if( nd2->getSubdomainId() == this_mpi_proc )
               {
-              bbTemp = nd2->GetAABB();
+              bbTemp = nd2->getAABB();
               hx = bbTemp.maxBB[0]-bbTemp.minBB[0];
               hy = bbTemp.maxBB[1]-bbTemp.minBB[1];
 
@@ -154,49 +154,49 @@ void  HBSplineCutFEM::applyInterfaceTerms2D()
                 
                 if( abs(geom[1]-bbTemp.minBB[1]) < 1.0e-8 ) // bottom edge
                 {
-                  nd3 = nd2->GetNeighbour(EAST);
+                  nd3 = nd2->getNeighbour(EAST);
                   
                   if( (nd3->domNums.size() == 1) && (nd3->domNums[0] != 0) )
                   {
-                    nd4 = nd2->GetNeighbour(SOUTH);
+                    nd4 = nd2->getNeighbour(SOUTH);
                     if( (nd4->domNums.size() == 1) && (nd4->domNums[0] != 0) )
-                      nd = nd2->GetNeighbour(WEST);
+                      nd = nd2->getNeighbour(WEST);
                     else
                       nd = nd4;
                   }
                   else
-                    nd = nd2->GetNeighbour(SOUTH);
+                    nd = nd2->getNeighbour(SOUTH);
                 }
                 else if( abs(geom[1]-bbTemp.maxBB[1]) < 1.0e-8 ) // top edge
                 {
-                  nd3 = nd2->GetNeighbour(EAST);
+                  nd3 = nd2->getNeighbour(EAST);
                   
                   if( (nd3->domNums.size() == 1) && (nd3->domNums[0] != 0) )
                   {
-                    nd4 = nd2->GetNeighbour(NORTH);
+                    nd4 = nd2->getNeighbour(NORTH);
                     if( (nd4->domNums.size() == 1) && (nd4->domNums[0] != 0) )
-                      nd = nd2->GetNeighbour(WEST);
+                      nd = nd2->getNeighbour(WEST);
                     else
                       nd = nd4;
                   }
                   else
-                    nd = nd2->GetNeighbour(NORTH);
+                    nd = nd2->getNeighbour(NORTH);
                 }
                 else
                 {
                   if( abs(geom[0]-bbTemp.minBB[0]) < 1.0e-8 ) // left edge
-                    nd = nd2->GetNeighbour(WEST);
+                    nd = nd2->getNeighbour(WEST);
                   else if( abs(geom[0]-bbTemp.maxBB[0]) < 1.0e-8 ) // right edge
-                    nd = nd2->GetNeighbour(EAST);
+                    nd = nd2->getNeighbour(EAST);
                   else
                   {
                     //cerr << " Boundary integration point lies in absurd element \n\n " << endl;
                   }
                   //cout << " llllllllll " << endl;
                   //if( abs(geom[1]-bbTemp.minBB[1]) < 1.0e-10 )
-                    //nd = nd2->GetNeighbour(SOUTH);
+                    //nd = nd2->getNeighbour(SOUTH);
                   //else if( abs(geom[1]-bbTemp.maxBB[1]) < 1.0e-10 )
-                    //nd = nd2->GetNeighbour(NORTH);
+                    //nd = nd2->getNeighbour(NORTH);
                 }
               }
               else
@@ -216,12 +216,12 @@ void  HBSplineCutFEM::applyInterfaceTerms2D()
               // stiffness and residual terms due to Nitsche method
               //cout << " stiffness and residual terms due to Nitsche method " << endl;
 
-              knotBegin = nd->GetKnotBegin();
-              knotIncr  = nd->GetKnotIncrement();
+              knotBegin = nd->getKnotBegin();
+              knotIncr  = nd->getKnotIncrement();
 
               GeomData.computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy);
 
-              if(nd->GetParent() == NULL)
+              if(nd->getParent() == NULL)
               {
                 N = NN;
                 dN_dx = dNN_dx;
@@ -345,10 +345,10 @@ void  HBSplineCutFEM::applyInterfaceTerms2D()
               } // for(ii=0;ii<totnlbf2;ii++)
 
               solverPetsc->AssembleMatrixAndVectorCutFEM(0, 0, nd->forAssyVec, grid_to_proc_DOF, K1, F1);
-              } //if( nd2->get_subdomain_id() == this_mpi_proc )
+              } //if( nd2->getSubdomainId() == this_mpi_proc )
             
             }//for(gp=0...
-          } // if( lme->IsActive() )
+          } // if( lme->isActive() )
         }//for(aa=0...
         start1 += ImmersedBodyObjects[bb]->GetTotalDOF();
       }//for(bb=0;...
@@ -573,7 +573,7 @@ void  HBSplineCutFEM::applyInterfaceTerms3D()
           lme  = ImmersedBodyObjects[bb]->ImmIntgElems[aa];
           poly = ImmersedBodyObjects[bb]->ImmersedFaces[aa];
 
-          if( lme->IsActive() )
+          if( lme->isActive() )
           {
             for(gp=0;gp<nGauss;gp++)
             {
@@ -592,7 +592,7 @@ void  HBSplineCutFEM::applyInterfaceTerms3D()
 
               ndTemp = elems[findCellNumber(geom)];
 
-              if( ndTemp->get_subdomain_id() == this_mpi_proc )
+              if( ndTemp->getSubdomainId() == this_mpi_proc )
               {
               geometryToParametric(geom, param);
 
@@ -611,12 +611,12 @@ void  HBSplineCutFEM::applyInterfaceTerms3D()
 
               //cout << " stiffness and residual terms due to Nitsche method " << endl;
 
-              knotBegin = ndTemp->GetKnotBegin();
-              knotIncr  = ndTemp->GetKnotIncrement();
+              knotBegin = ndTemp->getKnotBegin();
+              knotIncr  = ndTemp->getKnotIncrement();
 
               GeomData.computeBasisFunctions3D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy, dNN_dz);
 
-              if(ndTemp->GetParent() == NULL)
+              if(ndTemp->getParent() == NULL)
               {
                 N = NN;
                 dN_dx = dNN_dx;
@@ -794,10 +794,10 @@ void  HBSplineCutFEM::applyInterfaceTerms3D()
               //cout << " uuuuuuuuuuu \n\n " << endl;
 
               solverPetsc->AssembleMatrixAndVectorCutFEM(0, 0, ndTemp->forAssyVec, grid_to_proc_DOF, K1, F1);
-              } //if( ndTemp->get_subdomain_id() == this_mpi_proc )
+              } //if( ndTemp->getSubdomainId() == this_mpi_proc )
 
             }//for(gp=0...
-          } // if( lme->IsActive() )
+          } // if( lme->isActive() )
         }//for(aa=0...
       }//for(bb=0;...
       //
@@ -858,11 +858,11 @@ void  HBSplineCutFEM::applyGhostPenalty2D()
     // where, diameter of a cut element is taken to be the diagonal of that element
 
     
-    ii = elems[cutCellIds[0]]->GetLevel();
+    ii = elems[cutCellIds[0]]->getLevel();
     
     for(ee=0; ee<cutCellIds.size(); ee++)
     {
-      ii = max( ii, elems[cutCellIds[ee]]->GetLevel() );
+      ii = max( ii, elems[cutCellIds[ee]]->getLevel() );
     }
 
     // cout << " Maximum cut-cell level = " << ii << endl;
@@ -884,22 +884,22 @@ void  HBSplineCutFEM::applyGhostPenalty2D()
     {
       nd1 = elems[cutCellIds[ee]];
 
-      //if( nd1->IsCutElement() && !(nd1->IsBoundary()) )
-      if( nd1->get_subdomain_id() == this_mpi_proc )
+      //if( nd1->isCutElement() && !(nd1->isBoundary()) )
+      if( nd1->getSubdomainId() == this_mpi_proc )
       {
-      if( nd1->IsCutElement() )
+      if( nd1->isCutElement() )
       {
-        //cout << " nd1->GetID() " <<  nd1->GetID() << '\t' <<  nd1->GetLevel() << endl;
+        //cout << " nd1->getID() " <<  nd1->getID() << '\t' <<  nd1->getLevel() << endl;
 
-        knots1[0] = nd1->GetKnots(Dir1);
-        knots1[1] = nd1->GetKnots(Dir2);
+        knots1[0] = nd1->getKnots(Dir1);
+        knots1[1] = nd1->getKnots(Dir2);
 
-        knotBegin1 = nd1->GetKnotBegin();
-        knotIncr1  = nd1->GetKnotIncrement();
+        knotBegin1 = nd1->getKnotBegin();
+        knotIncr1  = nd1->getKnotIncrement();
 
-        //cout << " nd1->IsRightBoundary() = " << nd1->IsRightBoundary() << endl;
+        //cout << " nd1->isRightBoundary() = " << nd1->isRightBoundary() << endl;
 
-        if( nd1->IsBoundary() )
+        if( nd1->isBoundary() )
         {
           //gammGP[0]  = 0.0;
           //gammGP[0]  = cutFEMparams[6] *mu* h1*h1*h1;
@@ -927,12 +927,12 @@ void  HBSplineCutFEM::applyGhostPenalty2D()
 
         for(side=0; side<NUM_NEIGHBOURS; side++)
         {
-          nd2 = nd1->GetNeighbour(side);
+          nd2 = nd1->getNeighbour(side);
 
-          //cout << " side = " << side << '\t' << nd2->GetDomainNumber() << endl;
-          //if( !(nd2 == NULL) && !(nd2->IsGhost()) && nd2->IsLeaf() && (nd2->GetDomainNumber() == -1) && (nd2->GetDomainNumber() >= 1) )
-          //if( (nd2 != NULL) && !(nd2->IsGhost()) && !(nd2->IsBoundary()) && nd2->IsLeaf() && (nd2->IsCutElement() || nd2->domNums[0] == 0) )
-          if( (nd2 != NULL) && !(nd2->IsGhost()) && nd2->IsLeaf() && (nd2->IsCutElement() || nd2->domNums[0] == 0) )
+          //cout << " side = " << side << '\t' << nd2->getDomainNumber() << endl;
+          //if( !(nd2 == NULL) && !(nd2->isGhost()) && nd2->isLeaf() && (nd2->getDomainNumber() == -1) && (nd2->getDomainNumber() >= 1) )
+          //if( (nd2 != NULL) && !(nd2->isGhost()) && !(nd2->isBoundary()) && nd2->isLeaf() && (nd2->isCutElement() || nd2->domNums[0] == 0) )
+          if( (nd2 != NULL) && !(nd2->isGhost()) && nd2->isLeaf() && (nd2->isCutElement() || nd2->domNums[0] == 0) )
           {
               nr1 = nd1->forAssyVec.size();
               nr2 = nd2->forAssyVec.size();
@@ -949,11 +949,11 @@ void  HBSplineCutFEM::applyGhostPenalty2D()
               F1 = VectorXd::Zero(nr1);
               F2 = VectorXd::Zero(nr2);
 
-              knots2[0] = nd2->GetKnots(Dir1);
-              knots2[1] = nd2->GetKnots(Dir2);
+              knots2[0] = nd2->getKnots(Dir1);
+              knots2[1] = nd2->getKnots(Dir2);
 
-              knotBegin2 = nd2->GetKnotBegin();
-              knotIncr2  = nd2->GetKnotIncrement();
+              knotBegin2 = nd2->getKnotBegin();
+              knotIncr2  = nd2->getKnotIncrement();
 
 
               GeomData.getBoundaryNormal2D(side, normal1);
@@ -975,14 +975,14 @@ void  HBSplineCutFEM::applyGhostPenalty2D()
                   // multiply dvol with 0.5 as the ghost-penalty operation is applied
                   // twice on the face shared by the two elements both of which are cut elements
 
-                  if( nd2->GetDomainNumber() == -1 )
+                  if( nd2->getDomainNumber() == -1 )
                     dvol *= 0.5;
 
                   //printf(" %4d \t %4d \t %12.6f \t %12.6f \n", side, dir, param[0], param[1]);
 
                   GeomData.computeBasisFunctionsGhostPenalty2D(knotBegin1, knotIncr1, param, NN1, dNN1_dx, dNN1_dy );
 
-                  if(nd1->GetParent() == NULL)
+                  if(nd1->getParent() == NULL)
                   {
                     N1 = NN1;
                     dN1_dx = dNN1_dx;
@@ -998,7 +998,7 @@ void  HBSplineCutFEM::applyGhostPenalty2D()
 
                   GeomData.computeBasisFunctionsGhostPenalty2D(knotBegin2, knotIncr2, param, NN2, dNN2_dx, dNN2_dy );
 
-                  if(nd2->GetParent() == NULL)
+                  if(nd2->getParent() == NULL)
                   {
                     N2 = NN2;
                     dN2_dx = dNN2_dx;
@@ -1139,11 +1139,11 @@ void  HBSplineCutFEM::applyGhostPenalty2D()
                 }
               }
               //cout << " lllllllllllllll " << endl;
-          }//  if( neighbours[side] != NULL && !neighbours[side]->IsGhost() )
+          }//  if( neighbours[side] != NULL && !neighbours[side]->isGhost() )
         } // for(side=0; side<NUM_NEIGHBOURS
 
-      } //if( nd1->IsCutElement() )
-      } //if( nd1->get_subdomain_id() == this_mpi_proc )
+      } //if( nd1->isCutElement() )
+      } //if( nd1->getSubdomainId() == this_mpi_proc )
     } //for(ee=0; ee<activeElements.size(); ee++)
 
     //cout << " HBSplineCutFEM::applyGhostPenalty2D() ... FINISHED  " << endl;
@@ -1156,6 +1156,8 @@ void  HBSplineCutFEM::applyGhostPenalty2D()
 
 void  HBSplineCutFEM::applyGhostPenalty3D()
 {
+    cout << " need to modify HBSplineCutFEM::applyGhostPenalty3D() ... " << endl;
+
     ////////////////////////////////////////////////////////
     //
     // stiffness and residual due to ghost-penalty terms
@@ -1199,11 +1201,11 @@ void  HBSplineCutFEM::applyGhostPenalty3D()
     // where, diameter of a cut element is taken to be the diagonal of that element
 
     
-    ii = elems[cutCellIds[0]]->GetLevel();
+    ii = elems[cutCellIds[0]]->getLevel();
     
     for(ee=0; ee<cutCellIds.size(); ee++)
     {
-      ii = max( ii, elems[cutCellIds[ee]]->GetLevel() );
+      ii = max( ii, elems[cutCellIds[ee]]->getLevel() );
     }
 
     //cout << " Maximum cut-cell level = " << ii << endl;
@@ -1226,20 +1228,20 @@ void  HBSplineCutFEM::applyGhostPenalty3D()
     {
       nd1 = elems[cutCellIds[ee]];
 
-      if( nd1->IsCutElement() )
+      if( nd1->isCutElement() )
       {
-        //cout << " nd1->GetID() " <<  nd1->GetID() << '\t' <<  nd1->GetLevel() << endl;
+        //cout << " nd1->getID() " <<  nd1->getID() << '\t' <<  nd1->getLevel() << endl;
 
-        knots1[0] = nd1->GetKnots(Dir1);
-        knots1[1] = nd1->GetKnots(Dir2);
-        knots1[2] = nd1->GetKnots(Dir3);
+        knots1[0] = nd1->getKnots(Dir1);
+        knots1[1] = nd1->getKnots(Dir2);
+        knots1[2] = nd1->getKnots(Dir3);
 
-        knotBegin1 = nd1->GetKnotBegin();
-        knotIncr1  = nd1->GetKnotIncrement();
+        knotBegin1 = nd1->getKnotBegin();
+        knotIncr1  = nd1->getKnotIncrement();
 
         //
-        //if( nd1->IsLeftBoundary() || nd1->IsRightBoundary() )
-        if( nd1->IsBoundary() )
+        //if( nd1->isLeftBoundary() || nd1->isRightBoundary() )
+        if( nd1->isBoundary() )
         {
           gammGP[0]  = cutFEMparams[6] * mu*h1;
           gammGP[1]  = gammGP[0];
@@ -1268,10 +1270,10 @@ void  HBSplineCutFEM::applyGhostPenalty3D()
         for(side=0; side<NUM_NEIGHBOURS; side++)
         {
           //cout << " side = " << side << endl;
-          nd2 = nd1->GetNeighbour(side);
+          nd2 = nd1->getNeighbour(side);
 
-          //if( nd2 != NULL && !(nd2->IsGhost()) )
-          if( (nd2 != NULL) && !(nd2->IsGhost()) && nd2->IsLeaf() && (nd2->IsCutElement() || nd2->domNums[0] == 0) )
+          //if( nd2 != NULL && !(nd2->isGhost()) )
+          if( (nd2 != NULL) && !(nd2->isGhost()) && nd2->isLeaf() && (nd2->isCutElement() || nd2->domNums[0] == 0) )
           {
               nr1 = nd1->forAssyVec.size();
               nr2 = nd2->forAssyVec.size();
@@ -1288,12 +1290,12 @@ void  HBSplineCutFEM::applyGhostPenalty3D()
               F1 = VectorXd::Zero(nr1);
               F2 = VectorXd::Zero(nr2);
 
-              knots2[0] = nd2->GetKnots(Dir1);
-              knots2[1] = nd2->GetKnots(Dir2);
-              knots2[2] = nd2->GetKnots(Dir3);
+              knots2[0] = nd2->getKnots(Dir1);
+              knots2[1] = nd2->getKnots(Dir2);
+              knots2[2] = nd2->getKnots(Dir3);
 
-              knotBegin2 = nd2->GetKnotBegin();
-              knotIncr2  = nd2->GetKnotIncrement();
+              knotBegin2 = nd2->getKnotBegin();
+              knotIncr2  = nd2->getKnotIncrement();
 
               normal1 = GeomData.boundaryNormals[side];
               normal2 = -normal1;
@@ -1303,7 +1305,7 @@ void  HBSplineCutFEM::applyGhostPenalty3D()
               gps = &(GeomData.boundaryQuadrature3D[side].gausspoints[0]);
               gws = &(GeomData.boundaryQuadrature3D[side].gaussweights[0]);
 
-              JacTemp = GeomData.boundaryJacobians[side][nd2->GetLevel()];
+              JacTemp = GeomData.boundaryJacobians[side][nd2->getLevel()];
 
               //h1 = abs(hElem.dot(normal1));
 
@@ -1315,14 +1317,14 @@ void  HBSplineCutFEM::applyGhostPenalty3D()
 
                   dvol = JacTemp * gws[gp] ;
 
-                  if( nd2->GetDomainNumber() == -1 )
+                  if( nd2->getDomainNumber() == -1 )
                     dvol *= 0.5;
 
                   //printf(" %4d \t %4d \t %12.6f \t %12.6f \n", side, dir, vv, uu);
 
                   GeomData.computeBasisFunctionsGhostPenalty3D(knotBegin1, knotIncr1, param, NN1, dNN1_dx, dNN1_dy, dNN1_dz );
 
-                  if(nd1->GetParent() == NULL)
+                  if(nd1->getParent() == NULL)
                   {
                     N1 = NN1;
                     dN1_dx = dNN1_dx;
@@ -1340,7 +1342,7 @@ void  HBSplineCutFEM::applyGhostPenalty3D()
 
                   GeomData.computeBasisFunctionsGhostPenalty3D(knotBegin2, knotIncr2, param, NN2, dNN2_dx, dNN2_dy, dNN2_dz );
 
-                  if(nd2->GetParent() == NULL)
+                  if(nd2->getParent() == NULL)
                   {
                     N2 = NN2;
                     dN2_dx = dNN2_dx;
@@ -1483,10 +1485,10 @@ void  HBSplineCutFEM::applyGhostPenalty3D()
                 }
               }
               //cout << " lllllllllllllll " << endl;
-          }//  if( neighbours[side] != NULL && !neighbours[side]->IsGhost() )
+          }//  if( neighbours[side] != NULL && !neighbours[side]->isGhost() )
         } // for(side=0; side<NUM_NEIGHBOURS
 
-      } //if( nd1->IsCutElement() )
+      } //if( nd1->isCutElement() )
     } //for(ee=0; ee<activeElements.size(); ee++)
 
 

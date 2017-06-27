@@ -14,7 +14,8 @@ class  LagrangeElem3DPoissonHex8Node : public LagrangeElement
 
     virtual ~LagrangeElem3DPoissonHex8Node();
 
-    virtual void  resetMatrixAndVector();
+    virtual int getElmTypeNameNum()
+    {  return 17; }
 
     virtual void prepareElemData();
 

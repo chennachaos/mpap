@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
 
     sfemSolid.SetDimension(2);
 
-    sfemSolid.SetNDOF(2);
+    sfemSolid.setNdof(2);
 
 
     // set nodes and elements
@@ -188,7 +188,7 @@ int main(int argc, char* argv[])
 
     sfemFluid.SetDimension(2);
 
-    sfemFluid.SetNDOF(3);
+    sfemFluid.setNdof(3);
 
 
     // set nodes and elements

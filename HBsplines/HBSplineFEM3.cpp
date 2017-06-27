@@ -161,7 +161,7 @@ void HBSplineFEM::reset()
   SolnData.reset();
 
   for(int bb=0;bb<ImmersedBodyObjects.size();bb++)
-    //if(ImmersedBodyObjects[bb]->GetNdof() > 0)
+    //if(ImmersedBodyObjects[bb]->getNdof() > 0)
       ImmersedBodyObjects[bb]->reset();
 
   return;

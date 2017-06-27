@@ -441,7 +441,6 @@ void SetTimeParametersSolid(int tis, double rho, double dt, VectorXd& td)
 
             td[10] = 1.0; 
 
-
       break;
 
       case  1: // generalised midpoint rule

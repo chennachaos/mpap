@@ -82,7 +82,8 @@ HBSplineCutFEM::HBSplineCutFEM()
                           "immersed body output", //30
                           "contact elements", //31
                           "element type", //32
-                          "material type");
+                          "material type", //33
+                          "preload");
 
 }
 
@@ -869,7 +870,7 @@ void HBSplineCutFEM::prepareInputData()
     {
       nd = elems[activeElements[ee]];
 
-      bbTemp = nd->GetAABB();
+      bbTemp = nd->getAABB();
       
       //cout <<  " ee = " << ee << '\t' << activeElements[ee] << endl;
 

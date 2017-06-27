@@ -88,13 +88,13 @@ void ImmersedIntegrationElement::reset()
 }
 
 
-void ImmersedIntegrationElement::AssembleElementVector(int ind, bool flag, double* rhs)
+void ImmersedIntegrationElement::assembleElementVector(int ind, bool flag, double* rhs)
 {
   return;
 }
 
 
-void ImmersedIntegrationElement::AssembleElementMatrix(int index, SparseMatrixXd& mtx)
+void ImmersedIntegrationElement::assembleElementMatrix(int index, SparseMatrixXd& mtx)
 {
   return;
 }

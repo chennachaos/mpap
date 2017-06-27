@@ -34,9 +34,6 @@ void LagrangeElem2DPoissonQuad4Node::prepareElemData()
 {
   LagrangeElement::prepareElemData();
 
-  //Klocal.resize(nsize, nsize);
-  //Flocal.resize(nsize);
-
   return;
 }
 
@@ -46,13 +43,6 @@ void LagrangeElem2DPoissonQuad4Node::prepareElemData2()
   return;
 }
 
-
-
-
-void LagrangeElem2DPoissonQuad4Node::resetMatrixAndVector()
-{
-  return;
-}
 
 int LagrangeElem2DPoissonQuad4Node::calcLoadVector()
 {

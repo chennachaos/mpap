@@ -10,7 +10,6 @@
 
 using namespace std;
 
-//extern ComputerTime       computerTime;
 extern MpapTime mpapTime;
 
 
@@ -71,11 +70,6 @@ void EulerBernoulliBeamElement3D::prepareElemData2()
   return;
 }
 
-
-void EulerBernoulliBeamElement3D::resetMatrixAndVector()
-{
-  return;
-}
 
 int EulerBernoulliBeamElement3D::calcLoadVector()
 {

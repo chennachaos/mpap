@@ -35,7 +35,6 @@ class TreeNode
 
         int  totnlbf, totnlbf2, nsize, nsize2, ndof, counter;
         NodeOrientation  orientation;
-        //elemTypeCutFEM  elemType;
 
         double  *elmDat, *matDat, JacMultElem, elemError, volume;
         double  knots[3][4];
@@ -85,56 +84,56 @@ class TreeNode
 
         ~TreeNode();
 
-        int  GetLevel()
+        int  getLevel()
         {  return level; }
 
-        void SetLevel(int lev)
+        void setLevel(int lev)
         {  level = lev; }
 
-        bool IsLeaf()
+        bool isLeaf()
         {  return (child == NULL); }
 
-        bool IsActive()
+        bool isActive()
         {  return  ACTIVE_FLAG; }
 
-        bool IsProcessed()
+        bool isProcessed()
         {  return PROCESSED;}
 
-        int GetID()
+        int getID()
         {  return id;}
 
-        int GetDimension()
+        int getDimension()
         {  return DIM;}
 
-        void  Setndof(int nd)
+        void  setNdof(int nd)
         { ndof = nd; }
 
-        int  Getndof()
+        int  getNdof()
         { return ndof; }
 
-        int* GetDegree()
+        int* getDegree()
         {  return  degree; }
 
-        double  GetError()
+        double  getError()
         {  return  elemError; }
 
-        double  GetJacMultElement()
-	{ return JacMultElem; }
+        double  getJacMultElement()
+	      { return JacMultElem; }
 
-        double  GetVolume();
+        double  getVolume();
         
-        double  GetVolumeGaussPoints(int domTemp);
+        double  getVolumeGaussPoints(int domTemp);
 
-        int GetNsize()
+        int getNsize2()
         { return nsize2; }
 
-        void  set_subdomain_id(int sid)
+        void  setSubdomainId(int sid)
         {  subdomId = sid;  return;  }
 
-        int get_subdomain_id()
+        int getSubdomainId()
         {  return  subdomId;  }
 
-        void SetDegree(int* deg)
+        void setDegree(int* deg)
         {
           totnlbf = 1;
           for(int ii=0;ii<DIM;ii++)
@@ -147,64 +146,64 @@ class TreeNode
           LocalBasisFuncs.assign(totnlbf, -1);
         }
         
-        bool GetFuncFlag()
+        bool getFuncFlag()
         {  return FuncFlag; }
         
-        void SetFuncFlag(bool flag1)
+        void setFuncFlag(bool flag1)
         {  FuncFlag = flag1; }
         
-        void SetKnots(double* knots_)
+        void setKnots(double* knots_)
         {  knots = knots_; }
         
-        double* GetKnots(int ind)
+        double* getKnots(int ind)
         {  return knots[ind]; }
 
-        AABB& GetAABB()
+        AABB& getAABB()
         {  return  bbox; }
 
-        myPoint& GetKnotBegin()
+        myPoint& getKnotBegin()
         {  return knotBegin; }
 
-        myPoint& GetKnotEnd()
+        myPoint& getKnotEnd()
         {  return knotEnd; }
 
-        myPoint& GetKnotIncrement()
+        myPoint& getKnotIncrement()
         {  return knotIncr; }
 
-        void SetParent(TreeNode_PTR  parent1)
+        void setParent(TreeNode_PTR  parent1)
         {  parent = parent1; }
         
-        TreeNode_PTR  GetParent()
+        TreeNode_PTR  getParent()
         {  return parent; }
         
-        int GetNumberOfChildren()
+        int getNumberOfChildren()
         {  return NUM_CHILDREN; }
 
-        int GetNumberOfNeighbours()
+        int getNumberOfNeighbours()
         {  return NUM_NEIGHBOURS; }
         
-        void SetNeighbour(int ind, TreeNode_PTR node1)
+        void setNeighbour(int ind, TreeNode_PTR node1)
         {
            assert(ind < pow(2,DIM));
            neighbours[ind] = node1;
         }
         
-        TreeNode_PTR  GetNeighbour(int ind) 
+        TreeNode_PTR  getNeighbour(int ind) 
         {  return neighbours[ind]; }
 
-        TreeNode_PTR  GetChild(int ind)
+        TreeNode_PTR  getChild(int ind)
         {  return child[ind];	}
         
-        static int  GetCount()
+        static int  getCount()
         { return nodecount; }
 
-        void SetKnots(int index, double val0, double val1)
+        void setKnots(int index, double val0, double val1)
         {
           knots[index][0] = val0;
           knots[index][1] = val1;
         }
 
-        void SetKnots(double u0, double u1, double v0, double v1)
+        void setKnots(double u0, double u1, double v0, double v1)
         {
           knots[0][0] = u0;
           knots[0][1] = u1;
@@ -212,7 +211,7 @@ class TreeNode
           knots[1][1] = v1;
         }
 
-        void SetKnots(double u0, double u1, double v0, double v1, double w0, double w1)
+        void setKnots(double u0, double u1, double v0, double v1, double w0, double w1)
         {
           knots[0][0] = u0;
           knots[0][1] = u1;
@@ -222,40 +221,34 @@ class TreeNode
           knots[2][1] = w1;
         }
 
-        double  GetKnotSpan(int dir)
+        double  getKnotspan(int dir)
         {  return (knots[dir][1] - knots[dir][0]);  }
 
-        double  GetKnotAt(int dir, int loc)
+        double  getKnotAt(int dir, int loc)
         {  return  knots[dir][loc];  }
         
-        bool IsGhost()
+        bool isGhost()
         {  return GHOST_FLAG; }
         
-        void SetGhostOn()
+        void setGhostOn()
         {
           GHOST_FLAG  = true;
           ACTIVE_FLAG = false;
         }
         
-        void SetGhostOff()
+        void setGhostOff()
         {  GHOST_FLAG = false;	}
         
-        void Activate()
+        void activate()
         {  ACTIVE_FLAG = true;	}
         
-        void Deactivate()
+        void deactivate()
         {  ACTIVE_FLAG = false; }
 
-        //void SetDomainNumber(int  dd)
-        //{ domainNum = dd;  } 
-
-        //int GetDomainNumber()
-        //{  return domainNum; }
-
-        int GetDomainNumber()
+        int getDomainNumber()
         {  return ( (domNums.size() == 1) ? domNums[0] : -1); }
 
-        bool IsCutElement()
+        bool isCutElement()
         {  return (domNums.size() > 1); }
 
         bool  pointLiesInside(const myPoint& pt);
@@ -268,14 +261,14 @@ class TreeNode
         
         void  printSelf();
 
-        bool  IsBoundary();
+        bool  isBoundary();
         
-        bool  IsLeftBoundary();
-        bool  IsRightBoundary();
-        bool  IsTopBoundary();
-        bool  IsBottomBoundary();
-        bool  IsFrontBoundary();
-        bool  IsBackBoundary();
+        bool  isLeftBoundary();
+        bool  isRightBoundary();
+        bool  isTopBoundary();
+        bool  isBottomBoundary();
+        bool  isFrontBoundary();
+        bool  isBackBoundary();
 
         void  prepareElemData();
 
@@ -291,7 +284,7 @@ class TreeNode
 
         int  prepareCutCell(vector<double>& cutFEMparams);
 
-        int  ResetAdaptiveIntegrationNode();
+        int  resetAdaptiveIntegrationNode();
 
         int  clearSubtriangulation();
 
@@ -364,11 +357,11 @@ class TreeNode
 
         void  computeAndReturnJacobian(int, double*, double*, double*, double, double*, MatrixXd&, VectorXd&, VectorXd&);
 
-        void  AssembleElementVector(int ind, bool flag, double* rhs);
+        void  assembleElementVector(int ind, bool flag, double* rhs);
         
         //void  AssembleMatrixAndVector(int, Mat, double*);
 
-        void  AssembleElementMatrix2(int, SparseMatrixXd& globalK);
+        void  assembleElementMatrix2(int, SparseMatrixXd& globalK);
 
         void  MatrixToMapResult(int, int, SparseMatrixXd& globalK);
 
@@ -524,7 +517,7 @@ TreeNode<DIM>::~TreeNode()
 
 
 template <int DIM>
-int  TreeNode<DIM>::ResetAdaptiveIntegrationNode()
+int  TreeNode<DIM>::resetAdaptiveIntegrationNode()
 {
   if(adapIntegNode != NULL)
     delete adapIntegNode;
@@ -536,62 +529,62 @@ int  TreeNode<DIM>::ResetAdaptiveIntegrationNode()
 
 
 template <int DIM>
-bool  TreeNode<DIM>::IsLeftBoundary()
+bool  TreeNode<DIM>::isLeftBoundary()
 {
-   if(this->IsGhost())
+   if(this->isGhost())
      return false;
    else
-     return ((neighbours[LEFT] == NULL) ? false : neighbours[LEFT]->IsGhost() );
+     return ((neighbours[LEFT] == NULL) ? false : neighbours[LEFT]->isGhost() );
 }
 
 
 template <int DIM>
-bool  TreeNode<DIM>::IsRightBoundary()
+bool  TreeNode<DIM>::isRightBoundary()
 {
-   if(this->IsGhost())
+   if(this->isGhost())
      return false;
    else
-     return ((neighbours[RIGHT] == NULL) ? false : neighbours[RIGHT]->IsGhost() );
+     return ((neighbours[RIGHT] == NULL) ? false : neighbours[RIGHT]->isGhost() );
 }
 
 
 template <int DIM>
-bool  TreeNode<DIM>::IsTopBoundary()
+bool  TreeNode<DIM>::isTopBoundary()
 {
-   if(this->IsGhost())
+   if(this->isGhost())
      return false;
    else
-     return ((neighbours[NORTH] == NULL) ? false : neighbours[NORTH]->IsGhost() );
+     return ((neighbours[NORTH] == NULL) ? false : neighbours[NORTH]->isGhost() );
 }
 
 
 template <int DIM>
-bool  TreeNode<DIM>::IsBottomBoundary()
+bool  TreeNode<DIM>::isBottomBoundary()
 {
-   if(this->IsGhost())
+   if(this->isGhost())
      return false;
    else
-     return ((neighbours[SOUTH] == NULL) ? false : neighbours[SOUTH]->IsGhost() );
+     return ((neighbours[SOUTH] == NULL) ? false : neighbours[SOUTH]->isGhost() );
 }
 
 
 template <int DIM>
-bool  TreeNode<DIM>::IsFrontBoundary()
+bool  TreeNode<DIM>::isFrontBoundary()
 {
-   if(this->IsGhost())
+   if(this->isGhost())
      return false;
    else
-     return ((neighbours[FRONT] == NULL) ? false : neighbours[FRONT]->IsGhost() );
+     return ((neighbours[FRONT] == NULL) ? false : neighbours[FRONT]->isGhost() );
 }
 
 
 template <int DIM>
-bool  TreeNode<DIM>::IsBackBoundary()
+bool  TreeNode<DIM>::isBackBoundary()
 {
-   if(this->IsGhost())
+   if(this->isGhost())
      return false;
    else
-     return ((neighbours[BACK] == NULL) ? false : neighbours[BACK]->IsGhost() );
+     return ((neighbours[BACK] == NULL) ? false : neighbours[BACK]->isGhost() );
 }
 
 
@@ -622,7 +615,7 @@ void TreeNode<DIM>::prepareElemData()
       totnlbf *= nlbf[0];
     }
 
-    ndof = GeomData->GetNDOF();
+    ndof = GeomData->getNdof();
     nsize =  totnlbf * ndof;
 
     elmDat = &(GeomData->FluidProps[0]);
@@ -680,7 +673,7 @@ void TreeNode<DIM>::initialiseDOFvalues()
 
 
 template<int DIM>
-void TreeNode<DIM>::AssembleElementMatrix2(int index, SparseMatrixXd& globalMat)
+void TreeNode<DIM>::assembleElementMatrix2(int index, SparseMatrixXd& globalMat)
 {
   int ii, jj, row, col;
 
@@ -697,7 +690,7 @@ void TreeNode<DIM>::AssembleElementMatrix2(int index, SparseMatrixXd& globalMat)
 
 
 template<int DIM>
-void TreeNode<DIM>::AssembleElementVector(int ind, bool flag, double* rhs)
+void TreeNode<DIM>::assembleElementVector(int ind, bool flag, double* rhs)
 {
    for(int ii=0;ii<nsize;ii++)
      rhs[forAssyVec[ii]] += Flocal(ii);

@@ -51,19 +51,19 @@ class AdaptiveBinarytree
         
         ~AdaptiveBinarytree();
         
-        int  GetLevel()
+        int  getLevel()
         {  return level; }
            
-        void SetLevel(int lev)
+        void setLevel(int lev)
         {  level = lev; }
 
-        bool IsLeaf()
+        bool isLeaf()
         {  return (child == NULL); }
 
-        int GetID()
+        int getID()
         {  return id;}
         
-        int GetDimension()
+        int getDimension()
         {  return DIM;}
 
         void SetSideTemp(int dd)
@@ -84,52 +84,52 @@ class AdaptiveBinarytree
         int GetCoord3()
         {  return coord3; }
 
-        double  GetVolume()
+        double  getVolume()
         {  return volume; }
 
-        void SetKnots(double* knots_)
+        void setKnots(double* knots_)
         {  knots = knots_; }
         
-        double* GetKnots(int ind)
+        double* getKnots(int ind)
         {  return knots[ind]; }
         
-        void SetParent(AdaptiveBinarytree_PTR  parent1)
+        void setParent(AdaptiveBinarytree_PTR  parent1)
         {  parent = parent1; }
         
-        AdaptiveBinarytree_PTR  GetParent()
+        AdaptiveBinarytree_PTR  getParent()
         {  return parent; }
 
         NodeOrientation  GetOrientation()
         {  return  orientation; }
 
-        int GetNumberOfChildren()
+        int getNumberOfChildren()
         {  return NUM_CHILDREN; }
 
-        int GetNumberOfNeighbours()
+        int getNumberOfNeighbours()
         {  return NUM_NEIGHBOURS; }
 
-        void SetNeighbour(int ind, AdaptiveBinarytree_PTR node1)
+        void setNeighbour(int ind, AdaptiveBinarytree_PTR node1)
         {
            assert(ind < pow(2,DIM));
            neighbours[ind] = node1;
         }
 
-        AdaptiveBinarytree_PTR  GetNeighbour(int ind) 
+        AdaptiveBinarytree_PTR  getNeighbour(int ind) 
         {  return neighbours[ind]; }
 
-        AdaptiveBinarytree_PTR  GetChild(int ind)
+        AdaptiveBinarytree_PTR  getChild(int ind)
         {  return child[ind];	}
         
-        static int  GetCount()
+        static int  getCount()
         { return nodecount; }
 
-        void SetKnots(int index, double val0, double val1)
+        void setKnots(int index, double val0, double val1)
         {
            knots[index][0] = val0;
            knots[index][1] = val1;
         }
 
-        void SetKnots(double u0, double u1, double v0, double v1)
+        void setKnots(double u0, double u1, double v0, double v1)
         {
            knots[0][0] = u0;
            knots[0][1] = u1;
@@ -137,7 +137,7 @@ class AdaptiveBinarytree
            knots[1][1] = v1;
         }
 
-        void SetKnots(double u0, double u1, double v0, double v1, double w0, double w1)
+        void setKnots(double u0, double u1, double v0, double v1, double w0, double w1)
         {
            knots[0][0] = u0;
            knots[0][1] = u1;
@@ -147,28 +147,28 @@ class AdaptiveBinarytree
            knots[2][1] = w1;
         }
 
-        AABB& GetAABB()
+        AABB& getAABB()
         {  return  bbox; }
 
-        double  GetKnotSpan(int dir)
+        double  getKnotspan(int dir)
         {  return (knots[dir][1] - knots[dir][0]);  }
 
-        double  GetKnotAt(int dir, int loc)
+        double  getKnotAt(int dir, int loc)
         {  return  knots[dir][loc];  }
 
         //void SetDomainNumber(int  dd)
         //{ domainNum = dd;  } 
 
-        //int GetDomainNumber()
+        //int getDomainNumber()
         //{  return domainNum; }
 
-        int GetDomainNumber()
+        int getDomainNumber()
         {  return ( (domNums.size() == 1) ? domNums[0] : -1); }
 
-        //bool IsCutElement()
+        //bool isCutElement()
         //{  return (domainNum == -1); }
 
-        bool IsCutElement()
+        bool isCutElement()
         {  return (domNums.size() > 1); }
 
         void SetSplitDirection(int  dd)

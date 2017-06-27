@@ -75,12 +75,6 @@ void LagrangeElem1Dbar2Node::prepareElemData2()
 }
 
 
-void LagrangeElem1Dbar2Node::resetMatrixAndVector()
-{
-  return;
-}
-
-
 
 int LagrangeElem1Dbar2Node::calcLoadVector()
 {

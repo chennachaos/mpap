@@ -5,11 +5,11 @@
 #include "Functions.h"
 #include "Files.h"
 #include "MyString.h"
-#include "headersVTK.h"
 #include "myGeomUtilities.h"
 #include "myTria.h"
 #include "DistFunctions.h"
 #include "AABB.h"
+
 
 extern ComputerTime       computerTime;
 extern MpapTime mpapTime;
@@ -122,11 +122,11 @@ void HBSplineCutFEM::plotGeomSubTrias1D(int val1, bool flag2, int col, bool PLOT
 
     for(ii=0;ii<elems.size();ii++)
     {
-      //if( elems[ii]->IsLeaf() && !(elems[ii]->IsGhost()) &&  elems[ii]->IsActive())
-      if( elems[ii]->IsActive() )
+      //if( elems[ii]->isLeaf() && !(elems[ii]->isGhost()) &&  elems[ii]->isActive())
+      if( elems[ii]->isActive() )
       {
-          //cout << " Node # " << elems[ii]->GetID() << '\t' << elems[ii]->IsLeaf() << '\t' << elems[ii]->IsGhost() << endl;
-          tmp = elems[ii]->GetKnots(0);
+          //cout << " Node # " << elems[ii]->getID() << '\t' << elems[ii]->isLeaf() << '\t' << elems[ii]->isGhost() << endl;
+          tmp = elems[ii]->getKnots(0);
 
           param[0] = tmp[0];
           ComputeGeometry(param, geom);
@@ -168,9 +168,9 @@ void HBSplineCutFEM::plotGeomSubTrias2D(int val1, bool flag2, int col, bool PLOT
     {
         ndTemp = elems[activeElements[ee]];
 
-        if( !ndTemp->IsCutElement() )
+        if( !ndTemp->isCutElement() )
         {
-          bbTemp = ndTemp->GetAABB();
+          bbTemp = ndTemp->getAABB();
 
           ptIds[0] = pointsVTK->InsertNextPoint(bbTemp.minBB[0], bbTemp.minBB[1], 0.0);
           ptIds[1] = pointsVTK->InsertNextPoint(bbTemp.maxBB[0], bbTemp.minBB[1], 0.0);
@@ -180,10 +180,10 @@ void HBSplineCutFEM::plotGeomSubTrias2D(int val1, bool flag2, int col, bool PLOT
           for(ll=0;ll<4;ll++)
             quadVTK->GetPointIds()->SetId(ll, ptIds[ll]);
 
-          //cout << ndTemp->IsCutElement() << '\t' << ndTemp->get_subdomain_id() << endl;
+          //cout << ndTemp->isCutElement() << '\t' << ndTemp->getSubdomainId() << endl;
 
-          cellDataVTK->InsertNextValue(ndTemp->GetDomainNumber());
-          cellDataVTK2->InsertNextValue(ndTemp->get_subdomain_id());
+          cellDataVTK->InsertNextValue(ndTemp->getDomainNumber());
+          cellDataVTK2->InsertNextValue(ndTemp->getSubdomainId());
 
           uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
         }
@@ -210,8 +210,8 @@ void HBSplineCutFEM::plotGeomSubTrias2D(int val1, bool flag2, int col, bool PLOT
               triaVTK->GetPointIds()->SetId(kk, ptId );
             }
 
-            cellDataVTK->InsertNextValue(poly->GetDomainNumber());
-            cellDataVTK2->InsertNextValue(ndTemp->get_subdomain_id());
+            cellDataVTK->InsertNextValue(poly->getDomainNumber());
+            cellDataVTK2->InsertNextValue(ndTemp->getSubdomainId());
 
             uGridVTK->InsertNextCell(triaVTK->GetCellType(), triaVTK->GetPointIds());
 
@@ -242,10 +242,10 @@ void HBSplineCutFEM::plotGeomSubTrias3D(int val1, bool flag2, int col, bool PLOT
     {
         ndTemp = elems[activeElements[ee]];
 
-        //if( nd1->GetDomainNumber() < 5 )
-        if( !ndTemp->IsCutElement() )
+        //if( nd1->getDomainNumber() < 5 )
+        if( !ndTemp->isCutElement() )
         {
-          bbTemp = ndTemp->GetAABB();
+          bbTemp = ndTemp->getAABB();
 
           ptIds[0] = pointsVTK->InsertNextPoint(bbTemp.minBB[0], bbTemp.minBB[1], bbTemp.minBB[2]);
           ptIds[1] = pointsVTK->InsertNextPoint(bbTemp.maxBB[0], bbTemp.minBB[1], bbTemp.minBB[2]);
@@ -260,8 +260,8 @@ void HBSplineCutFEM::plotGeomSubTrias3D(int val1, bool flag2, int col, bool PLOT
           for(ll=0;ll<8;ll++)
             hexVTK->GetPointIds()->SetId(ll, ptIds[ll]);
 
-          cellDataVTK->InsertNextValue( ndTemp->GetDomainNumber() );
-          cellDataVTK2->InsertNextValue(ndTemp->get_subdomain_id());
+          cellDataVTK->InsertNextValue( ndTemp->getDomainNumber() );
+          cellDataVTK2->InsertNextValue(ndTemp->getSubdomainId());
 
           uGridVTK->InsertNextCell(hexVTK->GetCellType(), hexVTK->GetPointIds());
         }
@@ -288,8 +288,8 @@ void HBSplineCutFEM::plotGeomSubTrias3D(int val1, bool flag2, int col, bool PLOT
               tetVTK->GetPointIds()->SetId(kk, ptId );
             }
 
-            cellDataVTK->InsertNextValue(poly->GetDomainNumber());
-            cellDataVTK2->InsertNextValue(ndTemp->get_subdomain_id());
+            cellDataVTK->InsertNextValue(poly->getDomainNumber());
+            cellDataVTK2->InsertNextValue(ndTemp->getSubdomainId());
 
             uGridVTK->InsertNextCell(tetVTK->GetCellType(), tetVTK->GetPointIds());
 
@@ -413,23 +413,23 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
     for(ee=0; ee<activeElements.size(); ee++)
     {
       ndTemp = elems[activeElements[ee]];
-      //cout << " Node # " << nd->GetID() << endl;
+      //cout << " Node # " << nd->getID() << endl;
 
-        tmp0 = ndTemp->GetKnots(Dir1);
-        tmp1 = ndTemp->GetKnots(Dir2);
+        tmp0 = ndTemp->getKnots(Dir1);
+        tmp1 = ndTemp->getKnots(Dir2);
 
-        knotBegin = ndTemp->GetKnotBegin();
-        knotIncr  = ndTemp->GetKnotIncrement();
+        knotBegin = ndTemp->getKnotBegin();
+        knotIncr  = ndTemp->getKnotIncrement();
 
         //printf("\t tmp[0] and tmp[1]  ... : %12.8f\t%12.8f\n", tmp[0], tmp[1] );
 
         incr1 = tmp0[2] ;
         incr2 = tmp1[2] ;
 
-        //if( !(ndTemp->IsCutElement()) )
-        if( ndTemp->GetDomainNumber() < 10 )
+        //if( !(ndTemp->isCutElement()) )
+        if( ndTemp->getDomainNumber() < 10 )
         {
-          //if( ndTemp->GetDomainNumber() == 0 )
+          //if( ndTemp->getDomainNumber() == 0 )
           //{
             fact = incr1/resln[0];
             create_vector(tmp0[0], tmp0[1], fact, uu);
@@ -454,7 +454,7 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
 
                 GeomData.computeBasisFunctions2D(knotBegin, knotIncr, param, NN);
 
-                if(ndTemp->GetParent() == NULL)
+                if(ndTemp->getParent() == NULL)
                   N = NN;
                 else
                   N = ndTemp->SubDivMat*NN;
@@ -476,13 +476,13 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
             quadVTK->GetPointIds()->SetId(2, pt[3]);
             quadVTK->GetPointIds()->SetId(3, pt[2]);
 
-            //cout << ndTemp->GetID() << '\t' << ndTemp->get_subdomain_id() << endl;
+            //cout << ndTemp->getID() << '\t' << ndTemp->getSubdomainId() << endl;
 
             uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
             cellDataVTK->InsertNextValue(0);
-            cellDataVTK2->InsertNextValue(ndTemp->get_subdomain_id());
+            cellDataVTK2->InsertNextValue(ndTemp->getSubdomainId());
 	  //}
-        } //if( !nd->IsCutElement() )
+        } //if( !nd->isCutElement() )
         else // the element is cutCell
         {
           vtkSmartPointer<vtkTriangle> triaVTK =  vtkSmartPointer<vtkTriangle>::New();
@@ -493,7 +493,7 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
           {
             poly = ndTemp->subTrias[ii];
 
-            if( poly->GetDomainNumber() == 0 )
+            if( poly->getDomainNumber() == 0 )
             {
               for(kk=0; kk<3; kk++)
               {
@@ -505,7 +505,7 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
                 geometryToParametric(geom, param);
                 GeomData.computeBasisFunctions2D(knotBegin, knotIncr, param, NN);
 
-                if(ndTemp->GetParent() == NULL)
+                if(ndTemp->getParent() == NULL)
                   N = NN;
                 else
                   N = ndTemp->SubDivMat*NN;
@@ -521,7 +521,7 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
                 triaVTK->GetPointIds()->SetId(kk, pt[kk] );
               }
 
-              //cellDataVTK->InsertNextValue(poly->GetDomainNumber());
+              //cellDataVTK->InsertNextValue(poly->getDomainNumber());
 
               uGridVTK->InsertNextCell(triaVTK->GetCellType(), triaVTK->GetPointIds());
             }
@@ -561,21 +561,21 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
     for(ee=0; ee<activeElements.size(); ee++)
     {
         ndTemp = elems[activeElements[ee]];
-        //cout << " Node # " << nd->GetID() << endl;
+        //cout << " Node # " << nd->getID() << endl;
 
-        tmp0 = ndTemp->GetKnots(Dir1);
-        tmp1 = ndTemp->GetKnots(Dir2);
+        tmp0 = ndTemp->getKnots(Dir1);
+        tmp1 = ndTemp->getKnots(Dir2);
 
-        knotBegin = ndTemp->GetKnotBegin();
-        knotIncr  = ndTemp->GetKnotIncrement();
+        knotBegin = ndTemp->getKnotBegin();
+        knotIncr  = ndTemp->getKnotIncrement();
 
         //printf("\t tmp[0] and tmp[1]  ... : %12.8f\t%12.8f\n", tmp[0], tmp[1] );
 
         incr1 = tmp0[2] ;
         incr2 = tmp1[2] ;
 
-        if( ndTemp->GetDomainNumber() == 0 )
-        //if( ndTemp->GetDomainNumber() <= 10 )
+        if( ndTemp->getDomainNumber() == 0 )
+        //if( ndTemp->getDomainNumber() <= 10 )
         {
             fact = incr1/resln[0];
             create_vector(tmp0[0], tmp0[1], fact, uu);
@@ -600,7 +600,7 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
 
                 GeomData.computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy);
 
-                if(ndTemp->GetParent() == NULL)
+                if(ndTemp->getParent() == NULL)
                 {
                   N = NN;
                   dN_dx = dNN_dx;
@@ -638,12 +638,12 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
 
             uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
             cellDataVTK->InsertNextValue(0);
-            cellDataVTK2->InsertNextValue(ndTemp->get_subdomain_id());
+            cellDataVTK2->InsertNextValue(ndTemp->getSubdomainId());
 
             //cout << " ooooooooooooo " << endl;
-        } //if( !nd->IsCutElement() )
+        } //if( !nd->isCutElement() )
         //else // the element is cutCell
-        if( ndTemp->GetDomainNumber() == -1 )
+        if( ndTemp->getDomainNumber() == -1 )
         {
           vtkSmartPointer<vtkTriangle> triaVTK =  vtkSmartPointer<vtkTriangle>::New();
 
@@ -653,7 +653,7 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
           {
             poly = ndTemp->subTrias[ii];
 
-            if( poly->GetDomainNumber() == 0 )
+            if( poly->getDomainNumber() == 0 )
 	    {
               for(kk=0; kk<3; kk++)
               {
@@ -665,7 +665,7 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
                 geometryToParametric(geom, param);
                 GeomData.computeBasisFunctions2D(knotBegin, knotIncr, param, NN);
 
-                if(ndTemp->GetParent() == NULL)
+                if(ndTemp->getParent() == NULL)
                 {
                   N = NN;
                   dN_dx = dNN_dx;
@@ -696,7 +696,7 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
                 triaVTK->GetPointIds()->SetId(kk, pt[kk] );
               }
 
-              cellDataVTK->InsertNextValue(poly->GetDomainNumber());
+              cellDataVTK->InsertNextValue(poly->getDomainNumber());
               cellDataVTK2->InsertNextValue(0);
 
               uGridVTK->InsertNextCell(triaVTK->GetCellType(), triaVTK->GetPointIds());
@@ -757,14 +757,14 @@ void  HBSplineCutFEM::postProcessSubTrias3D(int vartype, int vardir, int nCol, b
     for(ee=0; ee<activeElements.size(); ee++)
     {
       ndTemp = elems[activeElements[ee]];
-      //cout << " Node # " << nd->GetID() << endl;
+      //cout << " Node # " << nd->getID() << endl;
 
-        tmp0 = ndTemp->GetKnots(Dir1);
-        tmp1 = ndTemp->GetKnots(Dir2);
-        tmp2 = ndTemp->GetKnots(Dir3);
+        tmp0 = ndTemp->getKnots(Dir1);
+        tmp1 = ndTemp->getKnots(Dir2);
+        tmp2 = ndTemp->getKnots(Dir3);
 
-        knotBegin = ndTemp->GetKnotBegin();
-        knotIncr  = ndTemp->GetKnotIncrement();
+        knotBegin = ndTemp->getKnotBegin();
+        knotIncr  = ndTemp->getKnotIncrement();
 
         //printf("\t tmp[0] and tmp[1]  ... : %12.8f\t%12.8f\n", tmp[0], tmp[1] );
 
@@ -772,7 +772,7 @@ void  HBSplineCutFEM::postProcessSubTrias3D(int vartype, int vardir, int nCol, b
         incr2 = tmp1[2] ;
         incr3 = tmp2[2] ;
 
-        if( !ndTemp->IsCutElement() )
+        if( !ndTemp->isCutElement() )
         {
           fact = incr1/resln[0];
           create_vector(tmp0[0], tmp0[1], fact, uu);
@@ -800,7 +800,7 @@ void  HBSplineCutFEM::postProcessSubTrias3D(int vartype, int vardir, int nCol, b
 
                 GeomData.computeBasisFunctions2D(knotBegin, knotIncr, param, NN);
 
-                if(ndTemp->GetParent() == NULL)
+                if(ndTemp->getParent() == NULL)
                   N = NN;
                 else
                   N = ndTemp->SubDivMat*NN;
@@ -826,7 +826,7 @@ void  HBSplineCutFEM::postProcessSubTrias3D(int vartype, int vardir, int nCol, b
           //cellDataVTK->InsertNextValue(0);
           //cellDataVTK2->InsertNextValue(0);
 
-        } //if( !nd->IsCutElement() )
+        } //if( !nd->isCutElement() )
         else // the element is cutCell
         {
           vtkSmartPointer<vtkTriangle> triaVTK =  vtkSmartPointer<vtkTriangle>::New();
@@ -837,7 +837,7 @@ void  HBSplineCutFEM::postProcessSubTrias3D(int vartype, int vardir, int nCol, b
           {
             poly = ndTemp->subTrias[ii];
 
-            if( poly->GetDomainNumber() == 0 )
+            if( poly->getDomainNumber() == 0 )
             {
               for(kk=0; kk<3; kk++)
               {
@@ -849,7 +849,7 @@ void  HBSplineCutFEM::postProcessSubTrias3D(int vartype, int vardir, int nCol, b
                 geometryToParametric(geom, param);
                 GeomData.computeBasisFunctions2D(knotBegin, knotIncr, param, NN);
 
-                if(ndTemp->GetParent() == NULL)
+                if(ndTemp->getParent() == NULL)
                   N = NN;
                 else
                   N = ndTemp->SubDivMat*NN;
@@ -865,7 +865,7 @@ void  HBSplineCutFEM::postProcessSubTrias3D(int vartype, int vardir, int nCol, b
                 triaVTK->GetPointIds()->SetId(kk, pt[kk] );
               }
 
-              cellDataVTK->InsertNextValue(poly->GetDomainNumber());
+              cellDataVTK->InsertNextValue(poly->getDomainNumber());
 
               uGridVTK->InsertNextCell(triaVTK->GetCellType(), triaVTK->GetPointIds());
             }
@@ -903,14 +903,14 @@ void  HBSplineCutFEM::postProcessSubTrias3D(int vartype, int vardir, int nCol, b
     for(ee=0; ee<activeElements.size(); ee++)
     {
         ndTemp = elems[activeElements[ee]];
-        //cout << " Node # " << nd->GetID() << endl;
+        //cout << " Node # " << nd->getID() << endl;
 
-        tmp0 = ndTemp->GetKnots(Dir1);
-        tmp1 = ndTemp->GetKnots(Dir2);
-        tmp2 = ndTemp->GetKnots(Dir3);
+        tmp0 = ndTemp->getKnots(Dir1);
+        tmp1 = ndTemp->getKnots(Dir2);
+        tmp2 = ndTemp->getKnots(Dir3);
 
-        knotBegin = ndTemp->GetKnotBegin();
-        knotIncr  = ndTemp->GetKnotIncrement();
+        knotBegin = ndTemp->getKnotBegin();
+        knotIncr  = ndTemp->getKnotIncrement();
 
         //printf("\t tmp[0] and tmp[1]  ... : %12.8f\t%12.8f\n", tmp[0], tmp[1] );
 
@@ -918,7 +918,7 @@ void  HBSplineCutFEM::postProcessSubTrias3D(int vartype, int vardir, int nCol, b
         incr2 = tmp1[2] ;
         incr3 = tmp2[2] ;
 
-        if( !(ndTemp->IsCutElement()) )
+        if( !(ndTemp->isCutElement()) )
         {
             fact = incr1/resln[0];
             create_vector(tmp0[0], tmp0[1], fact, uu);
@@ -952,7 +952,7 @@ void  HBSplineCutFEM::postProcessSubTrias3D(int vartype, int vardir, int nCol, b
 
                 GeomData.computeBasisFunctions3D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy, dNN_dz);
 
-                if(ndTemp->GetParent() == NULL)
+                if(ndTemp->getParent() == NULL)
                 {
                   N = NN;
                   dN_dx = dNN_dx;
@@ -993,9 +993,9 @@ void  HBSplineCutFEM::postProcessSubTrias3D(int vartype, int vardir, int nCol, b
 
             uGridVTK->InsertNextCell(hexVTK->GetCellType(), hexVTK->GetPointIds());
             //cellDataVTK->InsertNextValue(0);
-            cellDataVTK2->InsertNextValue(ndTemp->get_subdomain_id());
+            cellDataVTK2->InsertNextValue(ndTemp->getSubdomainId());
             //cout << " ooooooooooooo " << endl;
-        } //if( !nd->IsCutElement() )
+        } //if( !nd->isCutElement() )
         else // the element is cutCell
         {
           vtkSmartPointer<vtkTetra> tetVTK =  vtkSmartPointer<vtkTetra>::New();
@@ -1005,7 +1005,7 @@ void  HBSplineCutFEM::postProcessSubTrias3D(int vartype, int vardir, int nCol, b
           for(ii=0; ii<ndTemp->subTrias.size(); ii++)
           {
             poly = ndTemp->subTrias[ii];
-            domTemp = poly->GetDomainNumber();
+            domTemp = poly->getDomainNumber();
             if( domainInclYesNo[domTemp] )
 	    {
               for(kk=0; kk<4; kk++)
@@ -1018,7 +1018,7 @@ void  HBSplineCutFEM::postProcessSubTrias3D(int vartype, int vardir, int nCol, b
                 geometryToParametric(geom, param);
                 GeomData.computeBasisFunctions2D(knotBegin, knotIncr, param, NN);
 
-                if(ndTemp->GetParent() == NULL)
+                if(ndTemp->getParent() == NULL)
                 {
                   N = NN;
                   dN_dx = dNN_dx;
@@ -1046,7 +1046,7 @@ void  HBSplineCutFEM::postProcessSubTrias3D(int vartype, int vardir, int nCol, b
                 tetVTK->GetPointIds()->SetId(kk, pt[kk] );
               }
 
-              cellDataVTK->InsertNextValue(poly->GetDomainNumber());
+              cellDataVTK->InsertNextValue(poly->getDomainNumber());
 
               uGridVTK->InsertNextCell(tetVTK->GetCellType(), tetVTK->GetPointIds());
             } // if( domainInclYesNo[domTemp] )
@@ -1100,12 +1100,12 @@ void HBSplineCutFEM::plotGaussPointsElement()
         nd1 = elems[activeElements[ee]];
 
         for(ii=0; ii<DIM; ii++)
-          tmp[ii] = nd1->GetKnots(ii);
+          tmp[ii] = nd1->getKnots(ii);
 
         //cout << tmp[0][0] << '\t' << tmp[0][1] << '\t' << tmp1[0] << '\t' << tmp1[1] << endl;
 
         nGauss=0;
-        if( nd1->GetDomainNumber() == -1 )
+        if( nd1->getDomainNumber() == -1 )
         {
           nGauss = nd1->Quadrature.gausspoints.size();
       
@@ -1113,24 +1113,24 @@ void HBSplineCutFEM::plotGaussPointsElement()
           gws = &(nd1->Quadrature.gaussweights[0]);
         }
 
-        if( nd1->GetDomainNumber() == 0 )
+        if( nd1->getDomainNumber() == 0 )
         {
           nGauss = GeomData.gausspoints.size();
 
           gps = &(GeomData.gausspoints[0]);
           gws = &(GeomData.gaussweights[0]);
 
-          //cout << " elem volume = " << nd1->GetVolume() << endl;
-          volume += nd1->GetVolume();
+          //cout << " elem volume = " << nd1->getVolume() << endl;
+          volume += nd1->getVolume();
         } // else
 
-          //cout << ee << '\t' << nGauss << '\t' << nd1->GetDomainNumber() << endl;
+          //cout << ee << '\t' << nGauss << '\t' << nd1->getDomainNumber() << endl;
           for(gp=0; gp<nGauss; gp++)
           {
               for(ii=0; ii<DIM; ii++)
                 param[ii]  = 0.5*(tmp[ii][2] * gps[gp][ii] + tmp[ii][3]);
 
-              if( nd1->GetDomainNumber() == -1 )
+              if( nd1->getDomainNumber() == -1 )
                 volume += gws[gp];
 
               ComputeGeometry(param, geom);
@@ -1195,12 +1195,12 @@ void HBSplineCutFEM::plotGaussPointsDirichletBoundary()
     {
       nd1 = elems[activeElements[ee]];
         
-      if( nd1->IsBoundary() && ( (nd1->domNums.size()>1) || (nd1->domNums[0] == 0)) )
+      if( nd1->isBoundary() && ( (nd1->domNums.size()>1) || (nd1->domNums[0] == 0)) )
       {
         for(ii=0; ii<DIM; ii++)
-          tmp[ii] = nd1->GetKnots(ii);
+          tmp[ii] = nd1->getKnots(ii);
 
-        levTemp = nd1->GetLevel();
+        levTemp = nd1->getLevel();
         //cout << tmp[0][0] << '\t' << tmp[0][1] << '\t' << tmp1[0] << '\t' << tmp1[1] << endl;
 
         if( nd1->DirichletData.size() > 0)
@@ -1233,7 +1233,7 @@ void HBSplineCutFEM::plotGaussPointsDirichletBoundary()
                   for(ii=0; ii<DIM; ii++)
                     param[ii]  = 0.5*(tmp[ii][2] * gps[gp][ii] + tmp[ii][3]);
 
-                  //if( nd1->GetDomainNumber() == -1 )
+                  //if( nd1->getDomainNumber() == -1 )
                     volume += gws[gp] * JacTemp;
 
                   ComputeGeometry(param, geom);
@@ -1294,12 +1294,12 @@ void HBSplineCutFEM::plotGaussPointsNeumannBoundary()
     {
       nd1 = elems[activeElements[ee]];
         
-      if( nd1->IsBoundary() && ( (nd1->domNums.size()>1) || (nd1->domNums[0] == 0)) )
+      if( nd1->isBoundary() && ( (nd1->domNums.size()>1) || (nd1->domNums[0] == 0)) )
       {
         for(ii=0; ii<DIM; ii++)
-          tmp[ii] = nd1->GetKnots(ii);
+          tmp[ii] = nd1->getKnots(ii);
 
-        levTemp = nd1->GetLevel();
+        levTemp = nd1->getLevel();
         //cout << tmp[0][0] << '\t' << tmp[0][1] << '\t' << tmp1[0] << '\t' << tmp1[1] << endl;
 
         if( nd1->NeumannData.size() > 0)
@@ -1332,7 +1332,7 @@ void HBSplineCutFEM::plotGaussPointsNeumannBoundary()
                   for(ii=0; ii<DIM; ii++)
                     param[ii]  = 0.5*(tmp[ii][2] * gps[gp][ii] + tmp[ii][3]);
 
-                  //if( nd1->GetDomainNumber() == -1 )
+                  //if( nd1->getDomainNumber() == -1 )
                     volume += gws[gp] * JacTemp;
 
                   ComputeGeometry(param, geom);

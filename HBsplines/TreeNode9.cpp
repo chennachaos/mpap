@@ -1541,8 +1541,8 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
     int TI, TIp1, TIp2, TJ, TJp1, TJp2;
 
     double  JacTemp, Jac, dvol, stabParam, CI=4.0, bforce[2];
-    double  fact, fact2, b1, b2, b3, b4, b5, b6, b7, b8, acceFact, dt;
-    double  pres, Da, Db, af, am, muTaf, rad, urdr, urdr2, h2, h, tau[3];
+    double  fact, fact2, b1, b2, b3, b4, b5, b6, b7, b8;
+    double  pres, Da, Db, rad, urdr, urdr2, h2, h, tau[3];
 
     //double beta[6]; get_stabilisation_beta_wulf(beta);
 
@@ -1558,16 +1558,12 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
     bool   axsy = ((int)elmDat[2] == 1);
     double  rho = elmDat[3];
     double  mu  = elmDat[4];
-    bforce[0]   = elmDat[5];
-    bforce[1]   = elmDat[6];
-
-
-    af = SolnData->td(2);
-    am = SolnData->td(1);
-    acceFact = am*SolnData->td(9);
-    dt = mpapTime.dt;
-
-    muTaf = mu*af;
+    double  bforce[2]   = {elmDat[5], elmDat[6]};
+    double af = SolnData->td(2);
+    double am = SolnData->td(1);
+    double acceFact = am*SolnData->td(9);
+    double dt = mpapTime.dt;
+    double muTaf = mu*af;
 
     double *gws;
     myPoint *gps;
@@ -2520,7 +2516,7 @@ int TreeNode<2>::computeGaussPointsAdapIntegrationBoundary(int side, int refLev1
   flag = false;
   for(vector<myPoly*>::iterator poly = subTrias.begin() ; poly != subTrias.end(); ++poly)
   {
-      domTemp = (*poly)->GetDomainNumber();
+      domTemp = (*poly)->getDomainNumber();
       
       if( domTemp == 0 )
       {
@@ -2700,14 +2696,14 @@ void TreeNode<2>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
 {
   if(DirichletData.size() > 0)
   {
-    //if( IsCutElement() )
+    //if( isCutElement() )
     //{
       //vector<int>  domTemp;
       //std::vector<int>::iterator  itTemp;
 
       //for(vector<myPoly*>::iterator poly = subTrias.begin() ; poly != subTrias.end(); ++poly)
       //{
-        //domTemp.push_back( (*poly)->GetDomainNumber() );
+        //domTemp.push_back( (*poly)->getDomainNumber() );
       //}
       //printVector(domTemp);
 

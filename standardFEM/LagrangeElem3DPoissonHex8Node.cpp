@@ -34,9 +34,6 @@ void LagrangeElem3DPoissonHex8Node::prepareElemData()
 {
   LagrangeElement::prepareElemData();
 
-  //Klocal.resize(nsize, nsize);
-  //Flocal.resize(nsize);
-
   return;
 }
 
@@ -45,15 +42,6 @@ void LagrangeElem3DPoissonHex8Node::prepareElemData2()
 {
   return;
 }
-
-
-
-
-void LagrangeElem3DPoissonHex8Node::resetMatrixAndVector()
-{
-  return;
-}
-
 
 
 int LagrangeElem3DPoissonHex8Node::calcLoadVector()

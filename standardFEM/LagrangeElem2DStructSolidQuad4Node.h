@@ -14,7 +14,8 @@ class  LagrangeElem2DStructSolidQuad4Node : public LagrangeElement
 
     virtual ~LagrangeElem2DStructSolidQuad4Node();
 
-    virtual void  resetMatrixAndVector();
+    virtual int getElmTypeNameNum()
+    {  return 8; }
 
     virtual void prepareElemData();
 

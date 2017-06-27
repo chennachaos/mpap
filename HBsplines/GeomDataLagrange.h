@@ -23,8 +23,8 @@ class  GeomDataLagrange
     vector<myPoint>  NodePosOrig, NodePosNew, NodePosCur, NodePosPrev, NodePosPrevCur;
     vector<myPoint>  specValNew, specValCur, acceNew, acceCur;
 
-    vector<int>  node_map_new_to_old;
-    vector<int>  node_map_old_to_new;
+    vector<int>  node_map_new_to_old, node_map_old_to_new;
+    vector<int>  assy4r;
 
     GeomDataLagrange()  {}
 
@@ -36,7 +36,7 @@ class  GeomDataLagrange
     void  SetNumNode(int dd)
     {      nNode = dd;    }
 
-    void  SetNdof(int dd)
+    void  setNdof(int dd)
     {      ndof = dd;    }
 
     void  SetNGP(int nn)
@@ -45,7 +45,7 @@ class  GeomDataLagrange
     int  GetNumNode()
     {  return      nNode;    }
 
-    int  GetNdof()
+    int  getNdof()
     {  return  ndof;     }
 
     int GetNGP(int ind)

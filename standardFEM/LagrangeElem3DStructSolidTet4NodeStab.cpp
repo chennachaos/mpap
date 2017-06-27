@@ -75,14 +75,6 @@ void LagrangeElem3DStructSolidTet4NodeStab::prepareElemData2()
   return;
 }
 
-
-
-void LagrangeElem3DStructSolidTet4NodeStab::resetMatrixAndVector()
-{
-  return;
-}
-
-
 int LagrangeElem3DStructSolidTet4NodeStab::calcLoadVector()
 {
   return 0;

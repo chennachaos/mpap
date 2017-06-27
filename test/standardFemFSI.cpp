@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
 
     sfemSolid.SetDimension(2);
 
-    sfemSolid.SetNDOF(2);
+    sfemSolid.setNdof(2);
 
     sfemSolid.readFile( infileSolid );
 
@@ -124,7 +124,7 @@ int main(int argc, char* argv[])
 
     sfemFluid.SetDimension(2);
 
-    sfemFluid.SetNDOF(3);
+    sfemFluid.setNdof(3);
 
     std::ifstream  infileFluid("../src/test/IChannelFluid");
 
@@ -165,7 +165,7 @@ int main(int argc, char* argv[])
 
     sfemMesh.SetDimension(2);
 
-    sfemMesh.SetNDOF(2);
+    sfemMesh.setNdof(2);
 
     std::ifstream  infileMesh("../src/test/IChannelMesh");
 

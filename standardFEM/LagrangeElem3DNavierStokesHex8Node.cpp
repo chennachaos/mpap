@@ -40,9 +40,6 @@ void LagrangeElem3DNavierStokesHex8Node::prepareElemData()
 {
   LagrangeElement::prepareElemData();
 
-  //Klocal.resize(nsize, nsize);
-  //Flocal.resize(nsize);
-
   return;
 }
 
@@ -53,11 +50,6 @@ void LagrangeElem3DNavierStokesHex8Node::prepareElemData2()
 }
 
 
-
-void LagrangeElem3DNavierStokesHex8Node::resetMatrixAndVector()
-{
-  return;
-}
 
 int LagrangeElem3DNavierStokesHex8Node::calcLoadVector()
 {

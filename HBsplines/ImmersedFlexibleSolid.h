@@ -5,8 +5,6 @@
 
 #include "ImmersedSolid.h"
 
-//#include "util.h"
-
 #include "TreeNode.h"
 
 #include "LagrangeElement.h"

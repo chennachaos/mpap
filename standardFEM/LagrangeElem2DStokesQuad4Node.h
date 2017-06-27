@@ -13,7 +13,9 @@ class  LagrangeElem2DStokesQuad4Node : public LagrangeElement
     LagrangeElem2DStokesQuad4Node();
 
     virtual ~LagrangeElem2DStokesQuad4Node();
-    virtual void  resetMatrixAndVector();
+
+    virtual int getElmTypeNameNum()
+    {  return 12; }
 
     virtual void prepareElemData();
 

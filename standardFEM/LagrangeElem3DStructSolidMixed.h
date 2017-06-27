@@ -16,7 +16,8 @@ class  LagrangeElem3DStructSolidMixed : public LagrangeElement
 
     virtual ~LagrangeElem3DStructSolidMixed();
 
-    virtual void  resetMatrixAndVector();
+    virtual int getElmTypeNameNum()
+    {  return 20;     }
 
     virtual void prepareElemData();
 

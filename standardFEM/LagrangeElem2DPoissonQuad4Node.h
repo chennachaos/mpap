@@ -14,7 +14,8 @@ class  LagrangeElem2DPoissonQuad4Node : public LagrangeElement
 
     virtual ~LagrangeElem2DPoissonQuad4Node();
 
-    virtual void  resetMatrixAndVector();
+    virtual int getElmTypeNameNum()
+    {  return 6; }
 
     virtual void prepareElemData();
 

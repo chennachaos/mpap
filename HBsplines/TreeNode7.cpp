@@ -192,7 +192,7 @@ int TreeNode<3>::prepareCutCell(vector<double>& cutFEMparams)
   {
     return GeomData->doIntersect3D(bbox, false, cornerInOut, ptOut, domNums) ;
 
-    //if( IsRightBoundary() && IsTopBoundary() && IsBackBoundary() )
+    //if( isRightBoundary() && isTopBoundary() && isBackBoundary() )
     //{
       //bbox.printSelf();
       //printVector(cornerInOut);
@@ -251,7 +251,7 @@ int TreeNode<2>::computeGaussPointsSubTrias(int nGP, int inclFlag, int flag1, in
     {
       (*poly)->getGaussPointsCUTFEM(nGP, gpsLoc, gwsLoc );
       
-      domTemp = (*poly)->GetDomainNumber() ; 
+      domTemp = (*poly)->getDomainNumber() ; 
       //area2 = (*poly)->volume();
       
       //cout << area << '\t' << area2 << '\t' << area/area2 << endl;
@@ -290,7 +290,7 @@ int TreeNode<2>::computeGaussPointsSubTrias(int nGP, int inclFlag, int flag1, in
   {
     for(vector<myPoly*>::iterator poly = subTrias.begin() ; poly != subTrias.end(); ++poly)
     {
-      if( (*poly)->GetDomainNumber() == 0 )
+      if( (*poly)->getDomainNumber() == 0 )
       {
         (*poly)->getGaussPointsCUTFEM(nGP, gpsLoc, gwsLoc );
       
@@ -319,7 +319,7 @@ int TreeNode<2>::computeGaussPointsSubTrias(int nGP, int inclFlag, int flag1, in
           Quadrature.gausspoints.push_back(ptTemp);
           Quadrature.gaussweights.push_back(gwsLoc[gp]);
         }
-      } // if( (*poly)->GetDomainNumber() == 0 )
+      } // if( (*poly)->getDomainNumber() == 0 )
     }
   }
 
@@ -328,7 +328,7 @@ int TreeNode<2>::computeGaussPointsSubTrias(int nGP, int inclFlag, int flag1, in
   //cout << " area2 = " << area21 << '\t' << area22 << endl;
   //cout << " total area = " << area << '\t' << (area1+area2) << '\t' << temp << endl;
 
-  if( IsBoundary() )
+  if( isBoundary() )
   {
     //cout << " boundary element " << endl;
 
@@ -397,7 +397,7 @@ int TreeNode<3>::computeGaussPointsSubTrias(int nGP, int refLev2, int inclFlag, 
   area11 = area12 = area21 = area22 = 0.0;
   for(vector<myPoly*>::iterator poly = subTrias.begin() ; poly != subTrias.end(); ++poly)
   {
-    if( (*poly)->GetDomainNumber() == 0 )
+    if( (*poly)->getDomainNumber() == 0 )
     {
       (*poly)->getGaussPointsCUTFEM(nGP, gpsLoc, gwsLoc );
       
@@ -429,7 +429,7 @@ int TreeNode<3>::computeGaussPointsSubTrias(int nGP, int refLev2, int inclFlag, 
   }
 
 
-  if( IsBoundary() )
+  if( isBoundary() )
   {
     BoundaryQuadrature.resize(6);
     int aa, side;
@@ -499,7 +499,7 @@ int TreeNode<2>::computeGaussPointsAdapIntegration(int refLev1, int refLev2, int
   //adapIntegNode = new AdaptiveBinarytree<2>(0);
   adapIntegNode = new AdaptiveOctree<2>(0);
 
-  adapIntegNode->SetKnots(knots[0][0], knots[0][1], knots[1][0], knots[1][1]);
+  adapIntegNode->setKnots(knots[0][0], knots[0][1], knots[1][0], knots[1][1]);
 
   adapIntegNode->GeomData = GeomData;
   adapIntegNode->domNums = domNums;
@@ -541,7 +541,7 @@ int TreeNode<2>::computeGaussPointsAdapIntegration(int refLev1, int refLev2, int
     }
   }
 
-  if( IsBoundary() )
+  if( isBoundary() )
   {
     BoundaryQuadrature.resize(4);
     int aa, side;
@@ -600,7 +600,7 @@ int TreeNode<3>::computeGaussPointsAdapIntegration(int refLev1, int refLev2, int
   //adapIntegNode = new AdaptiveBinarytree<3>(0);
   adapIntegNode = new AdaptiveOctree<3>(0);
   
-  adapIntegNode->SetKnots(knots[0][0], knots[0][1], knots[1][0], knots[1][1], knots[2][0], knots[2][1]);
+  adapIntegNode->setKnots(knots[0][0], knots[0][1], knots[1][0], knots[1][1], knots[2][0], knots[2][1]);
 
   adapIntegNode->GeomData = GeomData;
   adapIntegNode->domNums = domNums;
@@ -646,7 +646,7 @@ int TreeNode<3>::computeGaussPointsAdapIntegration(int refLev1, int refLev2, int
   }
 
 
-  if( IsBoundary() )
+  if( isBoundary() )
   {
     BoundaryQuadrature.resize(6);
     int aa, side;

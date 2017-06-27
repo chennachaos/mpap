@@ -31,7 +31,7 @@ int  HBSplineBase::findCellNumber(const myPoint& geom)
   //printf("%5d \t %5d \t %5d \t %5d \n", ind[0], ind[1], ind[2], num);
   //printf("%5d \t %5d \t %5d \t %5d \n", nn[0], nn[1], nn[2], num);
 
-  if(elems[num]->IsLeaf())
+  if(elems[num]->isLeaf())
   {
      return num;
   }
@@ -47,15 +47,15 @@ int  HBSplineBase::findCellNumber(const myPoint& geom)
      {
        uu = (geom[0]-origin[0])/gridLEN[0];
 
-       while(!nd->IsLeaf())
+       while(!nd->isLeaf())
        {
-         nd1  = nd->GetChild(LEFT);
-         tmp1 = nd1->GetKnots(0);
+         nd1  = nd->getChild(LEFT);
+         tmp1 = nd1->getKnots(0);
 
          if( uu < tmp1[1] ) // LEFT
-           nd2 = nd->GetChild(LEFT);
+           nd2 = nd->getChild(LEFT);
          else  //RIGHT
-           nd2 = nd->GetChild(RIGHT);
+           nd2 = nd->getChild(RIGHT);
 
          nd = nd2;
        }
@@ -65,26 +65,26 @@ int  HBSplineBase::findCellNumber(const myPoint& geom)
        uu = (geom[0]-origin[0])/gridLEN[0];
        vv = (geom[1]-origin[1])/gridLEN[1];
 
-       while(!nd->IsLeaf())
+       while(!nd->isLeaf())
        {
-         nd1 = nd->GetChild(SW);
+         nd1 = nd->getChild(SW);
 
-         tmp1 = nd1->GetKnots(0);
-         tmp2 = nd1->GetKnots(1);
+         tmp1 = nd1->getKnots(0);
+         tmp2 = nd1->getKnots(1);
 
          if( uu < tmp1[1] ) // SW or NW
          {
            if( vv < tmp2[1] ) // SW
              nd2 = nd1;
            else // NW
-             nd2 = nd->GetChild(NW);
+             nd2 = nd->getChild(NW);
          }
          else  //SE or NE
          {
            if( vv < tmp2[1] ) // SE
-             nd2 = nd->GetChild(SE);
+             nd2 = nd->getChild(SE);
            else // NE
-             nd2 = nd->GetChild(NE);
+             nd2 = nd->getChild(NE);
          }
          nd = nd2;
        }
@@ -95,29 +95,29 @@ int  HBSplineBase::findCellNumber(const myPoint& geom)
        vv = (geom[1]-origin[1])/gridLEN[1];
        ww = (geom[2]-origin[2])/gridLEN[2];
 
-       while(!nd->IsLeaf())
+       while(!nd->isLeaf())
        {
-         nd1 = nd->GetChild(SW_BACK);
+         nd1 = nd->getChild(SW_BACK);
 
-         tmp1 = nd1->GetKnots(0);
-         tmp2 = nd1->GetKnots(1);
-         tmp3 = nd1->GetKnots(2);
+         tmp1 = nd1->getKnots(0);
+         tmp2 = nd1->getKnots(1);
+         tmp3 = nd1->getKnots(2);
 
          if( uu < tmp1[1] ) // SW_FRONT or NW_FRONT or SW_BACK or NW_BACK
          {
            if( vv < tmp2[1] ) // SW_FRONT or SW_BACK
            {
              if( ww < tmp3[1] )
-               nd2 = nd->GetChild(SW_BACK);
+               nd2 = nd->getChild(SW_BACK);
              else
-               nd2 = nd->GetChild(SW_FRONT);
+               nd2 = nd->getChild(SW_FRONT);
            }
            else // NW_FRONT or NW_BACK
            {
              if( ww < tmp3[1] )
-               nd2 = nd->GetChild(NW_BACK);
+               nd2 = nd->getChild(NW_BACK);
              else
-               nd2 = nd->GetChild(NW_FRONT);
+               nd2 = nd->getChild(NW_FRONT);
            }
          }
          else  //SE_FRONT or NE_FRONT or SE_BACK or NE_BACK
@@ -125,23 +125,23 @@ int  HBSplineBase::findCellNumber(const myPoint& geom)
            if( vv < tmp2[1] ) // SE_FRONT or SE_BACK
            {
              if( ww < tmp3[1] )
-               nd2 = nd->GetChild(SE_BACK);
+               nd2 = nd->getChild(SE_BACK);
              else
-               nd2 = nd->GetChild(SE_FRONT);
+               nd2 = nd->getChild(SE_FRONT);
            }
            else // NE_FRONT or NE_BACK
            {
              if( ww < tmp3[1] )
-               nd2 = nd->GetChild(NE_BACK);
+               nd2 = nd->getChild(NE_BACK);
              else
-               nd2 = nd->GetChild(NE_FRONT);
+               nd2 = nd->getChild(NE_FRONT);
            }
          }
          nd = nd2;
        }
      }
 
-     return  (nd->GetID());
+     return  (nd->getID());
   }
 }
 
@@ -182,9 +182,9 @@ void HBSplineBase::setInitialConditions()
 
     for(int ee=0;ee<elems.size();ee++)
     {
-      if( !(elems[ee]->IsGhost()) &&  elems[ee]->IsLeaf() )
+      if( !(elems[ee]->isGhost()) &&  elems[ee]->isLeaf() )
       {
-        //cout << " elems[ee]->GetID() " <<  elems[ee]->GetID() << '\t' <<  elems[ee]->GetLevel() << endl;
+        //cout << " elems[ee]->getID() " <<  elems[ee]->getID() << '\t' <<  elems[ee]->getLevel() << endl;
 
         elems[ee]->resetMatrixAndVector();
         elems[ee]->setInitialProfile();

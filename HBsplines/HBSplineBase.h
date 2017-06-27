@@ -149,10 +149,10 @@ class HBSplineBase: public Domain
         bool IsActive(int nodenum)
         {  return IsLeaf(nodenum);   }
         
-        int GetDimension()
+        int getDimension()
         {  return DIM;        }
 
-        int* GetDegree()
+        int* getDegree()
         {  return  degree;        }
 
         int GetNumberOfActiveElements()
@@ -167,7 +167,7 @@ class HBSplineBase: public Domain
         void SetDimension(int dd)
         {  ndm = DIM = dd;        }
 
-        void SetNDOF(int dd)
+        void setNdof(int dd)
         {  ndf = ndof = dd;        }
 
         void  SetOrigin(double x0=0.0, double y0=0.0, double z0=0.0)

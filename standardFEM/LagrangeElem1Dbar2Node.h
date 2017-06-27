@@ -14,7 +14,8 @@ class  LagrangeElem1Dbar2Node : public LagrangeElement
 
     virtual ~LagrangeElem1Dbar2Node();
 
-    virtual void  resetMatrixAndVector();
+    virtual int getElmTypeNameNum()
+    {  return 0;     }
 
     virtual void prepareElemData();
 

@@ -98,7 +98,7 @@ int main(int argc, char* argv[])
   hbs.SetControl(0, tol1, rho1);
 
 
-  hbs.SetNDOF(1);
+  hbs.setNdof(1);
   
   int parm[5], ii, iter, niter=10, solv=1;
   parm[0] = 2;
@@ -225,7 +225,7 @@ int main(int argc, char* argv[])
 
     hbs.SetDimension(2);
 
-    hbs.SetNDOF(1);
+    hbs.setNdof(1);
 
     hbs.SetOrigin(0.0, 0.0);
 

@@ -10,7 +10,6 @@
 
 using namespace std;
 
-//extern ComputerTime       computerTime;
 extern MpapTime mpapTime;
 
 
@@ -33,6 +32,10 @@ MindlinPlateElement::~MindlinPlateElement()
   if (debug) cout << " destructor MindlinPlateElement\n\n";
 }
 
+int MindlinPlateElement::calcLoadVector()
+{
+  return 0;
+}
 
 
 void MindlinPlateElement::prepareElemData()
@@ -70,18 +73,6 @@ void MindlinPlateElement::prepareElemData2()
   
   return;
 }
-
-
-void MindlinPlateElement::resetMatrixAndVector()
-{
-  return;
-}
-
-int MindlinPlateElement::calcLoadVector()
-{
-  return 0;
-}
-
 
 
 

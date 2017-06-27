@@ -428,7 +428,7 @@ int  myTria::IntersectWithTriangle(myTria& triaIn, vector<myPoint>& ptOut)
 
   // check if the bounding boxes of the two triangles intersect
   
-  if( !bbox.doIntersect(triaIn.GetAABB()) )
+  if( !bbox.doIntersect(triaIn.getAABB()) )
   {
     //cout << " bboxes do not intersect " << endl;
     return 0;

@@ -1503,7 +1503,7 @@ int TreeNode<3>::computeGaussPointsAdapIntegrationBoundary(int side, int refLev1
 
     //cout << " side = " << side << '\t' << e1 << '\t' << e2 << '\t' << val2 << endl;
 
-    AdapIntgCellBoundary->SetKnots(knots[e1][0], knots[e1][1], knots[e2][0], knots[e2][1]);
+    AdapIntgCellBoundary->setKnots(knots[e1][0], knots[e1][1], knots[e2][0], knots[e2][1]);
     AdapIntgCellBoundary->SetSideTemp(side);
     AdapIntgCellBoundary->SetParam3(val1);
     AdapIntgCellBoundary->SetCoord3(val2);

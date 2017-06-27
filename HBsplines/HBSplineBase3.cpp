@@ -10,21 +10,21 @@ void  HBSplineBase::subDivide(int nodenum)
     node  *nd, *nd2;
 
     nd = elems[nodenum];
-    if( nd->IsLeaf() )
+    if( nd->isLeaf() )
     {
       nd->subDivide();
 
-      ll = nd->GetLevel() + 1;
+      ll = nd->getLevel() + 1;
 
-      for(jj=0;jj<nd->GetNumberOfChildren();jj++)
+      for(jj=0;jj<nd->getNumberOfChildren();jj++)
       {
-         nd2 = nd->GetChild(jj);
+         nd2 = nd->getChild(jj);
 
          nd2->SolnData = &(SolnData);
          nd2->GeomData = &(GeomData);
 
          elems.push_back(nd2);
-         NodeNumsAtLevel[ll].push_back(nd2->GetID());
+         NodeNumsAtLevel[ll].push_back(nd2->getID());
       }
     }
 
@@ -155,19 +155,19 @@ void  HBSplineBase::Algorithm3(int lev)
 
 void  HBSplineBase::addGhostNodes(node* nd, int dir)
 {
-    nd = nd->GetNeighbour(dir);
+    nd = nd->getNeighbour(dir);
 
     if( nd != NULL )
     {
-      if(nd->IsGhost())
+      if(nd->isGhost())
       {
-          nodes2divide.push_back(nd->GetID());
-          nd = nd->GetNeighbour(dir);
+          nodes2divide.push_back(nd->getID());
+          nd = nd->getNeighbour(dir);
          
           while( nd != NULL)
           {
-             nodes2divide.push_back(nd->GetID());
-             nd = nd->GetNeighbour(dir);
+             nodes2divide.push_back(nd->getID());
+             nd = nd->getNeighbour(dir);
           }
       }
     }
@@ -196,12 +196,12 @@ void  HBSplineBase::Algorithm1_1D(int lev)
       nd = elems[nodenum];
       //nd->printSelf();
       //cout << " AAAAAAAAA " << endl;
-      if(nd->IsLeftBoundary())
+      if(nd->isLeftBoundary())
         addGhostNodes(nd, LEFT);
 
       //cout << " AAAAAAAAA " << endl;
       nd = elems[nodenum];
-      if(nd->IsRightBoundary())
+      if(nd->isRightBoundary())
         addGhostNodes(nd, RIGHT);
       //cout << " ee " << ee << '\t' << elemsToRefine[ee] << endl;
     }
@@ -227,63 +227,63 @@ void  HBSplineBase::Algorithm1_2D(int lev)
        ////////////////////////////////////////////////////////
        
        nd = elems[nodenum];
-       if(nd->IsLeftBoundary())
+       if(nd->isLeftBoundary())
          addGhostNodes(nd, WEST);
        
        nd = elems[nodenum];
-       if(nd->IsRightBoundary())
+       if(nd->isRightBoundary())
          addGhostNodes(nd, EAST);
        
        nd = elems[nodenum];
-       if(nd->IsTopBoundary())
+       if(nd->isTopBoundary())
          addGhostNodes(nd, NORTH);
 
        nd = elems[nodenum];
-       if(nd->IsBottomBoundary())
+       if(nd->isBottomBoundary())
          addGhostNodes(nd, SOUTH);
 
 
        // bottom-left corner
        nd = elems[nodenum];
-       if(nd->IsLeftBoundary() && nd->IsBottomBoundary())
+       if(nd->isLeftBoundary() && nd->isBottomBoundary())
        {
           while(nd != NULL)
           {
             addGhostNodes(nd, WEST);
-            nd = nd->GetNeighbour(SOUTH);
+            nd = nd->getNeighbour(SOUTH);
           }
        }
        
        // bottom-right corner
        nd = elems[nodenum];
-       if(nd->IsRightBoundary() && nd->IsBottomBoundary())
+       if(nd->isRightBoundary() && nd->isBottomBoundary())
        {
           while(nd != NULL)
           {
             addGhostNodes(nd, EAST);
-            nd = nd->GetNeighbour(SOUTH);
+            nd = nd->getNeighbour(SOUTH);
           }
        }
 
        // top-right corner
        nd = elems[nodenum];
-       if(nd->IsRightBoundary() && nd->IsTopBoundary())
+       if(nd->isRightBoundary() && nd->isTopBoundary())
        {
           while(nd != NULL)
           {
             addGhostNodes(nd, EAST);
-            nd = nd->GetNeighbour(NORTH);
+            nd = nd->getNeighbour(NORTH);
           }
        }
 
        // top-left corner
        nd = elems[nodenum];
-       if(nd->IsLeftBoundary() && nd->IsTopBoundary())
+       if(nd->isLeftBoundary() && nd->isTopBoundary())
        {
           while(nd != NULL)
           {
             addGhostNodes(nd, WEST);
-            nd = nd->GetNeighbour(NORTH);
+            nd = nd->getNeighbour(NORTH);
           }
        }
     }
@@ -311,121 +311,121 @@ void  HBSplineBase::Algorithm1_3D(int lev)
       ////////////////////////////////////////////////////////
 
       nd = elems[nodenum];
-      if(nd->IsLeftBoundary())
+      if(nd->isLeftBoundary())
         addGhostNodes(nd, WEST);
 
       nd = elems[nodenum];
-      if(nd->IsRightBoundary())
+      if(nd->isRightBoundary())
         addGhostNodes(nd, EAST);
 
       nd = elems[nodenum];
-      if(nd->IsTopBoundary())
+      if(nd->isTopBoundary())
         addGhostNodes(nd, NORTH);
 
       nd = elems[nodenum];
-      if(nd->IsBottomBoundary())
+      if(nd->isBottomBoundary())
         addGhostNodes(nd, SOUTH);
 
       nd = elems[nodenum];
-      if(nd->IsBackBoundary())
+      if(nd->isBackBoundary())
         addGhostNodes(nd, BACK);
 
       nd = elems[nodenum];
-      if(nd->IsFrontBoundary())
+      if(nd->isFrontBoundary())
         addGhostNodes(nd, FRONT);
 
       // front-left edge
       nd = elems[nodenum];
-      if(nd->IsFrontBoundary() && nd->IsLeftBoundary())
+      if(nd->isFrontBoundary() && nd->isLeftBoundary())
       {
         while(nd != NULL)
         {
           addGhostNodes(nd, FRONT);
-          nd = nd->GetNeighbour(WEST);
+          nd = nd->getNeighbour(WEST);
         }
       }
        
       // front-right edge
       nd = elems[nodenum];
-      if(nd->IsFrontBoundary() && nd->IsRightBoundary())
+      if(nd->isFrontBoundary() && nd->isRightBoundary())
       {
         while(nd != NULL)
         {
           addGhostNodes(nd, FRONT);
-          nd = nd->GetNeighbour(EAST);
+          nd = nd->getNeighbour(EAST);
         }
       }
        
       // front-bottom edge
       nd = elems[nodenum];
-      if(nd->IsFrontBoundary() && nd->IsBottomBoundary())
+      if(nd->isFrontBoundary() && nd->isBottomBoundary())
       {
         while(nd != NULL)
         {
           addGhostNodes(nd, FRONT);
-          nd = nd->GetNeighbour(SOUTH);
+          nd = nd->getNeighbour(SOUTH);
         }
       }
 
       // front-top edge
       nd = elems[nodenum];
-      if(nd->IsFrontBoundary() && nd->IsTopBoundary())
+      if(nd->isFrontBoundary() && nd->isTopBoundary())
       {
         while(nd != NULL)
         {
           addGhostNodes(nd, FRONT);
-          nd = nd->GetNeighbour(NORTH);
+          nd = nd->getNeighbour(NORTH);
         }
       }
 
       // back-left edge
       nd = elems[nodenum];
-      if(nd->IsBackBoundary() && nd->IsLeftBoundary())
+      if(nd->isBackBoundary() && nd->isLeftBoundary())
       {
         while(nd != NULL)
         {
           addGhostNodes(nd, BACK);
-          nd = nd->GetNeighbour(WEST);
+          nd = nd->getNeighbour(WEST);
         }
       }
        
       // back-right edge
       nd = elems[nodenum];
-      if(nd->IsBackBoundary() && nd->IsRightBoundary())
+      if(nd->isBackBoundary() && nd->isRightBoundary())
       {
         while(nd != NULL)
         {
           addGhostNodes(nd, BACK);
-          nd = nd->GetNeighbour(EAST);
+          nd = nd->getNeighbour(EAST);
         }
       }
 
       // back-bottom edge
       nd = elems[nodenum];
-      if(nd->IsBackBoundary() && nd->IsBottomBoundary())
+      if(nd->isBackBoundary() && nd->isBottomBoundary())
       {
         while(nd != NULL)
         {
           addGhostNodes(nd, BACK);
-          nd = nd->GetNeighbour(SOUTH);
+          nd = nd->getNeighbour(SOUTH);
         }
       }
 
       // back-top edge
       nd = elems[nodenum];
-      if(nd->IsBackBoundary() && nd->IsTopBoundary())
+      if(nd->isBackBoundary() && nd->isTopBoundary())
       {
         while(nd != NULL)
         {
           addGhostNodes(nd, BACK);
-          nd = nd->GetNeighbour(NORTH);
+          nd = nd->getNeighbour(NORTH);
         }
       }
 
       //cout << " AAAAAAAAA " << endl;
       // front-left-bottom corner
       nd = elems[nodenum];
-      if(nd->IsFrontBoundary() && nd->IsLeftBoundary() && nd->IsBottomBoundary() )
+      if(nd->isFrontBoundary() && nd->isLeftBoundary() && nd->isBottomBoundary() )
       {
         while(nd != NULL)
         {
@@ -433,15 +433,15 @@ void  HBSplineBase::Algorithm1_3D(int lev)
           while( nd1 != NULL )
           {
             addGhostNodes(nd1, SOUTH);
-            nd1 = nd1->GetNeighbour(WEST);
+            nd1 = nd1->getNeighbour(WEST);
           }
-          nd = nd->GetNeighbour(FRONT);
+          nd = nd->getNeighbour(FRONT);
         }
       }
 
       // front-left-top corner
       nd = elems[nodenum];
-      if(nd->IsFrontBoundary() && nd->IsLeftBoundary() && nd->IsTopBoundary() )
+      if(nd->isFrontBoundary() && nd->isLeftBoundary() && nd->isTopBoundary() )
       {
         while(nd != NULL)
         {
@@ -449,15 +449,15 @@ void  HBSplineBase::Algorithm1_3D(int lev)
           while( nd1 != NULL )
           {
             addGhostNodes(nd1, NORTH);
-            nd1 = nd1->GetNeighbour(WEST);
+            nd1 = nd1->getNeighbour(WEST);
           }
-          nd = nd->GetNeighbour(FRONT);
+          nd = nd->getNeighbour(FRONT);
         }
       }
 
       // front-right-bottom corner
       nd = elems[nodenum];
-      if(nd->IsFrontBoundary() && nd->IsRightBoundary() && nd->IsBottomBoundary() )
+      if(nd->isFrontBoundary() && nd->isRightBoundary() && nd->isBottomBoundary() )
       {
         while(nd != NULL)
         {
@@ -465,15 +465,15 @@ void  HBSplineBase::Algorithm1_3D(int lev)
           while( nd1 != NULL )
           {
             addGhostNodes(nd1, SOUTH);
-            nd1 = nd1->GetNeighbour(EAST);
+            nd1 = nd1->getNeighbour(EAST);
           }
-          nd = nd->GetNeighbour(FRONT);
+          nd = nd->getNeighbour(FRONT);
         }
       }
 
       // front-right-top corner
       nd = elems[nodenum];
-      if(nd->IsFrontBoundary() && nd->IsRightBoundary() && nd->IsTopBoundary() )
+      if(nd->isFrontBoundary() && nd->isRightBoundary() && nd->isTopBoundary() )
       {
         while(nd != NULL)
         {
@@ -481,15 +481,15 @@ void  HBSplineBase::Algorithm1_3D(int lev)
           while( nd1 != NULL )
           {
             addGhostNodes(nd1, NORTH);
-            nd1 = nd1->GetNeighbour(EAST);
+            nd1 = nd1->getNeighbour(EAST);
           }
-          nd = nd->GetNeighbour(FRONT);
+          nd = nd->getNeighbour(FRONT);
         }
       }
 
       // back-left-bottom corner
       nd = elems[nodenum];
-      if(nd->IsBackBoundary() && nd->IsLeftBoundary() && nd->IsBottomBoundary() )
+      if(nd->isBackBoundary() && nd->isLeftBoundary() && nd->isBottomBoundary() )
       {
         while(nd != NULL)
         {
@@ -497,15 +497,15 @@ void  HBSplineBase::Algorithm1_3D(int lev)
           while( nd1 != NULL )
           {
             addGhostNodes(nd1, SOUTH);
-            nd1 = nd1->GetNeighbour(WEST);
+            nd1 = nd1->getNeighbour(WEST);
           }
-          nd = nd->GetNeighbour(BACK);
+          nd = nd->getNeighbour(BACK);
         }
       }
 
       // back-left-top corner
       nd = elems[nodenum];
-      if(nd->IsBackBoundary() && nd->IsLeftBoundary() && nd->IsTopBoundary() )
+      if(nd->isBackBoundary() && nd->isLeftBoundary() && nd->isTopBoundary() )
       {
         while(nd != NULL)
         {
@@ -513,15 +513,15 @@ void  HBSplineBase::Algorithm1_3D(int lev)
           while( nd1 != NULL )
           {
             addGhostNodes(nd1, NORTH);
-            nd1 = nd1->GetNeighbour(WEST);
+            nd1 = nd1->getNeighbour(WEST);
           }
-          nd = nd->GetNeighbour(BACK);
+          nd = nd->getNeighbour(BACK);
         }
       }
 
       // back-right-bottom corner
       nd = elems[nodenum];
-      if(nd->IsBackBoundary() && nd->IsRightBoundary() && nd->IsBottomBoundary() )
+      if(nd->isBackBoundary() && nd->isRightBoundary() && nd->isBottomBoundary() )
       {
         while(nd != NULL)
         {
@@ -529,15 +529,15 @@ void  HBSplineBase::Algorithm1_3D(int lev)
           while( nd1 != NULL )
           {
             addGhostNodes(nd1, SOUTH);
-            nd1 = nd1->GetNeighbour(EAST);
+            nd1 = nd1->getNeighbour(EAST);
           }
-          nd = nd->GetNeighbour(BACK);
+          nd = nd->getNeighbour(BACK);
         }
       }
 
       // back-right-top corner
       nd = elems[nodenum];
-      if(nd->IsBackBoundary() && nd->IsRightBoundary() && nd->IsTopBoundary() )
+      if(nd->isBackBoundary() && nd->isRightBoundary() && nd->isTopBoundary() )
       {
         while(nd != NULL)
         {
@@ -545,9 +545,9 @@ void  HBSplineBase::Algorithm1_3D(int lev)
           while( nd1 != NULL )
           {
             addGhostNodes(nd1, NORTH);
-            nd1 = nd1->GetNeighbour(EAST);
+            nd1 = nd1->getNeighbour(EAST);
           }
-          nd = nd->GetNeighbour(BACK);
+          nd = nd->getNeighbour(BACK);
         }
       }
     }
@@ -573,7 +573,7 @@ void  HBSplineBase::Algorithm2_1D(int lev)
       
        flag1 = true;
        
-       if(nd->IsGhost())
+       if(nd->isGhost())
          flag2 = false;
        else
          flag2 = true;
@@ -581,19 +581,19 @@ void  HBSplineBase::Algorithm2_1D(int lev)
        nd1 = nd;
        for(ii=0;ii<=degree[0];ii++)
        {
-          if( nd1 == NULL || nd1->IsLeaf() )
+          if( nd1 == NULL || nd1->isLeaf() )
           {
              flag1 = false;
              break;
           }
           
-          if(!nd1->IsGhost())
+          if(!nd1->isGhost())
             flag2 = true;
 
-          nd1 = nd1->GetNeighbour(RIGHT);
+          nd1 = nd1->getNeighbour(RIGHT);
        }
 
-       //cout << nd->GetID() << '\t' << flag1 << '\t' << flag2 << endl;
+       //cout << nd->getID() << '\t' << flag1 << '\t' << flag2 << endl;
 
        if( flag1 && flag2 )
        {
@@ -609,7 +609,7 @@ void  HBSplineBase::Algorithm2_1D(int lev)
              for(ii=0;ii<=degree[0];ii++)
              {
                 nd1->LocalBasisFuncs[temp1-temp2++] = -1;
-                nd1 = nd1->GetNeighbour(RIGHT);
+                nd1 = nd1->getNeighbour(RIGHT);
              }
           }
        }
@@ -626,7 +626,7 @@ void  HBSplineBase::Algorithm2_2D(int lev)
 
     node  *nd, *nd1, *nd2;
 
-    //cout << " Node # " << nd1->GetID() << '\t' << nd1->IsGhost() << endl;
+    //cout << " Node # " << nd1->getID() << '\t' << nd1->isGhost() << endl;
 
     for(ee=0;ee<NodeNumsAtLevel[lev].size();ee++)
     {
@@ -637,7 +637,7 @@ void  HBSplineBase::Algorithm2_2D(int lev)
        // if the current node is a ghost node then check if all the neighbours are ghost nodes
        // if all the neighbours are ghost nodes then don't remove any basis function
 
-       if(nd->IsGhost())
+       if(nd->isGhost())
          flag2 = false;
        else
          flag2 = true;
@@ -648,24 +648,24 @@ void  HBSplineBase::Algorithm2_2D(int lev)
          nd1 = nd2;
          for(ii=0;ii<=degree[0];ii++)
          {
-            if( nd1 == NULL || nd1->IsLeaf() )
+            if( nd1 == NULL || nd1->isLeaf() )
             {
               flag1 = false;
               break;
             }
 
-            if( !nd1->IsGhost() )
+            if( !nd1->isGhost() )
               flag2 = true;
 
-            nd1 = nd1->GetNeighbour(EAST);
+            nd1 = nd1->getNeighbour(EAST);
          }
          if(!flag1)
            break;
          
-         nd2 = nd2->GetNeighbour(NORTH);
+         nd2 = nd2->getNeighbour(NORTH);
       }
 
-      //cout << " nd->GetID() ... : "  << '\t'<< nd->GetID() << '\t' << nd->IsGhost() << '\t' << flag1 << '\t' << flag2 << endl;
+      //cout << " nd->getID() ... : "  << '\t'<< nd->getID() << '\t' << nd->isGhost() << '\t' << flag1 << '\t' << flag2 << endl;
 
       if( flag1 && flag2 )
       {
@@ -685,9 +685,9 @@ void  HBSplineBase::Algorithm2_2D(int lev)
                for(ii=0;ii<=degree[0];ii++)
                {
                   nd1->LocalBasisFuncs[temp1-temp2++] = -1;
-                  nd1 = nd1->GetNeighbour(EAST);
+                  nd1 = nd1->getNeighbour(EAST);
                }
-               nd2 = nd2->GetNeighbour(NORTH);
+               nd2 = nd2->getNeighbour(NORTH);
             }
          }
       }
@@ -704,7 +704,7 @@ void  HBSplineBase::Algorithm2_3D(int lev)
 
     node  *nd, *nd1, *nd2, *nd3;
 
-    //cout << " Node # " << nd1->GetID() << '\t' << nd1->IsGhost() << endl;
+    //cout << " Node # " << nd1->getID() << '\t' << nd1->isGhost() << endl;
 
     for(ee=0;ee<NodeNumsAtLevel[lev].size();ee++)
     {
@@ -715,7 +715,7 @@ void  HBSplineBase::Algorithm2_3D(int lev)
        // if the current node is a ghost node then check if all the neighbours are ghost nodes
        // if all the neighbours are ghost nodes then don't remove any basis function
 
-       if(nd->IsGhost())
+       if(nd->isGhost())
          flag2 = false;
        else
          flag2 = true;
@@ -729,29 +729,29 @@ void  HBSplineBase::Algorithm2_3D(int lev)
            nd1 = nd2;
            for(ii=0;ii<=degree[0];ii++)
            {
-             if( nd1 == NULL || nd1->IsLeaf() )
+             if( nd1 == NULL || nd1->isLeaf() )
              {
                flag1 = false;
                break;
              }
 
-             if( !nd1->IsGhost() )
+             if( !nd1->isGhost() )
                flag2 = true;
 
-             nd1 = nd1->GetNeighbour(EAST);
+             nd1 = nd1->getNeighbour(EAST);
            }
            if(!flag1)
              break;
          
-           nd2 = nd2->GetNeighbour(NORTH);
+           nd2 = nd2->getNeighbour(NORTH);
         }
         if(!flag1)
           break;
 
-        nd3 = nd3->GetNeighbour(FRONT);
+        nd3 = nd3->getNeighbour(FRONT);
       }
 
-      //cout << " nd->GetID() ... : "  << '\t'<< nd->GetID() << '\t' << nd->IsGhost() << '\t' << flag1 << '\t' << flag2 << endl;
+      //cout << " nd->getID() ... : "  << '\t'<< nd->getID() << '\t' << nd->isGhost() << '\t' << flag1 << '\t' << flag2 << endl;
 
       if( flag1 && flag2 )
       {
@@ -774,11 +774,11 @@ void  HBSplineBase::Algorithm2_3D(int lev)
                 for(ii=0;ii<=degree[0];ii++)
                 {
                   nd1->LocalBasisFuncs[temp1-temp2++] = -1;
-                  nd1 = nd1->GetNeighbour(EAST);
+                  nd1 = nd1->getNeighbour(EAST);
                 }
-                nd2 = nd2->GetNeighbour(NORTH);
+                nd2 = nd2->getNeighbour(NORTH);
               }
-              nd3 = nd3->GetNeighbour(FRONT);
+              nd3 = nd3->getNeighbour(FRONT);
             }
          }
       }
@@ -817,7 +817,7 @@ void  HBSplineBase::Algorithm3_1D(int lev)
 
        flag1 = true;
        
-       if(nd->IsGhost())
+       if(nd->isGhost())
          flag2 = false;
        else
          flag2 = true;
@@ -831,13 +831,13 @@ void  HBSplineBase::Algorithm3_1D(int lev)
            break;
          }
 
-         if(!nd1->IsGhost())
+         if(!nd1->isGhost())
           flag2 = true;
 
-         nd1 = nd1->GetNeighbour(RIGHT);
+         nd1 = nd1->getNeighbour(RIGHT);
        }
 
-       //cout << nd->GetID() << '\t' << flag1 << '\t' << flag2 << endl;
+       //cout << nd->getID() << '\t' << flag1 << '\t' << flag2 << endl;
 
        if( flag1 && flag2 )
        {
@@ -853,7 +853,7 @@ void  HBSplineBase::Algorithm3_1D(int lev)
          for(jj=0;jj<=degree[0];jj++)
          {
            nd1->LocalBasisFuncs[degree[0]-jj] = val;
-           nd1 = nd1->GetNeighbour(RIGHT);
+           nd1 = nd1->getNeighbour(RIGHT);
          }
        }
     }
@@ -876,7 +876,7 @@ void  HBSplineBase::Algorithm3_2D(int lev)
       
        flag1 = true;
 
-       if(nd->IsGhost())
+       if(nd->isGhost())
          flag2 = false;
        else
          flag2 = true;
@@ -896,18 +896,18 @@ void  HBSplineBase::Algorithm3_2D(int lev)
                break;
              }
 
-             if( !nd1->IsGhost() )
+             if( !nd1->isGhost() )
                flag2 = true;
 
-             nd1 = nd1->GetNeighbour(EAST);
+             nd1 = nd1->getNeighbour(EAST);
           }
           if(!flag1)
             break;
          
-          nd2 = nd2->GetNeighbour(NORTH);
+          nd2 = nd2->getNeighbour(NORTH);
        }
       
-       //cout << " nd->GetID() ... : "  << '\t'<< nd->GetID() << '\t' << nd->IsGhost() << '\t' << flag1 << '\t' << flag2 << endl;
+       //cout << " nd->getID() ... : "  << '\t'<< nd->getID() << '\t' << nd->isGhost() << '\t' << flag1 << '\t' << flag2 << endl;
 
        if( flag1 && flag2 )
        {
@@ -928,9 +928,9 @@ void  HBSplineBase::Algorithm3_2D(int lev)
              for(ii=0;ii<=degree[0];ii++)
              {
                 nd1->LocalBasisFuncs[temp1-temp2++] = val;
-                nd1 = nd1->GetNeighbour(EAST);
+                nd1 = nd1->getNeighbour(EAST);
              }
-             nd2 = nd2->GetNeighbour(NORTH);
+             nd2 = nd2->getNeighbour(NORTH);
           }
        }
     }
@@ -962,7 +962,7 @@ void  HBSplineBase::Algorithm3_3D(int lev)
       
        flag1 = true;
 
-       if(nd->IsGhost())
+       if(nd->isGhost())
          flag2 = false;
        else
          flag2 = true;
@@ -984,23 +984,23 @@ void  HBSplineBase::Algorithm3_3D(int lev)
                flag1 = false;
                break;
              }
-             if( !nd1->IsGhost() )
+             if( !nd1->isGhost() )
                flag2 = true;
 
-             nd1 = nd1->GetNeighbour(EAST);
+             nd1 = nd1->getNeighbour(EAST);
            }
            if(!flag1)
              break;
          
-           nd2 = nd2->GetNeighbour(NORTH);
+           nd2 = nd2->getNeighbour(NORTH);
          }
          if(!flag1)
            break;
 
-         nd3 = nd3->GetNeighbour(FRONT);
+         nd3 = nd3->getNeighbour(FRONT);
        }
       
-       //cout << " nd->GetID() ... : "  << '\t'<< nd->GetID() << '\t' << nd->IsGhost() << '\t' << flag1 << '\t' << flag2 << endl;
+       //cout << " nd->getID() ... : "  << '\t'<< nd->getID() << '\t' << nd->isGhost() << '\t' << flag1 << '\t' << flag2 << endl;
 
        if( flag1 && flag2 )
        {
@@ -1025,11 +1025,11 @@ void  HBSplineBase::Algorithm3_3D(int lev)
               for(ii=0;ii<=degree[0];ii++)
               {
                 nd1->LocalBasisFuncs[temp1-temp2++] = val;
-                nd1 = nd1->GetNeighbour(EAST);
+                nd1 = nd1->getNeighbour(EAST);
               }
-              nd2 = nd2->GetNeighbour(NORTH);
+              nd2 = nd2->getNeighbour(NORTH);
             }
-            nd3 = nd3->GetNeighbour(FRONT);
+            nd3 = nd3->getNeighbour(FRONT);
           }
        }
     }
@@ -1058,33 +1058,33 @@ void  HBSplineBase::unRefine(int nodenum)
 
    nodes2unrefine.push_back(nodenum);
 
-   nd = nd->GetNeighbour(LEFT);
+   nd = nd->getNeighbour(LEFT);
 
-      if(nd->IsGhost())
+      if(nd->isGhost())
       {
          // take all ghost nodes to the left of this node
 
-         nd = nd->GetNeighbour(LEFT);
+         nd = nd->getNeighbour(LEFT);
          while( nd != NULL)
          {
-            nodes2unrefine.push_back(nd->GetID());
-            nd = nd->GetNeighbour(LEFT);
+            nodes2unrefine.push_back(nd->getID());
+            nd = nd->getNeighbour(LEFT);
          }
       }
 
    nd = elems[nodenum];
 
-   nd = nd->GetNeighbour(RIGHT);
+   nd = nd->getNeighbour(RIGHT);
 
-      if(nd->IsGhost())
+      if(nd->isGhost())
       {
          // take all ghost nodes to the left of this node
 
-         nd = nd->GetNeighbour(RIGHT);
+         nd = nd->getNeighbour(RIGHT);
          while( nd != NULL)
          {
-            nodes2unrefine.push_back(nd->GetID());
-            nd = nd->GetNeighbour(RIGHT);
+            nodes2unrefine.push_back(nd->getID());
+            nd = nd->getNeighbour(RIGHT);
          }
       }
 
@@ -1102,12 +1102,12 @@ void  HBSplineBase::unRefine(int nodenum)
 
       nd->printSelf();
       nd->unRefine();
-      nd->Activate();
+      nd->activate();
       /*
       for(jj=0;jj<2;jj++)
       {
-         cout << "  nd->GetChild(jj)->GetID()  " << nd->GetChild(jj)->GetID() << endl;
-         elems.erase(elems.begin()+nd->GetChild(jj)->GetID()+count);
+         cout << "  nd->getChild(jj)->getID()  " << nd->getChild(jj)->getID() << endl;
+         elems.erase(elems.begin()+nd->getChild(jj)->getID()+count);
          count--;
       }
       */
@@ -1138,23 +1138,23 @@ void HBSplineBase::performAdaptiveRefinement(double eTol)
     {
        nd = elems[ii];
        
-       if( !(nd->IsGhost()) &&  nd->IsLeaf() ) //&& (elems[ii]->GetLevel() == MAX_LEVEL) )
+       if( !(nd->isGhost()) &&  nd->isLeaf() ) //&& (elems[ii]->getLevel() == MAX_LEVEL) )
        {
-          if( nd->GetError() > totalError )
+          if( nd->getError() > totalError )
           {
-            //cout << " nd->IsProcessed() " << '\t' << nd->GetID() << '\t' << nd->IsProcessed() << endl;
+            //cout << " nd->isProcessed() " << '\t' << nd->getID() << '\t' << nd->isProcessed() << endl;
 
-            elemsToRefine.push_back( nd->GetID() );
+            elemsToRefine.push_back( nd->getID() );
 
             // add all the immediate neighbours
             
-            nd2 = nd->GetNeighbour(LEFT);
+            nd2 = nd->getNeighbour(LEFT);
             if( nd2 != NULL )
-              elemsToRefine.push_back(nd2->GetID());
+              elemsToRefine.push_back(nd2->getID());
 
-            nd2 = nd->GetNeighbour(RIGHT);
+            nd2 = nd->getNeighbour(RIGHT);
             if( nd2 != NULL )
-              elemsToRefine.push_back(nd2->GetID());
+              elemsToRefine.push_back(nd2->getID());
           }
        }
     }
@@ -1165,51 +1165,51 @@ void HBSplineBase::performAdaptiveRefinement(double eTol)
     {
        nd = elems[ii];
        
-       if( !(nd->IsGhost()) &&  nd->IsLeaf() && (nd->GetLevel() == CURRENT_LEVEL) )
+       if( !(nd->isGhost()) &&  nd->isLeaf() && (nd->getLevel() == CURRENT_LEVEL) )
        {
-          if( nd->GetError() > totalError )
+          if( nd->getError() > totalError )
           {
-            //cout << " nd->IsProcessed() " << '\t' << nd->GetID() << '\t' << nd->IsProcessed() << endl;
+            //cout << " nd->isProcessed() " << '\t' << nd->getID() << '\t' << nd->isProcessed() << endl;
 
-            elemsToRefine.push_back( nd->GetID() );
+            elemsToRefine.push_back( nd->getID() );
 
             // add all the immediate neighbours
             
-            nd1 = nd->GetNeighbour(WEST);
+            nd1 = nd->getNeighbour(WEST);
             if(nd1 != NULL)
             {
-               elemsToRefine.push_back(nd1->GetID());
+               elemsToRefine.push_back(nd1->getID());
 
-               nd2 = nd1->GetNeighbour(NORTH);
+               nd2 = nd1->getNeighbour(NORTH);
                if(nd2 != NULL)
-                 elemsToRefine.push_back(nd2->GetID());
+                 elemsToRefine.push_back(nd2->getID());
 
-               nd2 = nd1->GetNeighbour(SOUTH);
+               nd2 = nd1->getNeighbour(SOUTH);
                if(nd2 != NULL)
-                 elemsToRefine.push_back(nd2->GetID());
+                 elemsToRefine.push_back(nd2->getID());
             }
 
-            nd1 = nd->GetNeighbour(EAST);
+            nd1 = nd->getNeighbour(EAST);
             if(nd1 != NULL)
             {
-               elemsToRefine.push_back(nd1->GetID());
+               elemsToRefine.push_back(nd1->getID());
 
-               nd2 = nd1->GetNeighbour(NORTH);
+               nd2 = nd1->getNeighbour(NORTH);
                if(nd2 != NULL)
-                 elemsToRefine.push_back(nd2->GetID());
+                 elemsToRefine.push_back(nd2->getID());
 
-               nd2 = nd1->GetNeighbour(SOUTH);
+               nd2 = nd1->getNeighbour(SOUTH);
                if(nd2 != NULL)
-                 elemsToRefine.push_back(nd2->GetID());
+                 elemsToRefine.push_back(nd2->getID());
             }
 
-            nd1 = nd->GetNeighbour(NORTH);
+            nd1 = nd->getNeighbour(NORTH);
             if(nd1 != NULL)
-              elemsToRefine.push_back(nd1->GetID());
+              elemsToRefine.push_back(nd1->getID());
 
-            nd1 = nd->GetNeighbour(SOUTH);
+            nd1 = nd->getNeighbour(SOUTH);
             if(nd1 != NULL)
-              elemsToRefine.push_back(nd1->GetID());
+              elemsToRefine.push_back(nd1->getID());
           }
        }
     }
@@ -1231,35 +1231,35 @@ void HBSplineBase::performAdaptiveRefinement(double eTol)
     
     while(nd1 != NULL)
     {
-       if(nd->IsLeaf())
-         nd = nd->GetNeighbour(RIGHT);
+       if(nd->isLeaf())
+         nd = nd->getNeighbour(RIGHT);
        else
-         nd = nd->GetChild(LEFT);
+         nd = nd->getChild(LEFT);
 
-       if(nd->GetLevel() == CURRENT_LEVEL)
+       if(nd->getLevel() == CURRENT_LEVEL)
          nd1 == NULL;
     }
     
-    nd1 = nd->GetNeighbour(RIGHT);
+    nd1 = nd->getNeighbour(RIGHT);
 
-    cout << " AAAAAAAAAAAAAAAAA " << nd->GetID() << endl;
+    cout << " AAAAAAAAAAAAAAAAA " << nd->getID() << endl;
     
     
-    while( nd1 != NULL && !(nd1->IsGhost()) )
+    while( nd1 != NULL && !(nd1->isGhost()) )
     {
        cout << " CCCCCCCCCCCCCCCCC " << endl;
-       nd2 = nd1->GetNeighbour(RIGHT);
+       nd2 = nd1->getNeighbour(RIGHT);
        
-       cout << " AAAAAAAAAAAAAAAAA " << nd1->GetID() << '\t' << nd2->GetID() << endl;
+       cout << " AAAAAAAAAAAAAAAAA " << nd1->getID() << '\t' << nd2->getID() << endl;
        
-       if( nd2 != NULL && !(nd2->IsGhost()) )
+       if( nd2 != NULL && !(nd2->isGhost()) )
        {
-         if( binary_search(elemsToRefine.begin(), elemsToRefine.end(), nd->GetID()) && binary_search(elemsToRefine.begin(), elemsToRefine.end(), nd2->GetID()) )
-          elemsToRefine.push_back(nd1->GetID());
+         if( binary_search(elemsToRefine.begin(), elemsToRefine.end(), nd->getID()) && binary_search(elemsToRefine.begin(), elemsToRefine.end(), nd2->getID()) )
+          elemsToRefine.push_back(nd1->getID());
        }
        cout << " AAAAAAAAAAAAAAAAA " << endl;
-       nd  = nd->GetNeighbour(RIGHT);
-       nd1 = nd1->GetNeighbour(RIGHT);
+       nd  = nd->getNeighbour(RIGHT);
+       nd1 = nd1->getNeighbour(RIGHT);
        cout << " BBBBBBBBBBBBBBBBB " << endl;
     }
     */
@@ -1269,12 +1269,12 @@ void HBSplineBase::performAdaptiveRefinement(double eTol)
     elemsToRefine.clear();
     
     nd2=elems[boundaryNodes[1]];
-    elemsToRefine.push_back(nd2->GetID());
+    elemsToRefine.push_back(nd2->getID());
     
     for(ii=0;ii<degree[2];ii++)
     {
-       nd2 = nd2->GetNeighbour(LEFT);
-       elemsToRefine.push_back(nd2->GetID());
+       nd2 = nd2->getNeighbour(LEFT);
+       elemsToRefine.push_back(nd2->getID());
     }
     */
     /*

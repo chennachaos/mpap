@@ -2,7 +2,6 @@
 #include "ElementGeomExactTruss2D.h"
 
 #include "Debug.h"
-//#include "ComputerTime.h"
 #include "MpapTime.h"
 #include "BasisFunctionsLagrange.h"
 #include "GeomDataLagrange.h"
@@ -11,7 +10,6 @@
 
 using namespace std;
 
-//extern ComputerTime       computerTime;
 extern MpapTime mpapTime;
 
 
@@ -75,12 +73,6 @@ void ElementGeomExactTruss2D::prepareElemData2()
   return;
 }
 
-
-
-void ElementGeomExactTruss2D::resetMatrixAndVector()
-{
-  return;
-}
 
 int ElementGeomExactTruss2D::calcLoadVector()
 {

@@ -54,10 +54,6 @@ void LagrangeElem3DStructSolidMixed::prepareElemData()
 
    if(sss != 1) thick = 1.0; // for plane strain and axisymmetric problems
 
-
-  //Klocal.resize(nsize, nsize);
-  //Flocal.resize(nsize);
-  
   return;
 }
 
@@ -76,11 +72,6 @@ int LagrangeElem3DStructSolidMixed::calcLoadVector()
   return 0;
 }
 
-
-void LagrangeElem3DStructSolidMixed::resetMatrixAndVector()
-{
-  return;
-}
 
 
 int LagrangeElem3DStructSolidMixed::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)

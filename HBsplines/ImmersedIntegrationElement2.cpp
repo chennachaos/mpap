@@ -24,21 +24,21 @@ void ImmersedIntegrationElement::computeBodyForce(bool flag, double* VelSolid)
 
     PENALTY_NUM = 1.0;
 
-    degree = elem->GetDegree();
-    endof  = elem->Getndof();
+    degree = elem->getDegree();
+    endof  = elem->getNdof();
     //endof  = 3;
 
     nlocal = (degree[0] + 1)*(degree[1] + 1);
     
     VectorXd  NN(nlocal), N;
 
-    knots[0] = elem->GetKnots(0);
-    knots[1] = elem->GetKnots(1);
+    knots[0] = elem->getKnots(0);
+    knots[1] = elem->getKnots(1);
     
     //GeomData->computeBasisFunctions2D(knots[0][0], knots[1][0], knots[0][2], knots[1][2], param[0], param[1], &NN(0));
 
     //cout << " AAAAAAAAAAA " << endl;
-    if(elem->GetParent() == NULL)
+    if(elem->getParent() == NULL)
       N = NN;
     else
       N = elem->SubDivMat*NN;
@@ -134,15 +134,15 @@ void ImmersedIntegrationElement::mapDataToGlobalBodyForceVector(bool flag, doubl
     double   fact, fact2, ds, h1, h2, arclen=1.0, val1;
     double   *knots[2], *forceTmp, temp[2], normal[2];
 
-    degree = elem->GetDegree();
-    endof  = elem->Getndof();
+    degree = elem->getDegree();
+    endof  = elem->getNdof();
 
     nlocal = (degree[0] + 1)*(degree[1] + 1);
  
     VectorXd  NN(nlocal), N;
 
-    knots[0] = elem->GetKnots(0);
-    knots[1] = elem->GetKnots(1);
+    knots[0] = elem->getKnots(0);
+    knots[1] = elem->getKnots(1);
 
     //cout << " param " << param[0] << '\t' << param[1] << endl;
 
@@ -154,7 +154,7 @@ void ImmersedIntegrationElement::mapDataToGlobalBodyForceVector(bool flag, doubl
 
     //cout << " LLLLLLLLLLLLLLLLLL " << endl;
 
-    if(elem->GetParent() == NULL )
+    if(elem->getParent() == NULL )
       N = NN;
     else
       N = elem->SubDivMat * NN;

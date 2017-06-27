@@ -56,10 +56,6 @@ void LagrangeElem2DStructSolidMixed::prepareElemData()
    followerLoadFlag = (elmDat[8] == 1);
 
    if(sss != 1) thick = 1.0; // for plane strain and axisymmetric problems
-
-
-  //Klocal.resize(nsize, nsize);
-  //Flocal.resize(nsize);
   
   return;
 }
@@ -77,12 +73,6 @@ void LagrangeElem2DStructSolidMixed::prepareElemData2()
 int LagrangeElem2DStructSolidMixed::calcLoadVector()
 {
   return 0;
-}
-
-
-void LagrangeElem2DStructSolidMixed::resetMatrixAndVector()
-{
-  return;
 }
 
 

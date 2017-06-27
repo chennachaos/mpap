@@ -3,8 +3,6 @@
 #include "BasisFunctionsLagrange.h"
 
 #include "ImmersedSolid.h"
-//#include "SolutionDataFluid.h"
-//#include "SolutionDataSolid.h"
 
 
 using namespace std;
@@ -12,17 +10,12 @@ using namespace std;
 
 ContactElementPointToPoint2D::ContactElementPointToPoint2D()
 {
-  //id = pointcount++;
   DIM = 2;
-
-  //SolidSolnData = NULL;
-  //FluidSolnData = NULL;
 }
 
 
 ContactElementPointToPoint2D::~ContactElementPointToPoint2D()
 {
-  //pointcount--;
 }
 
 void ContactElementPointToPoint2D::prepareElemData()
@@ -153,13 +146,13 @@ void ContactElementPointToPoint2D::calcStiffnessAndResidual(int ind1, int ind2, 
 
 
 
-void ContactElementPointToPoint2D::AssembleElementVector(int ind, bool flag, double* rhs)
+void ContactElementPointToPoint2D::assembleElementVector(int ind, bool flag, double* rhs)
 {
   return;
 }
 
 
-void ContactElementPointToPoint2D::AssembleElementMatrix(int index, SparseMatrixXd& mtx)
+void ContactElementPointToPoint2D::assembleElementMatrix(int index, SparseMatrixXd& mtx)
 {
   return;
 }

@@ -9,7 +9,6 @@
 
 using namespace std;
 
-//extern ComputerTime       computerTime;
 extern MpapTime mpapTime;
 
 
@@ -74,10 +73,6 @@ void KirchhoffPlateElement::prepareElemData2()
 }
 
 
-void KirchhoffPlateElement::resetMatrixAndVector()
-{
-  return;
-}
 
 int KirchhoffPlateElement::calcLoadVector()
 {

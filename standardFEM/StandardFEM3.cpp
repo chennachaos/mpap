@@ -1,11 +1,12 @@
 
-#include "LagrangeElement.h"
+
 #include "StandardFEM.h"
 #include "MpapTime.h"
 #include "Functions.h"
 #include "Files.h"
 #include "MyString.h"
 #include "KimMoinFlow.h"
+#include "LagrangeElement.h"
 
 
 extern MpapTime mpapTime;
@@ -50,7 +51,7 @@ void StandardFEM::plotGeom(int a1, bool b1, int c1, bool d1, int* ffff)
 
           uGridVTK->InsertNextCell(triaVTK->GetCellType(), triaVTK->GetPointIds());
 
-          procIdVTK->InsertTuple1(ee, elems[ee]->get_subdomain_id());
+          procIdVTK->InsertTuple1(ee, elems[ee]->getSubdomainId());
         }
       }
       else // quad
@@ -64,7 +65,7 @@ void StandardFEM::plotGeom(int a1, bool b1, int c1, bool d1, int* ffff)
 
           uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
         
-          procIdVTK->InsertTuple1(ee, elems[ee]->get_subdomain_id());
+          procIdVTK->InsertTuple1(ee, elems[ee]->getSubdomainId());
         }
       }
     }
@@ -88,7 +89,7 @@ void StandardFEM::plotGeom(int a1, bool b1, int c1, bool d1, int* ffff)
 
           uGridVTK->InsertNextCell(tetraVTK->GetCellType(), tetraVTK->GetPointIds());
 
-          procIdVTK->InsertTuple1(ee, elems[ee]->get_subdomain_id());
+          procIdVTK->InsertTuple1(ee, elems[ee]->getSubdomainId());
         }
       }
       else
@@ -107,7 +108,7 @@ void StandardFEM::plotGeom(int a1, bool b1, int c1, bool d1, int* ffff)
 
           uGridVTK->InsertNextCell(hexVTK->GetCellType(), hexVTK->GetPointIds());
         
-          procIdVTK->InsertTuple1(ee, elems[ee]->get_subdomain_id());
+          procIdVTK->InsertTuple1(ee, elems[ee]->getSubdomainId());
         }
       }
     }
@@ -259,7 +260,7 @@ void  StandardFEM::postProcess(int vartype, int vardir, int nCol, bool umnxflag,
 
           uGridVTK->InsertNextCell(triaVTK->GetCellType(), triaVTK->GetPointIds());
 
-          procIdVTK->InsertTuple1(ee, elems[ee]->get_subdomain_id());
+          procIdVTK->InsertTuple1(ee, elems[ee]->getSubdomainId());
         }
       }
       else
@@ -273,7 +274,7 @@ void  StandardFEM::postProcess(int vartype, int vardir, int nCol, bool umnxflag,
 
           uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
           
-          procIdVTK->InsertTuple1(ee, elems[ee]->get_subdomain_id());
+          procIdVTK->InsertTuple1(ee, elems[ee]->getSubdomainId());
         }
       }
     }
@@ -333,7 +334,7 @@ void  StandardFEM::postProcess(int vartype, int vardir, int nCol, bool umnxflag,
 
           uGridVTK->InsertNextCell(tetraVTK->GetCellType(), tetraVTK->GetPointIds());
 
-          procIdVTK->InsertTuple1(ee, elems[ee]->get_subdomain_id());
+          procIdVTK->InsertTuple1(ee, elems[ee]->getSubdomainId());
         }
       }
       else
@@ -352,7 +353,7 @@ void  StandardFEM::postProcess(int vartype, int vardir, int nCol, bool umnxflag,
 
           uGridVTK->InsertNextCell(hexVTK->GetCellType(), hexVTK->GetPointIds());
         
-          procIdVTK->InsertTuple1(ee, elems[ee]->get_subdomain_id());
+          procIdVTK->InsertTuple1(ee, elems[ee]->getSubdomainId());
         }
       }
     }
@@ -425,7 +426,7 @@ else
 
           uGridVTK->InsertNextCell(triaVTK->GetCellType(), triaVTK->GetPointIds());
           
-          procIdVTK->InsertTuple1(ee, elems[ee]->get_subdomain_id());
+          procIdVTK->InsertTuple1(ee, elems[ee]->getSubdomainId());
         }
       }
       else
@@ -439,7 +440,7 @@ else
 
           uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
           
-          procIdVTK->InsertTuple1(ee, elems[ee]->get_subdomain_id());
+          procIdVTK->InsertTuple1(ee, elems[ee]->getSubdomainId());
         }
       }
     }
@@ -508,7 +509,7 @@ else
 
           uGridVTK->InsertNextCell(tetraVTK->GetCellType(), tetraVTK->GetPointIds());
 
-          procIdVTK->InsertTuple1(ee, elems[ee]->get_subdomain_id());
+          procIdVTK->InsertTuple1(ee, elems[ee]->getSubdomainId());
         }
       }
       else
@@ -527,7 +528,7 @@ else
 
           uGridVTK->InsertNextCell(hexVTK->GetCellType(), hexVTK->GetPointIds());
         
-          procIdVTK->InsertTuple1(ee, elems[ee]->get_subdomain_id());
+          procIdVTK->InsertTuple1(ee, elems[ee]->getSubdomainId());
         }
       }
     }

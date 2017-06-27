@@ -76,11 +76,6 @@ void LagrangeElem3DStructSolidHex8Node::prepareElemData2()
 
 
 
-void LagrangeElem3DStructSolidHex8Node::resetMatrixAndVector()
-{
-  return;
-}
-
 int LagrangeElem3DStructSolidHex8Node::calcLoadVector()
 {
   return 0;

@@ -14,7 +14,8 @@ class  LagrangeElem3DPoissonTet4Node : public LagrangeElement
 
     virtual ~LagrangeElem3DPoissonTet4Node();
 
-    virtual void  resetMatrixAndVector();
+    virtual int getElmTypeNameNum()
+    {  return 16; }
 
     virtual void prepareElemData();
 

@@ -1736,7 +1736,7 @@ int ImmersedRigidSolid::AssembleGlobalMatrixAndVectorCutFEM(int start1, int star
 
 
 
-void ImmersedRigidSolid::AssembleElementVector(int ind, bool flag, double* rhs)
+void ImmersedRigidSolid::assembleElementVector(int ind, bool flag, double* rhs)
 {
   for(int ii=0;ii<ndof;ii++)
   {

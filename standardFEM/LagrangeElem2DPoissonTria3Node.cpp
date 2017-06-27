@@ -35,21 +35,11 @@ void LagrangeElem2DPoissonTria3Node::prepareElemData()
 {
   LagrangeElement::prepareElemData();
 
-  //Klocal.resize(nsize, nsize);
-  //Flocal.resize(nsize);
-
   return;
 }
 
 
 void LagrangeElem2DPoissonTria3Node::prepareElemData2()
-{
-  return;
-}
-
-
-
-void LagrangeElem2DPoissonTria3Node::resetMatrixAndVector()
 {
   return;
 }

@@ -70,9 +70,6 @@ void LagrangeElem2DStructSolidTria3NodeStab::prepareElemData()
    followerLoadFlag = false;
 
   if(sss != 1) thick = 1.0; // for plane strain and axisymmetric problems
-
-  //Klocal.resize(nsize, nsize);
-  //Flocal.resize(nsize);
   
   return;
 }
@@ -82,13 +79,6 @@ void LagrangeElem2DStructSolidTria3NodeStab::prepareElemData()
 void LagrangeElem2DStructSolidTria3NodeStab::prepareElemData2()
 {
   cout << " LagrangeElem2DStructSolidTria3NodeStab::prepareElemData2() " << endl;
-  return;
-}
-
-
-
-void LagrangeElem2DStructSolidTria3NodeStab::resetMatrixAndVector()
-{
   return;
 }
 

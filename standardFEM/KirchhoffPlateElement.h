@@ -14,7 +14,8 @@ class  KirchhoffPlateElement : public LagrangeElement
 
     virtual ~KirchhoffPlateElement();
 
-    virtual void  resetMatrixAndVector();
+    virtual int getElmTypeNameNum()
+    {  return 31; }
 
     virtual void prepareElemData();
 

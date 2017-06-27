@@ -40,21 +40,11 @@ void LagrangeElem3DNavierStokesTet4Node::prepareElemData()
 {
   LagrangeElement::prepareElemData();
 
-  //Klocal.resize(nsize, nsize);
-  //Flocal.resize(nsize);
-
   return;
 }
 
 
 void LagrangeElem3DNavierStokesTet4Node::prepareElemData2()
-{
-  return;
-}
-
-
-
-void LagrangeElem3DNavierStokesTet4Node::resetMatrixAndVector()
 {
   return;
 }

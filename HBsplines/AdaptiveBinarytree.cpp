@@ -15,9 +15,9 @@ template<> int AdaptiveBinarytree<3>::MAX_LEVEL = 0;
 template<>
 void AdaptiveBinarytree<2>::subDivide(int refLev)
 {
-    //assert("Current Cell is a LEAF and Subdivision starts" && IsLeaf());
+    //assert("Current Cell is a LEAF and Subdivision starts" && isLeaf());
 
-    if( !IsLeaf() || (refLev < 1) )
+    if( !isLeaf() || (refLev < 1) )
       return;
 
 
@@ -82,7 +82,7 @@ void AdaptiveBinarytree<2>::subDivide(int refLev)
     {
       child[ii] = new AdaptiveBinarytree<2>(levTemp);
 
-      child[ii]->SetParent(this);
+      child[ii]->setParent(this);
     }
 
     child[FIRST]->orientation = FIRST;
@@ -93,25 +93,25 @@ void AdaptiveBinarytree<2>::subDivide(int refLev)
 
     if(splitDirTemp == 0)
     {
-      child[FIRST]->SetKnots(Dir1, knots[0][0], mid);
-      child[FIRST]->SetKnots(Dir2, knots[1][0], knots[1][1]);
+      child[FIRST]->setKnots(Dir1, knots[0][0], mid);
+      child[FIRST]->setKnots(Dir2, knots[1][0], knots[1][1]);
 
-      child[SECOND]->SetKnots(Dir1, mid,        knots[0][1]);
-      child[SECOND]->SetKnots(Dir2, knots[1][0], knots[1][1]);
+      child[SECOND]->setKnots(Dir1, mid,        knots[0][1]);
+      child[SECOND]->setKnots(Dir2, knots[1][0], knots[1][1]);
     }
 
     if(splitDirTemp == 1)
     {
-      child[FIRST]->SetKnots(Dir1, knots[0][0], knots[0][1]);
-      child[FIRST]->SetKnots(Dir2, knots[1][0], mid);
+      child[FIRST]->setKnots(Dir1, knots[0][0], knots[0][1]);
+      child[FIRST]->setKnots(Dir2, knots[1][0], mid);
 
-      child[SECOND]->SetKnots(Dir1, knots[0][0], knots[0][1]);
-      child[SECOND]->SetKnots(Dir2, mid,         knots[1][1]);
+      child[SECOND]->setKnots(Dir1, knots[0][0], knots[0][1]);
+      child[SECOND]->setKnots(Dir2, mid,         knots[1][1]);
     }
 
 
-    child[FIRST]->SetNeighbour(SECOND,  child[SECOND]);
-    child[SECOND]->SetNeighbour(FIRST, child[FIRST]);
+    child[FIRST]->setNeighbour(SECOND,  child[SECOND]);
+    child[SECOND]->setNeighbour(FIRST, child[FIRST]);
 
 
     /*
@@ -119,27 +119,27 @@ void AdaptiveBinarytree<2>::subDivide(int refLev)
 
     if(neighbours[FIRST] != NULL)
     {
-      if(neighbours[FIRST]->IsLeaf())
-        child[FIRST]->SetNeighbour(FIRST, NULL);
+      if(neighbours[FIRST]->isLeaf())
+        child[FIRST]->setNeighbour(FIRST, NULL);
       else
       {
-        tmpnode = neighbours[FIRST]->GetChild(SECOND);
+        tmpnode = neighbours[FIRST]->getChild(SECOND);
 
-        child[FIRST]->SetNeighbour(FIRST, tmpnode);
-        tmpnode->SetNeighbour(SECOND,child[FIRST]);
+        child[FIRST]->setNeighbour(FIRST, tmpnode);
+        tmpnode->setNeighbour(SECOND,child[FIRST]);
       }
     }
     
     if(neighbours[SECOND] != NULL)
     {
-      if(neighbours[SECOND]->IsLeaf())
-        child[SECOND]->SetNeighbour(SECOND, NULL);
+      if(neighbours[SECOND]->isLeaf())
+        child[SECOND]->setNeighbour(SECOND, NULL);
       else
       {
-        tmpnode = neighbours[SECOND]->GetChild(FIRST);
+        tmpnode = neighbours[SECOND]->getChild(FIRST);
 
-        child[SECOND]->SetNeighbour(SECOND, tmpnode);
-        tmpnode->SetNeighbour(FIRST,child[SECOND]);
+        child[SECOND]->setNeighbour(SECOND, tmpnode);
+        tmpnode->setNeighbour(FIRST,child[SECOND]);
       }
     }
     */
@@ -149,7 +149,7 @@ void AdaptiveBinarytree<2>::subDivide(int refLev)
     for(ii=0;ii<NUM_CHILDREN;ii++)
     {
       child[ii]->GeomData = GeomData;
-      child[ii]->SetLevel(levTemp);
+      child[ii]->setLevel(levTemp);
       child[ii]->SetSideTemp(sideTemp);
       child[ii]->SetParam3(param3);
       child[ii]->SetCoord3(coord3);
@@ -171,9 +171,9 @@ void AdaptiveBinarytree<2>::subDivide(int refLev)
 template<>
 void AdaptiveBinarytree<3>::subDivide(int refLev)
 {
-    //assert("Current Cell is a LEAF and Subdivision starts" && IsLeaf());
+    //assert("Current Cell is a LEAF and Subdivision starts" && isLeaf());
 
-    if( !IsLeaf() || (refLev < 1) )
+    if( !isLeaf() || (refLev < 1) )
       return;
 
 
@@ -223,7 +223,7 @@ void AdaptiveBinarytree<3>::subDivide(int refLev)
     {
       child[ii] = new AdaptiveBinarytree<3>(levTemp);
 
-      child[ii]->SetParent(this);
+      child[ii]->setParent(this);
     }
 
     child[FIRST]->orientation = FIRST;
@@ -234,40 +234,40 @@ void AdaptiveBinarytree<3>::subDivide(int refLev)
 
     if(splitDirTemp == 0)
     {
-      child[FIRST]->SetKnots(Dir1, knots[0][0], mid);
-      child[FIRST]->SetKnots(Dir2, knots[1][0], knots[1][1]);
-      child[FIRST]->SetKnots(Dir3, knots[2][0], knots[2][1]);
+      child[FIRST]->setKnots(Dir1, knots[0][0], mid);
+      child[FIRST]->setKnots(Dir2, knots[1][0], knots[1][1]);
+      child[FIRST]->setKnots(Dir3, knots[2][0], knots[2][1]);
 
-      child[SECOND]->SetKnots(Dir1, mid,        knots[0][1]);
-      child[SECOND]->SetKnots(Dir2, knots[1][0], knots[1][1]);
-      child[SECOND]->SetKnots(Dir3, knots[2][0], knots[2][1]);
+      child[SECOND]->setKnots(Dir1, mid,        knots[0][1]);
+      child[SECOND]->setKnots(Dir2, knots[1][0], knots[1][1]);
+      child[SECOND]->setKnots(Dir3, knots[2][0], knots[2][1]);
     }
 
     if(splitDirTemp == 1)
     {
-      child[FIRST]->SetKnots(Dir1, knots[0][0], knots[0][1]);
-      child[FIRST]->SetKnots(Dir2, knots[1][0], mid);
-      child[FIRST]->SetKnots(Dir3, knots[2][0], knots[2][1]);
+      child[FIRST]->setKnots(Dir1, knots[0][0], knots[0][1]);
+      child[FIRST]->setKnots(Dir2, knots[1][0], mid);
+      child[FIRST]->setKnots(Dir3, knots[2][0], knots[2][1]);
 
-      child[SECOND]->SetKnots(Dir1, knots[0][0], knots[0][1]);
-      child[SECOND]->SetKnots(Dir2, mid,         knots[1][1]);
-      child[SECOND]->SetKnots(Dir3, knots[2][0], knots[2][1]);
+      child[SECOND]->setKnots(Dir1, knots[0][0], knots[0][1]);
+      child[SECOND]->setKnots(Dir2, mid,         knots[1][1]);
+      child[SECOND]->setKnots(Dir3, knots[2][0], knots[2][1]);
     }
 
     if(splitDirTemp == 2)
     {
-      child[FIRST]->SetKnots(Dir1, knots[0][0], knots[0][1]);
-      child[FIRST]->SetKnots(Dir2, knots[1][0], knots[1][1]);
-      child[FIRST]->SetKnots(Dir3, knots[2][0], mid);
+      child[FIRST]->setKnots(Dir1, knots[0][0], knots[0][1]);
+      child[FIRST]->setKnots(Dir2, knots[1][0], knots[1][1]);
+      child[FIRST]->setKnots(Dir3, knots[2][0], mid);
 
-      child[SECOND]->SetKnots(Dir1, knots[0][0], knots[0][1]);
-      child[SECOND]->SetKnots(Dir2, knots[1][0], knots[1][1]);
-      child[SECOND]->SetKnots(Dir3, mid,         knots[2][1]);
+      child[SECOND]->setKnots(Dir1, knots[0][0], knots[0][1]);
+      child[SECOND]->setKnots(Dir2, knots[1][0], knots[1][1]);
+      child[SECOND]->setKnots(Dir3, mid,         knots[2][1]);
     }
 
 
-    child[FIRST]->SetNeighbour(SECOND,  child[SECOND]);
-    child[SECOND]->SetNeighbour(FIRST, child[FIRST]);
+    child[FIRST]->setNeighbour(SECOND,  child[SECOND]);
+    child[SECOND]->setNeighbour(FIRST, child[FIRST]);
 
 
     //
@@ -275,27 +275,27 @@ void AdaptiveBinarytree<3>::subDivide(int refLev)
 
     if(neighbours[FIRST] != NULL)
     {
-      if(neighbours[FIRST]->IsLeaf())
-        child[FIRST]->SetNeighbour(FIRST, NULL);
+      if(neighbours[FIRST]->isLeaf())
+        child[FIRST]->setNeighbour(FIRST, NULL);
       else
       {
-        tmpnode = neighbours[FIRST]->GetChild(SECOND);
+        tmpnode = neighbours[FIRST]->getChild(SECOND);
 
-        child[FIRST]->SetNeighbour(FIRST, tmpnode);
-        tmpnode->SetNeighbour(SECOND,child[FIRST]);
+        child[FIRST]->setNeighbour(FIRST, tmpnode);
+        tmpnode->setNeighbour(SECOND,child[FIRST]);
       }
     }
     
     if(neighbours[SECOND] != NULL)
     {
-      if(neighbours[SECOND]->IsLeaf())
-        child[SECOND]->SetNeighbour(SECOND, NULL);
+      if(neighbours[SECOND]->isLeaf())
+        child[SECOND]->setNeighbour(SECOND, NULL);
       else
       {
-        tmpnode = neighbours[SECOND]->GetChild(FIRST);
+        tmpnode = neighbours[SECOND]->getChild(FIRST);
 
-        child[SECOND]->SetNeighbour(SECOND, tmpnode);
-        tmpnode->SetNeighbour(FIRST,child[SECOND]);
+        child[SECOND]->setNeighbour(SECOND, tmpnode);
+        tmpnode->setNeighbour(FIRST,child[SECOND]);
       }
     }
     //
@@ -305,7 +305,7 @@ void AdaptiveBinarytree<3>::subDivide(int refLev)
     for(ii=0;ii<NUM_CHILDREN;ii++)
     {
       child[ii]->GeomData = GeomData;
-      //child[ii]->SetLevel(levTemp);
+      //child[ii]->setLevel(levTemp);
       child[ii]->prepareData();
       child[ii]->SetSplitDirection(splitDirTemp);
       child[ii]->subDivide(refLev);
@@ -327,7 +327,7 @@ void AdaptiveBinarytree<2>::printSelf()
             if(parent == NULL)
               printf("\t   Parent      = %5d\n", -1);
             else
-              printf("\t   Parent      = %5d\n", parent->GetID());
+              printf("\t   Parent      = %5d\n", parent->getID());
 
             printf("\t   Parameters ... \n");
             for(int ii=0;ii<2;ii++)
@@ -339,10 +339,10 @@ void AdaptiveBinarytree<2>::printSelf()
             if(neighbours != NULL)
             {
                if(neighbours[FIRST] != NULL)
-                 printf("\t\t FIRST   neighbour ID   = %5d \n", neighbours[FIRST]->GetID());
+                 printf("\t\t FIRST   neighbour ID   = %5d \n", neighbours[FIRST]->getID());
 
                if(neighbours[SECOND] != NULL)
-                 printf("\t\t SECOND   neighbour ID   = %5d \n", neighbours[SECOND]->GetID());
+                 printf("\t\t SECOND   neighbour ID   = %5d \n", neighbours[SECOND]->getID());
             }
             else
               printf("\t\t No Neighbours \n\n");
@@ -353,10 +353,10 @@ void AdaptiveBinarytree<2>::printSelf()
                //printf("\t  # of children    = %5d\n", NUM_CHILDREN);
                
                if(child[FIRST] != NULL)
-                 printf("\t\t FIRST   child ID   = %5d \n", child[FIRST]->GetID());
+                 printf("\t\t FIRST   child ID   = %5d \n", child[FIRST]->getID());
 
                if(child[SECOND] != NULL)
-                 printf("\t\t SECOND   child ID   = %5d \n", child[SECOND]->GetID());
+                 printf("\t\t SECOND   child ID   = %5d \n", child[SECOND]->getID());
             }
             else
               printf("\t\t No children \n");
@@ -376,7 +376,7 @@ void AdaptiveBinarytree<3>::printSelf()
             if(parent == NULL)
               printf("\t   Parent      = %5d\n", -1);
             else
-              printf("\t   Parent      = %5d\n", parent->GetID());
+              printf("\t   Parent      = %5d\n", parent->getID());
 
             printf("\t   Basis Functions --->  \n");
 
@@ -390,10 +390,10 @@ void AdaptiveBinarytree<3>::printSelf()
             if(neighbours != NULL)
             {
                if(neighbours[FIRST] != NULL)
-                 printf("\t\t FIRST   neighbour ID   = %5d \n", neighbours[FIRST]->GetID());
+                 printf("\t\t FIRST   neighbour ID   = %5d \n", neighbours[FIRST]->getID());
 
                if(neighbours[SECOND] != NULL)
-                 printf("\t\t SECOND   neighbour ID   = %5d \n", neighbours[SECOND]->GetID());
+                 printf("\t\t SECOND   neighbour ID   = %5d \n", neighbours[SECOND]->getID());
             }
             else
               printf("\t\t No Neighbours \n\n");
@@ -404,10 +404,10 @@ void AdaptiveBinarytree<3>::printSelf()
                //printf("\t  # of children    = %5d\n", NUM_CHILDREN);
                
                if(child[FIRST] != NULL)
-                 printf("\t\t FIRST   child ID   = %5d \n", child[FIRST]->GetID());
+                 printf("\t\t FIRST   child ID   = %5d \n", child[FIRST]->getID());
 
                if(child[SECOND] != NULL)
-                 printf("\t\t SECOND   child ID   = %5d \n", child[SECOND]->GetID());
+                 printf("\t\t SECOND   child ID   = %5d \n", child[SECOND]->getID());
             }
             else
               printf("\t\t No children \n");
@@ -427,7 +427,7 @@ void AdaptiveBinarytree<2>::mergeGaussPoints(int refLev2, int inclDom, int dummy
   //cout << knots[0][0] << '\t' << knots[0][1] << '\t' << knots[0][2] << '\t' << knots[0][3] << endl;
   //cout << knots[1][0] << '\t' << knots[1][1] << '\t' << knots[1][2] << '\t' << knots[1][3] << endl;
 
-  adapIntegNodeLocal->SetKnots(knots[0][0], knots[0][1], knots[1][0], knots[1][1]);
+  adapIntegNodeLocal->setKnots(knots[0][0], knots[0][1], knots[1][0], knots[1][1]);
 
   //cout << " AAAAAAAAAA " << endl;
 
@@ -494,7 +494,7 @@ void AdaptiveBinarytree<3>::mergeGaussPoints(int refLev2, int inclDom, int dummy
 //  cout << knots[0][0] << '\t' << knots[0][1] << '\t' << knots[0][2] << '\t' << knots[0][3] << endl;
 //  cout << knots[1][0] << '\t' << knots[1][1] << '\t' << knots[1][2] << '\t' << knots[1][3] << endl;
 
-  adapIntegNodeLocal->SetKnots(knots[0][0], knots[0][1], knots[1][0], knots[1][1], knots[2][0], knots[2][1]);
+  adapIntegNodeLocal->setKnots(knots[0][0], knots[0][1], knots[1][0], knots[1][1], knots[2][0], knots[2][1]);
 
   //cout << " AAAAAAAAAA " << endl;
 

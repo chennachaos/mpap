@@ -40,10 +40,6 @@ void ElementGeomExactBeam2D::prepareElemData()
 
   int ii, jj, ind, kk;
   
-  //Klocal.resize(nsize, nsize);
-  //Flocal.resize(nsize);
-  //Flocal2.resize(4);
-  
   return;
 }
 
@@ -78,15 +74,6 @@ void ElementGeomExactBeam2D::prepareElemData2()
 }
 
 
-
-void ElementGeomExactBeam2D::resetMatrixAndVector()
-{
-  //Klocal.setZero();
-  //Flocal.setZero();
-  //Flocal2.setZero();
-
-  return;
-}
 
 int ElementGeomExactBeam2D::calcLoadVector()
 {

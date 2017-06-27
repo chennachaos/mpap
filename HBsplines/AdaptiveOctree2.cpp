@@ -20,7 +20,7 @@
 template<>
 void AdaptiveOctree<2>::computeGaussPoints(int refLev2, int inclDom, int chkFlag, int mergeFlag, GaussQuadrature&  quadTemp)
 {
-  if( IsLeaf() )
+  if( isLeaf() )
   {
     myPoint  param, geom;
     int  gp, ii;
@@ -133,7 +133,7 @@ void AdaptiveOctree<2>::computeGaussPoints(int refLev2, int inclDom, int chkFlag
 template<>
 void AdaptiveOctree<3>::computeGaussPoints2Dfor3D(int refLev2, int inclDom, int chkFlag, int mergeFlag, GaussQuadrature&  quadTemp)
 {
-cout << " IsLeaf() ... 3D " << IsLeaf() << endl;
+cout << " isLeaf() ... 3D " << isLeaf() << endl;
 
   return;
 }
@@ -143,8 +143,8 @@ cout << " IsLeaf() ... 3D " << IsLeaf() << endl;
 template<>
 void AdaptiveOctree<2>::computeGaussPoints2Dfor3D(int refLev2, int inclDom, int chkFlag, int mergeFlag, GaussQuadrature&  quadTemp)
 {
-  //cout << " IsLeaf() " << IsLeaf() << endl;
-  if( IsLeaf() )
+  //cout << " isLeaf() " << isLeaf() << endl;
+  if( isLeaf() )
   {
     myPoint  param, geom;
     int  gp, ii;
@@ -262,7 +262,7 @@ void AdaptiveOctree<2>::computeGaussPoints2Dfor3D(int refLev2, int inclDom, int 
 template<>
 void AdaptiveOctree<2>::computeGaussPointsForMerging(int refLev2, int inclDom, int chkFlag, int mergeFlag, GaussQuadrature&  quadTemp)
 {
-  if( IsLeaf() )
+  if( isLeaf() )
   {
     myPoint  param, geom;
     int  gp, ii;
@@ -318,7 +318,7 @@ void AdaptiveOctree<2>::computeGaussPointsForMerging(int refLev2, int inclDom, i
 template<>
 void AdaptiveOctree<2>::computeGaussPointsForMerging2Dfor3D(int refLev2, int inclDom, int chkFlag, int mergeFlag, GaussQuadrature&  quadTemp)
 {
-  if( IsLeaf() )
+  if( isLeaf() )
   {
     myPoint  param, geom;
     int  gp, ii;
@@ -376,7 +376,7 @@ void AdaptiveOctree<2>::computeGaussPointsForMerging2Dfor3D(int refLev2, int inc
 template<>
 void AdaptiveOctree<3>::computeGaussPoints(int refLev2, int inclDom, int chkFlag, int mergeFlag, GaussQuadrature&  quadTemp)
 {
-  if( IsLeaf() )
+  if( isLeaf() )
   {
     myPoint  param, geom;
     int  gp, ii;
@@ -492,7 +492,7 @@ void AdaptiveOctree<3>::computeGaussPoints(int refLev2, int inclDom, int chkFlag
 template<>
 void AdaptiveOctree<3>::computeGaussPointsForMerging(int refLev2, int inclDom, int chkFlag, int mergeFlag, GaussQuadrature&  quadTemp)
 {
-  if( IsLeaf() )
+  if( isLeaf() )
   {
     myPoint  param, geom;
     int  gp, ii;

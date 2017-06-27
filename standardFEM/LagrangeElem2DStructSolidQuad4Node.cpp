@@ -83,12 +83,6 @@ void LagrangeElem2DStructSolidQuad4Node::prepareElemData2()
 }
 
 
-
-void LagrangeElem2DStructSolidQuad4Node::resetMatrixAndVector()
-{
-  return;
-}
-
 int LagrangeElem2DStructSolidQuad4Node::calcLoadVector()
 {
   return 0;

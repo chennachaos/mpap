@@ -41,21 +41,11 @@ void LagrangeElem2DStokesQuad4Node::prepareElemData()
 {
   LagrangeElement::prepareElemData();
 
-  //Klocal.resize(nsize, nsize);
-  //Flocal.resize(nsize);
-
   return;
 }
 
 
 void LagrangeElem2DStokesQuad4Node::prepareElemData2()
-{
-  return;
-}
-
-
-
-void LagrangeElem2DStokesQuad4Node::resetMatrixAndVector()
 {
   return;
 }
