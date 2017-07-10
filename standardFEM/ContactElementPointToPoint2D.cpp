@@ -158,7 +158,7 @@ void ContactElementPointToPoint2D::assembleElementMatrix(int index, SparseMatrix
 }
 
 
-void ContactElementPointToPoint2D::AssembleMatrixAndVector(int start, SparseMatrixXd& mtx, double* rhs)
+void ContactElementPointToPoint2D::assembleMatrixAndVector(int start, SparseMatrixXd& mtx, double* rhs)
 {
   int ii, jj, r;
   

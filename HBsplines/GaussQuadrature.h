@@ -11,8 +11,6 @@ using namespace std;
 using namespace Eigen;
 
 
-
-
 //template <int DIM>
 class GaussQuadrature
 {
@@ -22,17 +20,12 @@ class GaussQuadrature
 
     public:
 
-    //typedef Matrix<double, DIM, 1>  myPoint;
-
       vector<myPoint>  gausspoints;
       vector<double>  gaussweights;
 
       GaussQuadrature();
 
       ~GaussQuadrature();
-
-      //int getDimension()
-      //{ return DIM;}
 
       void SetGaussPoints(int nn);
       
@@ -46,14 +39,10 @@ template <int DIM>
 GaussQuadrature<DIM>::GaussQuadrature()
 {
 }
-
-
-
 template <int DIM>
 GaussQuadrature<DIM>::~GaussQuadrature()
 {
 }
-
 template <int DIM>
 void GaussQuadrature<DIM>::reset()
 {

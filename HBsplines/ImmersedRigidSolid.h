@@ -25,20 +25,26 @@ class ImmersedRigidSolid : public ImmersedSolid
 
         virtual ~ImmersedRigidSolid();
 
-        virtual bool  IsRigidBody() { return true; }
-        virtual bool  IsFlexibleBody() { return false; }
+        virtual bool  isRigidBody() { return true; }
+        virtual bool  isFlexibleBody() { return false; }
 
-        virtual void  SetMass(vector<double>&);
+        virtual void  setMass(vector<double>&);
 
-        virtual void  SetDamping(vector<double>&);
+        virtual void  setDamping(vector<double>&);
 
-        virtual void  SetStiffness(vector<double>&);
+        virtual void  setStiffness(vector<double>&);
 
-        virtual  void  SetNodalPositions(vector<vector<double> >&  vectemp);
+        virtual  void  setNodalPositions(vector<vector<double> >&  vectemp);
 
-        virtual void  SetBoundaryConditions(vector<int>& vectemp);
+        virtual void  setBoundaryConditions(vector<int>& vectemp);
 
-        virtual void  SetPrescibedMotion(vector<int>& vectemp);
+        virtual void  setPrescribedMotion(vector<int>& vectemp);
+
+        virtual void  setPreload(vector<double>&);
+
+        virtual void  setInitialForcePredictor(vector<double>&);
+
+        virtual void  setRigidBodyMotionLimits(vector<vector<double> >&);
 
         virtual void  printSelf();
 
@@ -54,7 +60,7 @@ class ImmersedRigidSolid : public ImmersedSolid
 
         virtual int  factoriseSolveAndUpdate();
 
-        virtual void  SolveTimeStep();
+        virtual void  solveTimeStep();
 
         virtual void  writeOutput();
 
@@ -72,7 +78,7 @@ class ImmersedRigidSolid : public ImmersedSolid
 
         virtual void  updateDisplacement(double*);
 
-        virtual void  SetBoundaryConditions(vector<vector<double> >& vectemp);
+        virtual void  setBoundaryConditions(vector<vector<double> >& vectemp);
 
         virtual void setSolver(int slv = 1, int *parm = NULL, bool cIO = false);
 
@@ -82,9 +88,9 @@ class ImmersedRigidSolid : public ImmersedSolid
 
         virtual void calcCouplingMatrices();
 
-        virtual int AssembleGlobalMatrixAndVector(int ind1, int ind2, SparseMatrixXd& mtx, double* rhs);
+        virtual int assembleGlobalMatrixAndVector(int ind1, int ind2, SparseMatrixXd& mtx, double* rhs);
 
-        virtual int AssembleGlobalMatrixAndVectorCutFEM(int ind1, int ind2, SolverPetsc* solverTemp);
+        virtual int assembleGlobalMatrixAndVectorCutFEM(int ind1, int ind2, SolverPetsc* solverTemp);
 
         virtual void  assembleElementVector(int ind, bool flag, double* rhs);
 };

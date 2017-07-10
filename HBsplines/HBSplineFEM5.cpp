@@ -151,13 +151,13 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
        //printf("\n\n");
        //printVector(Flocal);
        
-       //nd->AssembleMatrixAndVector(1, ((SolverEigen*)solver)->mtx, &(rhsVec(0)));
+       //nd->assembleMatrixAndVector(1, ((SolverEigen*)solver)->mtx, &(rhsVec(0)));
        //nd->assembleElementMatrix(1, ((SolverEigen*)solver)->mtx);
        //nd->assembleElementVector(firstIter, 1, &(rhsVec(0)));
        //cout << " AAAAAAAAAAAAAAAAA " << endl;
        //#pragma omp critical
-        //solver->AssembleMatrixAndVector(nd->forAssyVec, nd->forAssyVec, Klocal, Flocal);
-        solver->AssembleMatrixAndVector(velDOF, 0, nd->forAssyVec, Klocal, Flocal);
+        //solver->assembleMatrixAndVector(nd->forAssyVec, nd->forAssyVec, Klocal, Flocal);
+        solver->assembleMatrixAndVector(velDOF, 0, nd->forAssyVec, Klocal, Flocal);
        //cout << " AAAAAAAAAAAAAAAAA " << endl;
     }
   }
@@ -198,9 +198,9 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
     {
       for(bb=0;bb<ImmersedBodyObjects.size();bb++)
       {
-        if(ImmersedBodyObjects[bb]->IsBoundaryConditionTypeLagrange())
+        if(ImmersedBodyObjects[bb]->isBoundaryConditionTypeLagrange())
         {
-          for(aa=0;aa<ImmersedBodyObjects[bb]->GetNumNodes();aa++)
+          for(aa=0;aa<ImmersedBodyObjects[bb]->getNumberOfNodes();aa++)
           {
             //cout << bb << '\t' << aa << '\t' << ii << endl;
 
@@ -214,8 +214,8 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
             //cout << " PPPPPPPPPPPPPPPPPPPP " << endl;
             ImmersedBodyObjects[bb]->IBpoints[aa]->calcStiffnessAndResidual(1,0,0.0,0.0);
             //cout << " PPPPPPPPPPPPPPPPPPPP " << endl;
-            ImmersedBodyObjects[bb]->IBpoints[aa]->AssembleMatrixAndVector(fluidDOF, solver->mtx, &(solver->rhsVec(0)));
-            //solver->AssembleMatrixAndVector(nd->forAssyVec, nd->forAssyVec, Klocal, Flocal);
+            ImmersedBodyObjects[bb]->IBpoints[aa]->assembleMatrixAndVector(fluidDOF, solver->mtx, &(solver->rhsVec(0)));
+            //solver->assembleMatrixAndVector(nd->forAssyVec, nd->forAssyVec, Klocal, Flocal);
           }
         }
         else
@@ -245,8 +245,8 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
             for(jj=0;jj<DIM;jj++)
               nd->applyBoundaryConditionsAtApoint(jj, param, val[jj], Klocal, Flocal);
 
-            solver->AssembleMatrixAndVector(nd->forAssyVec, nd->forAssyVec, Klocal, Flocal);
-            //nd->AssembleMatrixAndVector(1, ((SolverEigen*)solver)->mtx, &(rhsVec(0)));
+            solver->assembleMatrixAndVector(nd->forAssyVec, nd->forAssyVec, Klocal, Flocal);
+            //nd->assembleMatrixAndVector(1, ((SolverEigen*)solver)->mtx, &(rhsVec(0)));
             //cout << " uuuuuuuuuuu " << endl;
           }
         }
@@ -365,14 +365,14 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
        //nd->applyNeumannBCsLSFEM(1, Klocal, Flocal);
        //cout << " AAAAAAAAAAAAAAAAA " << endl;
 
-       //solver->AssembleMatrixAndVector(velDOF, 0, nd->forAssyVec, nd->forAssyVec2, Klocal, Flocal);
+       //solver->assembleMatrixAndVector(velDOF, 0, nd->forAssyVec, nd->forAssyVec2, Klocal, Flocal);
 
        //if(IterNum)
        //cout << " AAAAAAAAAAAAAAAAA " << endl;
       //#pragma omp critical
-        solverEigen->AssembleMatrixAndVector(0, 0, nd->forAssyVec, Klocal, Flocal);
+        solverEigen->assembleMatrixAndVector(0, 0, nd->forAssyVec, Klocal, Flocal);
       //else
-        //solverEigen->AssembleVector(velDOF, 0, nd->forAssyVec, Flocal);
+        //solverEigen->assembleVector(velDOF, 0, nd->forAssyVec, Flocal);
       //cout << " AAAAAAAAAAAAAAAAA " << endl;
     }
 
@@ -415,7 +415,7 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
 
         cout << " this needs to completed " << endl;
         //nd->applyBoundaryConditionsAtApoint(dof, param, spec_val, PENALTY, Klocal, Flocal);
-        solverEigen->AssembleMatrixAndVector(velDOF, 0, nd->forAssyVec, Klocal, Flocal);
+        solverEigen->assembleMatrixAndVector(velDOF, 0, nd->forAssyVec, Klocal, Flocal);
       }
     }
     //
@@ -471,7 +471,7 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
       {
           kk = fluidDOF + IBDOF;
           //cout << " ppppppppppp " << kk << endl;
-          ImmersedBodyObjects[bb]->AssembleGlobalMatrixAndVector(fluidDOF, kk, solverEigen->mtx, &(solverEigen->rhsVec(0)));
+          ImmersedBodyObjects[bb]->assembleGlobalMatrixAndVector(fluidDOF, kk, solverEigen->mtx, &(solverEigen->rhsVec(0)));
           //cout << " ppppppppppp " << endl;
       }
 
@@ -479,7 +479,7 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
       for(bb=0;bb<contactElementObjects.size();bb++)
       {
         contactElementObjects[bb]->calcStiffnessAndResidual();
-        contactElementObjects[bb]->AssembleMatrixAndVector(kk, solverEigen->mtx, &(solverEigen->rhsVec(0)));
+        contactElementObjects[bb]->assembleMatrixAndVector(kk, solverEigen->mtx, &(solverEigen->rhsVec(0)));
       }
     }
 

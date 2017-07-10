@@ -126,7 +126,7 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
     //cout << " nGauss " << nGauss << '\t' << tempId << endl;
 
-    //volume = GeomData->GetGridLength(0) * knots[0][2] * GeomData->GetGridLength(1) * knots[1][2];
+    //volume = GeomData->getGridLength(0) * knots[0][2] * GeomData->getGridLength(1) * knots[1][2];
 
     fact = volume/(hx*hy);
 
@@ -176,8 +176,8 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
         dvol = gws[gp] * JacTemp;
 
-        geom[0] = GeomData->ComputeCoord(0, param[0]);
-        geom[1] = GeomData->ComputeCoord(1, param[1]);
+        geom[0] = GeomData->computeCoord(0, param[0]);
+        geom[1] = GeomData->computeCoord(1, param[1]);
 
         //cout << uu << '\t' << vv << endl;
         //cout << xx << '\t' << yy << endl;
@@ -539,8 +539,8 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
         dvol = gws[gp] * JacTemp;
 
-        geom[0] = GeomData->ComputeCoord(0, param[0]);
-        geom[1] = GeomData->ComputeCoord(1, param[1]);
+        geom[0] = GeomData->computeCoord(0, param[0]);
+        geom[1] = GeomData->computeCoord(1, param[1]);
 
         //cout << uu << '\t' << vv << endl;
         //cout << xx << '\t' << yy << endl;
@@ -838,8 +838,8 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
         dvol = gws[gp] * JacTemp;
 
-        geom[0] = GeomData->ComputeCoord(0, param[0]); // radius for axsy problems
-        //geom[1] = GeomData->ComputeCoord(1, param[1]);
+        geom[0] = GeomData->computeCoord(0, param[0]); // radius for axsy problems
+        //geom[1] = GeomData->computeCoord(1, param[1]);
 
         if(domNums.size() > 1) // cut cell
         {
@@ -1250,8 +1250,8 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
         dvol = gws[gp] * JacTemp;
 
-        geom[0] = GeomData->ComputeCoord(0, param[0]);
-        geom[1] = GeomData->ComputeCoord(1, param[1]);
+        geom[0] = GeomData->computeCoord(0, param[0]);
+        geom[1] = GeomData->computeCoord(1, param[1]);
 
         //cout << uu << '\t' << vv << endl;
         //cout << xx << '\t' << yy << endl;
@@ -1540,7 +1540,7 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
     int ii, jj, gp, nGauss, tempId, count=0;
     int TI, TIp1, TIp2, TJ, TJp1, TJp2;
 
-    double  JacTemp, Jac, dvol, stabParam, CI=4.0, bforce[2];
+    double  JacTemp, Jac, dvol, stabParam, CI=4.0;
     double  fact, fact2, b1, b2, b3, b4, b5, b6, b7, b8;
     double  pres, Da, Db, rad, urdr, urdr2, h2, h, tau[3];
 
@@ -1631,8 +1631,8 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
         dvol = gws[gp] * JacTemp;
 
-        geom[0] = GeomData->ComputeCoord(0, param[0]);
-        geom[1] = GeomData->ComputeCoord(1, param[1]);
+        geom[0] = GeomData->computeCoord(0, param[0]);
+        geom[1] = GeomData->computeCoord(1, param[1]);
 
         //cout << uu << '\t' << vv << endl;
         //cout << xx << '\t' << yy << endl;
@@ -1982,12 +1982,12 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
       
       JacTemp = JacMultElem;
 
-      volume = GeomData->GetGridLength(0) * knots[0][2] * GeomData->GetGridLength(1) * knots[1][2];
+      volume = GeomData->getGridLength(0) * knots[0][2] * GeomData->getGridLength(1) * knots[1][2];
     }
 
     //cout << " nGauss " << nGauss << '\t' << tempId << endl;
 
-    //volume = GeomData->GetGridLength(0) * knots[0][2] * GeomData->GetGridLength(1) * knots[1][2];
+    //volume = GeomData->getGridLength(0) * knots[0][2] * GeomData->getGridLength(1) * knots[1][2];
 
 //    cout << volume << '\t' << volume << endl;
     h2 = 4.0*volume/PI;
@@ -2012,8 +2012,8 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
         dvol = gws[gp] * JacTemp;
 
-        geom[0] = GeomData->ComputeCoord(0, param[0]);
-        geom[1] = GeomData->ComputeCoord(1, param[1]);
+        geom[0] = GeomData->computeCoord(0, param[0]);
+        geom[1] = GeomData->computeCoord(1, param[1]);
 
         //cout << uu << '\t' << vv << endl;
         //cout << xx << '\t' << yy << endl;
@@ -2628,7 +2628,7 @@ int TreeNode<2>::computeGaussPointsAdapIntegrationBoundary(int side, int refLev1
                 ptTemp = vecPts[0] + 0.5*(1.0 + GeomData->gausspoints2[ii])*(vecPts[1] - vecPts[0]);
 
                 // physcial domain to parametric domain
-                param = GeomData->ComputeParam(1, ptTemp[1]);
+                param = GeomData->computeParam(1, ptTemp[1]);
 
                 // parametric domain to integration master-quadrilateral domain
                 val = (2.0*param - knots[1][3])/knots[1][2];
@@ -2656,7 +2656,7 @@ int TreeNode<2>::computeGaussPointsAdapIntegrationBoundary(int side, int refLev1
                 ptTemp = vecPts[0] + 0.5*(1.0 + GeomData->gausspoints1[ii])*(vecPts[1] - vecPts[0]);
 
                 // physcial domain to parametric domain
-                param = GeomData->ComputeParam(0, ptTemp[0]);
+                param = GeomData->computeParam(0, ptTemp[0]);
 
                 // parametric domain to integration master-quadrilateral domain
                 val = (2.0*param - knots[0][3])/knots[0][2];
@@ -2797,8 +2797,8 @@ void TreeNode<2>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
 
             //printf(" %4d \t %4d \t %12.6f \t %12.6f \n", side, dir, vv, uu);
 
-            geom[0] = GeomData->ComputeCoord(0, param[0]);
-            geom[1] = GeomData->ComputeCoord(1, param[1]);
+            geom[0] = GeomData->computeCoord(0, param[0]);
+            geom[1] = GeomData->computeCoord(1, param[1]);
             //rad = sqrt(xx*xx+yy*yy);
             //cout << xx << '\t' << yy << endl;
 
@@ -2852,7 +2852,7 @@ void TreeNode<2>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
               }
             }
              */
-              //
+              /*
               if(side == 0 )
               {
                 if(dir == 0)
@@ -2888,7 +2888,7 @@ void TreeNode<2>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
                     //specVal = DirichletData[aa][2]*(1.0-geom[1]*geom[1]);
                 }
               }
-              //
+              */
 
               /*
               if(side == 3)
@@ -3114,8 +3114,8 @@ void TreeNode<2>::applyNeumannBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal,
 
             dvol = JacTemp * gws[gp] ;
 
-            geom[0] = GeomData->ComputeCoord(0, param[0]);
-            geom[1] = GeomData->ComputeCoord(1, param[1]);
+            geom[0] = GeomData->computeCoord(0, param[0]);
+            geom[1] = GeomData->computeCoord(1, param[1]);
             //r = sqrt(xx*xx+yy*yy);
             //val = 1.0+log(2.0*r);
             //cout << xx << '\t' << yy << endl;

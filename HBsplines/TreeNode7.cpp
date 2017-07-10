@@ -13,8 +13,8 @@ int TreeNode<1>::prepareCutCell(vector<double>& cutFEMparams)
 {
   double  x0, x1, xif=0.5;
   
-  x0 = GeomData->ComputeCoord(0, knots[0][0]);
-  x1 = GeomData->ComputeCoord(0, knots[0][1]);
+  x0 = GeomData->computeCoord(0, knots[0][0]);
+  x1 = GeomData->computeCoord(0, knots[0][1]);
   
   cout << x0 << '\t' << x1 << endl;
   
@@ -117,7 +117,7 @@ int TreeNode<2>::prepareCutCell(vector<double>& cutFEMparams)
       polyDataLoc->SetPoints(pointsLoc);
 
       //delaunay->BoundingTriangulationOn();
-      //delaunay->SetTolerance(0.0010);
+      //delaunay->setTolerance(0.0010);
       //delaunay->SetAlpha(0.0);
       delaunay->SetOffset(1000.0);
 
@@ -266,7 +266,7 @@ int TreeNode<2>::computeGaussPointsSubTrias(int nGP, int inclFlag, int flag1, in
             ptTemp[ii] = gpsLoc[gp][ii];
 
             // physcial domain to parametric domain
-            param[ii] = GeomData->ComputeParam(ii, ptTemp[ii]);
+            param[ii] = GeomData->computeParam(ii, ptTemp[ii]);
 
             // parametric domain to integration master-quadrilateral domain
             ptTemp[ii] = (2.0*param[ii] - knots[ii][3])/knots[ii][2];
@@ -278,8 +278,8 @@ int TreeNode<2>::computeGaussPointsSubTrias(int nGP, int inclFlag, int flag1, in
           //param[0]  = 0.5*(knots[0][2] * Quadrature.gausspoints[gp][0] + knots[0][3]);
           //param[1]  = 0.5*(knots[1][2] * Quadrature.gausspoints[gp][1] + knots[1][3]);
 
-          //geom[0] = GeomData->ComputeCoord(0, param[0]);
-          //geom[1] = GeomData->ComputeCoord(1, param[1]);
+          //geom[0] = GeomData->computeCoord(0, param[0]);
+          //geom[1] = GeomData->computeCoord(1, param[1]);
 
           //QuadratureDomNums.push_back( GeomData->within(geom) ) ;
           QuadratureDomNums.push_back( domTemp ) ;
@@ -308,7 +308,7 @@ int TreeNode<2>::computeGaussPointsSubTrias(int nGP, int inclFlag, int flag1, in
             geom[ii] = gpsLoc[gp][ii];
 
             // physcial domain to parametric domain
-            param[ii] = GeomData->ComputeParam(ii, geom[ii]);
+            param[ii] = GeomData->computeParam(ii, geom[ii]);
 
             // parametric domain to integration master-quadrilateral domain
             ptTemp[ii] = (2.0*param[ii] - knots[ii][3])/knots[ii][2];
@@ -415,7 +415,7 @@ int TreeNode<3>::computeGaussPointsSubTrias(int nGP, int refLev2, int inclFlag, 
             ptTemp[ii] = gpsLoc[gp][ii];
 
             // physcial domain to parametric domain
-            param[ii] = GeomData->ComputeParam(ii, ptTemp[ii]);
+            param[ii] = GeomData->computeParam(ii, ptTemp[ii]);
 
             // parametric domain to integration master-quadrilateral domain
             ptTemp[ii] = (2.0*param[ii] - knots[ii][3])/knots[ii][2];
@@ -503,7 +503,7 @@ int TreeNode<2>::computeGaussPointsAdapIntegration(int refLev1, int refLev2, int
 
   adapIntegNode->GeomData = GeomData;
   adapIntegNode->domNums = domNums;
-  //adapIntegNode->SetSplitDirection(-1);
+  //adapIntegNode->setSplitDirection(-1);
 
   adapIntegNode->prepareData();
   adapIntegNode->subDivide(refLev1);
@@ -534,8 +534,8 @@ int TreeNode<2>::computeGaussPointsAdapIntegration(int refLev1, int refLev2, int
       param[0]  = 0.5*(knots[0][2] * Quadrature.gausspoints[gp][0] + knots[0][3]);
       param[1]  = 0.5*(knots[1][2] * Quadrature.gausspoints[gp][1] + knots[1][3]);
 
-      geom[0] = GeomData->ComputeCoord(0, param[0]);
-      geom[1] = GeomData->ComputeCoord(1, param[1]);
+      geom[0] = GeomData->computeCoord(0, param[0]);
+      geom[1] = GeomData->computeCoord(1, param[1]);
 
       QuadratureDomNums.push_back( GeomData->within(geom) ) ;
     }
@@ -604,7 +604,7 @@ int TreeNode<3>::computeGaussPointsAdapIntegration(int refLev1, int refLev2, int
 
   adapIntegNode->GeomData = GeomData;
   adapIntegNode->domNums = domNums;
-  //adapIntegNode->SetSplitDirection(-1);
+  //adapIntegNode->setSplitDirection(-1);
 
   adapIntegNode->prepareData();
   adapIntegNode->subDivide(refLev1);
@@ -637,9 +637,9 @@ int TreeNode<3>::computeGaussPointsAdapIntegration(int refLev1, int refLev2, int
       param[1]  = 0.5*(knots[1][2] * Quadrature.gausspoints[gp][1] + knots[1][3]);
       param[2]  = 0.5*(knots[2][2] * Quadrature.gausspoints[gp][2] + knots[2][3]);
 
-      geom[0] = GeomData->ComputeCoord(0, param[0]);
-      geom[1] = GeomData->ComputeCoord(1, param[1]);
-      geom[2] = GeomData->ComputeCoord(1, param[2]);
+      geom[0] = GeomData->computeCoord(0, param[0]);
+      geom[1] = GeomData->computeCoord(1, param[1]);
+      geom[2] = GeomData->computeCoord(1, param[2]);
 
       QuadratureDomNums.push_back( GeomData->within(geom) ) ;
     }
@@ -720,22 +720,22 @@ int TreeNode<2>::checkCutCellValidityAdapIntegration()
   
   param[1] = vv[0];  param[0] = uu[0];
 
-  GeomData->ComputeCoord(param, geom);
+  GeomData->computeCoord(param, geom);
   vectmp[0] = GeomData->within(geom) ;
 
   param[1] = vv[0];  param[0] = uu[1];
 
-  GeomData->ComputeCoord(param, geom);
+  GeomData->computeCoord(param, geom);
   vectmp[1] = GeomData->within(geom) ;
 
   param[1] = vv[1];  param[0] = uu[0];
 
-  GeomData->ComputeCoord(param, geom);
+  GeomData->computeCoord(param, geom);
   vectmp[2] = GeomData->within(geom) ;
 
   param[1] = vv[1];  param[0] = uu[1];
 
-  GeomData->ComputeCoord(param, geom);
+  GeomData->computeCoord(param, geom);
   vectmp[3] = GeomData->within(geom) ;
 
   if( std::equal(vectmp.begin()+1, vectmp.end(), vectmp.begin()) )

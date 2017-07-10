@@ -279,9 +279,9 @@ void AdaptiveOctree<2>::subDivide(int refLev)
     {
       child[ii]->GeomData = GeomData;
       child[ii]->setLevel(levTemp);
-      child[ii]->SetSideTemp(sideTemp);
-      child[ii]->SetParam3(param3);
-      child[ii]->SetCoord3(coord3);
+      child[ii]->setSideTemp(sideTemp);
+      child[ii]->setParam3(param3);
+      child[ii]->setCoord3(coord3);
       child[ii]->prepareData();
 
       //cout << " eeeeeeeeee " << endl;
@@ -862,9 +862,9 @@ void AdaptiveOctree<2>::mergeGaussPoints(int refLev2, int inclDom, int dummy1, i
 
   //cout << " AAAAAAAAAA .... " << refLev << endl;
 
-  adapIntegNodeLocal->SetSideTemp(sideTemp);
-  adapIntegNodeLocal->SetParam3(param3);
-  adapIntegNodeLocal->SetCoord3(coord3);
+  adapIntegNodeLocal->setSideTemp(sideTemp);
+  adapIntegNodeLocal->setParam3(param3);
+  adapIntegNodeLocal->setCoord3(coord3);
 
   adapIntegNodeLocal->prepareData();
   adapIntegNodeLocal->subDivide(refLev2);
@@ -891,7 +891,7 @@ void AdaptiveOctree<2>::mergeGaussPoints(int refLev2, int inclDom, int dummy1, i
     for(ii=0; ii<2; ii++)
       param[ii] = QuadratureLocal.gausspoints[gp][ii] ;
 
-    //GeomData->ComputeCoord(param, geom);
+    //GeomData->computeCoord(param, geom);
     //ptTemp += geom;
 
     //cout << gp << '\t' << geom[0] << '\t' << geom[1] << '\t' << QuadratureLocal.gaussweights[gp] << endl;
@@ -952,7 +952,7 @@ void AdaptiveOctree<3>::mergeGaussPoints(int refLev2, int inclDom, int dummy1, i
     for(ii=0; ii<3; ii++)
       param[ii] = QuadratureLocal.gausspoints[gp][ii] ;
 
-    //GeomData->ComputeCoord(param, geom);
+    //GeomData->computeCoord(param, geom);
     //ptTemp += geom;
 
     wt +=  QuadratureLocal.gaussweights[gp];

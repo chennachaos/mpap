@@ -225,14 +225,14 @@ void HBSplineBase::prepareInputData()
     //
     ///////////////////////////////////////////////////////////////////
     
-    GeomData.SetDimension(DIM);
+    GeomData.setDimension(DIM);
 
     for(ii=0;ii<DIM;ii++)
     {
       GeomData.setDegree(ii, degree[ii]);
-      GeomData.SetNelem(ii, nelem[ii]);
-      GeomData.SetGridLength(ii, gridLEN[ii]);
-      GeomData.SetOrigin(ii, origin[ii]);
+      GeomData.setNumberOfElements(ii, nelem[ii]);
+      GeomData.setGridLength(ii, gridLEN[ii]);
+      GeomData.setOrigin(ii, origin[ii]);
     }
 
     GeomData.FluidProps = fluidProps;
@@ -251,9 +251,9 @@ void HBSplineBase::prepareInputData()
 
     boundaryNodes.resize(2*DIM);
 
-    BuildBase();
+    buildBase();
 
-    //printf("\n HBSplineBase : BuildBase        DONE \n \n ");
+    //printf("\n HBSplineBase : buildBase        DONE \n \n ");
 
     /////////////////////////////////////////////////////////////
     //
@@ -264,7 +264,7 @@ void HBSplineBase::prepareInputData()
     // compute the basis functions at level ZERO using algorithm #3  
 
     gridBF1 = 0;
-    Algorithm3(0);
+    algorithm3(0);
 
     /*
     for(ee=0;ee<elems.size();ee++)
@@ -297,16 +297,16 @@ void HBSplineBase::prepareInputData()
       cc = 0;
       for(bb=0; bb<nImmSolids; bb++)
       {
-        ImmersedBodyObjects[bb]->SetTimeIncrementType(tis);
-        ImmersedBodyObjects[bb]->SetRho(rhoInfty);
-        ImmersedBodyObjects[bb]->SetTolerance(tol);
+        ImmersedBodyObjects[bb]->setTimeIncrementType(tis);
+        ImmersedBodyObjects[bb]->setSpectralRadius(rhoInfty);
+        ImmersedBodyObjects[bb]->setTolerance(tol);
 
         ImmersedBodyObjects[bb]->STAGGERED = STAGGERED;
 
         ImmersedBodyObjects[bb]->SolnData.stagParams = stagParams;
 
         //cout << " zzzzzzzzzzzzzzzzz " << endl;
-        if( ImmersedBodyObjects[bb]->IsFlexibleBody() )
+        if( ImmersedBodyObjects[bb]->isFlexibleBody() )
         {
           //if( ImmersedBodyData[bb][4] > 0 )
             //ImmersedBodyObjects[bb]->SolnData.ElemProp = ElemProp[ImmersedBodyData[bb][4]-1];
@@ -330,7 +330,7 @@ void HBSplineBase::prepareInputData()
         //cout << " PPPPPPPPPPP " << endl;
         GeomData.immSolidPtrs.push_back( ImmersedBodyObjects[bb] );
 
-        GeomData.domainFixedYesNo.push_back( ImmersedBodyObjects[bb]->GetTotalDOF() == 0 ) ;
+        GeomData.domainFixedYesNo.push_back( ImmersedBodyObjects[bb]->getTotalDOF() == 0 ) ;
       }
     }
 
@@ -353,7 +353,7 @@ void HBSplineBase::prepareInputData()
         {
            default :
            case 0:
-              Refine(refinementData[2]);
+              refine(refinementData[2]);
               break;
            case 1:
               refinementforHemkerProblem();
@@ -365,10 +365,10 @@ void HBSplineBase::prepareInputData()
               refinementforAdvDiff2D();
               break;
            case 4:
-              PointBasedRefinement(refinementData[2]);
+              pointBasedRefinement(refinementData[2]);
               break;
            case 5:
-              LimitBasedRefinement(kk);
+              limitBasedRefinement(kk);
               break;
         }
 
@@ -382,9 +382,9 @@ void HBSplineBase::prepareInputData()
         */
 
         MAX_LEVEL += 1;
-        ApplyRefinementProcess();
+        applyRefinementProcess();
         CURRENT_LEVEL += 1;
-        ProcessBoundaryConditionsRefinedLevels();
+        processBoundaryConditionsRefinedLevels();
 
         //for(ii=0;ii<elemsToRefine.size();ii++)
         //elems[elemsToRefine[ii]]->printSelf();
@@ -396,7 +396,7 @@ void HBSplineBase::prepareInputData()
     // assign boundary conditions to the element
     //
 
-    AssignBoundaryConditions();
+    assignBoundaryConditions();
 
     /////////////////////////////////
 
@@ -668,7 +668,7 @@ void HBSplineBase::refinementforAdvDiff2D()
 
 
 
-void HBSplineBase::LimitBasedRefinement(int kk)
+void HBSplineBase::limitBasedRefinement(int kk)
 {
     node *nd, *nd1, *nd2;
     int  ii, ee, mm;
@@ -687,7 +687,7 @@ void HBSplineBase::LimitBasedRefinement(int kk)
           tmp1 = nd->getKnots(Dir1);
 
           param[0] = tmp1[0];
-          ComputeGeometry(param, geom);
+          computeGeometry(param, geom);
 
           //cout << " ee " << ee << endl;
           for(mm=0;mm<refineLimitVals.size();mm++)
@@ -710,7 +710,7 @@ void HBSplineBase::LimitBasedRefinement(int kk)
           tmp2 = nd->getKnots(Dir2);
 
           param[0] = tmp1[0];  param[1] = tmp2[0];
-          ComputeGeometry(param, geom);
+          computeGeometry(param, geom);
 
           for(mm=0;mm<refineLimitVals.size();mm++)
           {
@@ -738,13 +738,13 @@ void HBSplineBase::LimitBasedRefinement(int kk)
             tmp3 = nd->getKnots(Dir3);
 
             param[0] = 0.5*(tmp1[0]+tmp1[1]);  param[1] = 0.5*(tmp2[0]+tmp2[1]);  param[2] = 0.5*(tmp3[0]+tmp3[1]);
-            ComputeGeometry(param, geom);
-            //val[0] = ComputeGeometry(0, tmp1[0]);
-            //val[1] = ComputeGeometry(0, tmp1[1]);
-            //val[2] = ComputeGeometry(1, tmp2[0]);
-            //val[3] = ComputeGeometry(1, tmp2[1]);
-            //val[4] = ComputeGeometry(2, tmp3[0]);
-            //val[5] = ComputeGeometry(2, tmp3[1]);
+            computeGeometry(param, geom);
+            //val[0] = computeGeometry(0, tmp1[0]);
+            //val[1] = computeGeometry(0, tmp1[1]);
+            //val[2] = computeGeometry(1, tmp2[0]);
+            //val[3] = computeGeometry(1, tmp2[1]);
+            //val[4] = computeGeometry(2, tmp3[0]);
+            //val[5] = computeGeometry(2, tmp3[1]);
 
             //printf("%12.6f \t %12.6f \t %12.6f \t %12.6f \t %12.6f \t %12.6f \n", val[0], val[1], val[2], val[3], val[4], val[5]);
             for(mm=0;mm<refineLimitVals.size();mm++)
@@ -956,7 +956,7 @@ void  HBSplineBase::addNeighbourElements3D(int depth)
 
 
 
-void HBSplineBase::PointBasedRefinement(int kk)
+void HBSplineBase::pointBasedRefinement(int kk)
 {
   node *nd, *nd1, *nd2;
   int  ii, ee, bb, aa, cc, ll;
@@ -967,7 +967,7 @@ void HBSplineBase::PointBasedRefinement(int kk)
 
   for(bb=0;bb<ImmersedBodyObjects.size();bb++)
   {
-    for(aa=0; aa<ImmersedBodyObjects[bb]->GetNumNodes(); aa++)
+    for(aa=0; aa<ImmersedBodyObjects[bb]->getNumberOfNodes(); aa++)
     {
       //lme = ImmersedBodyObjects[bb]->ImmIntgElems[aa];
 
@@ -1010,7 +1010,7 @@ void HBSplineBase::PointBasedRefinement(int kk)
 
 
 
-void  HBSplineBase::Refine(int kk)
+void  HBSplineBase::refine(int kk)
 {
     //if((int)LevelSetFunc[0][0] == 1)
       //Circle   profile(LevelSetFunc[0][3], LevelSetFunc[0][4], LevelSetFunc[0][5]);
@@ -1107,22 +1107,22 @@ void  HBSplineBase::Refine(int kk)
           //
           param[0] = tmp1[0];
           param[1] = tmp2[0];
-          ComputeGeometry(param, geom);
+          computeGeometry(param, geom);
           f1 = profile.checkPointLocation(geom[0], geom[1]);
 
           param[0] = tmp1[1];
           param[1] = tmp2[0];
-          ComputeGeometry(param, geom);
+          computeGeometry(param, geom);
           f2 = profile.checkPointLocation(geom[0], geom[1]);
 
           param[0] = tmp1[1];
           param[1] = tmp2[1];
-          ComputeGeometry(param, geom);
+          computeGeometry(param, geom);
           f3 = profile.checkPointLocation(geom[0], geom[1]);
 
           param[0] = tmp1[0];
           param[1] = tmp2[1];
-          ComputeGeometry(param, geom);
+          computeGeometry(param, geom);
           f4 = profile.checkPointLocation(geom[0], geom[1]);
 
           if( (f1 || f2 || f3 || f4) && !(f1 && f2 && f3 && f4))
@@ -1299,7 +1299,7 @@ void  HBSplineBase::createImmersedBoundaryPoints()
 }
 
 
-void HBSplineBase::ProcessBoundaryConditionsRefinedLevels()
+void HBSplineBase::processBoundaryConditionsRefinedLevels()
 {
     assert(CURRENT_LEVEL > 0);
 
@@ -1358,7 +1358,7 @@ void HBSplineBase::ProcessBoundaryConditionsRefinedLevels()
 }
 
 
-void HBSplineBase::AssignBoundaryConditions()
+void HBSplineBase::assignBoundaryConditions()
 {
     //cout << "     HBSplineBase: assigning boundary conditions to the boundary elements ...\n\n";
 

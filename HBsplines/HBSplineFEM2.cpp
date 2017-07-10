@@ -214,9 +214,9 @@ void  HBSplineFEM::ImmersedBoundaryBodyForceLSFEM()
 
          ImmersedBodyObjects.SolveTimeStep(RigidBodyForce);
 
-         fact = ImmersedBodyObjects.GetDisplacement(1);
+         fact = ImmersedBodyObjects.getDisplacement(1);
        
-         VelSolid[1] = ImmersedBodyObjects.GetVelocity(1);
+         VelSolid[1] = ImmersedBodyObjects.getVelocity(1);
        }
 
        FluidSolnData.bodyForce.setZero();
@@ -279,7 +279,7 @@ void  HBSplineFEM::ImmersedBoundaryBodyForceLSFEM()
     //char        tmp[200];
     //MyString    tmpStr;
     
-    //printf(" \t %12.6E \t %12.6E \t %12.6E \n", RigidBodyForce[0], RigidBodyForce[1], ImmersedBodyObjects.GetDisplacement(1));
+    //printf(" \t %12.6E \t %12.6E \t %12.6E \n", RigidBodyForce[0], RigidBodyForce[1], ImmersedBodyObjects.getDisplacement(1));
 
     //sprintf(tmp," \t %12.6E \t %12.6E \t %12.6E \t %12.6E \t %12.6E ", RigidBodyForce[0], RigidBodyForce[1], fact, VelSolid[1], ImmersedBodyObjects.GetAcceleration(1));
     //sprintf(tmp," \t %12.6E \t %12.6E", RigidBodyForce(0,0), RigidBodyForce(0,1));
@@ -314,7 +314,7 @@ void  HBSplineFEM::solveSolidProblem()
     //ImmersedBodyObjects[bb]->updateForce(&(totalForce(0)));
 
     //cout << " kkkkkkkkkkk " << endl;
-    ImmersedBodyObjects[bb]->SolveTimeStep();
+    ImmersedBodyObjects[bb]->solveTimeStep();
 
     IB_MOVED = (IB_MOVED || ImmersedBodyObjects[bb]->updatePointPositions() );
   }
@@ -507,7 +507,7 @@ void  HBSplineFEM::applyInterfaceTerms2D()
         specValx.resize(nlb);
         specValy.resize(nlb);
 
-        if(ImmersedBodyObjects[bb]->IsBoundaryConditionTypeLagrange())
+        if(ImmersedBodyObjects[bb]->isBoundaryConditionTypeLagrange())
         {
           for(aa=0;aa<ImmersedBodyObjects[bb]->ImmIntgElems.size();aa++)
           {
@@ -682,7 +682,7 @@ void  HBSplineFEM::applyInterfaceTerms2D()
         {
           myDataIntegrateCutFEM  myData;
           
-          PENALTY = ImmersedBodyObjects[bb]->GetPenaltyParameter();
+          PENALTY = ImmersedBodyObjects[bb]->getPenaltyParameter();
 
           for(aa=0;aa<ImmersedBodyObjects[bb]->ImmIntgElems.size();aa++)
           {
@@ -756,8 +756,8 @@ void  HBSplineFEM::applyInterfaceTerms2D()
                 nd->applyBoundaryConditionsAtApoint(myData);
               }
 
-              //solverEigen->AssembleMatrixAndVector(velDOF, 0, nd->forAssyVec, nd->forAssyVec2, Klocal, Flocal);
-              solverEigen->AssembleMatrixAndVector(velDOF, 0, nd->forAssyVec, myData.K1, myData.F1);
+              //solverEigen->assembleMatrixAndVector(velDOF, 0, nd->forAssyVec, nd->forAssyVec2, Klocal, Flocal);
+              solverEigen->assembleMatrixAndVector(velDOF, 0, nd->forAssyVec, myData.K1, myData.F1);
               //cout << " uuuuuuuuuuu " << endl;
             }//for(gp=0...
           }//for(aa=0...
@@ -810,7 +810,7 @@ void  HBSplineFEM::applyInterfaceTerms3D()
         specValy.resize(nlb);
         specValz.resize(nlb);
 
-        if(ImmersedBodyObjects[bb]->IsBoundaryConditionTypeLagrange())
+        if(ImmersedBodyObjects[bb]->isBoundaryConditionTypeLagrange())
         {
           for(aa=0;aa<ImmersedBodyObjects[bb]->ImmIntgElems.size();aa++)
           {
@@ -1001,7 +1001,7 @@ void  HBSplineFEM::applyInterfaceTerms3D()
         {
           myDataIntegrateCutFEM  myData;
           
-          PENALTY = ImmersedBodyObjects[bb]->GetPenaltyParameter();
+          PENALTY = ImmersedBodyObjects[bb]->getPenaltyParameter();
 
           for(aa=0;aa<ImmersedBodyObjects[bb]->ImmIntgElems.size();aa++)
           {
@@ -1072,8 +1072,8 @@ void  HBSplineFEM::applyInterfaceTerms3D()
                 nd->applyBoundaryConditionsAtApoint(myData);
               }
 
-              //solverEigen->AssembleMatrixAndVector(velDOF, 0, nd->forAssyVec, nd->forAssyVec2, Klocal, Flocal);
-              solverEigen->AssembleMatrixAndVector(velDOF, 0, nd->forAssyVec, myData.K1, myData.F1);
+              //solverEigen->assembleMatrixAndVector(velDOF, 0, nd->forAssyVec, nd->forAssyVec2, Klocal, Flocal);
+              solverEigen->assembleMatrixAndVector(velDOF, 0, nd->forAssyVec, myData.K1, myData.F1);
               //cout << " uuuuuuuuuuu " << endl;
             }//for(gp=0...
           }//for(aa=0...

@@ -68,19 +68,19 @@ int main(int argc, char* argv[])
 
   //cout << "Hello, world! " << endl;
   
-  hbs.SetDimension(1);
+  hbs.setDimension(1);
 
-  hbs.SetOrigin(0.0, 0.0);
+  hbs.setOrigin(0.0, 0.0);
   
-  hbs.SetGridDimensions(1.0, 1.0);
+  hbs.setGridDimensions(1.0, 1.0);
   
-  hbs.SetBSplineDegree(degree, degree);
+  hbs.setBSplineDegree(degree, degree);
   
-  hbs.SetNumberOfElements(ne, ne);
+  hbs.setNumberOfElements(ne, ne);
 
 
-  hbs.AddDirichletBCs(1, 1, 0.0, PEN, isNitsche, NitscheFact);
-  hbs.AddDirichletBCs(2, 1, 0.0, PEN, isNitsche, NitscheFact);
+  hbs.addDirichletBCs(1, 1, 0.0, PEN, isNitsche, NitscheFact);
+  hbs.addDirichletBCs(2, 1, 0.0, PEN, isNitsche, NitscheFact);
   
   std::vector<double>  props(20, 0.0);
   props[0] = degree+1;
@@ -93,9 +93,9 @@ int main(int argc, char* argv[])
   props[9] = 1.0; // PSPG
   props[10] = 0.0; // LSIC
 
-  hbs.SetFluidProperties(props);
+  hbs.setFluidProperties(props);
   
-  hbs.SetControl(0, tol1, rho1);
+  hbs.setControl(0, tol1, rho1);
 
 
   hbs.setNdof(1);
@@ -223,30 +223,30 @@ int main(int argc, char* argv[])
 
     cout << "Hello, world! " << endl;
 
-    hbs.SetDimension(2);
+    hbs.setDimension(2);
 
     hbs.setNdof(1);
 
-    hbs.SetOrigin(0.0, 0.0);
+    hbs.setOrigin(0.0, 0.0);
 
-    hbs.SetGridDimensions(1.0, 1.0);
+    hbs.setGridDimensions(1.0, 1.0);
   
-    hbs.SetBSplineDegree(degree, degree);
+    hbs.setBSplineDegree(degree, degree);
   
-    hbs.SetNumberOfElements(ne, ne);
+    hbs.setNumberOfElements(ne, ne);
 
 
-    hbs.AddDirichletBCs(1, 1, 0.0, PEN, isNitsche, NitscheFact);
-    hbs.AddDirichletBCs(2, 1, 0.0, PEN, isNitsche, NitscheFact);
-    hbs.AddDirichletBCs(3, 1, 0.0, PEN, isNitsche, NitscheFact);
-    hbs.AddDirichletBCs(4, 1, 0.0, PEN, isNitsche, NitscheFact);
+    hbs.addDirichletBCs(1, 1, 0.0, PEN, isNitsche, NitscheFact);
+    hbs.addDirichletBCs(2, 1, 0.0, PEN, isNitsche, NitscheFact);
+    hbs.addDirichletBCs(3, 1, 0.0, PEN, isNitsche, NitscheFact);
+    hbs.addDirichletBCs(4, 1, 0.0, PEN, isNitsche, NitscheFact);
 
-    //hbs.AddDirichletBCs(1, 2, 0.0, PEN, isNitsche, NitscheFact);
-    //hbs.AddDirichletBCs(2, 2, 0.0, PEN, isNitsche, NitscheFact);
-    //hbs.AddDirichletBCs(3, 2, 0.0, PEN, isNitsche, NitscheFact);
-    //hbs.AddDirichletBCs(4, 2, 0.0, PEN, isNitsche, NitscheFact);
+    //hbs.addDirichletBCs(1, 2, 0.0, PEN, isNitsche, NitscheFact);
+    //hbs.addDirichletBCs(2, 2, 0.0, PEN, isNitsche, NitscheFact);
+    //hbs.addDirichletBCs(3, 2, 0.0, PEN, isNitsche, NitscheFact);
+    //hbs.addDirichletBCs(4, 2, 0.0, PEN, isNitsche, NitscheFact);
 
-    //hbs.AddPointBCs(0.0, 0.0, 1.0, 3, 0.0, 100.0);
+    //hbs.addPointBCs(0.0, 0.0, 1.0, 3, 0.0, 100.0);
   
     std::vector<double>  props(20, 0.0);
 
@@ -260,9 +260,9 @@ int main(int argc, char* argv[])
     props[9] = 0.0; // PSPG
     props[10] = 0.0; // LSIC
 
-    hbs.SetFluidProperties(props);
+    hbs.setFluidProperties(props);
 
-    hbs.SetControl(0, tol1, rho1);
+    hbs.setControl(0, tol1, rho1);
 
     int parm[5], ii, iter, niter=5, solv=8;
 

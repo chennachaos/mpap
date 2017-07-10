@@ -28,7 +28,7 @@ void HBSplineCutFEM::setInitialConditions()
 
            elems[ee]->resetMatrixAndVector();
            elems[ee]->setInitialProfile();
-           //elems[ee]->AssembleMatrixAndVector(1, solver->mtx, &(rhsVec(0)));
+           //elems[ee]->assembleMatrixAndVector(1, solver->mtx, &(rhsVec(0)));
        }
     }
 
@@ -82,7 +82,7 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
 
     if(firstIter)
     {
-      //solver->ResetPrecondFlag();
+      //solver->resetPrecondFlag();
       rNorm = -1.0;
     }
 
@@ -138,7 +138,7 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
           //printVector(Flocal);
 
           //#pragma omp critical
-          solverPetsc->AssembleMatrixAndVectorCutFEM(start, start, nd->forAssyVec, grid_to_proc_DOF, Klocal, Flocal);
+          solverPetsc->assembleMatrixAndVectorCutFEM(start, start, nd->forAssyVec, grid_to_proc_DOF, Klocal, Flocal);
           //cout << " CCCCCCCCCCCCCCCC " << endl;
         }
       }
@@ -191,7 +191,7 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
 
         //dof, param, spec_val, PENALTY, Klocal, Flocal
         nd->applyBoundaryConditionsAtApoint(myData);
-        solverPetsc->AssembleMatrixAndVector(0, 0, nd->forAssyVec, nd->forAssyVec, myData.K1, myData.F1);
+        solverPetsc->assembleMatrixAndVector(0, 0, nd->forAssyVec, nd->forAssyVec, myData.K1, myData.F1);
       }
     }
 
@@ -215,9 +215,9 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
       for(bb=0; bb<ImmersedBodyObjects.size(); bb++)
       {
         cout << " ppppppppppp " << kk << endl;
-        ImmersedBodyObjects[bb]->AssembleGlobalMatrixAndVectorCutFEM(kk, kk, solverPetsc);
+        ImmersedBodyObjects[bb]->assembleGlobalMatrixAndVectorCutFEM(kk, kk, solverPetsc);
         cout << " ppppppppppp " << endl;
-        kk += ImmersedBodyObjects[bb]->GetTotalDOF();
+        kk += ImmersedBodyObjects[bb]->getTotalDOF();
       }
     }
 
@@ -334,7 +334,7 @@ int HBSplineCutFEM::factoriseSolveAndUpdate()
           cout << " AAAAAAAAAAA " << bb << endl;
           ImmersedBodyObjects[bb]->updateDisplacement(&arrayTemp[kk]);
           //cout << " AAAAAAAAAAA " << bb << endl;
-          kk += ImmersedBodyObjects[bb]->GetTotalDOF();
+          kk += ImmersedBodyObjects[bb]->getTotalDOF();
         //}
       }
     }

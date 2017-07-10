@@ -41,6 +41,8 @@ int macro13(Macro &macro)
  
   if (macro.strg == "forw")
   {
+    //mpapTime.dtPrev  = mpapTime.dt;
+    
     mpapTime.prev2 = mpapTime.prev;
 
     mpapTime.prev  = mpapTime.cur;

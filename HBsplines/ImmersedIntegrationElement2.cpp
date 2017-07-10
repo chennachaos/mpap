@@ -76,8 +76,8 @@ void ImmersedIntegrationElement::computeBodyForce(bool flag, double* VelSolid)
     // map the force to global bodyForce vector
 
 
-    //h1 = GeomData->GetGridLength(0) * knots[0][2];
-    //h2 = GeomData->GetGridLength(1) * knots[1][2];
+    //h1 = GeomData->getGridLength(0) * knots[0][2];
+    //h2 = GeomData->getGridLength(1) * knots[1][2];
 
     arclen = 2.0*PI*0.5/301.0;
     //arclen = 2.0*PI*3.0/101.0;
@@ -159,8 +159,8 @@ void ImmersedIntegrationElement::mapDataToGlobalBodyForceVector(bool flag, doubl
     else
       N = elem->SubDivMat * NN;
 
-    //h1 = GeomData->GetGridLength(0) * knots[0][2];
-    //h2 = GeomData->GetGridLength(1) * knots[1][2];
+    //h1 = GeomData->getGridLength(0) * knots[0][2];
+    //h2 = GeomData->getGridLength(1) * knots[1][2];
 
     arclen = 2.0*PI*0.5/201.0;
     arclen = 2.0*PI*3.0/101.0;

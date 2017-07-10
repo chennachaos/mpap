@@ -2,11 +2,8 @@
 #define incl_ImmersedFlexibleSolid_h
 
 #include "Solver.h"
-
 #include "ImmersedSolid.h"
-
 #include "TreeNode.h"
-
 #include "LagrangeElement.h"
 
 
@@ -31,8 +28,8 @@ class ImmersedFlexibleSolid : public ImmersedSolid
 
         virtual ~ImmersedFlexibleSolid();
 
-        virtual bool IsRigidBody() { return false; }
-        virtual bool IsFlexibleBody() { return true; }
+        virtual bool isRigidBody() { return false; }
+        virtual bool isFlexibleBody() { return true; }
 
         void  prepareElemProp();
         void  prepareMatlProp();
@@ -43,7 +40,7 @@ class ImmersedFlexibleSolid : public ImmersedSolid
 
         virtual void  computeInitialAcceleration();
 
-        virtual  void  SetNodalPositions(vector<vector<double> >&  vectemp);
+        virtual void  setNodalPositions(vector<vector<double> >&  vectemp);
 
         virtual int   calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool zeroRes);
 
@@ -55,7 +52,7 @@ class ImmersedFlexibleSolid : public ImmersedSolid
 
         virtual int  applyExternalForces();
 
-        virtual void  SolveTimeStep();
+        virtual void  solveTimeStep();
 
         virtual void  writeOutput();
 
@@ -77,15 +74,15 @@ class ImmersedFlexibleSolid : public ImmersedSolid
 
         virtual void calcCouplingMatrices();
 
-        virtual int AssembleGlobalMatrixAndVector(int ind1, int ind2, SparseMatrixXd& mtx, double* rhs);
+        virtual int assembleGlobalMatrixAndVector(int ind1, int ind2, SparseMatrixXd& mtx, double* rhs);
 
-        virtual int AssembleGlobalMatrixAndVectorCutFEM(int ind1, int ind2, SolverPetsc* solverTemp);
+        virtual int assembleGlobalMatrixAndVectorCutFEM(int ind1, int ind2, SolverPetsc* solverTemp);
 
         virtual void setSolver(int slv = 1, int *parm = NULL, bool cIO = false);
 
-        virtual void  SetSolidElements(vector<vector<int> >& datatemp);
+        virtual void  setSolidElements(vector<vector<int> >& datatemp);
 
-        virtual void  SetBoundaryConditions(vector<vector<double> >& vectemp);
+        virtual void  setBoundaryConditions(vector<vector<double> >& vectemp);
 
         void  prepareMatrixPattern();
 };

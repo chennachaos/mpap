@@ -11,8 +11,8 @@ class MpapTime
   public:
 	
     MpapTime(void) { reset(); return; }
-     
-    double cur, prev, prev2, dt, dtMax, write;
+
+    double cur, prev, prev2, dt, dtPrev, dtMax, write;
 
     bool dtOK;
 

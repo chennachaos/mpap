@@ -36,8 +36,6 @@ void AdaptiveBinarytree<2>::subDivide(int refLev)
     if(level == (2*refLev) )
       return;
 
-    //cout << " bbbbbbbbbbb " << endl;
-
     int ii, levTemp, jj, bb, splitDirTemp=0;
 
     // find the split direction based on the Inside/Outside from of the current cell
@@ -60,21 +58,6 @@ void AdaptiveBinarytree<2>::subDivide(int refLev)
         splitDirTemp = 0;
     }
     
-    //if( (splitDir == -1) || (splitDir == splitDirTemp) )
-      //levTemp = level+1;
-    //else
-    //if( (splitDir == 0 && splitDirTemp == 1) || (splitDir == 1 && splitDirTemp == 0) )
-      //levTemp = level;
-
-    //if( (cornerInOut[0] == cornerInOut[1]) && (cornerInOut[2] == cornerInOut[3]) )
-      //splitDirTemp = 1;
-    //else //if( (cornerInOut[0] == cornerInOut[2]) && (cornerInOut[1] == cornerInOut[3]) )
-      //splitDirTemp = 0;
-
-
-    //cout << " ccccccccccc " << splitDir << '\t' << splitDirTemp << '\t' << levTemp << endl;
-
-
     NUM_CHILDREN = 2;
     child      = new AdaptiveBinarytree_PTR[NUM_CHILDREN];
 
@@ -150,11 +133,11 @@ void AdaptiveBinarytree<2>::subDivide(int refLev)
     {
       child[ii]->GeomData = GeomData;
       child[ii]->setLevel(levTemp);
-      child[ii]->SetSideTemp(sideTemp);
-      child[ii]->SetParam3(param3);
-      child[ii]->SetCoord3(coord3);
+      child[ii]->setSideTemp(sideTemp);
+      child[ii]->setParam3(param3);
+      child[ii]->setCoord3(coord3);
       child[ii]->prepareData();
-      child[ii]->SetSplitDirection(splitDirTemp);
+      child[ii]->setSplitDirection(splitDirTemp);
       //cout << " eeeeeeeeee " << endl;
       child[ii]->subDivide(refLev);
     }
@@ -307,7 +290,7 @@ void AdaptiveBinarytree<3>::subDivide(int refLev)
       child[ii]->GeomData = GeomData;
       //child[ii]->setLevel(levTemp);
       child[ii]->prepareData();
-      child[ii]->SetSplitDirection(splitDirTemp);
+      child[ii]->setSplitDirection(splitDirTemp);
       child[ii]->subDivide(refLev);
     }
 
@@ -321,46 +304,45 @@ void AdaptiveBinarytree<3>::subDivide(int refLev)
 template<>
 void AdaptiveBinarytree<2>::printSelf()
 {
-            printf("\t   ID          = %5d\n", id);
-            printf("\t   Level       = %5d\n", level);
+    printf("\t   ID          = %5d\n", id);
+    printf("\t   Level       = %5d\n", level);
 
-            if(parent == NULL)
-              printf("\t   Parent      = %5d\n", -1);
-            else
-              printf("\t   Parent      = %5d\n", parent->getID());
+    if(parent == NULL)
+      printf("\t   Parent      = %5d\n", -1);
+    else
+      printf("\t   Parent      = %5d\n", parent->getID());
 
-            printf("\t   Parameters ... \n");
-            for(int ii=0;ii<2;ii++)
-            {
-               printf("\t\t direction #%5d ---> \t%12.6f \t %12.6f\n", (ii+1), knots[ii][0], knots[ii][1]);
-            }
+    printf("\t   Parameters ... \n");
+    for(int ii=0;ii<2;ii++)
+    {
+      printf("\t\t direction #%5d ---> \t%12.6f \t %12.6f\n", (ii+1), knots[ii][0], knots[ii][1]);
+    }
 
-            printf("\n\t   Neighbours ... \n");
-            if(neighbours != NULL)
-            {
-               if(neighbours[FIRST] != NULL)
-                 printf("\t\t FIRST   neighbour ID   = %5d \n", neighbours[FIRST]->getID());
+    printf("\n\t   Neighbours ... \n");
+    if(neighbours != NULL)
+    {
+      if(neighbours[FIRST] != NULL)
+        printf("\t\t FIRST   neighbour ID   = %5d \n", neighbours[FIRST]->getID());
 
-               if(neighbours[SECOND] != NULL)
-                 printf("\t\t SECOND   neighbour ID   = %5d \n", neighbours[SECOND]->getID());
-            }
-            else
-              printf("\t\t No Neighbours \n\n");
+      if(neighbours[SECOND] != NULL)
+        printf("\t\t SECOND   neighbour ID   = %5d \n", neighbours[SECOND]->getID());
+    }
+    else
+      printf("\t\t No Neighbours \n\n");
 
-            printf("\n\t   children ... \n");
-            if(child != NULL)
-            {
-               //printf("\t  # of children    = %5d\n", NUM_CHILDREN);
-               
-               if(child[FIRST] != NULL)
-                 printf("\t\t FIRST   child ID   = %5d \n", child[FIRST]->getID());
+    printf("\n\t   children ... \n");
+    if(child != NULL)
+    {
+      if(child[FIRST] != NULL)
+        printf("\t\t FIRST   child ID   = %5d \n", child[FIRST]->getID());
 
-               if(child[SECOND] != NULL)
-                 printf("\t\t SECOND   child ID   = %5d \n", child[SECOND]->getID());
-            }
-            else
-              printf("\t\t No children \n");
-            printf("\n\n");
+      if(child[SECOND] != NULL)
+        printf("\t\t SECOND   child ID   = %5d \n", child[SECOND]->getID());
+    }
+    else
+      printf("\t\t No children \n");
+
+    printf("\n\n");
 
    return;
 }
@@ -370,48 +352,47 @@ void AdaptiveBinarytree<2>::printSelf()
 template<>
 void AdaptiveBinarytree<3>::printSelf()
 {
-            printf("\t   ID          = %5d\n", id);
-            printf("\t   Level       = %5d\n", level);
+    printf("\t   ID          = %5d\n", id);
+    printf("\t   Level       = %5d\n", level);
 
-            if(parent == NULL)
-              printf("\t   Parent      = %5d\n", -1);
-            else
-              printf("\t   Parent      = %5d\n", parent->getID());
+    if(parent == NULL)
+      printf("\t   Parent      = %5d\n", -1);
+    else
+      printf("\t   Parent      = %5d\n", parent->getID());
 
-            printf("\t   Basis Functions --->  \n");
+    printf("\t   Basis Functions --->  \n");
 
-            printf("\t   Parameters ... \n");
-            for(int ii=0;ii<3;ii++)
-            {
-               printf("\t\t direction #%5d ---> \t%12.6f \t %12.6f\n", (ii+1), knots[ii][0], knots[ii][1]);
-            }
+    printf("\t   Parameters ... \n");
+    for(int ii=0;ii<3;ii++)
+    {
+      printf("\t\t direction #%5d ---> \t%12.6f \t %12.6f\n", (ii+1), knots[ii][0], knots[ii][1]);
+    }
 
-            printf("\n\t   Neighbours ... \n");
-            if(neighbours != NULL)
-            {
-               if(neighbours[FIRST] != NULL)
-                 printf("\t\t FIRST   neighbour ID   = %5d \n", neighbours[FIRST]->getID());
+    printf("\n\t   Neighbours ... \n");
+    if(neighbours != NULL)
+    {
+      if(neighbours[FIRST] != NULL)
+        printf("\t\t FIRST   neighbour ID   = %5d \n", neighbours[FIRST]->getID());
 
-               if(neighbours[SECOND] != NULL)
-                 printf("\t\t SECOND   neighbour ID   = %5d \n", neighbours[SECOND]->getID());
-            }
-            else
-              printf("\t\t No Neighbours \n\n");
+        if(neighbours[SECOND] != NULL)
+          printf("\t\t SECOND   neighbour ID   = %5d \n", neighbours[SECOND]->getID());
+    }
+    else
+      printf("\t\t No Neighbours \n\n");
 
-            printf("\n\t   children ... \n");
-            if(child != NULL)
-            {
-               //printf("\t  # of children    = %5d\n", NUM_CHILDREN);
-               
-               if(child[FIRST] != NULL)
-                 printf("\t\t FIRST   child ID   = %5d \n", child[FIRST]->getID());
+    printf("\n\t   children ... \n");
+    if(child != NULL)
+    {
+      if(child[FIRST] != NULL)
+        printf("\t\t FIRST   child ID   = %5d \n", child[FIRST]->getID());
 
-               if(child[SECOND] != NULL)
-                 printf("\t\t SECOND   child ID   = %5d \n", child[SECOND]->getID());
-            }
-            else
-              printf("\t\t No children \n");
-            printf("\n\n");
+      if(child[SECOND] != NULL)
+        printf("\t\t SECOND   child ID   = %5d \n", child[SECOND]->getID());
+    }
+    else
+      printf("\t\t No children \n");
+
+    printf("\n\n");
 
    return;
 }
@@ -424,22 +405,15 @@ void AdaptiveBinarytree<2>::mergeGaussPoints(int refLev2, int inclDom, int dummy
 {
   AdaptiveBinarytree<2>  *adapIntegNodeLocal = new AdaptiveBinarytree<2>(0);
 
-  //cout << knots[0][0] << '\t' << knots[0][1] << '\t' << knots[0][2] << '\t' << knots[0][3] << endl;
-  //cout << knots[1][0] << '\t' << knots[1][1] << '\t' << knots[1][2] << '\t' << knots[1][3] << endl;
-
   adapIntegNodeLocal->setKnots(knots[0][0], knots[0][1], knots[1][0], knots[1][1]);
-
-  //cout << " AAAAAAAAAA " << endl;
 
   adapIntegNodeLocal->GeomData = GeomData;
   adapIntegNodeLocal->domNums = domNums;
-  adapIntegNodeLocal->SetSplitDirection(splitDir);
+  adapIntegNodeLocal->setSplitDirection(splitDir);
 
-  //cout << " AAAAAAAAAA .... " << refLev << endl;
-
-  adapIntegNodeLocal->SetSideTemp(sideTemp);
-  adapIntegNodeLocal->SetParam3(param3);
-  adapIntegNodeLocal->SetCoord3(coord3);
+  adapIntegNodeLocal->setSideTemp(sideTemp);
+  adapIntegNodeLocal->setParam3(param3);
+  adapIntegNodeLocal->setCoord3(coord3);
 
   adapIntegNodeLocal->prepareData();
   adapIntegNodeLocal->subDivide(refLev2);
@@ -463,9 +437,6 @@ void AdaptiveBinarytree<2>::mergeGaussPoints(int refLev2, int inclDom, int dummy
   {
     for(ii=0; ii<2; ii++)
       param[ii] = QuadratureLocal.gausspoints[gp][ii] ;
-
-    //GeomData->ComputeCoord(param, geom);
-    //ptTemp += geom;
 
     //cout << gp << '\t' << geom[0] << '\t' << geom[1] << '\t' << QuadratureLocal.gaussweights[gp] << endl;
     wt +=  QuadratureLocal.gaussweights[gp];
@@ -491,24 +462,15 @@ void AdaptiveBinarytree<3>::mergeGaussPoints(int refLev2, int inclDom, int dummy
 {
   AdaptiveBinarytree<3>  *adapIntegNodeLocal = new AdaptiveBinarytree<3>(0);
 
-//  cout << knots[0][0] << '\t' << knots[0][1] << '\t' << knots[0][2] << '\t' << knots[0][3] << endl;
-//  cout << knots[1][0] << '\t' << knots[1][1] << '\t' << knots[1][2] << '\t' << knots[1][3] << endl;
-
   adapIntegNodeLocal->setKnots(knots[0][0], knots[0][1], knots[1][0], knots[1][1], knots[2][0], knots[2][1]);
-
-  //cout << " AAAAAAAAAA " << endl;
 
   adapIntegNodeLocal->GeomData = GeomData;
   adapIntegNodeLocal->domNums = domNums;
-  adapIntegNodeLocal->SetSplitDirection(-1);
+  adapIntegNodeLocal->setSplitDirection(-1);
 
-  //cout << " AAAAAAAAAA .... " << refLev << endl;
-  
   adapIntegNodeLocal->prepareData();
   adapIntegNodeLocal->subDivide(refLev2);
   
-  //cout << " AAAAAAAAAA .... " << refLev << endl;
-
   GaussQuadrature  QuadratureLocal;
 
   int mergeFlag=0;
@@ -525,9 +487,6 @@ void AdaptiveBinarytree<3>::mergeGaussPoints(int refLev2, int inclDom, int dummy
   {
     for(ii=0; ii<3; ii++)
       param[ii] = QuadratureLocal.gausspoints[gp][ii] ;
-
-    //GeomData->ComputeCoord(param, geom);
-    //ptTemp += geom;
 
     wt +=  QuadratureLocal.gaussweights[gp];
     

@@ -63,7 +63,7 @@ class ContactElementPointToPoint2D
 
         void  assembleElementVector(int ind, bool flag, double* rhs);
 
-        void  AssembleMatrixAndVector(int, SparseMatrixXd&, double*);
+        void  assembleMatrixAndVector(int, SparseMatrixXd&, double*);
 
         void  prepareElemData();
 

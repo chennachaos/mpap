@@ -66,11 +66,11 @@ void HBSplineFEM::plotGeom1D(int val1, bool flag2, int col, bool PLOT_KNOT_LINES
           tmp = elems[ii]->getKnots(0);
 
           param[0] = tmp[0];
-          ComputeGeometry(param, geom);
+          computeGeometry(param, geom);
           pt0 = pointsVTK->InsertNextPoint(geom[0], 0.0, 0.0);
 
           param[0] = tmp[1];
-          ComputeGeometry(param, geom);
+          computeGeometry(param, geom);
           pt1 = pointsVTK->InsertNextPoint(geom[0], 0.0, 0.0);
           
           vertexVTK->GetPointIds()->SetId(0, pt0);
@@ -113,11 +113,11 @@ void HBSplineFEM::plotGeom2D(int val1, bool flag2, int col, bool PLOT_KNOT_LINES
           
           //cout << tmp1[0] << '\t' << tmp1[1] << '\t' << tmp2[0] << '\t' << tmp2[1] << endl;
 
-          x1 = ComputeGeometry(0, tmp1[0]);
-          x2 = ComputeGeometry(0, tmp1[1]);
+          x1 = computeGeometry(0, tmp1[0]);
+          x2 = computeGeometry(0, tmp1[1]);
 
-          y1 = ComputeGeometry(1, tmp2[0]);
-          y2 = ComputeGeometry(1, tmp2[1]);
+          y1 = computeGeometry(1, tmp2[0]);
+          y2 = computeGeometry(1, tmp2[1]);
 
 
           pt[0] = pointsVTK->InsertNextPoint(x1, y1, 0.0);
@@ -163,12 +163,12 @@ void HBSplineFEM::plotGeom3D(int val1, bool flag2, int col, bool PLOT_KNOT_LINES
           
           //cout << tmp1[0] << '\t' << tmp1[1] << '\t' << tmp2[0] << '\t' << tmp2[1] << '\t' << tmp3[0] << '\t' << tmp3[1]<< endl;
 
-          xx[0] = ComputeGeometry(0, tmp1[0]);
-          xx[1] = ComputeGeometry(0, tmp1[1]);
-          yy[0] = ComputeGeometry(1, tmp2[0]);
-          yy[1] = ComputeGeometry(1, tmp2[1]);
-          zz[0] = ComputeGeometry(2, tmp3[0]);
-          zz[1] = ComputeGeometry(2, tmp3[1]);
+          xx[0] = computeGeometry(0, tmp1[0]);
+          xx[1] = computeGeometry(0, tmp1[1]);
+          yy[0] = computeGeometry(1, tmp2[0]);
+          yy[1] = computeGeometry(1, tmp2[1]);
+          zz[0] = computeGeometry(2, tmp3[0]);
+          zz[1] = computeGeometry(2, tmp3[1]);
 
           pt[0] = pointsVTK->InsertNextPoint(xx[0], yy[0], zz[0]);
           pt[1] = pointsVTK->InsertNextPoint(xx[1], yy[0], zz[0]);
@@ -317,7 +317,7 @@ void  HBSplineFEM::createPostProcessGrid2D(int vartype, int vardir, int nCol, bo
               for(ii=0;ii<uu.size();ii++)
               {
                  param[0] = uu[ii]; param[1] = vv[jj];
-                 ComputeGeometry(param, geom);
+                 computeGeometry(param, geom);
 
                  xx.push_back(geom[0]);
                  yy.push_back(geom[1]);
@@ -500,7 +500,7 @@ void  HBSplineFEM::postProcess1D(int vartype, int vardir, int nCol, bool umnxfla
                  }
 
                  param[0] = uu[kk];
-                 ComputeGeometry(param, geom);
+                 computeGeometry(param, geom);
                  u1.push_back(geom[0]);
                  outp.push_back(nd1->computeValue(0, N));
                  //outp2.push_back(nd1->computeForce(0, N));
@@ -834,7 +834,7 @@ void  HBSplineFEM::postProcess2D(int vartype, int vardir, int nCol, bool umnxfla
 
     for(ee=0;ee<ImmersedBodyObjects.size();ee++)
     {
-      if( ImmersedBodyObjects[ee]->IsFlexibleBody() )
+      if( ImmersedBodyObjects[ee]->isFlexibleBody() )
         ImmersedBodyObjects[ee]->postProcess(filecount);
     }
     
@@ -899,7 +899,7 @@ void  HBSplineFEM::createPostProcessGrid3D(int vartype, int vardir, int nCol, bo
                for(ii=0;ii<uu.size();ii++)
                {
                  param[0] = uu[ii]; param[1] = vv[jj]; param[2] = ww[kk];
-                 ComputeGeometry(param, geom);
+                 computeGeometry(param, geom);
 
                  xx.push_back(geom[0]);
                  yy.push_back(geom[1]);
@@ -1312,7 +1312,7 @@ void HBSplineFEM::plotGaussPoints()
               param[0]  = 0.5*(tmp0[2] * GeomData.gausspoints[gp][0] + tmp0[3]);
               param[1]  = 0.5*(tmp1[2] * GeomData.gausspoints[gp][1] + tmp1[3]);
 
-              ComputeGeometry(param, geom);
+              computeGeometry(param, geom);
 
               //cout << param[0] << '\t' << param[1] << endl;
               //cout << geom[0] << '\t' << geom[1] << endl;

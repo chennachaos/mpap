@@ -37,7 +37,6 @@ class  ImmersedIntegrationElement;
 enum  {BC_ENFORCE_TYPE_LAGRANGE=0, BC_ENFORCE_TYPE_PENALTY};
 
 
-
 class ImmersedSolid
 {
     public:
@@ -53,9 +52,10 @@ class ImmersedSolid
         bool firstIter, STAGGERED, isNitsche, PRESC_MOTION;
 
         vector<int>  assy4r, PrescMotionTimeFuncs;
-
+        vector<double>  preLoad, initForcePred;
         vector<vector<int> >  forAssyMat, forAssyCoupledHorz, forAssyCoupledVert;
         vector<vector<int> >  OutputData;
+        vector<vector<double> > rigidBodyMotionLimits;
 
         VectorXd  soln, totalForce, fluidAcce, fluidAccePrev, fluidAcceCur;
         myPoint  centroid;
@@ -101,88 +101,88 @@ class ImmersedSolid
         int getID()
         {  return id; }
 
-        void  SetDimension(int dd)
+        void  setDimension(int dd)
         { DIM = dd; }
 
-        void  SetNNodes(int nn)
+        void  setNumberOfNodes(int nn)
         {  nNode = nn; }
 
-        int  GetNumNodes()
+        int  getNumberOfNodes()
         { return nNode; } 
 
-        void  SetNelem(int nn)
+        void  setNumberOfElements(int nn)
         {  nElem = nn; }
 
-        int  GetNelem()
+        int  getNumberOfElements()
         {  return nElem; }
 
-        void  SetNodePerElem(int nn)
+        void  setNumberOfNodesPerElement(int nn)
         {  npElem = nn; }
 
-        int GetTotalDOF()
+        int getTotalDOF()
         { return  totalDOF; }
         
-        void  SetTolerance(double tt)
+        void  setTolerance(double tt)
         { tol = tt; }
 
-        void  SetPenaltyParameter(double tt)
+        void  setPenaltyParameter(double tt)
         { PENALTY = tt; }
 
-        double  GetPenaltyParameter()
+        double  getPenaltyParameter()
         { return PENALTY; }
 
-        void  SetNitscheFact(double tt)
+        void  setNitscheFact(double tt)
         { NitscheFact = tt; }
 
-        double  GetNitscheFact()
+        double  getNitscheFact()
         { return NitscheFact; }
 
-        void  SetNitscheFlag(bool tt)
+        void  setNitscheFlag(bool tt)
         { isNitsche = tt; }
 
-        bool  GetNitscheFlag()
+        bool  getNitscheFlag()
         { return isNitsche; }
 
-        void SetTimeIncrementType(int ttt)
-        {  SolnData.SetTimeIncrementType(ttt); }
+        void setTimeIncrementType(int ttt)
+        {  SolnData.setTimeIncrementType(ttt); }
 
-        void SetRho(double ttt)
-        {  SolnData.SetRho(ttt); }
+        void setSpectralRadius(double ttt)
+        {  SolnData.setSpectralRadius(ttt); }
 
-        void SetInitDisplacement(int ind, int dir, double ttt)
+        void setInitDisplacement(int ind, int dir, double ttt)
         {  SolnData.var1[ind*ndof+dir] = ttt; }
         
-        void SetInitVelocity(int ind, int dir, double ttt)
+        void setInitVelocity(int ind, int dir, double ttt)
         {  SolnData.var1Dot[ind*ndof+dir] = ttt; }
 
-        void SetInitAcceleration(int ind, int dir, double ttt)
+        void setInitAcceleration(int ind, int dir, double ttt)
         {  SolnData.var1DotDot[ind*ndof+dir] = ttt; }
 
-        double GetDisplacement(int ind, int dir)
+        double getDisplacement(int ind, int dir)
         {  return  SolnData.var1[ind*ndof+dir]; }
 
-        double GetDisplacementCur(int ind, int dir)
+        double getDisplacementCur(int ind, int dir)
         {  return  SolnData.var1Cur[ind*ndof+dir]; }
 
-        double GetVelocity(int ind, int dir)
+        double getVelocity(int ind, int dir)
         {  return  SolnData.var1Dot[ind*ndof+dir]; }
 
-        double GetVelocityCur(int ind, int dir)
+        double getVelocityCur(int ind, int dir)
         {  return  SolnData.var1DotCur[ind*ndof+dir]; }
 
-        double GetAcceleration(int ind, int dir)
+        double getAcceleration(int ind, int dir)
         {  return  SolnData.var1DotDot[ind*ndof+dir]; }
 
-        double GetAccelerationCur(int ind, int dir)
+        double getAccelerationCur(int ind, int dir)
         {  return  SolnData.var1DotDotCur[ind*ndof+dir]; }
 
-        double GetForce(int ind, int dir)
+        double getForce(int ind, int dir)
         {  return  SolnData.force[ind*ndof+dir]; }
 
-        double GetForceCur(int ind, int dir)
+        double getForceCur(int ind, int dir)
         {  return  SolnData.forceCur[ind*ndof+dir]; }
 
-        void  SetBoundaryConditionType(int tt)
+        void  setBoundaryConditionType(int tt)
         {
           if(tt)
             BC_ENFORCE_TYPE = BC_ENFORCE_TYPE_LAGRANGE;
@@ -190,49 +190,47 @@ class ImmersedSolid
             BC_ENFORCE_TYPE = BC_ENFORCE_TYPE_PENALTY;
         }
 
-        bool IsBoundaryConditionTypeLagrange()
+        bool isBoundaryConditionTypeLagrange()
         {
           return (BC_ENFORCE_TYPE == BC_ENFORCE_TYPE_LAGRANGE);
         }
 
-        void  SetMaterialID(int tt)
+        void  setMaterialID(int tt)
         { matId = tt; }
 
-        int  GetMaterialID()
+        int  getMaterialID()
         { return matId; }
 
-        void  SetElementID(int tt)
+        void  setElementID(int tt)
         { elemId = tt; }
 
-        int  GetElementID()
+        int  getElementID()
         { return elemId; }
 
-        virtual bool IsRigidBody()
-        { cout << "   'IsRigidBody()' is not defined for this Solid!\n\n"; return true; }
+        virtual bool isRigidBody()
+        { cout << "   'isRigidBody()' is not defined for this Solid!\n\n"; return true; }
 
-        virtual bool IsFlexibleBody()
-        { cout << "   'IsFlexibleBody()' is not defined for this Solid!\n\n"; return true; }
+        virtual bool isFlexibleBody()
+        { cout << "   'isFlexibleBody()' is not defined for this Solid!\n\n"; return true; }
 
-        virtual  void  SetNodalPositions(vector<vector<double> >&  vectemp) = 0;
-        //{ cout << "   'SetNodalPositions' is not defined for this Solid!\n\n"; return; }
+        virtual  void  setNodalPositions(vector<vector<double> >&  vectemp) = 0;
 
-        virtual void  SetSolidElements(vector<vector<int> >& datatemp)
+        virtual void  setSolidElements(vector<vector<int> >& datatemp)
         { cout << "   'SetSolidElements' is not defined for this Solid!\n\n"; return; }
 
-        virtual void  SetImmersedElemActiveFlag(vector<int>& datatemp);
-        //{ cout << "   'SetImmersedElemActiveFlag' is not defined for this Solid!\n\n"; return; }
+        virtual void  setImmersedElemActiveFlag(vector<int>& datatemp);
 
-        virtual void  SetImmersedIntegrationElements(vector<vector<int> >& datatemp);
+        virtual void  setImmersedIntegrationElements(vector<vector<int> >& datatemp);
 
-        virtual  void  SetImmersedFaces();
-        
-        virtual  void  UpdateImmersedFaces();
+        virtual  void  setImmersedFaces();
+
+        virtual  void  updateImmersedFaces();
 
         void  adjustBoundaryPoints(double* minVal, double* maxVal);
 
-        virtual void  SetDataForOutput(vector<vector<int> >& vectemp);
+        virtual void  setDataForOutput(vector<vector<int> >& vectemp);
 
-        virtual void  SetBoundaryConditions(vector<vector<double> >& vectemp)
+        virtual void  setBoundaryConditions(vector<vector<double> >& vectemp)
         { cout << "   'SetBoundaryConditions' is not defined for this Solid!\n\n"; return; }
 
         virtual void  printSelf()
@@ -241,23 +239,32 @@ class ImmersedSolid
         virtual void  initialise()
         { cout << "   'initialise()' is not defined for this Solid!\n\n"; return; }
 
-        virtual void  SetMass(vector<double>&)
-        { cout << "   'SetMass()' is not defined for this Solid!\n\n"; return; }
+        virtual void  setMass(vector<double>&)
+        { cout << "   'setMass()' is not defined for this Solid!\n\n"; return; }
 
-        virtual void  SetDamping(vector<double>&)
-        { cout << "   'SetDamping()' is not defined for this Solid!\n\n"; return; }
+        virtual void  setDamping(vector<double>&)
+        { cout << "   'setDamping()' is not defined for this Solid!\n\n"; return; }
 
-        virtual void  SetStiffness(vector<double>&)
-        { cout << "   'SetStiffness()' is not defined for this Solid!\n\n"; return; }
+        virtual void  setStiffness(vector<double>&)
+        { cout << "   'setStiffness()' is not defined for this Solid!\n\n"; return; }
 
-        virtual void  SetBoundaryConditions(vector<int>& vectemp)
+        virtual void  setBoundaryConditions(vector<int>& vectemp)
         { cout << "   'SetBoundaryConditions' is not defined for this Solid!\n\n"; return; }
 
-        virtual void  SetPrescibedMotion(vector<int>& vectemp)
-        { cout << "   'SetPrescibedMotion' is not defined for this Solid!\n\n"; return; }
+        virtual void  setPrescribedMotion(vector<int>& vectemp)
+        { cout << "   'SetPrescribedMotion' is not defined for this Solid!\n\n"; return; }
 
-        virtual void SetSolver(int slv = 1, int *parm = NULL, bool cIO = false)
-        { cout << "   'SetSolver()' is not defined for this Solid!\n\n"; return; }
+        virtual void  setPreload(vector<double>&)
+        { cout << "   'setPreload' is not defined for this Solid!\n\n"; return; }
+
+        virtual void  setInitialForcePredictor(vector<double>&)
+        { cout << "   'setInitialForcePredictor' is not defined for this Solid!\n\n"; return; }
+
+        virtual void  setRigidBodyMotionLimits(vector<vector<double> >&)
+        { cout << "   'setRigidBodyMotionLimits' is not defined for this Solid!\n\n"; return; }
+
+        virtual void  setSolver(int slv = 1, int *parm = NULL, bool cIO = false)
+        { cout << "   'setSolver()' is not defined for this Solid!\n\n"; return; }
 
         virtual void  computeInitialAcceleration()
         { cout << "   'computeInitialAcceleration()' is not defined for this Solid!\n\n"; return; }
@@ -280,8 +287,8 @@ class ImmersedSolid
 
         virtual bool  converged();
 
-        virtual void  SolveTimeStep()
-        { cout << "   'SolveTimeStep()' is not defined for this Solid!\n\n"; return; }
+        virtual void  solveTimeStep()
+        { cout << "   'solveTimeStep()' is not defined for this Solid!\n\n"; return; }
 
         virtual void  timeUpdate();
 
@@ -291,7 +298,7 @@ class ImmersedSolid
 
         void  computeCentroid(int index);
 
-        myPoint&  GetCentroid(int index)
+        myPoint&  getCentroid(int index)
         {
           computeCentroid(index);
 
@@ -319,11 +326,11 @@ class ImmersedSolid
         virtual void calcCouplingMatrices()
         { cout << "   'calcCouplingMatrices()' is not defined for this Solid!\n\n"; return; }
 
-        virtual int AssembleGlobalMatrixAndVector(int ind1, int ind2, SparseMatrixXd& mtx, double* rhs)
-        { cout << "   'AssembleGlobalMatrixAndVector()' is not defined for this Solid!\n\n"; return 0; }
+        virtual int assembleGlobalMatrixAndVector(int ind1, int ind2, SparseMatrixXd& mtx, double* rhs)
+        { cout << "   'assembleGlobalMatrixAndVector()' is not defined for this Solid!\n\n"; return 0; }
 
-        virtual int AssembleGlobalMatrixAndVectorCutFEM(int ind1, int ind2, SolverPetsc* solverTemp)
-        { cout << "   'AssembleGlobalMatrixAndVectorCutFEM()' is not defined for this Solid!\n\n"; return 0; }
+        virtual int assembleGlobalMatrixAndVectorCutFEM(int ind1, int ind2, SolverPetsc* solverTemp)
+        { cout << "   'assembleGlobalMatrixAndVectorCutFEM()' is not defined for this Solid!\n\n"; return 0; }
 
         virtual void  writeOutput()
         { cout << "   'writeOutput()' is not defined for this Solid!\n\n"; return; }

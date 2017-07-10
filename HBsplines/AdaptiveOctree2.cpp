@@ -42,7 +42,7 @@ void AdaptiveOctree<2>::computeGaussPoints(int refLev2, int inclDom, int chkFlag
           for(ii=0; ii<2; ii++)
             param[ii] = 0.5*(knots[ii][2] * GeomData->gausspoints[gp][ii] + knots[ii][3]);
 
-          GeomData->ComputeCoord(param, geom);
+          GeomData->computeCoord(param, geom);
 
           //if( GeomData->within(geom) == inclDom )
           //{
@@ -70,7 +70,7 @@ void AdaptiveOctree<2>::computeGaussPoints(int refLev2, int inclDom, int chkFlag
             //cout << gp << '\t' << GeomData->gausspoints[gp][0] << '\t' << GeomData->gausspoints[gp][1] << endl;
             //cout << gp << '\t' << param(0) << '\t' << param(1) << endl;
 
-            GeomData->ComputeCoord(param, geom);
+            GeomData->computeCoord(param, geom);
 
             if( GeomData->within(geom) == inclDom )
             {
@@ -168,7 +168,7 @@ void AdaptiveOctree<2>::computeGaussPoints2Dfor3D(int refLev2, int inclDom, int 
           
           map2DPointTo3DPoint(sideTemp, param, param3);
 
-           //GeomData->ComputeCoord(param, geom);
+           //GeomData->computeCoord(param, geom);
            //cout << " Geom " << geom[0] << '\t' << geom[1] << '\t' << geom[2] << endl;
 
             //if( GeomData->within(geom) == inclDom )
@@ -199,7 +199,7 @@ void AdaptiveOctree<2>::computeGaussPoints2Dfor3D(int refLev2, int inclDom, int 
 
             map2DPointTo3DPoint(sideTemp, param, param3);
 
-            GeomData->ComputeCoord(param, geom);
+            GeomData->computeCoord(param, geom);
 
               if( GeomData->within(geom) == inclDom )
               {
@@ -276,7 +276,7 @@ void AdaptiveOctree<2>::computeGaussPointsForMerging(int refLev2, int inclDom, i
           for(ii=0; ii<2; ii++)
             param[ii] = 0.5*(knots[ii][2] * GeomData->gausspoints[gp][ii] + knots[ii][3]);
 
-          GeomData->ComputeCoord(param, geom);
+          GeomData->computeCoord(param, geom);
 
           if( GeomData->within(geom) == inclDom )
           {
@@ -292,7 +292,7 @@ void AdaptiveOctree<2>::computeGaussPointsForMerging(int refLev2, int inclDom, i
           for(ii=0; ii<2; ii++)
             param[ii] = 0.5*(knots[ii][2] * 0.0 + knots[ii][3]);
 
-          GeomData->ComputeCoord(param, geom);
+          GeomData->computeCoord(param, geom);
 
           if( GeomData->within(geom) == inclDom )
           {
@@ -334,7 +334,7 @@ void AdaptiveOctree<2>::computeGaussPointsForMerging2Dfor3D(int refLev2, int inc
 
           map2DPointTo3DPoint(sideTemp, param, param3);
 
-          GeomData->ComputeCoord(param, geom);
+          GeomData->computeCoord(param, geom);
 
           if( GeomData->within(geom) == inclDom )
           {
@@ -352,7 +352,7 @@ void AdaptiveOctree<2>::computeGaussPointsForMerging2Dfor3D(int refLev2, int inc
 
           map2DPointTo3DPoint(sideTemp, param, param3);
 
-          GeomData->ComputeCoord(param, geom);
+          GeomData->computeCoord(param, geom);
 
           if( GeomData->within(geom) == inclDom )
           {
@@ -398,7 +398,7 @@ void AdaptiveOctree<3>::computeGaussPoints(int refLev2, int inclDom, int chkFlag
           for(ii=0; ii<3; ii++)
             param[ii] = 0.5*(knots[ii][2] * GeomData->gausspoints[gp][ii] + knots[ii][3]);
 
-          GeomData->ComputeCoord(param, geom);
+          GeomData->computeCoord(param, geom);
 
             //if( GeomData->within(geom) == inclDom )
             //{
@@ -426,7 +426,7 @@ void AdaptiveOctree<3>::computeGaussPoints(int refLev2, int inclDom, int chkFlag
             //cout << gp << '\t' << GeomData->gausspoints[gp][0] << '\t' << GeomData->gausspoints[gp][1] << endl;
             //cout << gp << '\t' << param(0) << '\t' << param(1) << endl;
 
-            GeomData->ComputeCoord(param, geom);
+            GeomData->computeCoord(param, geom);
 
               if( GeomData->within(geom) == inclDom )
               {
@@ -503,7 +503,7 @@ void AdaptiveOctree<3>::computeGaussPointsForMerging(int refLev2, int inclDom, i
           for(ii=0; ii<3; ii++)
             param[ii] = 0.5*(knots[ii][2] * GeomData->gausspoints[gp][ii] + knots[ii][3]);
 
-          GeomData->ComputeCoord(param, geom);
+          GeomData->computeCoord(param, geom);
 
           if( GeomData->within(geom) == inclDom )
           {
@@ -517,7 +517,7 @@ void AdaptiveOctree<3>::computeGaussPointsForMerging(int refLev2, int inclDom, i
           for(ii=0; ii<3; ii++)
             param[ii] = 0.5*(knots[ii][2] * 0.0 + knots[ii][3]);
 
-          GeomData->ComputeCoord(param, geom);
+          GeomData->computeCoord(param, geom);
 
           if( GeomData->within(geom) == inclDom )
           {

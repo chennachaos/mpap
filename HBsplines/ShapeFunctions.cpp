@@ -4,7 +4,7 @@
 
 
 
-void ShapeFunctions::Initialise(int p)
+void ShapeFunctions::initialise(int p)
 {
     int ind = p+1;
 
@@ -16,7 +16,7 @@ void ShapeFunctions::Initialise(int p)
 }
 
 
-void ShapeFunctions::Initialise(int p, int q)
+void ShapeFunctions::initialise(int p, int q)
 {
     int ind = (p+1)*(q+1); 
 
@@ -30,7 +30,7 @@ void ShapeFunctions::Initialise(int p, int q)
 }
 
 
-void ShapeFunctions::Initialise(int p, int q, int r)
+void ShapeFunctions::initialise(int p, int q, int r)
 {
     int ind = (p+1)*(q+1)*(r+1);
 
@@ -85,11 +85,11 @@ void ShapeFunctions::Compute()
     fact1 = Jacobian[0]*Jacobian[0];
     fact2 = Jacobian[1]*Jacobian[1];
 
-    for(gp2=0;gp2<HbsData->GetNGP(1);gp2++)
+    for(gp2=0;gp2<HbsData->getNGP(1);gp2++)
     {
        vv = val3 * gausspoints2[gp2] + val4;
        
-       for(gp1=0;gp1<HbsData->GetNGP(0);gp1++)
+       for(gp1=0;gp1<HbsData->getNGP(0);gp1++)
        {
           uu = val1 * gausspoints1[gp1] + val2;
 

@@ -1,6 +1,5 @@
 
 #include "BasisFunctionsBSpline.h"
-
 #include <vector>
 
 using std::vector;

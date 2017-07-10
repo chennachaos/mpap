@@ -216,7 +216,7 @@ void SolverEigen::setupMatricesAndVectors()
     return;
 }
 
-void SolverEigen::SolverSchurCG()
+void SolverEigen::solverSchurCG()
 {
     setupMatricesAndVectors();
     
@@ -352,7 +352,7 @@ void SolverEigen::SolverSchurCG()
 }
 
 
-void SolverEigen::SolverSchurBiCGSTAB()
+void SolverEigen::solverSchurBiCGSTAB()
 {
     setupMatricesAndVectors();
 
@@ -534,7 +534,7 @@ void SolverEigen::SolverSchurBiCGSTAB()
 }
 
 
-void SolverEigen::SolverSchurGMRES()
+void SolverEigen::solverSchurGMRES()
 {
     setupMatricesAndVectors();
 
@@ -673,7 +673,7 @@ void SolverEigen::SolverSchurGMRES()
 }
 
   
-void SolverEigen::SolverUzawaType1()
+void SolverEigen::solverUzawaType1()
 {
     setupMatricesAndVectors();
 
@@ -952,7 +952,7 @@ void SolverEigen::SolverUzawaType1()
 }
 
 
-void SolverEigen::SolverUzawaType2()
+void SolverEigen::solverUzawaType2()
 {
 
   return;

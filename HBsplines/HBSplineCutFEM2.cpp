@@ -83,7 +83,7 @@ void  HBSplineCutFEM::prepareCutElements()
   for(int bb=0; bb<ImmersedBodyObjects.size(); bb++)
   {
     //cout << " jjjjjjjjjjjjjjjj " << endl;
-    ImmersedBodyObjects[bb]->UpdateImmersedFaces();
+    ImmersedBodyObjects[bb]->updateImmersedFaces();
     //cout << " jjjjjjjjjjjjjjjj " << endl;
     ImmersedBodyObjects[bb]->computeAABB(2);
   }
@@ -266,7 +266,7 @@ void  HBSplineCutFEM::prepareCutElements()
 
   for(bb=0; bb<ImmersedBodyObjects.size(); bb++)
   {
-    ImmersedBodyObjects[bb]->UpdateImmersedFaces();
+    ImmersedBodyObjects[bb]->updateImmersedFaces();
     ImmersedBodyObjects[bb]->computeAABB(2);
   }
 
@@ -765,7 +765,7 @@ void  HBSplineCutFEM::prepareCutElements3D()
 
       selectEnclosedPointsCell->CheckSurfaceOn();
 
-      selectEnclosedPointsCell->SetTolerance(0.000001);
+      selectEnclosedPointsCell->setTolerance(0.000001);
       selectEnclosedPointsCell->Initialize(polyDataCell);
 
       //cout << " BBBBBBBBB  " << endl;
@@ -774,7 +774,7 @@ void  HBSplineCutFEM::prepareCutElements3D()
       {
       vtkSmartPointer<vtkBooleanOperationPolyDataFilter> booleanOperation  =  vtkSmartPointer<vtkBooleanOperationPolyDataFilter>::New();
 
-      booleanOperation->SetTolerance(1.0e-10);
+      booleanOperation->setTolerance(1.0e-10);
 
       //booleanOperation->SetOperationToUnion();
       //booleanOperation->SetOperationToIntersection();
@@ -871,7 +871,7 @@ void  HBSplineCutFEM::prepareCutElements3D()
       polyDataLoc3->SetPoints(pointsLoc2);
 
       //delaunay->BoundingTriangulationOn();
-      //delaunay->SetTolerance(0.0010);
+      //delaunay->setTolerance(0.0010);
       //delaunay->SetAlpha(0.0);
       delaunay->SetOffset(1000.0);
 
@@ -1130,7 +1130,7 @@ void  HBSplineCutFEM::prepareCutElementsSubTrias3D()
       //delaunay3d->SetAlpha(0.0);
 
       /*
-      //delaunay2d->SetTolerance(0.0010);
+      //delaunay2d->setTolerance(0.0010);
       delaunay2d->SetOffset(10.0);
       delaunay2d->SetInputData(polyDataLoc);
       delaunay2d->Update();

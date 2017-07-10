@@ -225,9 +225,14 @@ void  SolutionData::timeUpdate()
   if(STAGGERED)
   {
     double  q1, q2, q3, q4, fact;
+    double  knp1 = mpapTime.dt/mpapTime.dtPrev;
 
     int  predType = (int) stagParams[1];
     //cout << " predType = " << predType << endl;
+    //cout << " mpapTime.dt    = " << mpapTime.dt << endl;
+    //cout << " mpapTime.prev  = " << mpapTime.prev << endl;
+    //cout << " mpapTime.prev2 = " << mpapTime.prev2 << endl;
+    cout << " knp1 = " << knp1 << endl;
     
     VectorXd  tempForce(force.rows());
     
@@ -251,8 +256,9 @@ void  SolutionData::timeUpdate()
         break;
         
       case 2:
-        q1 =  2.0;  q2 = -1.0;  q3 =  0.0;  q4 =  0.0;
+        //q1 =  2.0;  q2 = -1.0;  q3 =  0.0;  q4 =  0.0;
         //q1 =  4.0/3.0;  q2 = -1.0/3.0;  q3 =  0.0;  q4 =  0.0;
+        q1 = 1.0+knp1; q2 = -knp1;  q3 =  0.0;  q4 =  0.0;
         break;
       
       case 3:

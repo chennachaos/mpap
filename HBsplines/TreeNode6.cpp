@@ -54,19 +54,19 @@ void TreeNode<3>::MatrixToMapResult(int ind1, int ind2, SparseMatrixXd& globalK)
 
     Kl.setZero();
 
-    for(gp3=0;gp3<GeomData->GetNGP(2);gp3++)
+    for(gp3=0;gp3<GeomData->getNGP(2);gp3++)
     {
        param[2]  = 0.5*(knots[2][2] * GeomData->gausspoints3[gp3] + knots[2][3]);
        JacZ = GeomData->gaussweights3[gp3] * JacMultElem;
        //cout << " ww " << ww << endl;
 
-    for(gp2=0;gp2<GeomData->GetNGP(1);gp2++)
+    for(gp2=0;gp2<GeomData->getNGP(1);gp2++)
     {
        param[1]  = 0.5*(knots[1][2] * GeomData->gausspoints2[gp2] + knots[1][3]);
        JacY = GeomData->gaussweights2[gp2] * JacZ;
        //cout << " vv " << vv << endl;
        
-    for(gp1=0;gp1<GeomData->GetNGP(0);gp1++)
+    for(gp1=0;gp1<GeomData->getNGP(0);gp1++)
     {
        param[0]   = 0.5*(knots[0][2] * GeomData->gausspoints1[gp1] + knots[0][3]);
        dvol = GeomData->gaussweights1[gp1] * JacY;
@@ -109,19 +109,19 @@ void TreeNode<3>::RhsToMapResult(int ind1, int ind2, double* rhs)
 
     Fl.setZero();
 
-    for(gp3=0;gp3<GeomData->GetNGP(2);gp3++)
+    for(gp3=0;gp3<GeomData->getNGP(2);gp3++)
     {
        param[2]  = 0.5*(knots[2][2] * GeomData->gausspoints3[gp3] + knots[2][3]);
        JacZ = GeomData->gaussweights3[gp3] * JacMultElem;
        //cout << " ww " << ww << endl;
 
-    for(gp2=0;gp2<GeomData->GetNGP(1);gp2++)
+    for(gp2=0;gp2<GeomData->getNGP(1);gp2++)
     {
        param[1]  = 0.5*(knots[1][2] * GeomData->gausspoints2[gp2] + knots[1][3]);
        JacY = GeomData->gaussweights2[gp2] * JacZ;
        //cout << " vv " << vv << endl;
        
-    for(gp1=0;gp1<GeomData->GetNGP(0);gp1++)
+    for(gp1=0;gp1<GeomData->getNGP(0);gp1++)
     {
        param[0]   = 0.5*(knots[0][2] * GeomData->gausspoints1[gp1] + knots[0][3]);
        dvol = GeomData->gaussweights1[gp1] * JacY;
@@ -173,19 +173,19 @@ void TreeNode<3>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
     VectorXd  NN(totnlbf), dNN_dx(totnlbf), dNN_dy(totnlbf), dNN_dz(totnlbf);
     myPoint  param;
 
-    for(gp3=0;gp3<GeomData->GetNGP(2);gp3++)
+    for(gp3=0;gp3<GeomData->getNGP(2);gp3++)
     {
        param[2]  = 0.5*(knots[2][2] * GeomData->gausspoints3[gp3] + knots[2][3]);
        JacZ = GeomData->gaussweights3[gp3] * JacMultElem;
        //cout << " ww " << ww << endl;
 
-    for(gp2=0;gp2<GeomData->GetNGP(1);gp2++)
+    for(gp2=0;gp2<GeomData->getNGP(1);gp2++)
     {
        param[1]  = 0.5*(knots[1][2] * GeomData->gausspoints2[gp2] + knots[1][3]);
        JacY = GeomData->gaussweights2[gp2] * JacZ;
        //cout << " vv " << vv << endl;
        
-    for(gp1=0;gp1<GeomData->GetNGP(0);gp1++)
+    for(gp1=0;gp1<GeomData->getNGP(0);gp1++)
     {
        param[0]   = 0.5*(knots[0][2] * GeomData->gausspoints1[gp1] + knots[0][3]);
        dvol = GeomData->gaussweights1[gp1] * JacY;
@@ -214,9 +214,9 @@ void TreeNode<3>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
           }
 
 
-       xx = GeomData->ComputeCoord(0, param[0]);
-       yy = GeomData->ComputeCoord(1, param[1]);
-       zz = GeomData->ComputeCoord(2, param[2]);
+       xx = GeomData->computeCoord(0, param[0]);
+       yy = GeomData->computeCoord(1, param[1]);
+       zz = GeomData->computeCoord(2, param[2]);
        //r  = sqrt(xx*xx+yy*yy);
        fact = analy.computeForce(0, xx, yy, zz);
 
@@ -246,19 +246,19 @@ void TreeNode<3>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, doub
     VectorXd  N(totnlbf), dN_dx(totnlbf), dN_dy(totnlbf), dN_dz(totnlbf);
     VectorXd  d2N_dx2(totnlbf), d2N_dy2(totnlbf), d2N_dz2(totnlbf), D(totnlbf);
     
-    for(gp3=0;gp3<GeomData->GetNGP(2);gp3++)
+    for(gp3=0;gp3<GeomData->getNGP(2);gp3++)
     {
        ww  = 0.5*(knots[2][2] * GeomData->gausspoints3[gp3] + knots[2][3]);
        JacZ = GeomData->gaussweights3[gp3] * JacMult;
        //cout << " ww " << ww << endl;
 
-    for(gp2=0;gp2<GeomData->GetNGP(1);gp2++)
+    for(gp2=0;gp2<GeomData->getNGP(1);gp2++)
     {
        vv  = 0.5*(knots[1][2] * GeomData->gausspoints2[gp2] + knots[1][3]);
        JacY = GeomData->gaussweights2[gp2] * JacZ;
        //cout << " vv " << vv << endl;
        
-    for(gp1=0;gp1<GeomData->GetNGP(0);gp1++)
+    for(gp1=0;gp1<GeomData->getNGP(0);gp1++)
     {
        uu   = 0.5*(knots[0][2] * GeomData->gausspoints1[gp1] + knots[0][3]);
        dvol = GeomData->gaussweights1[gp1] * JacY;
@@ -274,9 +274,9 @@ void TreeNode<3>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, doub
        //for(ii=0;ii<totnlbf;ii++)
        //printf(" \t %12.6f  \t %12.6f  \t %12.6f \n ", N(ii), dN_dx(ii), dN_dy(ii));
 
-       xx = GeomData->ComputeCoord(0, uu);
-       yy = GeomData->ComputeCoord(1, vv);
-       zz = GeomData->ComputeCoord(2, ww);
+       xx = GeomData->computeCoord(0, uu);
+       yy = GeomData->computeCoord(1, vv);
+       zz = GeomData->computeCoord(2, ww);
        //r  = sqrt(xx*xx+yy*yy);
        res = analy.computeForceAt(xx, yy, zz);
 
@@ -329,17 +329,17 @@ void TreeNode<3>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
     muTaf = mu*af;
 
     count = 0;
-    for(gp3=0;gp3<GeomData->GetNGP(2);gp3++)
+    for(gp3=0;gp3<GeomData->getNGP(2);gp3++)
     {
        ww  = 0.5*(knots[2][2] * GeomData->gausspoints3[gp3] + knots[2][3]);
        JacZ = GeomData->gaussweights3[gp3] * JacMult;
 
-    for(gp2=0;gp2<GeomData->GetNGP(1);gp2++)
+    for(gp2=0;gp2<GeomData->getNGP(1);gp2++)
     {
        vv  = 0.5*(knots[1][2] * GeomData->gausspoints2[gp2] + knots[1][3]);
        JacY = GeomData->gaussweights2[gp2] * JacZ;
        
-    for(gp1=0;gp1<GeomData->GetNGP(0);gp1++)
+    for(gp1=0;gp1<GeomData->getNGP(0);gp1++)
     {
        uu   = 0.5*(knots[0][2] * GeomData->gausspoints1[gp1] + knots[0][3]);
        dvol = GeomData->gaussweights1[gp1] * JacY;
@@ -355,9 +355,9 @@ void TreeNode<3>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
           //d2N_dy2 = GeomData->shpfns[level][count].d2N_dy2;
           //count++;
 
-          //xx = GeomData->ComputeCoord(0, uu);
-          //yy = GeomData->ComputeCoord(1, vv);
-          //zz = GeomData->ComputeCoord(2, ww);
+          //xx = GeomData->computeCoord(0, uu);
+          //yy = GeomData->computeCoord(1, vv);
+          //zz = GeomData->computeCoord(2, ww);
 
           if(parent == NULL)
           {
@@ -529,17 +529,17 @@ void TreeNode<3>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
     acceFact = am*SolnData->td(9);
     muTaf = mu*af;
 
-    for(gp3=0;gp3<GeomData->GetNGP(2);gp3++)
+    for(gp3=0;gp3<GeomData->getNGP(2);gp3++)
     {
        param[2]  = 0.5*(knots[2][2] * GeomData->gausspoints3[gp3] + knots[2][3]);
        JacZ = GeomData->gaussweights3[gp3] * JacMultElem;
 
-    for(gp2=0;gp2<GeomData->GetNGP(1);gp2++)
+    for(gp2=0;gp2<GeomData->getNGP(1);gp2++)
     {
        param[1]  = 0.5*(knots[1][2] * GeomData->gausspoints2[gp2] + knots[1][3]);
        JacY = GeomData->gaussweights2[gp2] * JacZ;
 
-    for(gp1=0;gp1<GeomData->GetNGP(0);gp1++)
+    for(gp1=0;gp1<GeomData->getNGP(0);gp1++)
     {
        param[0]   = 0.5*(knots[0][2] * GeomData->gausspoints1[gp1] + knots[0][3]);
        dvol = GeomData->gaussweights1[gp1] * JacY;
@@ -555,9 +555,9 @@ void TreeNode<3>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
 
           //printf(" \t %14.8f \t %14.8f \t %14.8f \t %14.8f \t %14.8f \t %14.8f\n", res(0), res(1), JacMult, Jac, fact, dvol);
 
-          //xx = GeomData->ComputeCoord(0, uu);
-          //yy = GeomData->ComputeCoord(1, vv);
-          //zz = GeomData->ComputeCoord(2, ww);
+          //xx = GeomData->computeCoord(0, uu);
+          //yy = GeomData->computeCoord(1, vv);
+          //zz = GeomData->computeCoord(2, ww);
 
           if(parent == NULL)
           {
@@ -710,17 +710,17 @@ void TreeNode<3>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
     acceFact = am*SolnData->td(9);
     muTaf = mu*af;
 
-    for(gp3=0;gp3<GeomData->GetNGP(2);gp3++)
+    for(gp3=0;gp3<GeomData->getNGP(2);gp3++)
     {
        param[2]  = 0.5*(knots[2][2] * GeomData->gausspoints3[gp3] + knots[2][3]);
        JacZ = GeomData->gaussweights3[gp3] * JacMultElem;
 
-    for(gp2=0;gp2<GeomData->GetNGP(1);gp2++)
+    for(gp2=0;gp2<GeomData->getNGP(1);gp2++)
     {
        param[1]  = 0.5*(knots[1][2] * GeomData->gausspoints2[gp2] + knots[1][3]);
        JacY = GeomData->gaussweights2[gp2] * JacZ;
 
-    for(gp1=0;gp1<GeomData->GetNGP(0);gp1++)
+    for(gp1=0;gp1<GeomData->getNGP(0);gp1++)
     {
        param[0]   = 0.5*(knots[0][2] * GeomData->gausspoints1[gp1] + knots[0][3]);
        dvol = GeomData->gaussweights1[gp1] * JacY;
@@ -736,9 +736,9 @@ void TreeNode<3>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
 
           //printf(" \t %14.8f \t %14.8f \t %14.8f \t %14.8f \t %14.8f \t %14.8f\n", res(0), res(1), JacMult, Jac, fact, dvol);
 
-          //xx = GeomData->ComputeCoord(0, uu);
-          //yy = GeomData->ComputeCoord(1, vv);
-          //zz = GeomData->ComputeCoord(2, ww);
+          //xx = GeomData->computeCoord(0, uu);
+          //yy = GeomData->computeCoord(1, vv);
+          //zz = GeomData->computeCoord(2, ww);
 
           if(parent == NULL)
           {
@@ -914,19 +914,19 @@ void TreeNode<3>::calcStiffnessAndResidualLSFEM(bool flag, MatrixXd& Klocal, Vec
     MatrixXd  D(nsize,4);
     D.setZero();
     
-    for(gp3=0;gp3<GeomData->GetNGP(2);gp3++)
+    for(gp3=0;gp3<GeomData->getNGP(2);gp3++)
     {
        param[2]  = 0.5*(knots[2][2] * GeomData->gausspoints3[gp3] + knots[2][3]);
        JacZ = GeomData->gaussweights3[gp3] * JacMultElem;
        //cout << " ww " << ww << endl;
 
-    for(gp2=0;gp2<GeomData->GetNGP(1);gp2++)
+    for(gp2=0;gp2<GeomData->getNGP(1);gp2++)
     {
        param[1]  = 0.5*(knots[1][2] * GeomData->gausspoints2[gp2] + knots[1][3]);
        JacY = GeomData->gaussweights2[gp2] * JacZ;
        //cout << " vv " << vv << endl;
        
-    for(gp1=0;gp1<GeomData->GetNGP(0);gp1++)
+    for(gp1=0;gp1<GeomData->getNGP(0);gp1++)
     {
        param[0]   = 0.5*(knots[0][2] * GeomData->gausspoints1[gp1] + knots[0][3]);
        dvol = GeomData->gaussweights1[gp1] * JacY;
@@ -944,9 +944,9 @@ void TreeNode<3>::calcStiffnessAndResidualLSFEM(bool flag, MatrixXd& Klocal, Vec
 
           //printf(" \t %14.8f \t %14.8f \t %14.8f \t %14.8f \t %14.8f \t %14.8f\n", res(0), res(1), JacMult, Jac, fact, dvol);
 
-          //xx = GeomData->ComputeCoord(0, param[0]);
-          //yy = GeomData->ComputeCoord(1, param[1]);
-          //zz = GeomData->ComputeCoord(2, param[2]);
+          //xx = GeomData->computeCoord(0, param[0]);
+          //yy = GeomData->computeCoord(1, param[1]);
+          //zz = GeomData->computeCoord(2, param[2]);
 
           vel(0) = computeValue(0, N);
           vel(1) = computeValue(1, N);
@@ -1039,19 +1039,19 @@ void TreeNode<3>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, doub
     MatrixXd  D(nsize,4), F(3,3), FN(3,3);
     D.setZero();
 
-    for(gp3=0;gp3<GeomData->GetNGP(2);gp3++)
+    for(gp3=0;gp3<GeomData->getNGP(2);gp3++)
     {
        ww   = 0.5*(knots[2][2] * GeomData->gausspoints3[gp3] + knots[2][3]);
        JacZ = GeomData->gaussweights3[gp3] * JacMult;
        //cout << " ww " << ww << endl;
 
-    for(gp2=0;gp2<GeomData->GetNGP(1);gp2++)
+    for(gp2=0;gp2<GeomData->getNGP(1);gp2++)
     {
        vv   = 0.5*(knots[1][2] * GeomData->gausspoints2[gp2] + knots[1][3]);
        JacY = GeomData->gaussweights2[gp2] * JacZ;
        //cout << " vv " << vv << endl;
 
-    for(gp1=0;gp1<GeomData->GetNGP(0);gp1++)
+    for(gp1=0;gp1<GeomData->getNGP(0);gp1++)
     {
        uu   = 0.5*(knots[0][2] * GeomData->gausspoints1[gp1] + knots[0][3]);
        dvol = GeomData->gaussweights1[gp1] * JacY;
@@ -1071,9 +1071,9 @@ void TreeNode<3>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, doub
 
           //printf(" \t %14.8f \t %14.8f \t %14.8f \t %14.8f \t %14.8f \t %14.8f\n", res(0), res(1), JacMult, Jac, fact, dvol);
 
-          //xx = GeomData->ComputeCoord(0, uu);
-          //yy = GeomData->ComputeCoord(1, vv);
-          //zz = GeomData->ComputeCoord(2, ww);
+          //xx = GeomData->computeCoord(0, uu);
+          //yy = GeomData->computeCoord(1, vv);
+          //zz = GeomData->computeCoord(2, ww);
 
           vel(0) = computeValue(0, N);
           vel(1) = computeValue(1, N);
@@ -1230,27 +1230,27 @@ double TreeNode<3>::getJacBoundary(int side)
   switch(side)
   {
       case 0:
-          val = 0.25 * knots[1][2] * knots[2][2] * GeomData->GetJacobian(1) * GeomData->GetJacobian(2);
+          val = 0.25 * knots[1][2] * knots[2][2] * GeomData->getJacobian(1) * GeomData->getJacobian(2);
       break;
 
       case 1:
-          val = 0.25 * knots[1][2] * knots[2][2] * GeomData->GetJacobian(1) * GeomData->GetJacobian(2);
+          val = 0.25 * knots[1][2] * knots[2][2] * GeomData->getJacobian(1) * GeomData->getJacobian(2);
       break;
 
       case 2:
-          val = 0.25 * knots[0][2] * knots[2][2] * GeomData->GetJacobian(0) * GeomData->GetJacobian(2);
+          val = 0.25 * knots[0][2] * knots[2][2] * GeomData->getJacobian(0) * GeomData->getJacobian(2);
       break;
 
       case 3:
-          val = 0.25 * knots[0][2] * knots[2][2] * GeomData->GetJacobian(0) * GeomData->GetJacobian(2);
+          val = 0.25 * knots[0][2] * knots[2][2] * GeomData->getJacobian(0) * GeomData->getJacobian(2);
       break;
 
       case 4:
-          val = 0.25 * knots[0][2] * knots[1][2] * GeomData->GetJacobian(0) * GeomData->GetJacobian(1);
+          val = 0.25 * knots[0][2] * knots[1][2] * GeomData->getJacobian(0) * GeomData->getJacobian(1);
       break;
 
       case 5:
-          val = 0.25 * knots[0][2] * knots[1][2] * GeomData->GetJacobian(0) * GeomData->GetJacobian(1);
+          val = 0.25 * knots[0][2] * knots[1][2] * GeomData->getJacobian(0) * GeomData->getJacobian(1);
       break;
 
       default :
@@ -1407,9 +1407,9 @@ void TreeNode<3>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
             //if(pout) printf(" knotsAtGPs = %12.6f \t xx = %12.6f \t yy = %12.6f \n", knotsAtGPs, xx, yy);
             //printf(" uu = %12.6f \t vv = %12.6f \t dvol = %12.6f \t volume = %12.6f \n", uu, vv, dvol, volume);
 
-            xx = GeomData->ComputeCoord(0, param[0]);
-            yy = GeomData->ComputeCoord(1, param[1]);
-            zz = GeomData->ComputeCoord(2, param[2]);
+            xx = GeomData->computeCoord(0, param[0]);
+            yy = GeomData->computeCoord(1, param[1]);
+            zz = GeomData->computeCoord(2, param[2]);
 
             //rad = sqrt((yy-yc)*(yy-yc)+(zz-zc)*(zz-zc));
             //r = sqrt(xx*xx+yy*yy);
@@ -1712,9 +1712,9 @@ void TreeNode<3>::applyNeumannBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int do
         //if(pout) printf(" knotsAtGPs = %12.6f \t xx = %12.6f \t yy = %12.6f \n", knotsAtGPs, xx, yy);
         //printf(" uu = %12.6f \t vv = %12.6f \t dvol = %12.6f \t volume = %12.6f \n", uu, vv, dvol, volume);
 
-        xx = GeomData->ComputeCoord(0, param[0]);
-        yy = GeomData->ComputeCoord(1, param[1]);
-        zz = GeomData->ComputeCoord(2, param[2]);
+        xx = GeomData->computeCoord(0, param[0]);
+        yy = GeomData->computeCoord(1, param[1]);
+        zz = GeomData->computeCoord(2, param[2]);
         //r = sqrt(xx*xx+yy*yy);
         //val = 1.0+log(2.0*r);
         //cout << xx << '\t' << yy << endl;
@@ -1824,9 +1824,9 @@ void TreeNode<3>::applyNeumannBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int do
             //if(pout) printf(" knotsAtGPs = %12.6f \t xx = %12.6f \t yy = %12.6f \n", knotsAtGPs, xx, yy);
             //printf(" uu = %12.6f \t vv = %12.6f \t dvol = %12.6f \t volume = %12.6f \n", uu, vv, dvol, volume);
 
-            geom[0] = GeomData->ComputeCoord(0, param[0]);
-            geom[1] = GeomData->ComputeCoord(1, param[1]);
-            geom[2] = GeomData->ComputeCoord(2, param[2]);
+            geom[0] = GeomData->computeCoord(0, param[0]);
+            geom[1] = GeomData->computeCoord(1, param[1]);
+            geom[2] = GeomData->computeCoord(2, param[2]);
 
             //r = sqrt(xx*xx+yy*yy);
             //val = 1.0+log(2.0*r);

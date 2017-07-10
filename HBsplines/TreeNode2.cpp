@@ -19,7 +19,7 @@ double TreeNode<1>::getVolume()
 {
   volume = 1.0;
   for(int ii=0; ii<1; ii++)
-    volume *=  knots[ii][2]* GeomData->GetGridLength(ii);
+    volume *=  knots[ii][2]* GeomData->getGridLength(ii);
 
   return  volume;
 }
@@ -30,7 +30,7 @@ double TreeNode<2>::getVolume()
 {
   volume = 1.0;
   for(int ii=0; ii<2; ii++)
-    volume *=  knots[ii][2]* GeomData->GetGridLength(ii);
+    volume *=  knots[ii][2]* GeomData->getGridLength(ii);
 
   return  volume;
 }
@@ -41,7 +41,7 @@ double TreeNode<3>::getVolume()
 {
   volume = 1.0;
   for(int ii=0; ii<3; ii++)
-    volume *=  knots[ii][2]* GeomData->GetGridLength(ii);
+    volume *=  knots[ii][2]* GeomData->getGridLength(ii);
 
   return  volume;
 }
@@ -52,7 +52,7 @@ double TreeNode<1>::getVolumeGaussPoints(int domTemp)
 {
   volume = 1.0;
   for(int ii=0; ii<1; ii++)
-    volume *=  knots[ii][2]* GeomData->GetGridLength(ii);
+    volume *=  knots[ii][2]* GeomData->getGridLength(ii);
 
   return  volume;
 }
@@ -73,7 +73,7 @@ double TreeNode<2>::getVolumeGaussPoints(int domTemp)
   {
     volume = 1.0;
     for(int ii=0; ii<2; ii++)
-      volume *=  knots[ii][2]* GeomData->GetGridLength(ii);
+      volume *=  knots[ii][2]* GeomData->getGridLength(ii);
   }
 
   return  volume;
@@ -85,7 +85,7 @@ double TreeNode<3>::getVolumeGaussPoints(int domTemp)
 {
   volume = 1.0;
   for(int ii=0; ii<2; ii++)
-    volume *=  knots[ii][2]* GeomData->GetGridLength(ii);
+    volume *=  knots[ii][2]* GeomData->getGridLength(ii);
 
   return  volume;
 }
@@ -107,7 +107,7 @@ void TreeNode<1>::checkPartitionOfUnity()
 
     count = 0;
        
-    for(gp1=0;gp1<GeomData->GetNGP(0);gp1++)
+    for(gp1=0;gp1<GeomData->getNGP(0);gp1++)
     {
        param[0]   = 0.5*(knots[0][2] * GeomData->gausspoints1[gp1] + knots[0][3]);
 
@@ -148,11 +148,11 @@ void TreeNode<2>::checkPartitionOfUnity()
     //printf(" elemnum = %6d ...  ", id);
 
     count = 0;
-    for(gp2=0;gp2<GeomData->GetNGP(1);gp2++)
+    for(gp2=0;gp2<GeomData->getNGP(1);gp2++)
     {
        param[1]  = 0.5*(knots[1][2] * GeomData->gausspoints2[gp2] + knots[1][3]);
        
-    for(gp1=0;gp1<GeomData->GetNGP(0);gp1++)
+    for(gp1=0;gp1<GeomData->getNGP(0);gp1++)
     {
        param[0]   = 0.5*(knots[0][2] * GeomData->gausspoints1[gp1] + knots[0][3]);
 
@@ -198,17 +198,17 @@ void TreeNode<3>::checkPartitionOfUnity()
     //printf(" elemnum = %6d ...  ", id);
 
     count = 0;
-    for(gp3=0;gp3<GeomData->GetNGP(2);gp3++)
+    for(gp3=0;gp3<GeomData->getNGP(2);gp3++)
     {
        param[2]  = 0.5*(knots[2][2] * GeomData->gausspoints3[gp3] + knots[2][3]);
        JacZ = GeomData->gaussweights3[gp3] * JacMultElem;
 
-    for(gp2=0;gp2<GeomData->GetNGP(1);gp2++)
+    for(gp2=0;gp2<GeomData->getNGP(1);gp2++)
     {
        param[1]  = 0.5*(knots[1][2] * GeomData->gausspoints2[gp2] + knots[1][3]);
        JacY = GeomData->gaussweights2[gp2] * JacZ;
        
-    for(gp1=0;gp1<GeomData->GetNGP(0);gp1++)
+    for(gp1=0;gp1<GeomData->getNGP(0);gp1++)
     {
        param[0]   = 0.5*(knots[0][2] * GeomData->gausspoints1[gp1] + knots[0][3]);
        dvol = GeomData->gaussweights1[gp1] * JacY;
@@ -271,11 +271,11 @@ int TreeNode<1>::calcError(int index, int domainCur)
     VectorXd  NN(totnlbf), dNN_dx(totnlbf), N, dN_dx;
     
     elemError = 0.0;
-    volume = knots[0][2] * GeomData->GetGridLength(0);
+    volume = knots[0][2] * GeomData->getGridLength(0);
 
     if(index == 0) // L2 error norm
     {
-      for(gp=0;gp<GeomData->GetNGP(0);gp++)   // loop over Gauss points
+      for(gp=0;gp<GeomData->getNGP(0);gp++)   // loop over Gauss points
       {
         param[0]   = 0.5*(knots[0][2] * GeomData->gausspoints1[gp] + knots[0][3]);
 
@@ -296,7 +296,7 @@ int TreeNode<1>::calcError(int index, int domainCur)
         }
         //
 
-        xx = GeomData->ComputeCoord(0, param[0]);
+        xx = GeomData->computeCoord(0, param[0]);
 
         val = analy.computeValue(0, xx, 0.0);
         val -= computeValue(0, N);
@@ -309,7 +309,7 @@ int TreeNode<1>::calcError(int index, int domainCur)
     }
     else if(index == 1) // H1 error norm
     {
-      for(gp=0;gp<GeomData->GetNGP(0);gp++)   // loop over Gauss points
+      for(gp=0;gp<GeomData->getNGP(0);gp++)   // loop over Gauss points
       {
         param[0]   = 0.5*(knots[0][2] * GeomData->gausspoints1[gp] + knots[0][3]);
 
@@ -328,7 +328,7 @@ int TreeNode<1>::calcError(int index, int domainCur)
           dN_dx = SubDivMat*dNN_dx;
         }
 
-        xx = GeomData->ComputeCoord(0, param[0]);
+        xx = GeomData->computeCoord(0, param[0]);
 
         val = analy.computeValue(0, xx, 0.0);
         val -= computeValue(0, N);
@@ -346,7 +346,7 @@ int TreeNode<1>::calcError(int index, int domainCur)
       VectorXd  d2NN_dx2(totnlbf), d2N_dx2;
       double  Du;
 
-      for(gp=0;gp<GeomData->GetNGP(0);gp++)   // loop over Gauss points
+      for(gp=0;gp<GeomData->getNGP(0);gp++)   // loop over Gauss points
       {
         param[0]   = 0.5*(knots[0][2] * GeomData->gausspoints1[gp] + knots[0][3]);
 
@@ -367,7 +367,7 @@ int TreeNode<1>::calcError(int index, int domainCur)
             d2N_dx2 = SubDivMat*d2NN_dx2;
           }
 
-          xx = GeomData->ComputeCoord(0, param[0]);
+          xx = GeomData->computeCoord(0, param[0]);
 
           val = analy.computeValue(0, xx, 0.0);
           val -= computeValue(0, N);
@@ -386,7 +386,7 @@ int TreeNode<1>::calcError(int index, int domainCur)
     }
     else // gradient based error
     {
-        for(gp=0;gp<GeomData->GetNGP(0);gp++)   // loop over Gauss points
+        for(gp=0;gp<GeomData->getNGP(0);gp++)   // loop over Gauss points
         {
             param[0]   = 0.5*(knots[0][2] * GeomData->gausspoints1[gp] + knots[0][3]);
 
@@ -427,7 +427,7 @@ void TreeNode<1>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, doub
     double  val1 = 0.5*knots[0][2];
     double  val2 = 0.5*knots[0][3];
 
-    JacMult = GeomData->GetJacobianFull() * val1 ;
+    JacMult = GeomData->getJacobianFull() * val1 ;
 
     Klocal.setZero();
     Flocal.setZero();
@@ -436,14 +436,14 @@ void TreeNode<1>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, doub
     double  *gaussweights = &(GeomData->gaussweights1[0]);
     double  *Data = &(GeomData->soln(0));
     
-    for(gp=0;gp<GeomData->GetTotalNGP();gp++)   // loop over Gauss points
+    for(gp=0;gp<GeomData->getTotalNGP();gp++)   // loop over Gauss points
     {
        uu   = val1*gausspoints[gp] + val2;
        dvol = gaussweights[gp] * JacMult;
 
        computeBasisFunctions1D(knots[0][0], knots[0][2], uu, &N(0), &dN_dx(0), &d2N_dx2(0));
 
-       xcoord = GeomData->ComputeCoord(0, uu);
+       xcoord = GeomData->computeCoord(0, uu);
        a = xcoord;
 
        D = a*dN_dx - mu*d2N_dx2;
@@ -482,7 +482,7 @@ void TreeNode<1>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, doub
     ///////////////////////////////////////
 
     AdvDiffExact  advexact(3.0, a, mu, s);
-    advexact.SetBoundaryConditions(0.0, 1.0);
+    advexact.setBoundaryConditions(0.0, 1.0);
 
     int ii, jj, gp;
    
@@ -494,9 +494,9 @@ void TreeNode<1>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, doub
     double  val1 = 0.5*incr;
     double  val2 = 0.5*knots[0][3];
     
-    L = GeomData->GetGridLength(0);
+    L = GeomData->getGridLength(0);
 
-    JacMult = GeomData->GetJacobianFull() * val1 ;
+    JacMult = GeomData->getJacobianFull() * val1 ;
 
     Klocal.setZero();
     Mlocal.setZero();
@@ -505,7 +505,7 @@ void TreeNode<1>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, doub
     double  *gausspoints  = &(GeomData->gausspoints1[0]);
     double  *gaussweights = &(GeomData->gaussweights1[0]);
     
-    for(gp=0;gp<GeomData->GetTotalNGP();gp++)   // loop over Gauss points
+    for(gp=0;gp<GeomData->getTotalNGP();gp++)   // loop over Gauss points
     {
        knotsAtGPs = val1*gausspoints[gp] + val2;
 
@@ -547,7 +547,7 @@ void TreeNode<1>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, doub
     double  val1 = 0.5*incr;
     double  val2 = 0.5*knots[0][3];
 
-    JacMult = GeomData->GetJacobianFull() * val1 ;
+    JacMult = GeomData->getJacobianFull() * val1 ;
 
     Klocal.setZero();
     Flocal.setZero();
@@ -556,10 +556,10 @@ void TreeNode<1>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, doub
     double  *gaussweights = &(GeomData->gaussweights1[0]);
 
     x0 = -1.0;
-    L = GeomData->GetGridLength(0);
+    L = GeomData->getGridLength(0);
     h = incr*L;
 
-    for(gp=0;gp<GeomData->GetTotalNGP();gp++)
+    for(gp=0;gp<GeomData->getTotalNGP();gp++)
     {
        knotsAtGPs = val1 * gausspoints[gp] + val2;
 
@@ -641,7 +641,7 @@ void TreeNode<1>::setInitialProfile()
           N = SubDivMat*NN;
         }
        
-        xx = GeomData->ComputeCoord(0, param[0]);
+        xx = GeomData->computeCoord(0, param[0]);
 
         //u  = computeValue(0, N);
 
@@ -677,9 +677,9 @@ void TreeNode<1>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, doub
     double  val1 = 0.5*knots[0][2];
     double  val2 = 0.5*knots[0][3];
 
-    JacMult = GeomData->GetJacobianFull() * val1 ;
+    JacMult = GeomData->getJacobianFull() * val1 ;
     
-    beta = elmDat[3] * GeomData->GetGridLength(0) * knots[0][2];
+    beta = elmDat[3] * GeomData->getGridLength(0) * knots[0][2];
     
     double  *gausspoints  = &(GeomData->gausspoints1[0]);
     double  *gaussweights = &(GeomData->gaussweights1[0]);
@@ -687,7 +687,7 @@ void TreeNode<1>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, doub
     temp.setZero();
     D.setZero();
 
-    for(gp=0;gp<GeomData->GetTotalNGP();gp++)
+    for(gp=0;gp<GeomData->getTotalNGP();gp++)
     {
        knotsAtGPs = val1 * gausspoints[gp] + val2;
 
@@ -695,7 +695,7 @@ void TreeNode<1>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, doub
        
        dvol = gaussweights[gp] * JacMult;
 
-       xx = GeomData->ComputeCoord(0, knotsAtGPs) - 0.5*GeomData->GetGridLength(0) ;
+       xx = GeomData->computeCoord(0, knotsAtGPs) - 0.5*GeomData->getGridLength(0) ;
 
        delta = DiracDelta1(xx, beta);
        
@@ -750,16 +750,16 @@ void TreeNode<1>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, doub
     double  val1 = 0.5*knots[0][2];
     double  val2 = 0.5*knots[0][3];
 
-    JacMult = GeomData->GetJacobianFull() * val1 ;
+    JacMult = GeomData->getJacobianFull() * val1 ;
     
-    beta = elmDat[3] * GeomData->GetGridLength(0) * knots[0][2];
+    beta = elmDat[3] * GeomData->getGridLength(0) * knots[0][2];
     
     double  *gausspoints  = &(GeomData->gausspoints1[0]);
     double  *gaussweights = &(GeomData->gaussweights1[0]);
 
     temp.setZero();
 
-    for(gp=0;gp<GeomData->GetTotalNGP();gp++)
+    for(gp=0;gp<GeomData->getTotalNGP();gp++)
     {
        knotsAtGPs = val1 * gausspoints[gp] + val2;
 
@@ -767,7 +767,7 @@ void TreeNode<1>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, doub
        
        dvol = gaussweights[gp] * JacMult;
 
-       xx = GeomData->ComputeCoord(0, knotsAtGPs) - 0.5*GeomData->GetGridLength(0) ;
+       xx = GeomData->computeCoord(0, knotsAtGPs) - 0.5*GeomData->getGridLength(0) ;
 
        delta = DiracDelta1(xx, beta);
        
@@ -814,9 +814,9 @@ void TreeNode<1>::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)
     double  val1 = 0.5*knots[0][2];
     double  val2 = 0.5*knots[0][3];
 
-    JacMult = GeomData->GetJacobianFull() * val1 ;
+    JacMult = GeomData->getJacobianFull() * val1 ;
     
-    beta = elmDat[3] * GeomData->GetGridLength(0) * knots[0][2];
+    beta = elmDat[3] * GeomData->getGridLength(0) * knots[0][2];
     
     double  *gausspoints  = &(GeomData->gausspoints1[0]);
     double  *gaussweights = &(GeomData->gaussweights1[0]);
@@ -831,7 +831,7 @@ void TreeNode<1>::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)
     d1 = am/af/gamma/dt;
 
 
-    for(gp=0;gp<GeomData->GetTotalNGP();gp++)
+    for(gp=0;gp<GeomData->getTotalNGP();gp++)
     {
        knotsAtGPs = val1 * gausspoints[gp] + val2;
 
@@ -871,9 +871,9 @@ void TreeNode<1>::computeAndReturnJacobian(int index, double* position, double* 
     double  val1 = 0.5*knots[0][2];
     double  val2 = 0.5*knots[0][3];
 
-    //JacMult = GeomData->GetJacobianFull() * val1 ;
+    //JacMult = GeomData->getJacobianFull() * val1 ;
     
-    beta = elmDat[3] * GeomData->GetGridLength(0) * incr;
+    beta = elmDat[3] * GeomData->getGridLength(0) * incr;
     
     double  *gausspoints  = &(GeomData->gausspoints1[0]);
     double  *gaussweights = &(GeomData->gaussweights1[0]);
@@ -882,7 +882,7 @@ void TreeNode<1>::computeAndReturnJacobian(int index, double* position, double* 
     Ddelta = 0.0;
     fact1 = 0.0;
 
-    for(gp=0;gp<GeomData->GetNGP(0);gp++)
+    for(gp=0;gp<GeomData->getNGP(0);gp++)
     {
        param[0] = val1 * gausspoints[gp] + val2;
 
@@ -890,12 +890,12 @@ void TreeNode<1>::computeAndReturnJacobian(int index, double* position, double* 
        
        dvol = gaussweights[gp] * JacMultElem;
 
-       xx = GeomData->ComputeCoord(0, param[0]) - position[0];
+       xx = GeomData->computeCoord(0, param[0]) - position[0];
        delta  = DiracDelta1(xx, beta);
        //delta2 = DiracDelta1(0.0, beta);
 
-       //xx = (GeomData->ComputeCoord(0, knotsAtGPs) - position[0])/(GeomData->GetGridLength(0) * incr);
-       //delta  = DiracDelta2(xx, 1.0)/(GeomData->GetGridLength(0) * incr);
+       //xx = (GeomData->computeCoord(0, knotsAtGPs) - position[0])/(GeomData->getGridLength(0) * incr);
+       //delta  = DiracDelta2(xx, 1.0)/(GeomData->getGridLength(0) * incr);
        //delta2 = DiracDelta2(0.0, 1.0);
        
        //Klocal += ( (dvol*dN_dx) * dN_dx.transpose());
@@ -985,7 +985,7 @@ void TreeNode<1>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
 
     VectorXd  N(totnlbf), dN_dx(totnlbf), d2N_dx2(totnlbf), tempVec(totnlbf), tempVec2(totnlbf);
 
-    he = GeomData->GetGridLength(0) * knots[0][2];
+    he = GeomData->getGridLength(0) * knots[0][2];
 //    cout << volume << '\t' << volume << endl;
 
     a   = elmDat[3];
@@ -1009,7 +1009,7 @@ void TreeNode<1>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
     //Mlocal.setZero();
     //Flocal.setZero();
 
-    for(gp=0;gp<GeomData->GetNGP(0);gp++)
+    for(gp=0;gp<GeomData->getNGP(0);gp++)
     {
        uu   = 0.5*(knots[0][2] * GeomData->gausspoints1[gp] + knots[0][3]);
 
@@ -1099,7 +1099,7 @@ void TreeNode<1>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
           dN_dx = SubDivMat*dNN_dx;
         }
        
-        xx = GeomData->ComputeCoord(0, param[0]);
+        xx = GeomData->computeCoord(0, param[0]);
         
         force = - analy.computeForce(0, xx);
         //force = 0.0;
@@ -1164,7 +1164,7 @@ void TreeNode<1>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
           dN_dx = SubDivMat*dNN_dx;
         }
        
-        xx = GeomData->ComputeCoord(0, param[0]);
+        xx = GeomData->computeCoord(0, param[0]);
         
         force = analy.computeForce(0, xx);
         //force = 0.0;
@@ -1298,7 +1298,7 @@ void TreeNode<1>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
           dN_dx = SubDivMat*dNN_dx;
         }
 
-        xx = GeomData->ComputeCoord(0, param[0]);
+        xx = GeomData->computeCoord(0, param[0]);
         
         specVal = analy.computeValue(0, mpapTime.cur, xx);
 
@@ -1405,7 +1405,7 @@ void TreeNode<1>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
           d2N_dx2 = SubDivMat*d2NN_dx2;
         }
        
-        xx = GeomData->ComputeCoord(0, param[0]);
+        xx = GeomData->computeCoord(0, param[0]);
         
         force = analy.computeForce(0, xx);
         //force = 0.0;
@@ -1516,7 +1516,7 @@ void TreeNode<1>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
           d3N_dx3 = SubDivMat*d3NN_dx3;
         }
 
-        xx = GeomData->ComputeCoord(0, param[0]);
+        xx = GeomData->computeCoord(0, param[0]);
 
         //specVal = analy.computeValue(0, mpapTime.cur, xx);
         specVal = analy.computeValue(dir, xx, 0.0);
@@ -1605,7 +1605,7 @@ void TreeNode<1>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, doub
 {
 //    HemkerExact  advexact(2.0, a, mu, s);
     
-//    advexact.SetBoundaryConditions(0.0, 1.0);
+//    advexact.setBoundaryConditions(0.0, 1.0);
 
     int ii, jj, gp;
    
@@ -1618,7 +1618,7 @@ void TreeNode<1>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, doub
     double  val1 = 0.5*(knots[0][1] - knots[0][0]);
     double  val2 = 0.5*(knots[0][1] + knots[0][0]);
 
-    JacMult = GeomData->GetJacobianFull() * val1 ;
+    JacMult = GeomData->getJacobianFull() * val1 ;
 
     Klocal.setZero();
     Mlocal.setZero();
@@ -1633,7 +1633,7 @@ void TreeNode<1>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, doub
     double  *gausspoints  = &(GeomData->gausspoints1[0]);
     double  *gaussweights = &(GeomData->gaussweights1[0]);
 
-    for(gp=0;gp<GeomData->GetTotalNGP();gp++)   // loop over Gauss points
+    for(gp=0;gp<GeomData->getTotalNGP();gp++)   // loop over Gauss points
     {
        knotsAtGPs = val1 * gausspoints[gp] + val2;
 
@@ -1756,7 +1756,7 @@ void TreeNode<1>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, doub
     double  val1 = 0.5*(knots[0][1] - knots[0][0]);
     double  val2 = 0.5*(knots[0][1] + knots[0][0]);
 
-    JacMult = GeomData->GetJacobianFull() * val1 ;
+    JacMult = GeomData->getJacobianFull() * val1 ;
 
     Klocal.setZero();
     Mlocal.setZero();
@@ -1765,7 +1765,7 @@ void TreeNode<1>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, doub
     double  *gausspoints  = &(GeomData->gausspoints1[0]);
     double  *gaussweights = &(GeomData->gaussweights1[0]);
 
-    for(gp=0;gp<GeomData->GetTotalNGP();gp++)   // loop over Gauss points
+    for(gp=0;gp<GeomData->getTotalNGP();gp++)   // loop over Gauss points
     {
        knotsAtGPs = val1 * gausspoints[gp] + val2;
 
@@ -1803,7 +1803,7 @@ void TreeNode<1>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, doub
     double  val1 = 0.5*(knots[0][1] - knots[0][0]);
     double  val2 = 0.5*(knots[0][1] + knots[0][0]);
 
-    JacMult = GeomData->GetJacobianFull() * val1 ;
+    JacMult = GeomData->getJacobianFull() * val1 ;
 
     if( CompareDoubles(elmDat[4], 0.0) )
        tau = 0.0;
@@ -1823,7 +1823,7 @@ void TreeNode<1>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, doub
     double  *gausspoints  = &(GeomData->gausspoints1[0]);
     double  *gaussweights = &(GeomData->gaussweights1[0]);
 
-    for(gp=0;gp<GeomData->GetTotalNGP();gp++)   // loop over Gauss points
+    for(gp=0;gp<GeomData->getTotalNGP();gp++)   // loop over Gauss points
     {
        knotsAtGPs = val1 * gausspoints[gp] + val2;
 
@@ -1856,7 +1856,7 @@ void TreeNode<1>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, doub
     double  val1 = 0.5*(knots[0][1] - knots[0][0]);
     double  val2 = 0.5*(knots[0][1] + knots[0][0]);
 
-    JacMult = GeomData->GetJacobianFull() * val1 ;
+    JacMult = GeomData->getJacobianFull() * val1 ;
 
     if( CompareDoubles(elmDat[4], 0.0) )
        tau = 0.0;
@@ -1879,7 +1879,7 @@ void TreeNode<1>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, doub
     double  *gausspoints  = &(GeomData->gausspoints1[0]);
     double  *gaussweights = &(GeomData->gaussweights1[0]);
 
-    for(gp=0;gp<GeomData->GetTotalNGP();gp++)   // loop over Gauss points
+    for(gp=0;gp<GeomData->getTotalNGP();gp++)   // loop over Gauss points
     {
        knotsAtGPs = val1 * gausspoints[gp] + val2;
 
@@ -1920,7 +1920,7 @@ void TreeNode<1>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, doub
     double  val1 = 0.5*(knots[0][1] - knots[0][0]);
     double  val2 = 0.5*(knots[0][1] + knots[0][0]);
 
-    JacMult = GeomData->GetJacobianFull() * val1 ;
+    JacMult = GeomData->getJacobianFull() * val1 ;
 
     if( CompareDoubles(elmDat[4], 0.0) )
        tau = 0.0;
@@ -1940,7 +1940,7 @@ void TreeNode<1>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, doub
     double  *gausspoints  = &(GeomData->gausspoints1[0]);
     double  *gaussweights = &(GeomData->gaussweights1[0]);
 
-    for(gp=0;gp<GeomData->GetTotalNGP();gp++)   // loop over Gauss points
+    for(gp=0;gp<GeomData->getTotalNGP();gp++)   // loop over Gauss points
     {
        knotsAtGPs = val1 * gausspoints[gp] + val2;
 
@@ -1984,7 +1984,7 @@ int TreeNode<1>::calcLoadVector(int ind1, int ind2, double inp1, double inp2)
     
     mid = x1-x0;
 
-    //JacMult = GeomData->GetJacobianFull() * val1 ;
+    //JacMult = GeomData->getJacobianFull() * val1 ;
 
     //Mlocal.setZero();
     Flocal.setZero();
@@ -1992,9 +1992,9 @@ int TreeNode<1>::calcLoadVector(int ind1, int ind2, double inp1, double inp2)
     double  *gausspoints  = &(GeomData->gausspoints1[0]);
     double  *gaussweights = &(GeomData->gaussweights1[0]);
 
-    //cout << " CCCCCCCCCCCC " << GeomData->GetTotalNGP() << endl;
+    //cout << " CCCCCCCCCCCC " << GeomData->getTotalNGP() << endl;
 
-    for(gp=0;gp<GeomData->GetTotalNGP();gp++)   // loop over Gauss points
+    for(gp=0;gp<GeomData->getTotalNGP();gp++)   // loop over Gauss points
     {
        param[0] = val1 * gausspoints[gp] + val2;
 

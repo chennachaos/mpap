@@ -1,11 +1,9 @@
 
+
 #include "ContactElement2D1nodedContactWithYaxis.h"
 #include "BasisFunctionsLagrange.h"
-
-#include "ImmersedSolid.h"
-//#include "SolutionDataFluid.h"
-//#include "SolutionDataSolid.h"
-
+#include "GeomDataLagrange.h"
+#include "SolutionData.h"
 
 using namespace std;
 
@@ -97,7 +95,7 @@ int ContactElement2D1nodedContactWithYaxis::calcStiffnessAndResidual(MatrixXd& K
 
 
 /*
-void ContactElement2D1nodedContactWithYaxis::AssembleMatrixAndVector(int start, SparseMatrixXd& mtx, double* rhs)
+void ContactElement2D1nodedContactWithYaxis::assembleMatrixAndVector(int start, SparseMatrixXd& mtx, double* rhs)
 {
   int ii, jj, r;
   

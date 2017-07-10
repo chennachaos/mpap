@@ -147,7 +147,7 @@ void HBSplineCutFEM::updateIterStep()
             if(solverPetsc->initialise(0, 0, totalDOF) != 0)
               return;
 
-            solverPetsc->SetSolverAndParameters();
+            solverPetsc->setSolverAndParameters();
             //cout << " kkkkkkkkkk " << endl;
             //solverPetsc->printInfo();
             //cout << " aaaaaaaaa " << endl;
@@ -168,7 +168,7 @@ void HBSplineCutFEM::updateIterStep()
                 return;
             }
 
-            solverPetsc->SetSolverAndParameters();
+            solverPetsc->setSolverAndParameters();
 
         break;
 
@@ -367,6 +367,8 @@ int  HBSplineCutFEM::setCoveringUncovering3D()
 
 int  HBSplineCutFEM::prepareMatrixPattern()
 {
+    //for PETSc - working
+
     assert(SOLVER_TYPE == SOLVER_TYPE_PETSC);
 
     //time_t tstart, tend;
@@ -416,7 +418,7 @@ int  HBSplineCutFEM::prepareMatrixPattern()
     {
       for(bb=0; bb<ImmersedBodyObjects.size(); bb++)
       {
-        solidDOF += ImmersedBodyObjects[bb]->GetTotalDOF();
+        solidDOF += ImmersedBodyObjects[bb]->getTotalDOF();
       }
     }
 
@@ -461,9 +463,9 @@ int  HBSplineCutFEM::prepareMatrixPattern()
           kk++;
         }
       }
-  }
-  else
-  {
+    }
+    else
+    {
       /////////////////////////////////////////////////////////////////////////////
       //
       // Partition the mesh. This can be done using software libraries
@@ -484,10 +486,15 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
       cout << " elem_start = " << elem_start << '\t' << elem_end << '\t' << nElem_local << endl;
 
-      idx_t eptr[nElem+1];
-      idx_t epart[nElem];
-      idx_t npart[nNode];
+      //idx_t eptr[nElem+1];
+      //idx_t epart[nElem];
+      //idx_t npart[nNode];
 
+      PetscInt  *eptr, *eind, *epart, *npart;
+
+      ierr  = PetscMalloc1(nElem+1,  &eptr);  CHKERRQ(ierr);
+      ierr  = PetscMalloc1(nElem,    &epart); CHKERRQ(ierr);
+      ierr  = PetscMalloc1(nNode,    &npart); CHKERRQ(ierr);
 
       eptr[0] = 0;
 
@@ -501,12 +508,10 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
       cout << " npElem_total = " << npElem_total << endl;
 
-      idx_t eind[npElem_total];
+      //idx_t eind[npElem_total];
+      ierr  = PetscMalloc1(npElem_total,  &eind); CHKERRQ(ierr);
 
       //PetscInt  *eptr, *eind;
-
-      //PetscInt  eptr[nElem_local+1];
-      //PetscInt  eind[nElem_local*npElem];
 
       //ierr  = PetscMalloc1(nElem_local+1,  &eptr);CHKERRQ(ierr);
       //ierr  = PetscMalloc1(nElem_local*npElem,  &eind);CHKERRQ(ierr);
@@ -552,10 +557,9 @@ int  HBSplineCutFEM::prepareMatrixPattern()
       if(DIM == 2)
         nodes_per_side = 2;
       else
-        nodes_per_side = 3;
+        nodes_per_side = 4;
 
 
-      //
       idx_t  nWeights  = 1;
       idx_t  nParts = n_mpi_procs;
       idx_t  objval;
@@ -567,7 +571,7 @@ int  HBSplineCutFEM::prepareMatrixPattern()
       METIS_SetDefaultOptions(options);
 
       // Specifies the partitioning method.
-      options[METIS_OPTION_PTYPE] = METIS_PTYPE_RB;    // Multilevel recursive bisectioning.
+      //options[METIS_OPTION_PTYPE] = METIS_PTYPE_RB;    // Multilevel recursive bisectioning.
       options[METIS_OPTION_PTYPE] = METIS_PTYPE_KWAY;  // Multilevel k-way partitioning.
 
       //options[METIS_OPTION_NSEPS] = 10;
@@ -576,7 +580,6 @@ int  HBSplineCutFEM::prepareMatrixPattern()
       //options[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_VOL; // Total communication volume minimization
 
       options[METIS_OPTION_NUMBERING] = 0;  // C-style numbering is assumed that starts from 0.
-      //options[METIS_OPTION_NUMBERING] = 1;  // Fortran-style numbering is assumed that starts from 1.
 
 
       // METIS partition routine
@@ -729,7 +732,6 @@ int  HBSplineCutFEM::prepareMatrixPattern()
     for(ii=0; ii<totalDOF; ii++)
       proc_to_grid_DOF[ii]  =  cutfem_to_grid_DOF[dof_map_new_to_old[ii]];
 
-    //return 1;
 
     vector<vector<int> > DDconn;
 
@@ -791,6 +793,147 @@ int  HBSplineCutFEM::prepareMatrixPattern()
       //PetscPrintf(MPI_COMM_WORLD, " aaaaaaaaaaaaa \n");
     } // for(e=0;e<fluidElementIds.size();e++)
 
+
+
+
+    PetscSynchronizedPrintf(MPI_COMM_WORLD, "\n   Finding global positions DONE \n\n");
+
+    //tend = time(0); 
+    //cout << "It took "<< difftime(tend, tstart) <<" second(s)."<< endl;
+
+
+    SolnData.node_map_new_to_old = node_map_new_to_old;
+    SolnData.node_map_old_to_new = node_map_old_to_new;
+
+    GeomData.node_map_new_to_old = node_map_new_to_old;
+    GeomData.node_map_old_to_new = node_map_old_to_new;
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    // find the number of nonzeroes in the diagonal and off-diagonal portions of each processor
+    ////////////////////////////////////////////////////////////////////////////////////////////
+
+    cout << " local sizes " << row_start << '\t' << row_end << '\t' << ndofs_local << endl;
+
+    PetscInt  count_diag=0, count_offdiag=0, tempInt;
+
+    //PetscInt  d_nnz[ndofs_local], o_nnz[ndofs_local];
+    // this leads to segmentation fault errors. So, allocate using Malloc functions
+
+    PetscInt  *d_nnz, *o_nnz;
+
+    ierr  = PetscMalloc1(ndofs_local,  &d_nnz);CHKERRQ(ierr);
+    ierr  = PetscMalloc1(ndofs_local,  &o_nnz);CHKERRQ(ierr);
+
+    kk=0;
+    nnz_max_row = 0;
+    for(ii=row_start; ii<=row_end; ii++)
+    {
+      findUnique(DDconn[ii]);
+
+      size1 = DDconn[ii].size();
+
+      nnz_max_row = max(nnz_max_row, jj);
+
+      count_diag=0, count_offdiag=0;
+      for(jj=0; jj<size1; jj++)
+      {
+        tempInt = DDconn[ii][jj];
+
+        if(tempInt >= row_start && tempInt <= row_end)
+          count_diag++;
+        else
+          count_offdiag++;
+      }
+
+      d_nnz[kk] = count_diag;
+      o_nnz[kk] = count_offdiag;
+      kk++;
+    }
+
+    cout << " iiiiiiiiiiiii " << count_diag << '\t' << count_offdiag << endl;
+
+    //Create parallel matrix, specifying only its global dimensions.
+    //When using MatCreate(), the matrix format can be specified at
+    //runtime. Also, the parallel partitioning of the matrix is
+    //determined by Petsc at runtime.
+    //Performance tuning note: For problems of substantial size,
+    //preallocation of matrix memory is crucial for attaining good
+    //performance. See the matrix chapter of the users manual for details.
+
+    ierr = MatCreate(PETSC_COMM_WORLD, &solverPetsc->mtx);CHKERRQ(ierr);
+
+    ierr = MatSetSizes(solverPetsc->mtx, ndofs_local, ndofs_local, totalDOF, totalDOF);CHKERRQ(ierr);
+
+    ierr = MatSetFromOptions(solverPetsc->mtx);CHKERRQ(ierr);
+
+    ierr = MatMPIAIJSetPreallocation(solverPetsc->mtx, 20, d_nnz, 20, o_nnz);CHKERRQ(ierr);
+    ierr = MatSeqAIJSetPreallocation(solverPetsc->mtx, 20, d_nnz);CHKERRQ(ierr);
+
+    cout << " jjjjjjjjjjjjjjjj " << endl;
+
+    PetscInt  colTemp[nnz_max_row];
+    PetscScalar  arrayD[nnz_max_row];
+
+    for(jj=0; jj<nnz_max_row; jj++)
+      arrayD[jj] = 0.0;
+
+    for(ii=row_start; ii<=row_end; ii++)
+    {
+      size1 = DDconn[ii].size();
+
+      for(jj=0; jj<size1; jj++)
+        colTemp[jj] = DDconn[ii][jj];
+
+      ierr = MatSetValues(solverPetsc->mtx, 1, &ii, size1, colTemp, arrayD, INSERT_VALUES);
+    }
+
+    //cout << " iiiiiiiiiiiii " << endl;
+
+    VecCreate(PETSC_COMM_WORLD, &solverPetsc->soln);
+    VecCreate(PETSC_COMM_WORLD, &solverPetsc->solnPrev);
+    VecCreate(PETSC_COMM_WORLD, &solverPetsc->rhsVec);
+    VecCreate(PETSC_COMM_WORLD, &solverPetsc->reac);
+
+    ierr = VecSetSizes(solverPetsc->soln, ndofs_local, totalDOF); CHKERRQ(ierr);
+    //ierr = VecSetSizes(solnPrev, ndofs_local, totalDOF); CHKERRQ(ierr);
+    //ierr = VecSetSizes(rhsVec, ndofs_local, totalDOF); CHKERRQ(ierr);
+    //ierr = VecSetSizes(solverPetsc->reac, ndofs_local, totalDOF); CHKERRQ(ierr);
+
+    ierr = VecSetFromOptions(solverPetsc->soln);CHKERRQ(ierr);
+    ierr = VecDuplicate(solverPetsc->soln, &solverPetsc->rhsVec);CHKERRQ(ierr);
+    ierr = VecDuplicate(solverPetsc->soln, &solverPetsc->solnPrev);CHKERRQ(ierr);
+    ierr = VecDuplicate(solverPetsc->soln, &solverPetsc->reac);CHKERRQ(ierr);
+
+    solverPetsc->currentStatus = PATTERN_OK;
+
+    soln.resize(totalDOF);
+    soln.setZero();
+    solnInit = soln;
+
+    GRID_CHANGED = IB_MOVED = false;
+
+    //ierr  = PetscFree(eptr);  CHKERRQ(ierr);
+    //ierr  = PetscFree(eind);  CHKERRQ(ierr);
+    //ierr  = PetscFree(epart); CHKERRQ(ierr);
+    //ierr  = PetscFree(npart); CHKERRQ(ierr);
+
+    ierr  = PetscFree(d_nnz); CHKERRQ(ierr);
+    ierr  = PetscFree(o_nnz); CHKERRQ(ierr);
+
+
+    //printf("\n     HBSplineCutFEM::prepareMatrixPattern()  .... FINISHED ...\n\n");
+
+  return 1;
+}
+
+
+
+
+
+
+
+/*
 
 
     if(!STAGGERED)
@@ -882,668 +1025,12 @@ int  HBSplineCutFEM::prepareMatrixPattern()
           }
         }
 
-        start1 += ImmersedBodyObjects[bb]->GetTotalDOF();
+        start1 += ImmersedBodyObjects[bb]->getTotalDOF();
         start2 = start1;
 
       } // for(bb=0; bb<ImmersedBodyObjects.size(); bb++)
     } // if(!STAGGERED)
 
-    PetscSynchronizedPrintf(MPI_COMM_WORLD, "\n   Finding global positions DONE \n\n");
-
-    //tend = time(0); 
-    //cout << "It took "<< difftime(tend, tstart) <<" second(s)."<< endl;
-
-
-    SolnData.node_map_new_to_old = node_map_new_to_old;
-    SolnData.node_map_old_to_new = node_map_old_to_new;
-
-    GeomData.node_map_new_to_old = node_map_new_to_old;
-    GeomData.node_map_old_to_new = node_map_old_to_new;
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////
-    // find the number of nonzeroes in the diagonal and off-diagonal portions of each processor
-    ////////////////////////////////////////////////////////////////////////////////////////////
-
-    cout << " local sizes " << row_start << '\t' << row_end << '\t' << ndofs_local << endl;
-
-    PetscInt  count_diag=0, count_offdiag=0, tempInt;
-    PetscInt  d_nnz[ndofs_local], o_nnz[ndofs_local];
-
-    kk=0;
-    nnz_max_row = 0;
-    for(ii=row_start; ii<=row_end; ii++)
-    {
-      findUnique(DDconn[ii]);
-
-      size1 = DDconn[ii].size();
-
-      nnz_max_row = max(nnz_max_row, jj);
-
-      count_diag=0, count_offdiag=0;
-      for(jj=0; jj<size1; jj++)
-      {
-        tempInt = DDconn[ii][jj];
-
-        if(tempInt >= row_start && tempInt <= row_end)
-          count_diag++;
-        else
-          count_offdiag++;
-      }
-
-      d_nnz[kk] = count_diag;
-      o_nnz[kk] = count_offdiag;
-      kk++;
-    }
-
-    //cout << " iiiiiiiiiiiii " << count_diag << '\t' << count_offdiag << endl;
-
-    //Create parallel matrix, specifying only its global dimensions.
-    //When using MatCreate(), the matrix format can be specified at
-    //runtime. Also, the parallel partitioning of the matrix is
-    //determined by Petsc at runtime.
-    //Performance tuning note: For problems of substantial size,
-    //preallocation of matrix memory is crucial for attaining good
-    //performance. See the matrix chapter of the users manual for details.
-
-    ierr = MatCreate(PETSC_COMM_WORLD, &solverPetsc->mtx);CHKERRQ(ierr);
-
-    ierr = MatSetSizes(solverPetsc->mtx, ndofs_local, ndofs_local, totalDOF, totalDOF);CHKERRQ(ierr);
-
-    ierr = MatSetFromOptions(solverPetsc->mtx);CHKERRQ(ierr);
-
-    ierr = MatMPIAIJSetPreallocation(solverPetsc->mtx, 20, d_nnz, 20, o_nnz);CHKERRQ(ierr);
-    ierr = MatSeqAIJSetPreallocation(solverPetsc->mtx, 20, d_nnz);CHKERRQ(ierr);
-
-    //cout << " jjjjjjjjjjjjjjjj " << endl;
-
-    PetscInt  colTemp[nnz_max_row];
-    PetscScalar  arrayD[nnz_max_row];
-
-    for(jj=0; jj<nnz_max_row; jj++)
-      arrayD[jj] = 0.0;
-
-    for(ii=row_start; ii<=row_end; ii++)
-    {
-      size1 = DDconn[ii].size();
-
-      for(jj=0; jj<size1; jj++)
-        colTemp[jj] = DDconn[ii][jj];
-
-      ierr = MatSetValues(solverPetsc->mtx, 1, &ii, size1, colTemp, arrayD, INSERT_VALUES);
-    }
-
-    //cout << " iiiiiiiiiiiii " << endl;
-
-    VecCreate(PETSC_COMM_WORLD, &solverPetsc->soln);
-    VecCreate(PETSC_COMM_WORLD, &solverPetsc->solnPrev);
-    VecCreate(PETSC_COMM_WORLD, &solverPetsc->rhsVec);
-    VecCreate(PETSC_COMM_WORLD, &solverPetsc->reac);
-
-    ierr = VecSetSizes(solverPetsc->soln, ndofs_local, totalDOF); CHKERRQ(ierr);
-    //ierr = VecSetSizes(solnPrev, ndofs_local, totalDOF); CHKERRQ(ierr);
-    //ierr = VecSetSizes(rhsVec, ndofs_local, totalDOF); CHKERRQ(ierr);
-    //ierr = VecSetSizes(solverPetsc->reac, ndofs_local, totalDOF); CHKERRQ(ierr);
-
-    ierr = VecSetFromOptions(solverPetsc->soln);CHKERRQ(ierr);
-    ierr = VecDuplicate(solverPetsc->soln, &solverPetsc->rhsVec);CHKERRQ(ierr);
-    ierr = VecDuplicate(solverPetsc->soln, &solverPetsc->solnPrev);CHKERRQ(ierr);
-    ierr = VecDuplicate(solverPetsc->soln, &solverPetsc->reac);CHKERRQ(ierr);
-
-    solverPetsc->currentStatus = PATTERN_OK;
-
-    soln.resize(totalDOF);
-    soln.setZero();
-    solnInit = soln;
-
-    GRID_CHANGED = IB_MOVED = false;
-
-    //printf("\n     HBSplineCutFEM::prepareMatrixPattern()  .... FINISHED ...\n\n");
-
-  return 1;
-}
-
-
-
-
-/*
-int  HBSplineCutFEM::prepareMatrixPattern()
-{
-    for petsc - working
-    
-    assert(SOLVER_TYPE == SOLVER_TYPE_PETSC);
-
-    time_t tstart, tend; 
-
-    int  tempDOF, domTemp, npElem, ind, size1;
-    int  r, c, r1, c1, count=0, count1=0, count2=0, ii, jj, ee, dd, ind1, ind2;
-    int  *tt1, *tt2, val1, val2, nnz, nnz_max_row, n1, n2, kk, e1, e2, ll, pp, aa, bb;
-    int  side, NUM_NEIGHBOURS=2*DIM, start1, start2, nr1, nr2;
-
-    node  *nd1, *nd2;
-
-    //MPI_Comm_size(MPI_COMM_WORLD, &n_mpi_procs);
-    //MPI_Comm_rank(MPI_COMM_WORLD, &this_mpi_proc);
-
-    //cout << " this_mpi_proc " << this_mpi_proc << endl;
-    //cout << " n_mpi_procs " << n_mpi_procs << endl;
-
-    int n_subdomains = n_mpi_procs, subdomain=0;
-
-
-    tstart = time(0);
-
-    prepareCutElements();
-
-    tend = time(0);
-    //printf("HBSplineCutFEM::prepareCutElements() took %8.4f second(s) \n ", difftime(tend, tstart) );
-
-    //cout << " activeElements.size () = "  << activeElements.size() << endl;
-    //cout << " fluidElementIds.size () = "  << fluidElementIds.size() << endl;
-
-    PetscSynchronizedPrintf(MPI_COMM_WORLD, " nElem = %8d \n", nElem);
-    PetscSynchronizedPrintf(MPI_COMM_WORLD, " nNode = %8d \n", nNode);
-
-    if(n_mpi_procs == 1)
-    {
-      elem_start = 0;
-      elem_end   = nElem-1;
-
-      nElem_local = nElem;
-
-      totalDOF = nNode*ndof;
-
-      row_start = 0;
-      row_end   = totalDOF-1;
-
-      ndofs_local = totalDOF;
-
-      node_map_new_to_old.resize(nNode, 0);
-      node_map_old_to_new.resize(nNode, 0);
-
-      dof_map_new_to_old.resize(totalDOF, 0);
-      dof_map_old_to_new.resize(totalDOF, 0);
-
-      kk=0;
-      for(ii=0; ii<nNode; ii++)
-      {
-        node_map_new_to_old[ii] = ii;
-        node_map_old_to_new[ii] = ii;
-        
-        for(jj=0; jj<ndof; jj++)
-        {
-          dof_map_new_to_old[kk] = kk;
-          dof_map_old_to_new[kk] = kk;
-          kk++;
-        }
-      }
-  }
-  else
-  {
-      /////////////////////////////////////////////////////////////////////////////
-      //
-      // Partition the mesh. This can be done using software libraries
-      // Chaco, Jostle, METIS and Scotch.
-      // Here METIS is used.
-      // 
-      /////////////////////////////////////////////////////////////////////////////
-
-      n2 = ceil(nElem/n_mpi_procs);
-
-      elem_start = n2*this_mpi_proc;
-      elem_end   = n2*(this_mpi_proc+1)-1;
-
-      if(this_mpi_proc == (n_mpi_procs-1))
-        elem_end = nElem-1;
-
-      nElem_local = elem_end - elem_start + 1;
-
-      cout << " elem_start = " << elem_start << '\t' << elem_end << '\t' << nElem_local << endl;
-
-      idx_t eptr[nElem+1];
-      idx_t epart[nElem];
-      idx_t npart[nNode];
-
-
-      eptr[0] = 0;
-
-      idx_t npElem_total = 0;
-      for(e1=0; e1<nElem; e1++)
-      {
-        npElem_total += elems[activeElements[e1]]->GlobalBasisFuncs.size();
-
-        eptr[e1+1] = npElem_total;
-      }
-
-      cout << " npElem_total = " << npElem_total << endl;
-
-      idx_t eind[npElem_total];
-
-      //PetscInt  *eptr, *eind;
-
-      //PetscInt  eptr[nElem_local+1];
-      //PetscInt  eind[nElem_local*npElem];
-
-      //ierr  = PetscMalloc1(nElem_local+1,  &eptr);CHKERRQ(ierr);
-      //ierr  = PetscMalloc1(nElem_local*npElem,  &eind);CHKERRQ(ierr);
-
-      //ierr  = PetscMalloc1(nElem+1,  &eptr);CHKERRQ(ierr);
-      //ierr  = PetscMalloc1(nElem*npElem,  &eind);CHKERRQ(ierr);
-
-      //PetscSynchronizedPrintf(PETSC_COMM_WORLD,"%d \n", elem_start);
-
-      vector<int>  vecTemp2;
-
-      kk=0;
-      //for(e1=0; e1<nElem_local; e1++)
-      for(e1=0; e1<nElem; e1++)
-      {
-        //e2 = elem_start + e1;
-
-        vecTemp2 = elems[activeElements[e1]]->GlobalBasisFuncs ;
-
-        //if(this_mpi_proc == 0)
-          //printVector(vecTemp2);
-        //findUnique(vecTemp2);
-
-        npElem = vecTemp2.size();
-
-        for(ii=0; ii<npElem; ii++)
-          eind[kk+ii] = vecTemp2[ii] ;
-
-        kk += npElem;
-      }
-
-      //for(e1=0; e1<nElem; e1++)
-      //{
-        //kk = e1*npElem;
-        //for(ii=0; ii<npElem; ii++)
-          //cout << eind[kk+ii] << '\t' ;
-        //cout << endl;
-      //}
-
-      //PetscInt  nodes_per_side;
-      idx_t nodes_per_side;
-      
-      if(DIM == 2)
-        nodes_per_side = 2;
-      else
-        nodes_per_side = 3;
-
-
-      //
-      idx_t  nWeights  = 1;
-      idx_t  nParts = n_mpi_procs;
-      idx_t  objval;
-      idx_t  *xadj, *adjncy;
-      idx_t  numflag=0;
-
-      idx_t options[METIS_NOPTIONS];
-
-      METIS_SetDefaultOptions(options);
-
-      // Specifies the partitioning method.
-      options[METIS_OPTION_PTYPE] = METIS_PTYPE_RB;    // Multilevel recursive bisectioning.
-      options[METIS_OPTION_PTYPE] = METIS_PTYPE_KWAY;  // Multilevel k-way partitioning.
-
-      //options[METIS_OPTION_NSEPS] = 10;
-
-      options[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_CUT;   // Edge-cut minimization
-      //options[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_VOL; // Total communication volume minimization
-
-      options[METIS_OPTION_NUMBERING] = 0;  // C-style numbering is assumed that starts from 0.
-      //options[METIS_OPTION_NUMBERING] = 1;  // Fortran-style numbering is assumed that starts from 1.
-
-
-      // METIS partition routine
-      //int ret = METIS_PartMeshNodal(&nElem, &nNode, eptr, eind, NULL, NULL, &nParts, NULL, options, &objval, epart, npart);
-      int ret = METIS_PartMeshDual(&nElem, &nNode, eptr, eind, NULL, NULL, &nodes_per_side, &n_mpi_procs, NULL, options, &objval, epart, npart);
-
-      //idx_t  wgtflag=0, numflag=0, ncon=0, ncommonnodes=2, nparts=n_mpi_procs;
-      //idx_t  *elmdist;
-
-      //int ret = ParMETIS_V3_PartMeshKway(elmdist, eptr, eind, NULL, &wgtflag, &numflag, &ncon, &ncommonnodes, &nparts, NULL, NULL, options, NULL, npart, MPI_COMM_WORLD);
-
-      //pcout <<  " ccccccccccc " << endl;
-
-      if(ret == METIS_OK)
-        PetscPrintf(MPI_COMM_WORLD, "   METIS partition routine successful \n");
-      else
-        PetscPrintf(MPI_COMM_WORLD, "   METIS partition routine FAILED \n");
-
-      //
-      //if(this_mpi_proc == 0)
-      //{
-        //for(ee=0; ee<nElem; ee++)
-          //cout << ee << '\t' << epart[ee] << endl;
-
-        //cout << " \n\n\n\n " << endl;
-
-        //for(ee=0; ee<nNode; ee++)
-          //cout << ee << '\t' << npart[ee] << endl;
-      //}
-      //
-
-      //cout << " nNode_local = " << nNode_local << endl;
-
-      for(e1=0; e1<nElem; e1++)
-        elems[activeElements[e1]]->setSubdomainId(epart[e1]);
-
-
-      std::vector<std::vector<int> >  locally_owned_nodes_total;
-      std::vector<int>  locally_owned_nodes;
-
-      locally_owned_nodes_total.resize(n_subdomains);
-
-      for(ee=0; ee<nNode; ee++)
-      {
-        locally_owned_nodes_total[npart[ee]].push_back(ee);
-      }
-
-      locally_owned_nodes = locally_owned_nodes_total[this_mpi_proc];
-
-      nNode_local = locally_owned_nodes.size();
-
-      cout << " nNode_local = " << nNode_local << '\t' << this_mpi_proc << endl;
-
-      node_map_new_to_old.resize(nNode, 0);
-      node_map_old_to_new.resize(nNode, 0);
-
-      ii=0;
-      for(subdomain=0; subdomain<n_subdomains; subdomain++)
-      {
-        for(kk=0; kk<locally_owned_nodes_total[subdomain].size(); kk++)
-        {
-          node_map_new_to_old[ii++] = locally_owned_nodes_total[subdomain][kk];
-        }
-      }
-
-      for(ii=0; ii<nNode; ii++)
-        node_map_old_to_new[node_map_new_to_old[ii]] = ii;
-
-      totalDOF = nNode*ndof;
-
-      dof_map_new_to_old.resize(totalDOF, 0);
-      dof_map_old_to_new.resize(totalDOF, 0);
-
-      kk = 0;
-      for(ii=0; ii<nNode; ii++)
-      {
-        ind1 = node_map_new_to_old[ii]*ndof;
-        ind2 = node_map_old_to_new[ii]*ndof;
-
-        for(jj=0; jj<ndof; jj++)
-        {
-          dof_map_new_to_old[kk] = ind1 + jj;
-          dof_map_old_to_new[kk] = ind2 + jj;
-          kk++;
-        }
-      }
-
-      row_start = 0;
-      row_end   = locally_owned_nodes_total[0].size()*ndof - 1;
-
-      for(subdomain=1; subdomain<=this_mpi_proc; subdomain++)
-      {
-        row_start += locally_owned_nodes_total[subdomain-1].size()*ndof;
-        row_end   += locally_owned_nodes_total[subdomain].size()*ndof;
-      }
-
-      ndofs_local = row_end - row_start + 1;
-
-
-      /////////////////////////////////////////////////////////////
-      // 
-      // reorder element node numbers, and
-      // the the associated DOFs
-      /////////////////////////////////////////////////////////////
-
-      MPI_Barrier(MPI_COMM_WORLD);
-
-      for(e1=0; e1<nElem; e1++)
-      {
-        ee = activeElements[e1];
-        //if(elems[ee]->getSubdomainId() == this_mpi_proc)
-        //{
-          for(ii=0; ii<elems[ee]->GlobalBasisFuncs.size(); ii++)
-          {
-            elems[ee]->GlobalBasisFuncs[ii] = node_map_old_to_new[elems[ee]->GlobalBasisFuncs[ii]];
-          }
-        //}
-      }
-    } // if(n_mpi_procs > 1)
-
-    /////////////////////////////////////////////////////
-    // mesh partitioning and node reordering is done
-    /////////////////////////////////////////////////////
-
-    for(ee=0; ee<nElem; ee++)
-    {
-      elems[activeElements[ee]]->initialiseDOFvalues();
-    }
-
-    PetscSynchronizedPrintf(MPI_COMM_WORLD, "\n    preparing matrix pattern    \n");
-    //printf("\n element DOF values initialised \n\n");
-    //printf("\n Finding Global positions \n\n");
-
-    vector<vector<int> >  DDconnLoc;
-
-    tempDOF  = gridBF1 * ndof;
-
-    DDconnLoc.resize(tempDOF);
-
-    //cout << " tempDOF =  " << tempDOF << endl;
-
-    for(ee=0; ee<activeElements.size(); ee++)
-    {
-        nd1 = elems[activeElements[ee]];
-
-        val1 =  nd1->getNsize2();
-        tt1  =  &(nd1->forAssyVec[0]);
-
-        if( nd1->domNums[0] == 0 )
-        {
-          for(ii=0; ii<val1; ii++)
-          {
-            r = tt1[ii];
-
-            for(jj=0; jj<val1; jj++)
-              DDconnLoc[r].push_back(tt1[jj]);
-          }
-        }
-
-      // connectivity for ghost-penalty terms
-      if( nd1->isCutElement() )
-      {
-        for(side=0; side<NUM_NEIGHBOURS; side++)
-        {
-          nd2 = nd1->getNeighbour(side);
-
-          if( (nd2 != NULL) && !(nd2->isGhost()) && nd2->isLeaf() && (nd2->isCutElement() || nd2->domNums[0] == 0) )
-          {
-              nr1 = nd1->forAssyVec.size();
-              nr2 = nd2->forAssyVec.size();
-
-              for(ii=0; ii<nr1; ii++)
-              {
-                r = nd1->forAssyVec[ii];
-
-                for(jj=0; jj<nr2; jj++)
-                {
-                  c = nd2->forAssyVec[jj];
-
-                  DDconnLoc[r].push_back(c);
-                  DDconnLoc[c].push_back(r);
-                } // for(jj=0; jj<nr2; jj++)
-              } // for(ii=0; ii<nr1; ii++)
-          }
-        } //for(side=0; side<NUM_NEIGHBOURS; side++)
-      } //if( nd1->isCutElement() )
-    } // for(e=0;e<activeElements.size();e++)
-
-    PetscSynchronizedPrintf(MPI_COMM_WORLD, "\n    Global positions DONE for individual domains \n\n");
-
-    grid_to_cutfem_DOFprev = grid_to_cutfem_DOF;
-
-    cutfem_to_grid_DOF.clear();
-    grid_to_cutfem_DOF.assign(tempDOF, -1);
-
-
-    fluidDOF = 0;
-    for(ee=0; ee<tempDOF; ee++)
-    {
-      findUnique(DDconnLoc[ee]);
-
-      if(DDconnLoc[ee].size() > 0)
-      {
-        grid_to_cutfem_DOF[ee]  = fluidDOF++;
-        cutfem_to_grid_DOF.push_back(ee);
-      }
-      else
-        grid_to_cutfem_DOF[ee] = -1;
-    }
-
-    // for monolithic scheme add the DOF of the solids to the global DOF
-    solidDOF=0;
-
-    totalDOF = fluidDOF + solidDOF;
-
-    //printf("\n \t   Fluid DOF in the model   =  %8d\n\n", fluidDOF);
-    //printf("\n \t   Solid DOF in the model   =  %8d\n\n", solidDOF);
-    PetscSynchronizedPrintf(MPI_COMM_WORLD, "\n \t   Total DOF in the model   =  %8d\n\n", totalDOF);
-
-
-    vector<vector<int> > DDconn;
-
-    DDconn.resize(totalDOF);
-
-    for(ee=0; ee<DDconnLoc.size(); ee++)
-    {
-      if(grid_to_cutfem_DOF[ee] != -1)
-      {
-        val1 = DDconnLoc[ee].size();
-        //cout << " val1 " << ee << '\t' << val1 << endl;
-        r = grid_to_cutfem_DOF[ee];
-        for(ii=0; ii<val1; ii++)
-        {
-          DDconn[r].push_back( grid_to_cutfem_DOF[DDconnLoc[ee][ii]] );
-        }
-      }
-    } //for(ee=0; ee<DDconnLoc[dd].size(); ee++)
-
-    //printf("\n Finding Global positions DONE \n\n");
-
-    tend = time(0); 
-    //cout << "It took "<< difftime(tend, tstart) <<" second(s)."<< endl;
-
-
-    SolnData.node_map_new_to_old = node_map_new_to_old;
-    SolnData.node_map_old_to_new = node_map_old_to_new;
-
-    GeomData.node_map_new_to_old = node_map_new_to_old;
-    GeomData.node_map_old_to_new = node_map_old_to_new;
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////
-    // find the number of nonzeroes in the diagonal and off-diagonal portions of each processor
-    ////////////////////////////////////////////////////////////////////////////////////////////
-
-    cout << " local sizes " << row_start << '\t' << row_end << '\t' << ndofs_local << endl;
-
-    PetscInt  count_diag=0, count_offdiag=0, tempInt;
-    PetscInt  d_nnz[ndofs_local], o_nnz[ndofs_local];
-
-    kk=0;
-    nnz_max_row = 0;
-    for(ii=row_start; ii<=row_end; ii++)
-    {
-      size1 = DDconn[ii].size();
-
-      nnz_max_row = max(nnz_max_row, jj);
-
-      count_diag=0, count_offdiag=0;
-      for(jj=0; jj<size1; jj++)
-      {
-        tempInt = DDconn[ii][jj];
-
-        if(tempInt >= row_start && tempInt <= row_end)
-          count_diag++;
-        else
-          count_offdiag++;
-      }
-
-      d_nnz[kk] = count_diag;
-      o_nnz[kk] = count_offdiag;
-      kk++;
-    }
-
-    //Create parallel matrix, specifying only its global dimensions.
-    //When using MatCreate(), the matrix format can be specified at
-    //runtime. Also, the parallel partitioning of the matrix is
-    //determined by Petsc at runtime.
-    //Performance tuning note: For problems of substantial size,
-    //preallocation of matrix memory is crucial for attaining good
-    //performance. See the matrix chapter of the users manual for details.
-
-    ierr = MatCreate(PETSC_COMM_WORLD, &solverPetsc->mtx);CHKERRQ(ierr);
-
-    ierr = MatSetSizes(solverPetsc->mtx, ndofs_local, ndofs_local, totalDOF, totalDOF);CHKERRQ(ierr);
-
-    ierr = MatSetFromOptions(solverPetsc->mtx);CHKERRQ(ierr);
-
-    ierr = MatMPIAIJSetPreallocation(solverPetsc->mtx, 20, d_nnz, 50, o_nnz);CHKERRQ(ierr);
-    ierr = MatSeqAIJSetPreallocation(solverPetsc->mtx, 50, d_nnz);CHKERRQ(ierr);
-
-    PetscInt  colTemp[nnz_max_row];
-    PetscScalar  arrayD[nnz_max_row];
-
-    for(jj=0; jj<nnz_max_row; jj++)
-      arrayD[jj] = 0.0;
-
-    for(ii=row_start; ii<=row_end; ii++)
-    {
-      size1 = DDconn[ii].size();
-
-      for(jj=0; jj<size1; jj++)
-        colTemp[jj] = DDconn[ii][jj];
-
-      ierr = MatSetValues(solverPetsc->mtx, 1, &ii, size1, colTemp, arrayD, INSERT_VALUES);
-    }
-
-    VecCreate(PETSC_COMM_WORLD, &solverPetsc->soln);
-    VecCreate(PETSC_COMM_WORLD, &solverPetsc->solnPrev);
-    VecCreate(PETSC_COMM_WORLD, &solverPetsc->rhsVec);
-    VecCreate(PETSC_COMM_WORLD, &solverPetsc->reac);
-
-    ierr = VecSetSizes(solverPetsc->soln, ndofs_local, totalDOF); CHKERRQ(ierr);
-    //ierr = VecSetSizes(solnPrev, ndofs_local, totalDOF); CHKERRQ(ierr);
-    //ierr = VecSetSizes(rhsVec, ndofs_local, totalDOF); CHKERRQ(ierr);
-    //ierr = VecSetSizes(solverPetsc->reac, ndofs_local, totalDOF); CHKERRQ(ierr);
-
-    ierr = VecSetFromOptions(solverPetsc->soln);CHKERRQ(ierr);
-    ierr = VecDuplicate(solverPetsc->soln, &solverPetsc->rhsVec);CHKERRQ(ierr);
-    ierr = VecDuplicate(solverPetsc->soln, &solverPetsc->solnPrev);CHKERRQ(ierr);
-    ierr = VecDuplicate(solverPetsc->soln, &solverPetsc->reac);CHKERRQ(ierr);
-
-    solverPetsc->currentStatus = PATTERN_OK;
-
-    soln.resize(totalDOF);
-    soln.setZero();
-    solnInit = soln;
-
-    GRID_CHANGED = IB_MOVED = false;
-
-    //printf("\n     HBSplineCutFEM::prepareMatrixPattern()  .... FINISHED ...\n\n");
-
-  return 1;
-}
-*/
-
-
-
-
-
-/*
 int HBSplineCutFEM::prepareMatrixPattern()
 {
     // subroutine for Eigen based solver
@@ -1879,8 +1366,8 @@ void HBSplineCutFEM::prepareMatrixPatternCutFEM()
     SolnData.initialise(tempDOF, tempDOF, 0, 0);
 
     SolnData.SetSolidOrFluid(0);
-    SolnData.SetTimeIncrementType(tis);
-    SolnData.SetRho(td[0]);
+    SolnData.setTimeIncrementType(tis);
+    SolnData.setSpectralRadius(td[0]);
     SolnData.STAGGERED = STAGGERED;
 
     tstart = time(0);

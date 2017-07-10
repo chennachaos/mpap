@@ -72,9 +72,9 @@ void  HBSplineCutFEM::applyInterfaceTerms2D()
       start1 = fluidDOF;
       for(bb=0;bb<ImmersedBodyObjects.size();bb++)
       {
-        PENALTY     = ImmersedBodyObjects[bb]->GetPenaltyParameter();
-        isNitsche   = ImmersedBodyObjects[bb]->GetNitscheFlag();
-        NitscheFact = ImmersedBodyObjects[bb]->GetNitscheFact();
+        PENALTY     = ImmersedBodyObjects[bb]->getPenaltyParameter();
+        isNitsche   = ImmersedBodyObjects[bb]->getNitscheFlag();
+        NitscheFact = ImmersedBodyObjects[bb]->getNitscheFact();
 
         //cout << " PENALTY     = " << PENALTY << endl;
         //cout << " isNitsche   = " << isNitsche << endl;
@@ -344,13 +344,13 @@ void  HBSplineCutFEM::applyInterfaceTerms2D()
 
               } // for(ii=0;ii<totnlbf2;ii++)
 
-              solverPetsc->AssembleMatrixAndVectorCutFEM(0, 0, nd->forAssyVec, grid_to_proc_DOF, K1, F1);
+              solverPetsc->assembleMatrixAndVectorCutFEM(0, 0, nd->forAssyVec, grid_to_proc_DOF, K1, F1);
               } //if( nd2->getSubdomainId() == this_mpi_proc )
             
             }//for(gp=0...
           } // if( lme->isActive() )
         }//for(aa=0...
-        start1 += ImmersedBodyObjects[bb]->GetTotalDOF();
+        start1 += ImmersedBodyObjects[bb]->getTotalDOF();
       }//for(bb=0;...
 
   //cout << " HBSplineCutFEM::applyInterfaceTerms2D() ... FINISHED  " << endl;
@@ -542,9 +542,9 @@ void  HBSplineCutFEM::applyInterfaceTerms3D()
       {
         //cout << " uuuuuuuuuuu " << endl;
 
-        PENALTY     = ImmersedBodyObjects[bb]->GetPenaltyParameter();
-        isNitsche   = ImmersedBodyObjects[bb]->GetNitscheFlag();
-        NitscheFact = ImmersedBodyObjects[bb]->GetNitscheFact();
+        PENALTY     = ImmersedBodyObjects[bb]->getPenaltyParameter();
+        isNitsche   = ImmersedBodyObjects[bb]->getNitscheFlag();
+        NitscheFact = ImmersedBodyObjects[bb]->getNitscheFact();
 
         nlb = ImmersedBodyObjects[bb]->ImmIntgElems[0]->pointNums.size();
 
@@ -793,7 +793,7 @@ void  HBSplineCutFEM::applyInterfaceTerms3D()
 
               //cout << " uuuuuuuuuuu \n\n " << endl;
 
-              solverPetsc->AssembleMatrixAndVectorCutFEM(0, 0, ndTemp->forAssyVec, grid_to_proc_DOF, K1, F1);
+              solverPetsc->assembleMatrixAndVectorCutFEM(0, 0, ndTemp->forAssyVec, grid_to_proc_DOF, K1, F1);
               } //if( ndTemp->getSubdomainId() == this_mpi_proc )
 
             }//for(gp=0...
@@ -868,8 +868,8 @@ void  HBSplineCutFEM::applyGhostPenalty2D()
     // cout << " Maximum cut-cell level = " << ii << endl;
     // lengths of element sides at level '0'
 
-    hElem[0] = GeomData.GetGridLength(0)/nelem[0];
-    hElem[1] = GeomData.GetGridLength(1)/nelem[1];
+    hElem[0] = GeomData.getGridLength(0)/nelem[0];
+    hElem[1] = GeomData.getGridLength(1)/nelem[1];
 
     // lengths of element sides at level 'ii'
     fact = pow(2.0, double (ii) );
@@ -1011,8 +1011,8 @@ void  HBSplineCutFEM::applyGhostPenalty2D()
                     dN2_dy = nd2->SubDivMat*dNN2_dy;
                   }
 
-                  geom[0] = GeomData.ComputeCoord(0, param[0]);
-                  geom[1] = GeomData.ComputeCoord(1, param[1]);
+                  geom[0] = GeomData.computeCoord(0, param[0]);
+                  geom[1] = GeomData.computeCoord(1, param[1]);
                   //rad = sqrt(xx*xx+yy*yy);
                   //specVal = 1.0+log(2.0*rad);
                   //cout << xx << '\t' << yy << endl;
@@ -1211,9 +1211,9 @@ void  HBSplineCutFEM::applyGhostPenalty3D()
     //cout << " Maximum cut-cell level = " << ii << endl;
     // lengths of element sides at level '0'
 
-    hElem[0] = GeomData.GetGridLength(0)/nelem[0];
-    hElem[1] = GeomData.GetGridLength(1)/nelem[1];
-    hElem[2] = GeomData.GetGridLength(2)/nelem[2];
+    hElem[0] = GeomData.getGridLength(0)/nelem[0];
+    hElem[1] = GeomData.getGridLength(1)/nelem[1];
+    hElem[2] = GeomData.getGridLength(2)/nelem[2];
 
     // lengths of element sides at level 'ii'
     fact = pow(2.0, double (ii) );
@@ -1357,9 +1357,9 @@ void  HBSplineCutFEM::applyGhostPenalty3D()
                     dN2_dz = nd2->SubDivMat*dNN2_dz;
                   }
 
-                  geom[0] = GeomData.ComputeCoord(0, param[0]);
-                  geom[1] = GeomData.ComputeCoord(1, param[1]);
-                  geom[2] = GeomData.ComputeCoord(2, param[2]);
+                  geom[0] = GeomData.computeCoord(0, param[0]);
+                  geom[1] = GeomData.computeCoord(1, param[1]);
+                  geom[2] = GeomData.computeCoord(2, param[2]);
                   //cout << xx << '\t' << yy << endl;
 
                   for(ii=0; ii<ndof; ii++)

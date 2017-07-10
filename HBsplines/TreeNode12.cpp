@@ -87,8 +87,8 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMPoisson(MatrixXd& Klocal, Vector
           dN_dy = SubDivMat*dNN_dy;
         }
 
-        geom[0] = GeomData->ComputeCoord(0, param[0]);
-        geom[1] = GeomData->ComputeCoord(1, param[1]);
+        geom[0] = GeomData->computeCoord(0, param[0]);
+        geom[1] = GeomData->computeCoord(1, param[1]);
 
         //cout << uu << '\t' << vv << endl;
         //cout << geom[0] << '\t' << geom[1] << endl;
@@ -423,9 +423,9 @@ void TreeNode<2>::applyDirichletBCsCutFEMPoisson(MatrixXd& Klocal, VectorXd& Flo
 
             //printf(" %4d \t %4d \t %12.6f \t %12.6f \n", side, dir, vv, uu);
 
-            geom[0] = GeomData->ComputeCoord(0, param[0]);
-            geom[1] = GeomData->ComputeCoord(1, param[1]);
-            //yy = GeomData->ComputeCoord(1, param[1]);
+            geom[0] = GeomData->computeCoord(0, param[0]);
+            geom[1] = GeomData->computeCoord(1, param[1]);
+            //yy = GeomData->computeCoord(1, param[1]);
             //rad = sqrt(xx*xx+yy*yy);
             //cout << xx << '\t' << yy << endl;
 
@@ -576,8 +576,8 @@ void TreeNode<2>::applyNeumannBCsCutFEMPoisson(MatrixXd& Klocal, VectorXd& Floca
 
             dvol = JacTemp * gws[gp] ;
 
-            geom[0] = GeomData->ComputeCoord(0, param[0]);
-            geom[1] = GeomData->ComputeCoord(1, param[1]);
+            geom[0] = GeomData->computeCoord(0, param[0]);
+            geom[1] = GeomData->computeCoord(1, param[1]);
 
             if(axsy)
             {
@@ -688,8 +688,8 @@ int TreeNode<2>::calcErrorPoisson(int index, int domainCur)
           dN_dy = SubDivMat*dNN_dy;
         }
 
-        geom[0] = GeomData->ComputeCoord(0, param[0]);
-        geom[1] = GeomData->ComputeCoord(1, param[1]);
+        geom[0] = GeomData->computeCoord(0, param[0]);
+        geom[1] = GeomData->computeCoord(1, param[1]);
 
         //cout << uu << '\t' << vv << endl;
         //cout << geom[0] << '\t' << geom[1] << endl;
@@ -748,8 +748,8 @@ int TreeNode<2>::calcErrorPoisson(int index, int domainCur)
           dN_dy = SubDivMat*dNN_dy;
         }
 
-        geom[0] = GeomData->ComputeCoord(0, param[0]);
-        geom[1] = GeomData->ComputeCoord(1, param[1]);
+        geom[0] = GeomData->computeCoord(0, param[0]);
+        geom[1] = GeomData->computeCoord(1, param[1]);
 
         //cout << uu << '\t' << vv << endl;
         //cout << geom[0] << '\t' << geom[1] << endl;

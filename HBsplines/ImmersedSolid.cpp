@@ -65,7 +65,7 @@ ImmersedSolid::~ImmersedSolid()
 
 void ImmersedSolid::setTimeParam()
 {
-  //SolnData.SetTimeIncrementType(4);
+  //SolnData.setTimeIncrementType(4);
 
   SolnData.setTimeParam();
   
@@ -154,7 +154,7 @@ bool ImmersedSolid::diverging(double factor)
 
 
 
-void  ImmersedSolid::SetImmersedIntegrationElements(vector<vector<int> >& datatemp)
+void  ImmersedSolid::setImmersedIntegrationElements(vector<vector<int> >& datatemp)
 {
   int ii, jj, kk, ind;
   kk = datatemp[0].size()-1 ;
@@ -171,7 +171,7 @@ void  ImmersedSolid::SetImmersedIntegrationElements(vector<vector<int> >& datate
 
       lme->SolnData = &(SolnData);
       lme->GeomDataLag = &(GeomData);
-      lme->SetDimension(DIM);
+      lme->setDimension(DIM);
       lme->prepareElemData();
 
       //cout << " ii " << ii << endl;
@@ -185,7 +185,7 @@ void  ImmersedSolid::SetImmersedIntegrationElements(vector<vector<int> >& datate
 
       if( datatemp[ii][0] == 0 )
       {
-        lme->TurnIsActiveOFF();
+        lme->turnIsActiveOFF();
       }
 
       ImmIntgElems.push_back(lme);
@@ -198,7 +198,7 @@ void  ImmersedSolid::SetImmersedIntegrationElements(vector<vector<int> >& datate
 
 
 
-void  ImmersedSolid::SetDataForOutput(vector<vector<int> >& vectemp)
+void  ImmersedSolid::setDataForOutput(vector<vector<int> >& vectemp)
 {
   OutputData.resize(vectemp.size());
   for(int ii=0; ii<vectemp.size(); ii++)
@@ -213,7 +213,7 @@ void  ImmersedSolid::SetDataForOutput(vector<vector<int> >& vectemp)
 
 
 
-void ImmersedSolid::SetImmersedElemActiveFlag(vector<int>& datatemp)
+void ImmersedSolid::setImmersedElemActiveFlag(vector<int>& datatemp)
 {
   return;
 }
@@ -349,14 +349,14 @@ void  ImmersedSolid::computeTotalForce()
 {
     totalForce.resize(6);
     totalForce.setZero();
-    if(IsBoundaryConditionTypeLagrange())
+    if(isBoundaryConditionTypeLagrange())
     {
       computeCentroid(1);
 
       for(int aa=0;aa<ImmIntgElems.size();aa++)
       {
         //cout << " aa " << aa << endl;
-        ImmIntgElems[aa]->IntegrateForceAndMoment(totalForce, centroid);
+        ImmIntgElems[aa]->integrateForceAndMoment(totalForce, centroid);
         //printVector(vectemp);
       }
     }

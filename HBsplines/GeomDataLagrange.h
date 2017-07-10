@@ -3,7 +3,6 @@
 #define incl_GeomDataLagrange_h
 
 #include "util.h"
-
 #include <vector>
 
 using std::vector;
@@ -30,25 +29,25 @@ class  GeomDataLagrange
 
     ~GeomDataLagrange() {}
 
-    void  SetDimension(int dd)
+    void  setDimension(int dd)
     {      DIM = dd;    }
 
-    void  SetNumNode(int dd)
+    void  setNumNode(int dd)
     {      nNode = dd;    }
 
     void  setNdof(int dd)
     {      ndof = dd;    }
 
-    void  SetNGP(int nn)
+    void  setNGP(int nn)
     {      nGP = nn;    }
 
-    int  GetNumNode()
+    int  getNumNode()
     {  return      nNode;    }
 
     int  getNdof()
     {  return  ndof;     }
 
-    int GetNGP(int ind)
+    int getNGP(int ind)
     {  return  nGP;     }
 
     void  printSelf();
@@ -57,7 +56,7 @@ class  GeomDataLagrange
 
     void  reset();
 
-    void  SetNodalPositions(vector<myPoint>&  datatemp);
+    void  setNodalPositions(vector<myPoint>&  datatemp);
 
     void  updateNodePositions(double* );
 

@@ -77,13 +77,15 @@ HBSplineCutFEM::HBSplineCutFEM()
                           "rigid body stiffness",//25
                           "rigid body degree of freedom", //26
                           "rigid body prescribed motion", //27
-                          "solid elements",//28
-                          "immersed point boundary condition",//29
-                          "immersed body output", //30
-                          "contact elements", //31
-                          "element type", //32
-                          "material type", //33
-                          "preload");
+                          "rigid body preload", // 28
+                          "rigid body initial force predictor", // 29
+                          "rigid body motion limits", //30
+                          "solid elements",//31
+                          "immersed point boundary condition",//32
+                          "immersed body output", //33
+                          "contact elements", //34
+                          "element type", //35
+                          "material type");
 
 }
 
@@ -457,10 +459,10 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
               imsolid = new ImmersedFlexibleSolid(DIM);
             }
 
-            imsolid->SetBoundaryConditionType(1);
-            imsolid->SetPenaltyParameter(lvdTmp[0][2]);
-            imsolid->SetNitscheFlag(lvdTmp[0][3]);
-            imsolid->SetNitscheFact(lvdTmp[0][4]);
+            imsolid->setBoundaryConditionType(1);
+            imsolid->setPenaltyParameter(lvdTmp[0][2]);
+            imsolid->setNitscheFlag(lvdTmp[0][3]);
+            imsolid->setNitscheFact(lvdTmp[0][4]);
 
             ImmersedBodyObjects.push_back(imsolid);
 
@@ -490,7 +492,7 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
 
             bb = ImmersedBodyObjects.size() - 1;
 
-            ImmersedBodyObjects[bb]->SetNodalPositions(vecvecDbl);
+            ImmersedBodyObjects[bb]->setNodalPositions(vecvecDbl);
 
             break;
 
@@ -520,7 +522,7 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
 
             bb = ImmersedBodyObjects.size() - 1;
 
-            ImmersedBodyObjects[bb]->SetImmersedIntegrationElements(vecvecInt);
+            ImmersedBodyObjects[bb]->setImmersedIntegrationElements(vecvecInt);
 
             break;
 
@@ -538,7 +540,7 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
 
             bb = ImmersedBodyObjects.size() - 1;
 
-            ImmersedBodyObjects[bb]->SetMass(vecDbl);
+            ImmersedBodyObjects[bb]->setMass(vecDbl);
 
             break;
 
@@ -556,7 +558,7 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
 
             bb = ImmersedBodyObjects.size() - 1;
 
-            ImmersedBodyObjects[bb]->SetDamping(vecDbl);
+            ImmersedBodyObjects[bb]->setDamping(vecDbl);
 
             break;
 
@@ -574,7 +576,7 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
 
             bb = ImmersedBodyObjects.size() - 1;
 
-            ImmersedBodyObjects[bb]->SetStiffness(vecDbl);
+            ImmersedBodyObjects[bb]->setStiffness(vecDbl);
 
             break;
 
@@ -592,7 +594,7 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
 
             bb = ImmersedBodyObjects.size() - 1;
 
-            ImmersedBodyObjects[bb]->SetBoundaryConditions(vecInt);
+            ImmersedBodyObjects[bb]->setBoundaryConditions(vecInt);
 
             break;
 
@@ -617,7 +619,68 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
 
             break;
 
-    case  28: //cout << "     HBSplineCutFEM: reading 'solid elements' ...\n\n";
+    case  28: //cout << "     HBSplineCutFEM: reading 'rigid body preload' ...\n\n";
+
+            if (!prgReadLnBrkSepListVectorDbl(Ifile,line,lvdTmp))
+              prgError(1,fct,"invalid input in 'rigid body preload'!");
+
+            vecDbl.resize(lvdTmp[0].n);
+
+            for(j=0; j<lvdTmp[0].n; j++)
+              vecDbl[j] = lvdTmp[0][j];
+
+            assert(ImmersedBodyObjects.size() > 0);
+
+            bb = ImmersedBodyObjects.size() - 1;
+
+            ImmersedBodyObjects[bb]->setPreload(vecDbl);
+
+            break;
+
+    case  29: //cout << "     HBSplineCutFEM: reading 'rigid body initial force predictor' ...\n\n";
+
+            if (!prgReadLnBrkSepListVectorDbl(Ifile,line,lvdTmp))
+              prgError(1,fct,"invalid input in 'rigid body initial force predictor'!");
+
+            vecDbl.resize(lvdTmp[0].n);
+
+            for(j=0; j<lvdTmp[0].n; j++)
+              vecDbl[j] = lvdTmp[0][j];
+
+            assert(ImmersedBodyObjects.size() > 0);
+
+            bb = ImmersedBodyObjects.size() - 1;
+
+            ImmersedBodyObjects[bb]->setInitialForcePredictor(vecDbl);
+
+            break;
+
+    case  30: //cout << "     HBSplineCutFEM: reading 'rigid body motion limits' ...\n\n";
+
+            if (!prgReadLnBrkSepListVectorDbl(Ifile,line,lvdTmp))
+              prgError(1,fct,"invalid input in 'rigid body motion limits'!");
+
+            vecvecDbl.resize(lvdTmp.n);
+
+            for(i=0;i<lvdTmp.n;i++)
+            {
+                vecvecDbl[i].resize(lvdTmp[i].n);
+                if(lvdTmp[i].n < 1)
+                   prgError(2, fct, "invalid number of 'rigid body motion limits' !");
+                
+                for(j=0;j<lvdTmp[i].n;j++)
+                  vecvecDbl[i][j] = lvdTmp[i][j];
+            }
+
+            assert(ImmersedBodyObjects.size() > 0);
+
+            bb = ImmersedBodyObjects.size() - 1;
+
+            ImmersedBodyObjects[bb]->setRigidBodyMotionLimits(vecvecDbl);
+
+            break;
+
+    case  31: //cout << "     HBSplineCutFEM: reading 'solid elements' ...\n\n";
 
             if (!prgReadLnBrkSepListVectorInt(Ifile,line,lviTmp))
               prgError(1,fct,"invalid input in 'solid elements'!");
@@ -639,11 +702,11 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
 
             bb = ImmersedBodyObjects.size() - 1;
 
-            ImmersedBodyObjects[bb]->SetSolidElements(vecvecInt);
+            ImmersedBodyObjects[bb]->setSolidElements(vecvecInt);
 
             break;
 
-    case  29: //cout << "     HBSplineCutFEM: reading 'immersed point boundary condition' ...\n\n";
+    case  32: //cout << "     HBSplineCutFEM: reading 'immersed point boundary condition' ...\n\n";
 
             if (!prgReadLnBrkSepListVectorDbl(Ifile,line,lvdTmp))
               prgError(1,fct,"invalid input in 'immersed point boundary condition'!");
@@ -668,11 +731,11 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
 
             bb = ImmersedBodyObjects.size() - 1;
 
-            ImmersedBodyObjects[bb]->SetBoundaryConditions(vecvecDbl);
+            ImmersedBodyObjects[bb]->setBoundaryConditions(vecvecDbl);
 
             break;
 
-    case  30: //cout << "     HBSplineCutFEM: reading 'immersed body output' ...\n\n";
+    case  33: //cout << "     HBSplineCutFEM: reading 'immersed body output' ...\n\n";
 
             if (!prgReadLnBrkSepListVectorInt(Ifile,line,lviTmp))
               prgError(1,fct,"invalid input in 'immersed body output'!");
@@ -693,11 +756,11 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
 
             bb = ImmersedBodyObjects.size() - 1;
 
-            ImmersedBodyObjects[bb]->SetDataForOutput(vecvecInt);
+            ImmersedBodyObjects[bb]->setDataForOutput(vecvecInt);
 
             break;
 
-    case  31: //cout << "     HBSplineCutFEM: reading 'contact elements' ...\n\n";
+    case  34: //cout << "     HBSplineCutFEM: reading 'contact elements' ...\n\n";
 
             if (!prgReadLnBrkSepListVectorInt(Ifile,line,lviTmp))
               prgError(1,fct,"invalid input in 'contact elements'!");
@@ -716,7 +779,7 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
 
             break;
 
-    case  32: //cout << "     HBSplineCutFEM: reading 'element type' ...\n\n";
+    case  35: //cout << "     HBSplineCutFEM: reading 'element type' ...\n\n";
 
             //ElemProp.add(new PropertyItem(ELEMENTTYPE));
             //ElemProp[ElemProp.n-1].readInputData(Ifile,line,"input error in 'element type'!");
@@ -730,7 +793,7 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
 
             break;
 
-    case  33: //cout << "     HBSplineCutFEM: reading 'material type' ...\n\n";
+    case  36: //cout << "     HBSplineCutFEM: reading 'material type' ...\n\n";
 
             //MatlProp.add(new PropertyItem(MATERIAL));
             //MatlProp[MatlProp.n-1].readInputData(Ifile,line,"input error in 'material type'!");
@@ -778,9 +841,9 @@ void HBSplineCutFEM::prepareInputData()
 
   SolnData.initialise(totalDOF, totalDOF, 0, 0);
 
-  SolnData.SetPhysicsTypetoFluid();
-  SolnData.SetTimeIncrementType(tis);
-  SolnData.SetRho(td[0]);
+  SolnData.setPhysicsTypetoFluid();
+  SolnData.setTimeIncrementType(tis);
+  SolnData.setSpectralRadius(td[0]);
   SolnData.SetStaggeredParams(stagParams);
 
   int bb;
@@ -811,8 +874,8 @@ void HBSplineCutFEM::prepareInputData()
 
     for(int ii=0; ii<DIM; ii++)
     {
-      minVal[ii] = GeomData.ComputeCoord(ii, 0.0);
-      maxVal[ii] = GeomData.ComputeCoord(ii, 1.0);
+      minVal[ii] = GeomData.computeCoord(ii, 0.0);
+      maxVal[ii] = GeomData.computeCoord(ii, 1.0);
     }
     //cout << minVal[0] << '\t' << minVal[1] << '\t' << minVal[2] << endl;
     //cout << maxVal[0] << '\t' << maxVal[1] << '\t' << maxVal[2] << endl;
@@ -849,20 +912,20 @@ void HBSplineCutFEM::prepareInputData()
     
     double  bounds[6],  ptTemp[8][3];
 
-    bounds[0] = ComputeGeometry(0, 0.0);
-    bounds[1] = ComputeGeometry(0, 1.0);
+    bounds[0] = computeGeometry(0, 0.0);
+    bounds[1] = computeGeometry(0, 1.0);
 
-    bounds[2] = ComputeGeometry(1, 0.0);
-    bounds[3] = ComputeGeometry(1, 1.0);
+    bounds[2] = computeGeometry(1, 0.0);
+    bounds[3] = computeGeometry(1, 1.0);
 
-    bounds[4] = ComputeGeometry(2, 0.0);
-    bounds[5] = ComputeGeometry(2, 1.0);
+    bounds[4] = computeGeometry(2, 0.0);
+    bounds[5] = computeGeometry(2, 1.0);
 
     //cout << " cccccccccc " << endl;
 
     mergePoints->InitPointInsertion(pointsVTKfluidgrid, bounds);
     mergePoints->SetDivisions(nelem[0], nelem[1], nelem[2]);
-    mergePoints->SetTolerance(1.0e-5);
+    mergePoints->setTolerance(1.0e-5);
 
     //cout << " AAAAAAAAAAA " << endl;
 
@@ -920,8 +983,8 @@ void HBSplineCutFEM::prepareInputData()
       ImmersedBodyObjects[bb]->selectEnclosedPoints->SetInputData(pointsPolydataVTK);
     #endif
 
-    //cout << "  HBSplineCutFEM::SetImmersedFaces()  " << endl;
-    ImmersedBodyObjects[bb]->SetImmersedFaces();
+    //cout << "  HBSplineCutFEM::setImmersedFaces()  " << endl;
+    ImmersedBodyObjects[bb]->setImmersedFaces();
   }
 
   */
@@ -931,8 +994,8 @@ void HBSplineCutFEM::prepareInputData()
 
   for(bb=0; bb<nImmSolids; bb++)
   {
-    //cout << "  HBSplineCutFEM::SetImmersedFaces()  " << endl;
-    ImmersedBodyObjects[bb]->SetImmersedFaces();
+    //cout << "  HBSplineCutFEM::setImmersedFaces()  " << endl;
+    ImmersedBodyObjects[bb]->setImmersedFaces();
   }
 
   PetscPrintf(MPI_COMM_WORLD, "\n     HBSplineCutFEM::prepareInputData()  .... FINISHED ...\n\n");

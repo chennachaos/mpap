@@ -33,34 +33,34 @@ void  HBSplineBase::subDivide(int nodenum)
 
 
 
-void  HBSplineBase::ApplyRefinementProcess()
+void  HBSplineBase::applyRefinementProcess()
 {
     //printf(" Current level = %2d \n", CURRENT_LEVEL);
     //printf(" Maximum level = %2d \n\n", MAX_LEVEL);
 
-    Algorithm1(CURRENT_LEVEL);
-    Algorithm2(CURRENT_LEVEL);
-    Algorithm3(CURRENT_LEVEL+1);
+    algorithm1(CURRENT_LEVEL);
+    algorithm2(CURRENT_LEVEL);
+    algorithm3(CURRENT_LEVEL+1);
 
     return;
 }
 
 
 
-void  HBSplineBase::Algorithm1(int lev)
+void  HBSplineBase::algorithm1(int lev)
 {
     // nucleus operation for each element: create new leaves (children) of level k+1
     //
     //////////////////////////////////////////////////////////////////////////////////////
    
-    //printf(" Algorithm1 for level = %2d STARTED \n ",lev);
+    //printf(" algorithm1 for level = %2d STARTED \n ",lev);
 
     if(DIM == 1)
-      Algorithm1_1D(lev);
+      algorithm1_1D(lev);
     else if(DIM == 2)
-      Algorithm1_2D(lev);
+      algorithm1_2D(lev);
     else
-      Algorithm1_3D(lev);
+      algorithm1_3D(lev);
 
 
     findUnique(nodes2divide);
@@ -85,18 +85,18 @@ void  HBSplineBase::Algorithm1(int lev)
     printf("\n\n");
     */
 
-    //printf(" Algorithm1 for level = %2d FINISHED \n ",lev);
+    //printf(" algorithm1 for level = %2d FINISHED \n ",lev);
 
     return;
 }
 
 
 
-void  HBSplineBase::Algorithm2(int lev)
+void  HBSplineBase::algorithm2(int lev)
 {
     // remove linear dependence between basis functions of level k and level k+1.
     
-    //printf("\n\n\n  Algorithm2 for level = %2d STARTED \n ",lev);
+    //printf("\n\n\n  algorithm2 for level = %2d STARTED \n ",lev);
 
     /*
     printf("\n\n\n");
@@ -107,11 +107,11 @@ void  HBSplineBase::Algorithm2(int lev)
     */
 
     if(DIM == 1)
-      Algorithm2_1D(lev);
+      algorithm2_1D(lev);
     else if(DIM == 2)
-      Algorithm2_2D(lev);
+      algorithm2_2D(lev);
     else
-      Algorithm2_3D(lev);
+      algorithm2_3D(lev);
 
     findUnique(VacantBFs);
 
@@ -123,29 +123,29 @@ void  HBSplineBase::Algorithm2(int lev)
     printf("\n\n\n");
     */
 
-    //printf(" Algorithm2 for level = %2d FINISHED \n", lev);
+    //printf(" algorithm2 for level = %2d FINISHED \n", lev);
 
     return;
 }
 
 
 
-void  HBSplineBase::Algorithm3(int lev)
+void  HBSplineBase::algorithm3(int lev)
 {
     // assign numbers to the new basis functions of level k+1
     
-    //printf("\n\n\n Algorithm3 for level = %2d STARTED \n ",lev);
+    //printf("\n\n\n algorithm3 for level = %2d STARTED \n ",lev);
 
     if(DIM == 1)
-      Algorithm3_1D(lev);
+      algorithm3_1D(lev);
     else if(DIM == 2)
-      Algorithm3_2D(lev);
+      algorithm3_2D(lev);
     else
-      Algorithm3_3D(lev);
+      algorithm3_3D(lev);
 
     //printf("\n \t   Total number of basis functions    =  %5d\n\n", gridBF1);
 
-    //printf(" Algorithm3 for level = %2d FINISHED \n ",lev);
+    //printf(" algorithm3 for level = %2d FINISHED \n ",lev);
 
     return;
 }
@@ -176,7 +176,7 @@ void  HBSplineBase::addGhostNodes(node* nd, int dir)
 }
 
 
-void  HBSplineBase::Algorithm1_1D(int lev)
+void  HBSplineBase::algorithm1_1D(int lev)
 {
     int ee, nodenum;
     node  *nd;
@@ -210,7 +210,7 @@ void  HBSplineBase::Algorithm1_1D(int lev)
 }
 
 
-void  HBSplineBase::Algorithm1_2D(int lev)
+void  HBSplineBase::algorithm1_2D(int lev)
 {
     int  ee, nodenum;
     node  *nd;
@@ -292,7 +292,7 @@ void  HBSplineBase::Algorithm1_2D(int lev)
 }
 
 
-void  HBSplineBase::Algorithm1_3D(int lev)
+void  HBSplineBase::algorithm1_3D(int lev)
 {
   // still pending
     
@@ -557,7 +557,7 @@ void  HBSplineBase::Algorithm1_3D(int lev)
 
 
 
-void  HBSplineBase::Algorithm2_1D(int lev)
+void  HBSplineBase::algorithm2_1D(int lev)
 {
     int ee, ii, jj, val, temp1, temp2;
     bool flag1, flag2;
@@ -619,7 +619,7 @@ void  HBSplineBase::Algorithm2_1D(int lev)
 }
 
 
-void  HBSplineBase::Algorithm2_2D(int lev)
+void  HBSplineBase::algorithm2_2D(int lev)
 {
     int ii, jj, val, ee, temp1, temp2;
     bool flag1, flag2;
@@ -697,7 +697,7 @@ void  HBSplineBase::Algorithm2_2D(int lev)
 }
 
 
-void  HBSplineBase::Algorithm2_3D(int lev)
+void  HBSplineBase::algorithm2_3D(int lev)
 {
     int ii, jj, kk, val, ee, temp1, temp2;
     bool flag1, flag2;
@@ -788,7 +788,7 @@ void  HBSplineBase::Algorithm2_3D(int lev)
 }
 
 
-void  HBSplineBase::Algorithm3_1D(int lev)
+void  HBSplineBase::algorithm3_1D(int lev)
 {
     int  ee, ii, jj, val;
     bool flag1, flag2;
@@ -863,7 +863,7 @@ void  HBSplineBase::Algorithm3_1D(int lev)
 
 
 
-void  HBSplineBase::Algorithm3_2D(int lev)
+void  HBSplineBase::algorithm3_2D(int lev)
 {
     int ii, jj, val, ee, temp1, temp2;
     bool flag1, flag2;
@@ -941,7 +941,7 @@ void  HBSplineBase::Algorithm3_2D(int lev)
 
 
 
-void  HBSplineBase::Algorithm3_3D(int lev)
+void  HBSplineBase::algorithm3_3D(int lev)
 {
     int ii, jj, kk, val, ee, temp1, temp2;
     
@@ -1303,7 +1303,7 @@ void HBSplineBase::performAdaptiveRefinement(double eTol)
     */
     
     MAX_LEVEL += 1;
-    ApplyRefinementProcess();
+    applyRefinementProcess();
     CURRENT_LEVEL += 1;
 
     prepareMatrixPattern();

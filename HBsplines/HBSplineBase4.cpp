@@ -153,7 +153,7 @@ void  HBSplineBase::printResultAtPoint(int index, double u1, double v1, double w
 
                     param[0] = uu[ii];
                     param[1] = 0.5;
-                    ComputeGeometry(param, geom);
+                    computeGeometry(param, geom);
 
                     xx.push_back(geom[0]);
                  }
@@ -188,7 +188,7 @@ void  HBSplineBase::printResultAtPoint(int index, double u1, double v1, double w
 
                     param[0] = 0.5;
                     param[1] = vv[jj];
-                    ComputeGeometry(param, geom);
+                    computeGeometry(param, geom);
 
                     yy.push_back(geom[1]);
                  }

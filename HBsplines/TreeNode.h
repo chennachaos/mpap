@@ -359,7 +359,7 @@ class TreeNode
 
         void  assembleElementVector(int ind, bool flag, double* rhs);
         
-        //void  AssembleMatrixAndVector(int, Mat, double*);
+        //void  assembleMatrixAndVector(int, Mat, double*);
 
         void  assembleElementMatrix2(int, SparseMatrixXd& globalK);
 
@@ -620,20 +620,20 @@ void TreeNode<DIM>::prepareElemData()
 
     elmDat = &(GeomData->FluidProps[0]);
 
-    //JacMultElem = SolnData->GetJacobianFull() * (0.5*knots[0][2]) * (0.5*knots[1][2]) * (0.5*knots[2][2]);
+    //JacMultElem = SolnData->getJacobianFull() * (0.5*knots[0][2]) * (0.5*knots[1][2]) * (0.5*knots[2][2]);
     //
     // because determinant of the Jacobian is constant for uniform rectangular grids.
 
-    JacMultElem = GeomData->GetJacobianFull();
+    JacMultElem = GeomData->getJacobianFull();
 
     for(ii=0;ii<DIM;ii++)
     {
       JacMultElem *= (0.5*knots[ii][2]);
 
-      bbox.minBB[ii] = GeomData->ComputeCoord(ii, knots[ii][0]);
-      bbox.maxBB[ii] = GeomData->ComputeCoord(ii, knots[ii][1]);
+      bbox.minBB[ii] = GeomData->computeCoord(ii, knots[ii][0]);
+      bbox.maxBB[ii] = GeomData->computeCoord(ii, knots[ii][1]);
     }
-    //cout << JacMultElem << '\t' << SolnData->GetJacobianFull() << '\t' << (0.5*knots[0][2]) << '\t' << (0.5*knots[1][2]) << '\t' << (0.5*knots[2][2]) << endl;
+    //cout << JacMultElem << '\t' << SolnData->getJacobianFull() << '\t' << (0.5*knots[0][2]) << '\t' << (0.5*knots[1][2]) << '\t' << (0.5*knots[2][2]) << endl;
 
     return;
 }
@@ -702,7 +702,7 @@ void TreeNode<DIM>::assembleElementVector(int ind, bool flag, double* rhs)
 
 /*
 template<int DIM>
-void TreeNode<DIM>::AssembleMatrixAndVector(int index, Mat mtx, double* rhs)
+void TreeNode<DIM>::assembleMatrixAndVector(int index, Mat mtx, double* rhs)
 {
   PetscErrorCode ierr;
     

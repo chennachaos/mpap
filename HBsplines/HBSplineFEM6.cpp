@@ -422,7 +422,7 @@ void HBSplineFEM::prepareMatrixPatternLagrangeMultipliers()
 
     for(bb=0;bb<ImmersedBodyObjects.size();bb++)
     {
-      if(ImmersedBodyObjects[bb]->IsBoundaryConditionTypeLagrange())
+      if(ImmersedBodyObjects[bb]->isBoundaryConditionTypeLagrange())
       {
         for(aa=0;aa<ImmersedBodyObjects[bb]->ImmIntgElems.size();aa++)
         {

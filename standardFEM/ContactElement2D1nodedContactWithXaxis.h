@@ -21,7 +21,7 @@ class ContactElement2D1nodedContactWithXaxis: public LagrangeElement
 
         //void  assembleElementVector(int ind, bool flag, double* rhs);
 
-        //void  AssembleMatrixAndVector(int, SparseMatrixXd&, double*);
+        //void  assembleMatrixAndVector(int, SparseMatrixXd&, double*);
 };
 
 

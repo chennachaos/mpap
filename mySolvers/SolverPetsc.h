@@ -2,20 +2,14 @@
 #ifndef incl_SolverPetsc_h
 #define incl_SolverPetsc_h
 
-//#include "headersBasic.h"
-
 #include "SolverEigen.h"
-
 #include "Solver.h"
-
 #include "petscksp.h"
 #include "petscmat.h"
 
-//#include <Eigen/Dense>
 
 using namespace std;
-//using Eigen::VectorXd;
-//using Eigen::MatrixXd;
+
 
 class SolverPetsc
 {
@@ -55,7 +49,7 @@ class SolverPetsc
 
     virtual int initialise(int p1 = 0, int p2 = 0, int p3 = 0);
     
-    int SetSolverAndParameters();
+    int setSolverAndParameters();
 
     virtual bool isChildOfSolverSparse(void) { return false; }
 
@@ -69,26 +63,23 @@ class SolverPetsc
 
     virtual double giveMatrixCoefficient(int,int);
 
-    virtual int AssembleMatrixAndVector(vector<int>& row, vector<int>& col, MatrixXd& Klocal, VectorXd& Flocal);
+    virtual int assembleMatrixAndVector(vector<int>& row, vector<int>& col, MatrixXd& Klocal, VectorXd& Flocal);
 
-    virtual int AssembleMatrixAndVector(int r1, int c1, vector<int>& row, vector<int>& col, MatrixXd& Klocal, VectorXd& Flocal);
+    virtual int assembleMatrixAndVector(int r1, int c1, vector<int>& row, vector<int>& col, MatrixXd& Klocal, VectorXd& Flocal);
 
-    virtual int AssembleMatrixAndVectorCutFEM(int r1, int c1, vector<int>& tempVec, vector<int>& forAssy, MatrixXd& Klocal, VectorXd& Flocal);
+    virtual int assembleMatrixAndVectorCutFEM(int r1, int c1, vector<int>& tempVec, vector<int>& forAssy, MatrixXd& Klocal, VectorXd& Flocal);
 
-    virtual int AssembleMatrixAndVectorCutFEM2(int r1, int c1, vector<int>& tempVec, 
+    virtual int assembleMatrixAndVectorCutFEM2(int r1, int c1, vector<int>& tempVec, 
                 vector<int>& forAssy1, vector<int>& forAssy2, MatrixXd& Klocal, VectorXd& Flocal1, VectorXd& Flocal2);
 
-    virtual int AssembleMatrixAndVectorCutFEM3(int r1, int c1, vector<int>& row, vector<int>& col,
+    virtual int assembleMatrixAndVectorCutFEM3(int r1, int c1, vector<int>& row, vector<int>& col,
                 vector<int>& forAssy1, vector<int>& forAssy2, MatrixXd& Klocal, VectorXd& Flocal1);
 
-    virtual int AssembleVector(int r1, int c1, vector<int>& row, VectorXd& Flocal);
+    virtual int assembleVector(int r1, int c1, vector<int>& row, VectorXd& Flocal);
 
-    virtual int AssembleMatrixAndVectorMixedFormulation(int r1, int c1, vector<int>& vec1, vector<int>& vec2, MatrixXd& Klocal, VectorXd& Flocal);
+    virtual int assembleMatrixAndVectorMixedFormulation(int r1, int c1, vector<int>& vec1, vector<int>& vec2, MatrixXd& Klocal, VectorXd& Flocal);
 
-    //virtual double *solve(double*, int nrhs = 1);
-    //virtual double *factoriseAndSolve(double*, int nrhs = 1);
-
-    virtual int  factorise();
+    virtual int factorise();
 
     virtual int solve();
 

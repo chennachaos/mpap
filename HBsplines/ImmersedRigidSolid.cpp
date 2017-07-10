@@ -4,7 +4,6 @@
 #include "myConstants.h"
 #include "ImmersedIntegrationElement.h"
 #include "FunctionsProgram.h"
-
 #include "MpapTime.h"
 #include "TimeFunction.h"
 
@@ -40,7 +39,7 @@ ImmersedRigidSolid::ImmersedRigidSolid(int dd)
   dofData.resize(size,-1);
 
   SolnData.initialise(3, 0, 0, 0);
-  SolnData.SetPhysicsTypetoSolid();
+  SolnData.setPhysicsTypetoSolid();
   
   PRESC_MOTION = false;
   //PRESC_MOTION = true;
@@ -180,7 +179,7 @@ void ImmersedRigidSolid::printSelf()
 }
 
 
-void ImmersedRigidSolid::SetMass(vector<double>& tempVec)
+void ImmersedRigidSolid::setMass(vector<double>& tempVec)
 {
   assert( tempVec.size() >= size*size );
   
@@ -196,7 +195,7 @@ void ImmersedRigidSolid::SetMass(vector<double>& tempVec)
 }
 
 
-void ImmersedRigidSolid::SetDamping(vector<double>& tempVec)
+void ImmersedRigidSolid::setDamping(vector<double>& tempVec)
 {
   assert( tempVec.size() >= size*size );
 
@@ -212,7 +211,7 @@ void ImmersedRigidSolid::SetDamping(vector<double>& tempVec)
 }
 
 
-void ImmersedRigidSolid::SetStiffness(vector<double>& tempVec)
+void ImmersedRigidSolid::setStiffness(vector<double>& tempVec)
 {
   assert( tempVec.size() >= size*size );
 
@@ -228,7 +227,7 @@ void ImmersedRigidSolid::SetStiffness(vector<double>& tempVec)
 }
 
 
-void ImmersedRigidSolid::SetBoundaryConditions(vector<int>& vectemp)
+void ImmersedRigidSolid::setBoundaryConditions(vector<int>& vectemp)
 {
   dofData = vectemp;
 
@@ -239,7 +238,7 @@ void ImmersedRigidSolid::SetBoundaryConditions(vector<int>& vectemp)
 
 
 
-void ImmersedRigidSolid::SetPrescibedMotion(vector<int>& vectemp)
+void ImmersedRigidSolid::setPrescribedMotion(vector<int>& vectemp)
 {
   //cout << "  vectemp.size() = " << vectemp.size() << endl;
   if(vectemp.size() > 0)
@@ -257,7 +256,34 @@ void ImmersedRigidSolid::SetPrescibedMotion(vector<int>& vectemp)
 
 
 
-void  ImmersedRigidSolid::SetNodalPositions(vector<vector<double> >&  datatemp)
+void ImmersedRigidSolid::setPreload(vector<double>& tempVec)
+{
+  assert( tempVec.size() >= size );
+
+  preLoad = tempVec;
+
+  return;
+}
+
+void  ImmersedRigidSolid::setInitialForcePredictor(vector<double>& tempVec)
+{
+  assert( tempVec.size() >= size );
+
+  initForcePred = tempVec;
+
+  return;
+}
+
+
+void  ImmersedRigidSolid::setRigidBodyMotionLimits(vector<vector<double> >& tempVec)
+{
+  rigidBodyMotionLimits = tempVec;
+
+  return;
+}
+
+
+void  ImmersedRigidSolid::setNodalPositions(vector<vector<double> >&  datatemp)
 {
   nNode = datatemp.size();
   cout << " nNode  = " << nNode << endl;
@@ -416,9 +442,8 @@ void ImmersedRigidSolid::prepareMatrixPattern()
 }
 
 
-void  ImmersedRigidSolid::SetBoundaryConditions(vector<vector<double> >& datatemp)
+void  ImmersedRigidSolid::setBoundaryConditions(vector<vector<double> >& datatemp)
 {
-
   return;
 }
 
@@ -820,15 +845,11 @@ void  ImmersedRigidSolid::updatePointPositions2D()
           GeomData.NodePosCur[bb][ii]  = rNew[ii];
           GeomData.specValCur[bb][ii]  = vNew[ii];
         }
-
       }
     }
 
-  //cout << " jjjjjjjjjjjjj " << endl;
-
   return;
 }
-
 
 
 
@@ -1150,7 +1171,6 @@ void  ImmersedRigidSolid::updatePointPositions3D()
       }
     }
 
-
   return;
 }
 
@@ -1235,7 +1255,7 @@ void ImmersedRigidSolid::updateDisplacement(double* data)
 }
 
 
-void ImmersedRigidSolid::SolveTimeStep()
+void ImmersedRigidSolid::solveTimeStep()
 {
   if( totalDOF > 0 )
   {
@@ -1259,13 +1279,10 @@ void ImmersedRigidSolid::SolveTimeStep()
       //printVector(SolnData.var1Dot);
       //printVector(SolnData.var1);
     }
-    //cout << disp[0] << '\t' << velo[0] << '\t' << acce[0] << endl;
-    //cout << dispCur[0] << '\t' << veloCur[0] << '\t' << acceCur[0] << endl;
-
     //printf("\n Solving Immersed Rigid Solid ..... DONE  \n\n");
   }
 
-    printf("\n Solving Immersed Rigid Solid ..... DONE  \n\n");
+  printf("\n Solving Immersed Rigid Solid ..... DONE  \n\n");
 
   return;
 }
@@ -1289,6 +1306,14 @@ void ImmersedRigidSolid::resetMatrixAndVector()
   return;
 }
 
+/*
+  double F0=9.0;
+  //double F0=0.0035;
+  //F0 = 1.2*0.196349540849362*981.0;
+  //F0 = 0.0072*1.7671e+03*9.81*0.001;
+  //F0 = 0.001996*0.0314158*981.0;
+  //F0 = 1.2*0.0314158*981.0;
+*/
 
 //
 int ImmersedRigidSolid::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool zeroRes)
@@ -1299,9 +1324,6 @@ int ImmersedRigidSolid::calcStiffnessAndResidual(int solver_type, bool zeroMtx, 
   int ii, jj, ind;
   double  y1, y2, fact, tol=1.e-12, lamn, gn, af, cn, g0, disp, beta=1.0;
   
-  double F0=9.0;
-  //double F0=0.0035;
-
   Kglobal.setZero();
   rhsVec.setZero();
   
@@ -1318,17 +1340,7 @@ int ImmersedRigidSolid::calcStiffnessAndResidual(int solver_type, bool zeroMtx, 
   //Kglobal(0,0) = SolnData.td[5]*matM(2,2) + SolnData.td[6]*matC(2,2) + SolnData.td[7]*matK(2,2);
   //rhsVec(0)    = SolnData.forceCur(0) - matM(2,2)*SolnData.var1DotDotCur[0] - matC(2,2)*SolnData.var1DotCur[0] - matK(2,2)*SolnData.var1Cur[0];
 
-  //F0 = 1.2*0.196349540849362*981.0;
-
-  //F0 = 0.0072*1.7671e+03*9.81*0.001;
-
-  //F0 = 0.001996*0.0314158*981.0;
-
-  //F0 = 1.2*0.0314158*981.0;
-
-  //rhsVec(0)   -= F0 ;
-
-  //rhsVec(0)   -= (SolnData.var1Cur[1] + SolnData.var1Cur[2]) ;
+  rhsVec(0)   -= preLoad[1] ;
 
   //cout << " contact force = " << veloCur(1) << '\t' << velo(1) << '\t' << veloPrev(1) << endl;
 
@@ -1616,7 +1628,7 @@ int ImmersedRigidSolid::factoriseSolveAndUpdate()
 
 
 /*
-int ImmersedRigidSolid::AssembleGlobalMatrixAndVector(int start1, int start2, SparseMatrixXd& mtx, double* rhs)
+int ImmersedRigidSolid::assembleGlobalMatrixAndVector(int start1, int start2, SparseMatrixXd& mtx, double* rhs)
 {
   int ii, jj, r, c, kk, ll;
 
@@ -1666,7 +1678,7 @@ int ImmersedRigidSolid::AssembleGlobalMatrixAndVector(int start1, int start2, Sp
 
 
 //
-int ImmersedRigidSolid::AssembleGlobalMatrixAndVector(int ind1, int ind2, SparseMatrixXd& mtx, double* rhs)
+int ImmersedRigidSolid::assembleGlobalMatrixAndVector(int ind1, int ind2, SparseMatrixXd& mtx, double* rhs)
 {
   if(totalDOF <= 0)
     return 1;
@@ -1706,7 +1718,7 @@ int ImmersedRigidSolid::AssembleGlobalMatrixAndVector(int ind1, int ind2, Sparse
 
 
 
-int ImmersedRigidSolid::AssembleGlobalMatrixAndVectorCutFEM(int start1, int start2, SolverPetsc* solverTemp)
+int ImmersedRigidSolid::assembleGlobalMatrixAndVectorCutFEM(int start1, int start2, SolverPetsc* solverTemp)
 {
   calcStiffnessAndResidual(1, 0, 0);
   //printMatrix(Klocal);

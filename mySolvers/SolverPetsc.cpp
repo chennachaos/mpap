@@ -45,7 +45,7 @@ int SolverPetsc::initialise(int p1, int p2, int p3)
 }
 
 
-int SolverPetsc::SetSolverAndParameters()
+int SolverPetsc::setSolverAndParameters()
 {
     //PetscPrintf(MPI_COMM_WORLD, " AAAAAAAAAA \n");
     ierr = KSPCreate(PETSC_COMM_WORLD, &ksp);CHKERRQ(ierr);
@@ -276,7 +276,7 @@ int SolverPetsc::factoriseAndSolve()
 
 
 
-int SolverPetsc::AssembleMatrixAndVector(vector<int>& row, vector<int>& col, MatrixXd& Klocal, VectorXd& Flocal)
+int SolverPetsc::assembleMatrixAndVector(vector<int>& row, vector<int>& col, MatrixXd& Klocal, VectorXd& Flocal)
 {
   int ii, jj;
 
@@ -298,7 +298,7 @@ int SolverPetsc::AssembleMatrixAndVector(vector<int>& row, vector<int>& col, Mat
 
 
 
-int SolverPetsc::AssembleMatrixAndVector(int start1, int start2, vector<int>& row, vector<int>& col, MatrixXd& Klocal, VectorXd& Flocal)
+int SolverPetsc::assembleMatrixAndVector(int start1, int start2, vector<int>& row, vector<int>& col, MatrixXd& Klocal, VectorXd& Flocal)
 {
   int ii, jj, r1, c1;
 
@@ -324,7 +324,7 @@ int SolverPetsc::AssembleMatrixAndVector(int start1, int start2, vector<int>& ro
 
 
 
-int SolverPetsc::AssembleMatrixAndVectorCutFEM(int start, int c1, vector<int>& forAssyElem, vector<int>& map_to_cutfem, MatrixXd& Klocal, VectorXd& Flocal)
+int SolverPetsc::assembleMatrixAndVectorCutFEM(int start, int c1, vector<int>& forAssyElem, vector<int>& map_to_cutfem, MatrixXd& Klocal, VectorXd& Flocal)
 {
   int ii, jj, r, kk=0;
 
@@ -355,7 +355,7 @@ int SolverPetsc::AssembleMatrixAndVectorCutFEM(int start, int c1, vector<int>& f
 
 
 
-int SolverPetsc::AssembleMatrixAndVectorCutFEM2(int start1, int start2, vector<int>& tempVec, 
+int SolverPetsc::assembleMatrixAndVectorCutFEM2(int start1, int start2, vector<int>& tempVec, 
      vector<int>& forAssy1, vector<int>& forAssy2, MatrixXd& Klocal, VectorXd& Flocal1, VectorXd& Flocal2)
 {
   // to assemble coupling matrices arriving from 
@@ -394,7 +394,7 @@ int SolverPetsc::AssembleMatrixAndVectorCutFEM2(int start1, int start2, vector<i
 
 
 
-int SolverPetsc::AssembleMatrixAndVectorCutFEM3(int start1, int start2, vector<int>& row, vector<int>& col, 
+int SolverPetsc::assembleMatrixAndVectorCutFEM3(int start1, int start2, vector<int>& row, vector<int>& col, 
      vector<int>& forAssy1, vector<int>& forAssy2, MatrixXd& Klocal, VectorXd& Flocal1)
 {
  
@@ -405,7 +405,7 @@ int SolverPetsc::AssembleMatrixAndVectorCutFEM3(int start1, int start2, vector<i
 
 
 
-int SolverPetsc::AssembleMatrixAndVectorMixedFormulation(int start, int c1, vector<int>& vec1, vector<int>& vec2, MatrixXd& Klocal, VectorXd& Flocal)
+int SolverPetsc::assembleMatrixAndVectorMixedFormulation(int start, int c1, vector<int>& vec1, vector<int>& vec2, MatrixXd& Klocal, VectorXd& Flocal)
 {
   int ii, jj, aa, bb, size1, size2;
 
@@ -442,7 +442,7 @@ int SolverPetsc::AssembleMatrixAndVectorMixedFormulation(int start, int c1, vect
 
 
 
-int SolverPetsc::AssembleVector(int start, int c1, vector<int>& vec1, VectorXd& Flocal)
+int SolverPetsc::assembleVector(int start, int c1, vector<int>& vec1, VectorXd& Flocal)
 {
   int ii, jj;
 

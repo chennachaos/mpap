@@ -440,10 +440,10 @@ void  HBSplineFEM::readInputData(std::ifstream &Ifile, MyString &line)
               imsolid = new ImmersedFlexibleSolid(DIM);
             }
 
-            imsolid->SetBoundaryConditionType( (int) lvdTmp[0][1] );
-            imsolid->SetPenaltyParameter(lvdTmp[0][2]);
-            imsolid->SetNitscheFlag(lvdTmp[0][3]);
-            imsolid->SetNitscheFact(lvdTmp[0][4]);
+            imsolid->setBoundaryConditionType( (int) lvdTmp[0][1] );
+            imsolid->setPenaltyParameter(lvdTmp[0][2]);
+            imsolid->setNitscheFlag(lvdTmp[0][3]);
+            imsolid->setNitscheFact(lvdTmp[0][4]);
 
             ImmersedBodyObjects.push_back(imsolid);
 
@@ -473,7 +473,7 @@ void  HBSplineFEM::readInputData(std::ifstream &Ifile, MyString &line)
 
             bb = ImmersedBodyObjects.size() - 1;
 
-            ImmersedBodyObjects[bb]->SetNodalPositions(vecvecDbl);
+            ImmersedBodyObjects[bb]->setNodalPositions(vecvecDbl);
 
             break;
 
@@ -503,7 +503,7 @@ void  HBSplineFEM::readInputData(std::ifstream &Ifile, MyString &line)
 
             bb = ImmersedBodyObjects.size() - 1;
 
-            ImmersedBodyObjects[bb]->SetImmersedIntegrationElements(vecvecInt);
+            ImmersedBodyObjects[bb]->setImmersedIntegrationElements(vecvecInt);
 
             break;
 
@@ -521,7 +521,7 @@ void  HBSplineFEM::readInputData(std::ifstream &Ifile, MyString &line)
 
             bb = ImmersedBodyObjects.size() - 1;
 
-            ImmersedBodyObjects[bb]->SetMass(vecDbl);
+            ImmersedBodyObjects[bb]->setMass(vecDbl);
 
             break;
 
@@ -539,7 +539,7 @@ void  HBSplineFEM::readInputData(std::ifstream &Ifile, MyString &line)
 
             bb = ImmersedBodyObjects.size() - 1;
 
-            ImmersedBodyObjects[bb]->SetDamping(vecDbl);
+            ImmersedBodyObjects[bb]->setDamping(vecDbl);
 
             break;
 
@@ -557,7 +557,7 @@ void  HBSplineFEM::readInputData(std::ifstream &Ifile, MyString &line)
 
             bb = ImmersedBodyObjects.size() - 1;
 
-            ImmersedBodyObjects[bb]->SetStiffness(vecDbl);
+            ImmersedBodyObjects[bb]->setStiffness(vecDbl);
 
             break;
 
@@ -575,7 +575,7 @@ void  HBSplineFEM::readInputData(std::ifstream &Ifile, MyString &line)
 
             bb = ImmersedBodyObjects.size() - 1;
 
-            ImmersedBodyObjects[bb]->SetBoundaryConditions(vecInt);
+            ImmersedBodyObjects[bb]->setBoundaryConditions(vecInt);
 
             break;
 
@@ -625,7 +625,7 @@ void  HBSplineFEM::readInputData(std::ifstream &Ifile, MyString &line)
 
             bb = ImmersedBodyObjects.size() - 1;
 
-            ImmersedBodyObjects[bb]->SetSolidElements(vecvecInt);
+            ImmersedBodyObjects[bb]->setSolidElements(vecvecInt);
 
             break;
 
@@ -654,7 +654,7 @@ void  HBSplineFEM::readInputData(std::ifstream &Ifile, MyString &line)
 
             bb = ImmersedBodyObjects.size() - 1;
 
-            ImmersedBodyObjects[bb]->SetBoundaryConditions(vecvecDbl);
+            ImmersedBodyObjects[bb]->setBoundaryConditions(vecvecDbl);
 
             break;
 
@@ -680,7 +680,7 @@ void  HBSplineFEM::readInputData(std::ifstream &Ifile, MyString &line)
 
             bb = ImmersedBodyObjects.size() - 1;
 
-            ImmersedBodyObjects[bb]->SetDataForOutput(vecvecInt);
+            ImmersedBodyObjects[bb]->setDataForOutput(vecvecInt);
 
             break;
 
@@ -813,15 +813,15 @@ void HBSplineFEM::prepareInputData()
     IBDOF = 0;
     for(bb=0;bb<ImmersedBodyObjects.size();bb++)
     {
-      if(ImmersedBodyObjects[bb]->IsBoundaryConditionTypeLagrange())
-        IBDOF += (ImmersedBodyObjects[bb]->GetNumNodes() * DIM);
+      if(ImmersedBodyObjects[bb]->isBoundaryConditionTypeLagrange())
+        IBDOF += (ImmersedBodyObjects[bb]->getNumberOfNodes() * DIM);
     }
 
     solidDOF = 0;
     if(!STAGGERED)
     {
       for(bb=0;bb<ImmersedBodyObjects.size();bb++)
-        solidDOF += ImmersedBodyObjects[bb]->GetTotalDOF();
+        solidDOF += ImmersedBodyObjects[bb]->getTotalDOF();
 
       solidDOF += contElemData.size();
     }
@@ -838,9 +838,9 @@ void HBSplineFEM::prepareInputData()
     
     SolnData.initialise(velDOF, presDOF, IBDOF, solidDOF);
 
-    SolnData.SetPhysicsTypetoFluid();
-    SolnData.SetTimeIncrementType(tis);
-    SolnData.SetRho(rhoInfty);
+    SolnData.setPhysicsTypetoFluid();
+    SolnData.setTimeIncrementType(tis);
+    SolnData.setSpectralRadius(rhoInfty);
     SolnData.SetStaggeredParams(stagParams);
 
     for(bb=0;bb<ImmersedBodyObjects.size();bb++)

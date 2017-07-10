@@ -11,9 +11,6 @@ using std::vector;
 
 void Lagrange_BasisFuns1D(int p, double xi, double* N, double* dN_dxi, double* d2N_dxi2)
 {
-  //int nen = p+1;
-  //N =zeros(nen,1); dN_dxi   = zeros(nen,1); d2N_dxi2 = zeros(nen,1);
-
   double  fact1, fact2, val1, val2, val3, val4;
 
   switch(p)
@@ -306,8 +303,6 @@ void computeLagrangeBFsLine1D(int p, double uu, double *xx, double *N, double *d
 
   Lagrange_BasisFuns1D(p, uu, N, &dN1[0]);
 
-  //cout << xx[0] << '\t' << xx[1] << endl;
-
   if(p == 0)
   {
     Jac = 1.0;
@@ -338,8 +333,6 @@ void computeLagrangeBFsLine2D(int p, double uu, double *xx, double* yy, double *
    vector<double>  dN1(nlbf);
 
    Lagrange_BasisFuns1D(p, uu, N, &dN1[0]);
-
-   //cout << xx[0] << '\t' << xx[1] << endl;
 
    if(p == 0)
    {
@@ -376,8 +369,6 @@ void computeLagrangeBFsLine3D(int p, double uu, double *xx, double* yy, double* 
 
    Lagrange_BasisFuns1D(p, uu, N, &dN1[0]);
 
-   //cout << xx[0] << '\t' << xx[1] << endl;
-
    if(p == 0)
    {
      Jac = 1.0;
@@ -404,31 +395,10 @@ void computeLagrangeBFsLine3D(int p, double uu, double *xx, double* yy, double* 
 }
 
 
-void  computeLagrangeBFs3(double uu, double *xx, double *yy, double *N)
-{
-   if(uu <= 0.0)
-   {
-     N[0] = 1.0;
-     N[1] = 0.0;
-   }
-   else
-   {
-     N[0] = 0.0;
-     N[1] = 1.0;
-   }
-  
-  return;
-}
-
-
-
 
 
 void LagrangeBasisFunsTria(int p, double xi, double zeta, double* N, double* dN_dxi, double* dN_dzeta)
 {
-  //int nen = p+1;
-  //N =zeros(nen,1); dN_dxi   = zeros(nen,1); d2N_dxi2 = zeros(nen,1);
-
   double  fact1, fact2, val1, val2, val3, val4;
   
   switch(p)
@@ -587,9 +557,6 @@ void LagrangeBasisFunsQuad(int p, double xi, double eta, double* N, double* dN_d
 
 void LagrangeBasisFunsTet(int p, double xi1, double xi2, double xi3, double* N, double* dN_dxi1, double* dN_dxi2, double* dN_dxi3)
 {
-  //int nen = p+1;
-  //N =zeros(nen,1); dN_dxi   = zeros(nen,1); d2N_dxi2 = zeros(nen,1);
-
   double  fact1, fact2, val1, val2, val3, val4;
   
   switch(p)

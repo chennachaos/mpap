@@ -52,9 +52,9 @@ void ImmersedSolid::adjustBoundaryPoints(double* minVal, double* maxVal)
 
 
 /*
-void  ImmersedSolid::SetImmersedFaces()
+void  ImmersedSolid::setImmersedFaces()
 {
-  cout << "  ImmersedSolid::SetImmersedFaces()  " << endl;
+  cout << "  ImmersedSolid::setImmersedFaces()  " << endl;
 
   // set the immersed faces for cutFEM purposes
 
@@ -220,7 +220,7 @@ void  ImmersedSolid::SetImmersedFaces()
       }
       else
       {
-        cout << " Error in ImmersedSolid::SetImmersedFaces()  " << endl;
+        cout << " Error in ImmersedSolid::setImmersedFaces()  " << endl;
       }
     }
 
@@ -266,7 +266,7 @@ void  ImmersedSolid::SetImmersedFaces()
 }
 
 
-void ImmersedSolid::UpdateImmersedFaces()
+void ImmersedSolid::updateImmersedFaces()
 {
   //if(totalDOF == 0)
     //return;
@@ -311,9 +311,9 @@ void ImmersedSolid::UpdateImmersedFaces()
 
 
 
-void  ImmersedSolid::SetImmersedFaces()
+void  ImmersedSolid::setImmersedFaces()
 {
-  //cout << "  ImmersedSolid::SetImmersedFaces()  " << endl;
+  //cout << "  ImmersedSolid::setImmersedFaces()  " << endl;
 
   // set the immersed faces for cutFEM purposes
 
@@ -500,7 +500,7 @@ void  ImmersedSolid::SetImmersedFaces()
       }
       else
       {
-        cout << " Error in ImmersedSolid::SetImmersedFaces()  " << endl;
+        cout << " Error in ImmersedSolid::setImmersedFaces()  " << endl;
       }
     }
 
@@ -540,7 +540,7 @@ void  ImmersedSolid::SetImmersedFaces()
 }
 
 
-void ImmersedSolid::UpdateImmersedFaces()
+void ImmersedSolid::updateImmersedFaces()
 {
   //if(totalDOF == 0)
     //return;
@@ -614,7 +614,7 @@ void ImmersedSolid::UpdateImmersedFaces()
       }
       else
       {
-        cout << " Error in ImmersedSolid::SetImmersedFaces()  " << endl;
+        cout << " Error in ImmersedSolid::setImmersedFaces()  " << endl;
       }
     }
 

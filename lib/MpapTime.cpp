@@ -13,8 +13,10 @@ using namespace std;
 
 
 
-void MpapTime::cut(void)
+void MpapTime::cut()
 { 
+  dtPrev = dt;
+  
   dt *= 0.5;
   
   stack.append(dt);
@@ -24,28 +26,41 @@ void MpapTime::cut(void)
 
 
 
-void MpapTime::stck(void)
+void MpapTime::stck()
 { 
   int m = stack.n;
 
-  if (m == 1) { dt = stack[0]; return; }
+  if(m < 1)
+    prgError(1,"MpapTime::stck","stack totally empty!");
+
+  dtPrev = dt;
+
+  if(m == 1)
+  {
+    dt = stack[0];
+    return;
+  }
  
-  if (m > 1)  { dt = stack[m-1]; stack.trunc(m-1); return; }
-  
-  if (m < 1)  prgError(1,"MpapTime::stck","stack totally empty!");
+  if(m > 1)
+  {
+    dt = stack[m-1];
+    stack.trunc(m-1);
+    return; 
+  }
 	
   return; 
 }
 
 
 
-void MpapTime::reset(void)
+void MpapTime::reset()
 { 
-  dt = -1.; 
-  cur = 0.; 
-  prev = -1.; 
-  prev2 = -2.; 
-  write = -1.;
+  dtPrev = -1.0;
+  dt = -1.0; 
+  cur = 0.0; 
+  prev = -1.0; 
+  prev2 = -2.0; 
+  write = -1.0;
   dtOK = false; 
   stack.free(); 
   

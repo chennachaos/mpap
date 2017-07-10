@@ -45,21 +45,21 @@ class  SolutionData
 
     ~SolutionData(){}
 
-    void SetTimeIncrementType(int ttt)
+    void setTimeIncrementType(int ttt)
     {  tis = ttt; }
 
-    void SetRho(double ttt)
+    void setSpectralRadius(double ttt)
     {  rho = ttt; }
 
     void  SetStaggeredParams(vector<double>&  vecTemp);
 
-    void  SetPhysicsTypetoSolid()
+    void  setPhysicsTypetoSolid()
     {
       PHYSICS_TYPE = PHYSICS_TYPE_SOLID;
       return;
     }
 
-    void  SetPhysicsTypetoFluid()
+    void  setPhysicsTypetoFluid()
     { 
       PHYSICS_TYPE = PHYSICS_TYPE_FLUID;
       return;

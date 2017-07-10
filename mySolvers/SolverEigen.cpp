@@ -5,8 +5,6 @@
 #include "Debug.h"
 #include "SolverEigen.h"
 #include "SolverPetsc.h"
-//#include "petscmat.h"
-//#include "petscksp.h"
 #include "SolverTime.h"
 #include "ComputerTime.h"
 #include "util.h"
@@ -22,7 +20,7 @@
 extern SolverTime      solverTime;
 extern ComputerTime    computerTime;
 
-//
+/*
 #define VIENNACL_WITH_EIGEN 1
 #define VIENNACL_WITH_OPENMP 1
 
@@ -41,7 +39,7 @@ extern ComputerTime    computerTime;
 typedef viennacl::compressed_matrix<double> SparseMatrixVCL;
 
 //using namespace viennacl::linalg;
-//
+*/
 
 
 using namespace std;
@@ -84,14 +82,14 @@ int SolverEigen::initialise(int p1, int p2, int p3)
    //mtx.resize(nRow, nCol);
 
    //cout << " AAAAAAAAAA " << endl;
-   //SetSolverAndParameters();
+   //setSolverAndParameters();
    //cout << " AAAAAAAAAA " << endl;
 
   return 0;
 }
 
 
-int SolverEigen::SetSolverAndParameters()
+int SolverEigen::setSolverAndParameters()
 {
     ///////////////////////
     // Create the linear solver and set various options
@@ -338,7 +336,7 @@ int  SolverEigen::solve()
 
   if( algoType == 3 )
   {
-    //
+    /*
     cout << " Solving with ViennaCL::BiCGSTAB " << endl;
     
     solnPrev = soln;
@@ -438,20 +436,20 @@ int  SolverEigen::solve()
     cout << " jjjjjjjjjjjjj " << endl;
 
     viennacl::copy(vcl_soln, soln);
-    //
+    */
   }
 
   if( algoType == 4 )
   {
-    //SolverSchurCG();
-    SolverSchurBiCGSTAB();
-    //SolverSchurGMRES();
+    //solverSchurCG();
+    solverSchurBiCGSTAB();
+    //solverSchurGMRES();
   }
 
   if( algoType == 5 )
   {
-    SolverUzawaType1();
-    //SolverSchurGMRES();
+    solverUzawaType1();
+    //solverSchurGMRES();
   }
 
   if( algoType == 6 )
@@ -537,7 +535,7 @@ int SolverEigen::factoriseAndSolve()
 
 
 
-int SolverEigen::AssembleMatrixAndVector(vector<int>& row, vector<int>& col, MatrixXd& Klocal, VectorXd& Flocal)
+int SolverEigen::assembleMatrixAndVector(vector<int>& row, vector<int>& col, MatrixXd& Klocal, VectorXd& Flocal)
 {
   int ii, jj;
   for(ii=0;ii<row.size();ii++)
@@ -555,7 +553,7 @@ int SolverEigen::AssembleMatrixAndVector(vector<int>& row, vector<int>& col, Mat
 
 
 
-int SolverEigen::AssembleMatrixAndVector(int start, int c1, vector<int>& vec1, vector<int>& vec2, MatrixXd& Klocal, VectorXd& Flocal)
+int SolverEigen::assembleMatrixAndVector(int start, int c1, vector<int>& vec1, vector<int>& vec2, MatrixXd& Klocal, VectorXd& Flocal)
 {
   // subroutine for mixed formulation
   // vec1 - for variable 'u'
@@ -609,7 +607,7 @@ int SolverEigen::AssembleMatrixAndVector(int start, int c1, vector<int>& vec1, v
 
 
 
-int SolverEigen::AssembleMatrixAndVector(int start, int c1, vector<int>& forAssy, MatrixXd& Klocal, VectorXd& Flocal)
+int SolverEigen::assembleMatrixAndVector(int start, int c1, vector<int>& forAssy, MatrixXd& Klocal, VectorXd& Flocal)
 {
   int ii, jj, aa, bb, size1, r, c;
 
@@ -647,7 +645,7 @@ int SolverEigen::AssembleMatrixAndVector(int start, int c1, vector<int>& forAssy
 
 
 
-int SolverEigen::AssembleVector(int start, int c1, vector<int>& vec1, VectorXd& Flocal)
+int SolverEigen::assembleVector(int start, int c1, vector<int>& vec1, VectorXd& Flocal)
 {
   int ii, jj;
 
@@ -661,7 +659,7 @@ int SolverEigen::AssembleVector(int start, int c1, vector<int>& vec1, VectorXd& 
 
 
 
-int SolverEigen::AssembleMatrixAndVectorCutFEM(int start, int c1, vector<int>& grid2cutfem_DOF, vector<int>& forAssy, MatrixXd& Klocal, VectorXd& Flocal)
+int SolverEigen::assembleMatrixAndVectorCutFEM(int start, int c1, vector<int>& grid2cutfem_DOF, vector<int>& forAssy, MatrixXd& Klocal, VectorXd& Flocal)
 {
   int ii, jj, size1, r;
 
@@ -714,7 +712,7 @@ int SolverEigen::AssembleMatrixAndVectorCutFEM(int start, int c1, vector<int>& g
 
 
 
-int SolverEigen::AssembleMatrixAndVectorCutFEM2(int start1, int start2, vector<int>& grid2cutfem_DOF, 
+int SolverEigen::assembleMatrixAndVectorCutFEM2(int start1, int start2, vector<int>& grid2cutfem_DOF, 
      vector<int>& forAssy1, vector<int>& forAssy2, MatrixXd& Klocal, VectorXd& Flocal1, VectorXd& Flocal2)
 {
   // to assemble coupling matrices arriving from 
@@ -753,7 +751,7 @@ int SolverEigen::AssembleMatrixAndVectorCutFEM2(int start1, int start2, vector<i
 
 
 
-int SolverEigen::AssembleMatrixAndVectorCutFEM3(int start1, int start2, vector<int>& row, vector<int>& col, 
+int SolverEigen::assembleMatrixAndVectorCutFEM3(int start1, int start2, vector<int>& row, vector<int>& col, 
      vector<int>& forAssy1, vector<int>& forAssy2, MatrixXd& Klocal, VectorXd& Flocal1)
 {
  

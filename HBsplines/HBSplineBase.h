@@ -11,7 +11,6 @@
 #include "headersVTK.h"
 #include "headersEigen.h"
 #include "ImmersedSolid.h"
-
 #include "SolverEigen.h"
 #include "SolverPetsc.h"
 
@@ -69,13 +68,10 @@ class HBSplineBase: public Domain
         vector<vector<double> >  DirichletBCs, NeumannBCs, DerivativeBCs, pointBCs, Iconds;
         vector<vector<double> >  refineLimitVals, FluidOutputData;
 
-
         vector<node*>  elems;
         //typedef boost::ptr_vector<base> container;
         //boost::ptr_vector<node>  elems;
-        
         //std::vector<std::unique_ptr<node> > elems;
-        
         //vector< std::tr1::shared_ptr<node> > elems;
 
         vector<int>  node_map_new_to_old;
@@ -83,7 +79,6 @@ class HBSplineBase: public Domain
 
         vector<int>  dof_map_new_to_old;
         vector<int>  dof_map_old_to_new;
-
 
         MyString   anlySolnType;
 
@@ -140,14 +135,14 @@ class HBSplineBase: public Domain
         //
         ///////////////////////////////////////////////////////////
 
-        int  GetMaxLevel()
+        int  getMaxLevel()
         {  return MAX_LEVEL;  }
            
-        bool IsLeaf(int nodenum)
+        bool isLeaf(int nodenum)
         {  return false;      }
 
-        bool IsActive(int nodenum)
-        {  return IsLeaf(nodenum);   }
+        bool isActive(int nodenum)
+        {  return isLeaf(nodenum);   }
         
         int getDimension()
         {  return DIM;        }
@@ -155,50 +150,50 @@ class HBSplineBase: public Domain
         int* getDegree()
         {  return  degree;        }
 
-        int GetNumberOfActiveElements()
+        int getNumberOfActiveElements()
         {  return  numActiveElem;        }
 
-        int GetNumberOfActiveBasisFunctions()
+        int getNumberOfActiveBasisFunctions()
         {  return numActiveBasis;        }
 
-        node*  GetRoot()
+        node*  getRoot()
         {  return  root;        }
 
-        void SetDimension(int dd)
+        void setDimension(int dd)
         {  ndm = DIM = dd;        }
 
         void setNdof(int dd)
         {  ndf = ndof = dd;        }
 
-        void  SetOrigin(double x0=0.0, double y0=0.0, double z0=0.0)
+        void  setOrigin(double x0=0.0, double y0=0.0, double z0=0.0)
         {
           origin[0] = x0;
           origin[1] = y0;
           origin[2] = z0;
         }
 
-        void  SetGridDimensions(double xl=1.0, double yl=1.0, double zl=1.0)
+        void  setGridDimensions(double xl=1.0, double yl=1.0, double zl=1.0)
         {
           gridLEN[0] = xl;
           gridLEN[1] = yl;
           gridLEN[2] = zl;
         }
 
-        void  SetBSplineDegree(int p1=1, int p2=0, int p3=0)
+        void  setBSplineDegree(int p1=1, int p2=0, int p3=0)
         {
           degree[0] = p1;
           degree[1] = p2;
           degree[2] = p3;
         }
 
-        void  SetNumberOfElements(int n1=1, int n2=1, int n3=1)
+        void  setNumberOfElements(int n1=1, int n2=1, int n3=1)
         {
           nelem[0] = n1;
           nelem[1] = n2;
           nelem[2] = n3;
         }
 
-        void  AddDirichletBCs(int side, int dof, double val, double PEN, int type, double fact)
+        void  addDirichletBCs(int side, int dof, double val, double PEN, int type, double fact)
         {
           int aa = DirichletBCs.size();
           vector<double>  vectemp(6);
@@ -212,7 +207,7 @@ class HBSplineBase: public Domain
           DirichletBCs[aa][5] = fact;
         }
 
-        void  AddNeumannBCs(int side, int dof, double val, double PEN, int type, double fact)
+        void  addNeumannBCs(int side, int dof, double val, double PEN, int type, double fact)
         {
           int aa = NeumannBCs.size();
           vector<double>  vectemp(6);
@@ -226,7 +221,7 @@ class HBSplineBase: public Domain
           NeumannBCs[aa][5] = fact;
         }
 
-        void  AddPointBCs(double xx, double yy, double zz, int dof, double val, double PEN)
+        void  addPointBCs(double xx, double yy, double zz, int dof, double val, double PEN)
         {
           int aa = pointBCs.size();
           vector<double>  vectemp(6);
@@ -240,12 +235,12 @@ class HBSplineBase: public Domain
           pointBCs[aa][5] = PEN;
         }
 
-        void SetFluidProperties(const vector<double>&  vectemp)
+        void setFluidProperties(const vector<double>&  vectemp)
         {
           fluidProps = vectemp;
         }
 
-        void SetControl(int tis1, double tol1, double rho1)
+        void setControl(int tis1, double tol1, double rho1)
         {
            tis = tis1;
            td[0] = rho1;
@@ -267,9 +262,9 @@ class HBSplineBase: public Domain
         //
         ///////////////////////////////////////////////////////////
 
-        void AssignBoundaryConditions();
+        void assignBoundaryConditions();
 
-        void ProcessBoundaryConditionsRefinedLevels();
+        void processBoundaryConditionsRefinedLevels();
 
         virtual void prepareInteractions();
 
@@ -281,14 +276,14 @@ class HBSplineBase: public Domain
 
         void  geometryToParametric(const myPoint& geom, myPoint& param);
 
-        double  ComputeGeometry(const int dir, double param);
+        double  computeGeometry(const int dir, double param);
 
-        void  ComputeGeometry(const myPoint& param, myPoint& geom);
+        void  computeGeometry(const myPoint& param, myPoint& geom);
 
-        void  BuildBase();
-        void  BuildBase1D();
-        void  BuildBase2D();
-        void  BuildBase3D();
+        void  buildBase();
+        void  buildBase1D();
+        void  buildBase2D();
+        void  buildBase3D();
 
         virtual void  printInfo();
 
@@ -304,27 +299,27 @@ class HBSplineBase: public Domain
             elems[ind]->printSelf();
         }
         
-        void   Refine(int kk);
+        void   refine(int kk);
         
-        void   ApplyRefinementProcess();
+        void   applyRefinementProcess();
         
         void   addGhostNodes(node* nd, int direction);
 
-        void   Algorithm1(int lev);
-        void   Algorithm2(int lev);
-        void   Algorithm3(int lev);
+        void   algorithm1(int lev);
+        void   algorithm2(int lev);
+        void   algorithm3(int lev);
 
-        void   Algorithm1_1D(int lev);
-        void   Algorithm2_1D(int lev);
-        void   Algorithm3_1D(int lev);
+        void   algorithm1_1D(int lev);
+        void   algorithm2_1D(int lev);
+        void   algorithm3_1D(int lev);
 
-        void   Algorithm1_2D(int lev);
-        void   Algorithm2_2D(int lev);
-        void   Algorithm3_2D(int lev);
+        void   algorithm1_2D(int lev);
+        void   algorithm2_2D(int lev);
+        void   algorithm3_2D(int lev);
 
-        void   Algorithm1_3D(int lev);
-        void   Algorithm2_3D(int lev);
-        void   Algorithm3_3D(int lev);
+        void   algorithm1_3D(int lev);
+        void   algorithm2_3D(int lev);
+        void   algorithm3_3D(int lev);
 
         virtual void readInputData(std::ifstream &, MyString &)
         { cout << " readInputData() ... is not defined for the class... " << endl; return; }
@@ -335,9 +330,9 @@ class HBSplineBase: public Domain
         virtual void  plotGaussPoints()
         { cout << " plotGaussPoints() ... is not defined for the class... " << endl; return; }
 
-        void  ImmersedBoundaryConditions2D1();
-        void  ImmersedBoundaryConditions2D2();
-        void  ImmersedBoundaryConditions2D3();
+        void  immersedBoundaryConditions2D1();
+        void  immersedBoundaryConditions2D2();
+        void  immersedBoundaryConditions2D3();
 
         void  createImmersedBoundaryPoints();
 
@@ -355,8 +350,8 @@ class HBSplineBase: public Domain
         void  refinementforAdvDiff1D();
         void  refinementforAdvDiff2D();
 
-        void  PointBasedRefinement(int kk);
-        void  LimitBasedRefinement(int kk);
+        void  pointBasedRefinement(int kk);
+        void  limitBasedRefinement(int kk);
 
         virtual  void  writeReadResult(int, MyString &)
         { cout << " writeReadResult() ... is not defined for the class... " << endl; return; }

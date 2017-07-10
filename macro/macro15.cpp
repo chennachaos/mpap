@@ -34,8 +34,20 @@ int macro15(Macro &macro)
   if (macro.strg == "init")
   {  
     mpapTime.dtOK     = true;
-    mpapTime.dt       = fabs(macro.p[0]);
-    mpapTime.dtMax    = fabs(macro.p[1]);
+
+    if(mpapTime.dt < 1.0e-10)
+    {
+      mpapTime.dt       = fabs(macro.p[0]);
+      mpapTime.dtMax    = fabs(macro.p[1]);
+      mpapTime.dtPrev   = mpapTime.dt;
+    }
+    else
+    {
+      mpapTime.dtPrev   = mpapTime.dt;
+      mpapTime.dt       = fabs(macro.p[0]);
+      mpapTime.dtMax    = fabs(macro.p[1]);      
+    }
+
     mpapTime.stack.free();
     mpapTime.stack.append(mpapTime.dt);
     if (mpapTime.dtMax < 1.e-15) mpapTime.dtMax = mpapTime.dt;

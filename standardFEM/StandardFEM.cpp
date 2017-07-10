@@ -542,18 +542,18 @@ void StandardFEM::prepareInputData()
     //
     ///////////////////////////////////////////////////////////////////
 
-    GeomData.SetDimension(DIM);
+    GeomData.setDimension(DIM);
     GeomData.setNdof(ndof);
 
     if(SolnData.ElemProp[elemConn[0][1]].id == 4 || SolnData.ElemProp[elemConn[0][1]].id ==  6 || 
        SolnData.ElemProp[elemConn[0][1]].id == 9 || SolnData.ElemProp[elemConn[0][1]].id == 12 || 
        SolnData.ElemProp[elemConn[0][1]].id == 13)
-      GeomData.SetNGP(SolnData.ElemProp[0].data[0]);
+      GeomData.setNGP(SolnData.ElemProp[0].data[0]);
     else
-      GeomData.SetNGP(1);
+      GeomData.setNGP(1);
 
     GeomData.build();
-    GeomData.SetNodalPositions(nodePosData);
+    GeomData.setNodalPositions(nodePosData);
 
     //cout << " AAAAAAAAAAAAAAAAA " << endl;
 
@@ -563,8 +563,8 @@ void StandardFEM::prepareInputData()
     //
     ///////////////////////////////////////////////////////////////////
 
-    SolnData.SetTimeIncrementType(tis);
-    SolnData.SetRho(rhoInfty);
+    SolnData.setTimeIncrementType(tis);
+    SolnData.setSpectralRadius(rhoInfty);
     SolnData.initialise(nNode*ndof, 0, 0, 0);
 
     vector<int>  solidElems, fluidElems;
@@ -607,12 +607,12 @@ void StandardFEM::prepareInputData()
 
     if( it != solidElems.end() )
     {
-      SolnData.SetPhysicsTypetoSolid();
+      SolnData.setPhysicsTypetoSolid();
       PHYSICS_TYPE = PHYSICS_TYPE_SOLID;
     }
     else
     {
-      SolnData.SetPhysicsTypetoFluid();
+      SolnData.setPhysicsTypetoFluid();
       PHYSICS_TYPE = PHYSICS_TYPE_FLUID;
     }
 
@@ -675,19 +675,19 @@ void StandardFEM::findMinMaxX(double *xmn, double *xmx, bool defFlg)
 }
 
 
-double  StandardFEM::ComputeGeometry(const int dir, double param)
+double  StandardFEM::computeGeometry(const int dir, double param)
 {
   return  0.0;
 }
 
 
-void  StandardFEM::ComputeGeometry(const myPoint& param, myPoint& geom)
+void  StandardFEM::computeGeometry(const myPoint& param, myPoint& geom)
 {
   return;
 }
 
 
-void StandardFEM::AssignBoundaryConditions()
+void StandardFEM::assignBoundaryConditions()
 {
 
 }  

@@ -28,12 +28,8 @@ class SolverEigen
 
     double normPrev, normCur, normRef; // norm of solution error
 
-    //IncompleteLUT<double>  precond1;
-
     myIncompleteLUT<double>  precond;
     
-    //SolverPardisoEigen  precond2;
-
     ////////////////////////////
     //
     // member functions
@@ -47,7 +43,7 @@ class SolverEigen
 
     virtual int initialise(int p1 = 0, int p2 = 0, int p3 = 0);
     
-    int SetSolverAndParameters();
+    int setSolverAndParameters();
     
     void setAlgorithmType(int tt)
     {  algoType = tt; return; }
@@ -64,21 +60,21 @@ class SolverEigen
 
     virtual double giveMatrixCoefficient(int,int);
 
-    virtual int AssembleMatrixAndVector(vector<int>& row, vector<int>& col, MatrixXd& Klocal, VectorXd& Flocal);
+    virtual int assembleMatrixAndVector(vector<int>& row, vector<int>& col, MatrixXd& Klocal, VectorXd& Flocal);
 
-    virtual int AssembleMatrixAndVector(int r1, int c1, vector<int>& row, vector<int>& col, MatrixXd& Klocal, VectorXd& Flocal);
+    virtual int assembleMatrixAndVector(int r1, int c1, vector<int>& row, vector<int>& col, MatrixXd& Klocal, VectorXd& Flocal);
     
-    virtual int AssembleMatrixAndVector(int r1, int c1, vector<int>& row, MatrixXd& Klocal, VectorXd& Flocal);
+    virtual int assembleMatrixAndVector(int r1, int c1, vector<int>& row, MatrixXd& Klocal, VectorXd& Flocal);
 
-    virtual int AssembleMatrixAndVectorCutFEM(int r1, int c1, vector<int>& tempVec, vector<int>& forAssy, MatrixXd& Klocal, VectorXd& Flocal);
+    virtual int assembleMatrixAndVectorCutFEM(int r1, int c1, vector<int>& tempVec, vector<int>& forAssy, MatrixXd& Klocal, VectorXd& Flocal);
 
-    virtual int AssembleMatrixAndVectorCutFEM2(int r1, int c1, vector<int>& tempVec, 
+    virtual int assembleMatrixAndVectorCutFEM2(int r1, int c1, vector<int>& tempVec, 
                 vector<int>& forAssy1, vector<int>& forAssy2, MatrixXd& Klocal, VectorXd& Flocal1, VectorXd& Flocal2);
 
-    virtual int AssembleMatrixAndVectorCutFEM3(int r1, int c1, vector<int>& row, vector<int>& col,
+    virtual int assembleMatrixAndVectorCutFEM3(int r1, int c1, vector<int>& row, vector<int>& col,
                 vector<int>& forAssy1, vector<int>& forAssy2, MatrixXd& Klocal, VectorXd& Flocal1);
 
-    virtual int AssembleVector(int r1, int c1, vector<int>& row, VectorXd& Flocal);
+    virtual int assembleVector(int r1, int c1, vector<int>& row, VectorXd& Flocal);
 
     virtual int factorise();
 
@@ -88,19 +84,19 @@ class SolverEigen
     
     void setupMatricesAndVectors();
     
-    void SolverSchurCG();
+    void solverSchurCG();
     
-    void SolverSchurGMRES();
+    void solverSchurGMRES();
     
-    void SolverSchurBiCGSTAB();
+    void solverSchurBiCGSTAB();
     
-    void SolverUzawaType1();
+    void solverUzawaType1();
     
-    void SolverUzawaType2();
+    void solverUzawaType2();
     
     int  myBiCGSTAB();
     
-    void  ResetPrecondFlag()
+    void resetPrecondFlag()
     {
       update_precond = 1;
     }

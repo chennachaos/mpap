@@ -317,9 +317,9 @@ void  HBSplineFEM::writeReadResult(int index, MyString &fileName)
 
       for(bb=0;bb<ImmersedBodyObjects.size();bb++)
       {
-          if( ImmersedBodyObjects[bb]->IsBoundaryConditionTypeLagrange() )
+          if( ImmersedBodyObjects[bb]->isBoundaryConditionTypeLagrange() )
           {
-          for(ii=0;ii<ImmersedBodyObjects[bb]->GetNumNodes();ii++)
+          for(ii=0;ii<ImmersedBodyObjects[bb]->getNumberOfNodes();ii++)
           {
             //ind = ImmersedBodyObjects[bb]->GlobalPointNumbers[ii];
             ind = ii;

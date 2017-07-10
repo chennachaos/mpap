@@ -69,7 +69,7 @@ void TreeNode<1>::calcStiffnessAndResidualCutFEMPoisson(MatrixXd& Klocal, Vector
           dN_dx = SubDivMat*dNN_dx;
         }
        
-        xx = GeomData->ComputeCoord(0, param[0]);
+        xx = GeomData->computeCoord(0, param[0]);
         
         if( xx <= 0.5)
         {
@@ -270,7 +270,7 @@ void TreeNode<1>::applyBoundaryConditionsAtApointCutFEMPoisson2(myDataIntegrateC
       dN_dx = SubDivMat*dNN_dx;
     }
 
-    xx = GeomData->ComputeCoord(0, uu);
+    xx = GeomData->computeCoord(0, uu);
     
     mu1 = 1.0;
     normal1  = 1.0;
@@ -367,7 +367,7 @@ void TreeNode<1>::applyDirichletBCsCutFEMPoisson(MatrixXd& Klocal, VectorXd& Flo
           dN_dx = SubDivMat*dNN_dx;
         }
 
-        xx = GeomData->ComputeCoord(0, param[0]);
+        xx = GeomData->computeCoord(0, param[0]);
         
         //specVal = analy.computeValue(dir, xx, 0.0);
 

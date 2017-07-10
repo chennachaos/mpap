@@ -2,6 +2,7 @@
 #include "AdaptiveBinarytree.h"
 #include "util.h"
 
+
 /*
 template<>
 void AdaptiveBinarytree<2>::computeGaussPoints(int flag, GaussQuadrature&  quadTemp)
@@ -35,7 +36,7 @@ void AdaptiveBinarytree<2>::computeGaussPoints(int flag, GaussQuadrature&  quadT
           //cout << gp << '\t' << GeomData->gausspoints[gp][0] << '\t' << GeomData->gausspoints[gp][1] << endl;
           //cout << gp << '\t' << param(0) << '\t' << param(1) << endl;
 
-          GeomData->ComputeCoord(param, geom);
+          GeomData->computeCoord(param, geom);
 
           if(flag) // add only those Gauss points which are in domain '0' // for fluid problems
           {
@@ -59,7 +60,7 @@ void AdaptiveBinarytree<2>::computeGaussPoints(int flag, GaussQuadrature&  quadT
           for(ii=0; ii<2; ii++)
             param[ii] = 0.5*(knots[ii][2] * 0.0 + knots[ii][3]);
 
-          GeomData->ComputeCoord(param, geom);
+          GeomData->computeCoord(param, geom);
 
           if(flag)
           {
@@ -93,9 +94,6 @@ void AdaptiveBinarytree<2>::computeGaussPoints(int flag, GaussQuadrature&  quadT
 
 
 
-
-
-
 template<>
 void AdaptiveBinarytree<2>::computeGaussPoints(int refLev2, int inclDom, int chkFlag, int mergeFlag, GaussQuadrature&  quadTemp)
 {
@@ -120,7 +118,7 @@ void AdaptiveBinarytree<2>::computeGaussPoints(int refLev2, int inclDom, int chk
           for(ii=0; ii<2; ii++)
             param[ii] = 0.5*(knots[ii][2] * GeomData->gausspoints[gp][ii] + knots[ii][3]);
 
-          GeomData->ComputeCoord(param, geom);
+          GeomData->computeCoord(param, geom);
 
             //if( GeomData->within(geom) == inclDom )
             //{
@@ -148,7 +146,7 @@ void AdaptiveBinarytree<2>::computeGaussPoints(int refLev2, int inclDom, int chk
             //cout << gp << '\t' << GeomData->gausspoints[gp][0] << '\t' << GeomData->gausspoints[gp][1] << endl;
             //cout << gp << '\t' << param(0) << '\t' << param(1) << endl;
 
-            GeomData->ComputeCoord(param, geom);
+            GeomData->computeCoord(param, geom);
 
               if( GeomData->within(geom) == inclDom )
               {
@@ -210,15 +208,13 @@ void AdaptiveBinarytree<2>::computeGaussPoints(int refLev2, int inclDom, int chk
 template<>
 void AdaptiveBinarytree<3>::computeGaussPoints2Dfor3D(int refLev2, int inclDom, int chkFlag, int mergeFlag, GaussQuadrature&  quadTemp)
 {
-cout << " isLeaf() ... 3D " << isLeaf() << endl;
-
+  cout << " isLeaf() ... 3D " << isLeaf() << endl;
   return;
 }
 
 template<>
 void AdaptiveBinarytree<2>::computeGaussPoints2Dfor3D(int refLev2, int inclDom, int chkFlag, int mergeFlag, GaussQuadrature&  quadTemp)
 {
-  //cout << " isLeaf() " << isLeaf() << endl;
   if( isLeaf() )
   {
     myPoint  param, geom;
@@ -243,7 +239,7 @@ void AdaptiveBinarytree<2>::computeGaussPoints2Dfor3D(int refLev2, int inclDom, 
           
           map2DPointTo3DPoint(sideTemp, param, param3);
 
-           //GeomData->ComputeCoord(param, geom);
+           //GeomData->computeCoord(param, geom);
            //cout << " Geom " << geom[0] << '\t' << geom[1] << '\t' << geom[2] << endl;
 
             //if( GeomData->within(geom) == inclDom )
@@ -274,7 +270,7 @@ void AdaptiveBinarytree<2>::computeGaussPoints2Dfor3D(int refLev2, int inclDom, 
 
             map2DPointTo3DPoint(sideTemp, param, param3);
 
-            GeomData->ComputeCoord(param, geom);
+            GeomData->computeCoord(param, geom);
 
               if( GeomData->within(geom) == inclDom )
               {
@@ -350,7 +346,7 @@ void AdaptiveBinarytree<2>::computeGaussPointsForMerging(int refLev2, int inclDo
           for(ii=0; ii<2; ii++)
             param[ii] = 0.5*(knots[ii][2] * GeomData->gausspoints[gp][ii] + knots[ii][3]);
 
-          GeomData->ComputeCoord(param, geom);
+          GeomData->computeCoord(param, geom);
 
           if( GeomData->within(geom) == inclDom )
           {
@@ -366,7 +362,7 @@ void AdaptiveBinarytree<2>::computeGaussPointsForMerging(int refLev2, int inclDo
           for(ii=0; ii<2; ii++)
             param[ii] = 0.5*(knots[ii][2] * 0.0 + knots[ii][3]);
 
-          GeomData->ComputeCoord(param, geom);
+          GeomData->computeCoord(param, geom);
 
           if( GeomData->within(geom) == inclDom )
           {
@@ -408,7 +404,7 @@ void AdaptiveBinarytree<2>::computeGaussPointsForMerging2Dfor3D(int refLev2, int
 
           map2DPointTo3DPoint(sideTemp, param, param3);
 
-          GeomData->ComputeCoord(param, geom);
+          GeomData->computeCoord(param, geom);
 
           if( GeomData->within(geom) == inclDom )
           {
@@ -426,7 +422,7 @@ void AdaptiveBinarytree<2>::computeGaussPointsForMerging2Dfor3D(int refLev2, int
 
           map2DPointTo3DPoint(sideTemp, param, param3);
 
-          GeomData->ComputeCoord(param, geom);
+          GeomData->computeCoord(param, geom);
 
           if( GeomData->within(geom) == inclDom )
           {
@@ -472,7 +468,7 @@ void AdaptiveBinarytree<3>::computeGaussPoints(int refLev2, int inclDom, int chk
           for(ii=0; ii<3; ii++)
             param[ii] = 0.5*(knots[ii][2] * GeomData->gausspoints[gp][ii] + knots[ii][3]);
 
-          GeomData->ComputeCoord(param, geom);
+          GeomData->computeCoord(param, geom);
 
             //if( GeomData->within(geom) == inclDom )
             //{
@@ -500,7 +496,7 @@ void AdaptiveBinarytree<3>::computeGaussPoints(int refLev2, int inclDom, int chk
             //cout << gp << '\t' << GeomData->gausspoints[gp][0] << '\t' << GeomData->gausspoints[gp][1] << endl;
             //cout << gp << '\t' << param(0) << '\t' << param(1) << endl;
 
-            GeomData->ComputeCoord(param, geom);
+            GeomData->computeCoord(param, geom);
 
               if( GeomData->within(geom) == inclDom )
               {
@@ -575,7 +571,7 @@ void AdaptiveBinarytree<3>::computeGaussPointsForMerging(int refLev2, int inclDo
           for(ii=0; ii<3; ii++)
             param[ii] = 0.5*(knots[ii][2] * GeomData->gausspoints[gp][ii] + knots[ii][3]);
 
-          GeomData->ComputeCoord(param, geom);
+          GeomData->computeCoord(param, geom);
 
           if( GeomData->within(geom) == inclDom )
           {
@@ -589,7 +585,7 @@ void AdaptiveBinarytree<3>::computeGaussPointsForMerging(int refLev2, int inclDo
           for(ii=0; ii<3; ii++)
             param[ii] = 0.5*(knots[ii][2] * 0.0 + knots[ii][3]);
 
-          GeomData->ComputeCoord(param, geom);
+          GeomData->computeCoord(param, geom);
 
           if( GeomData->within(geom) == inclDom )
           {

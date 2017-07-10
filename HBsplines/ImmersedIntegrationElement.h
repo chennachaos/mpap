@@ -3,7 +3,6 @@
 
 
 #include "util.h"
-
 #include "TreeNode.h"
 
 
@@ -31,12 +30,7 @@ class ImmersedIntegrationElement
         vector<int>  pointNums, posIndices, elemNums;
         vector<double>  gausspoints, gaussweights;
 
-        //double  positionOrig[ndim], positionCur[ndim], positionOld[ndim], param[ndim];
-
-        //VectorXd  U, dU, ddU, iU, Un, dUn, ddUn, iUn, force, param;
         myPoint  U, dU, ddU, iU, Un, dUn, ddUn, iUn, force, param;
-
-        //double  normal[ndim], force[ndim], forcePrev[ndim], forceCur[ndim], specVal[ndim];
 
         VectorXd  Flocal, Flocal2;
 
@@ -58,7 +52,7 @@ class ImmersedIntegrationElement
         static int  getCount()
         { return pointcount; }
 
-        void SetDimension(int dd)
+        void setDimension(int dd)
         {  DIM = dd; return;  }
 
         int getDimension()
@@ -67,10 +61,10 @@ class ImmersedIntegrationElement
         bool isActive()
         {  return (IS_ACTIVE == true);  }
 
-        void TurnIsActiveON()
+        void turnIsActiveON()
         {  IS_ACTIVE = true;  return ;  }
 
-        void TurnIsActiveOFF()
+        void turnIsActiveOFF()
         {  IS_ACTIVE = false;  return ;  }
 
         void  printSelf();
@@ -83,9 +77,9 @@ class ImmersedIntegrationElement
         
         void  computePointAtGP(int ind, myPoint& pt);
 
-        void  IntegrateForceAndMoment(VectorXd& vectemp, myPoint& centLoc);
+        void  integrateForceAndMoment(VectorXd& vectemp, myPoint& centLoc);
 
-        void  IntegrateForceFlexible(int ind1, int ind2, VectorXd& vectemp);
+        void  integrateForceFlexible(int ind1, int ind2, VectorXd& vectemp);
 
         void  computeKhorzKvertRigid(MatrixXd& tempMat, MatrixXd& tempMat2);
 
@@ -97,7 +91,7 @@ class ImmersedIntegrationElement
 
         void  assembleElementVector(int ind, bool flag, double* rhs);
 
-        void  AssembleMatrixAndVector(int, SparseMatrixXd&, double*);
+        void  assembleMatrixAndVector(int, SparseMatrixXd&, double*);
 
         void  prepareElemData();
 
@@ -107,7 +101,7 @@ class ImmersedIntegrationElement
 
         void  mapDataToGlobalBodyForceVector(bool flag, double* useThisData);
 
-        void reset();
+        void  reset();
 
         void  computeVelocity(const VectorXd& NN, myPoint&  velSpec);
 

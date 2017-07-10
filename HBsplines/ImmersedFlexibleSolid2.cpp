@@ -388,7 +388,7 @@ void ImmersedFlexibleSolid::prepareMatrixPattern()
 
 
 
-void ImmersedFlexibleSolid::SolveTimeStep()
+void ImmersedFlexibleSolid::solveTimeStep()
 {
   printf("\n Solving Immersed Flexible Solid \n");
   //printf("\n External force norm = %12.6E \n", forceCur.norm());
@@ -453,7 +453,7 @@ int ImmersedFlexibleSolid::calcStiffnessAndResidual(int printRes, bool zeroMtx, 
       //cout << " MMMMMMMMMMM " << endl;
       //elems[ee]->assembleElementVector(false, false, &(solver->rhsVec(0)), &(SolnData.reac(0)), 0, 0);
 
-      solver->AssembleMatrixAndVector(0, 0, elems[ee]->forAssyVec, Klocal, Flocal);
+      solver->assembleMatrixAndVector(0, 0, elems[ee]->forAssyVec, Klocal, Flocal);
   }
 
   //cout << " solver->rhsVec " << endl;        printVector(solver->rhsVec);
@@ -702,7 +702,7 @@ void ImmersedFlexibleSolid::calcCouplingMatrices()
 
 
 
-int ImmersedFlexibleSolid::AssembleGlobalMatrixAndVector(int start1, int start2, SparseMatrixXd& mtx, double* rhs)
+int ImmersedFlexibleSolid::assembleGlobalMatrixAndVector(int start1, int start2, SparseMatrixXd& mtx, double* rhs)
 {
   if(totalDOF <= 0)
     return 1;
@@ -784,7 +784,7 @@ int ImmersedFlexibleSolid::AppendSolidMatrixPatternCutFEM(int start1, int start2
 */
 
 
-int ImmersedFlexibleSolid::AssembleGlobalMatrixAndVectorCutFEM(int start1, int start2, SolverPetsc* solverTemp)
+int ImmersedFlexibleSolid::assembleGlobalMatrixAndVectorCutFEM(int start1, int start2, SolverPetsc* solverTemp)
 {
   int ee, ii, jj, ind;
 
@@ -797,7 +797,7 @@ int ImmersedFlexibleSolid::AssembleGlobalMatrixAndVectorCutFEM(int start1, int s
 
       elems[ee]->calcStiffnessAndResidual(Klocal, Flocal);
 
-      solverTemp->AssembleMatrixAndVector(start1, start2, elems[ee]->forAssyVec, elems[ee]->forAssyVec, Klocal, Flocal);
+      solverTemp->assembleMatrixAndVector(start1, start2, elems[ee]->forAssyVec, elems[ee]->forAssyVec, Klocal, Flocal);
   }
 
   //cout << " solver->rhsVec " << endl;        printVector(solver->rhsVec);

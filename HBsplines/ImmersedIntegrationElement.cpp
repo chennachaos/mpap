@@ -100,7 +100,7 @@ void ImmersedIntegrationElement::assembleElementMatrix(int index, SparseMatrixXd
 }
 
 
-void ImmersedIntegrationElement::AssembleMatrixAndVector(int start, SparseMatrixXd& mtx, double* rhs)
+void ImmersedIntegrationElement::assembleMatrixAndVector(int start, SparseMatrixXd& mtx, double* rhs)
 {
   return;
 }
@@ -197,7 +197,7 @@ void ImmersedIntegrationElement::computeAccelerationCur(const VectorXd& NN, myPo
 
 
 
-void ImmersedIntegrationElement::IntegrateForceAndMoment(VectorXd& vectemp, myPoint& centLoc)
+void ImmersedIntegrationElement::integrateForceAndMoment(VectorXd& vectemp, myPoint& centLoc)
 {
   // to compute total force on the immersed rigid solid
   
@@ -352,7 +352,7 @@ void ImmersedIntegrationElement::computeKhorzKvertRigid(MatrixXd& Kh, MatrixXd& 
 
 
 
-void ImmersedIntegrationElement::IntegrateForceFlexible(int ind1, int ind2, VectorXd& vectemp)
+void ImmersedIntegrationElement::integrateForceFlexible(int ind1, int ind2, VectorXd& vectemp)
 {
   // to compute force vector on the immersed flexible solid
 

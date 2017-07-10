@@ -125,9 +125,9 @@ void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
         dvol = gws[gp] * JacTemp;
 
-        geom[0] = GeomData->ComputeCoord(0, param[0]);
-        geom[1] = GeomData->ComputeCoord(1, param[1]);
-        geom[2] = GeomData->ComputeCoord(2, param[2]);
+        geom[0] = GeomData->computeCoord(0, param[0]);
+        geom[1] = GeomData->computeCoord(1, param[1]);
+        geom[2] = GeomData->computeCoord(2, param[2]);
 
         //cout << uu << '\t' << vv << endl;
         //cout << xx << '\t' << yy << endl;
@@ -456,9 +456,9 @@ void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
         dvol = gws[gp] * JacTemp;
 
-        geom[0] = GeomData->ComputeCoord(0, param[0]);
-        geom[1] = GeomData->ComputeCoord(1, param[1]);
-        geom[2] = GeomData->ComputeCoord(2, param[2]);
+        geom[0] = GeomData->computeCoord(0, param[0]);
+        geom[1] = GeomData->computeCoord(1, param[1]);
+        geom[2] = GeomData->computeCoord(2, param[2]);
 
         //cout << uu << '\t' << vv << endl;
         //cout << xx << '\t' << yy << endl;
@@ -877,9 +877,9 @@ void TreeNode<3>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
         dvol = gws[gp] * JacTemp;
 
-        geom[0] = GeomData->ComputeCoord(0, param[0]);
-        geom[1] = GeomData->ComputeCoord(1, param[1]);
-        geom[2] = GeomData->ComputeCoord(2, param[2]);
+        geom[0] = GeomData->computeCoord(0, param[0]);
+        geom[1] = GeomData->computeCoord(1, param[1]);
+        geom[2] = GeomData->computeCoord(2, param[2]);
 
         //cout << gp << '\t' << gps[gp][0] << '\t' << gps[gp][1] << '\t' << gws[gp] << '\t' << dvol << endl;
 
@@ -1444,7 +1444,7 @@ int TreeNode<3>::computeGaussPointsAdapIntegrationBoundary(int side, int refLev1
           e1 = 1;  e2 = 2;
           
           val1 = knots[0][0];
-          val2 = GeomData->ComputeCoord(0, 0.0);
+          val2 = GeomData->computeCoord(0, 0.0);
 
         break;
 
@@ -1453,7 +1453,7 @@ int TreeNode<3>::computeGaussPointsAdapIntegrationBoundary(int side, int refLev1
           e1 = 1;  e2 = 2;
           
           val1 = knots[0][1];
-          val2 = GeomData->ComputeCoord(0, 1.0);
+          val2 = GeomData->computeCoord(0, 1.0);
 
         break;
 
@@ -1462,7 +1462,7 @@ int TreeNode<3>::computeGaussPointsAdapIntegrationBoundary(int side, int refLev1
           e1 = 0;  e2 = 2;
 
           val1 = knots[1][0];
-          val2 = GeomData->ComputeCoord(1, 0.0);
+          val2 = GeomData->computeCoord(1, 0.0);
 
         break;
 
@@ -1471,7 +1471,7 @@ int TreeNode<3>::computeGaussPointsAdapIntegrationBoundary(int side, int refLev1
           e1 = 0;  e2 = 2;
 
           val1 = knots[1][1];
-          val2 = GeomData->ComputeCoord(1, 1.0);
+          val2 = GeomData->computeCoord(1, 1.0);
 
         break;
 
@@ -1480,7 +1480,7 @@ int TreeNode<3>::computeGaussPointsAdapIntegrationBoundary(int side, int refLev1
           e1 = 0;  e2 = 1;
 
           val1 = knots[2][0];
-          val2 = GeomData->ComputeCoord(2, 0.0);
+          val2 = GeomData->computeCoord(2, 0.0);
 
         break;
 
@@ -1489,7 +1489,7 @@ int TreeNode<3>::computeGaussPointsAdapIntegrationBoundary(int side, int refLev1
           e1 = 0;  e2 = 1;
 
           val1 = knots[2][1];
-          val2 = GeomData->ComputeCoord(2, 1.0);
+          val2 = GeomData->computeCoord(2, 1.0);
 
         break;
 
@@ -1504,13 +1504,13 @@ int TreeNode<3>::computeGaussPointsAdapIntegrationBoundary(int side, int refLev1
     //cout << " side = " << side << '\t' << e1 << '\t' << e2 << '\t' << val2 << endl;
 
     AdapIntgCellBoundary->setKnots(knots[e1][0], knots[e1][1], knots[e2][0], knots[e2][1]);
-    AdapIntgCellBoundary->SetSideTemp(side);
-    AdapIntgCellBoundary->SetParam3(val1);
-    AdapIntgCellBoundary->SetCoord3(val2);
+    AdapIntgCellBoundary->setSideTemp(side);
+    AdapIntgCellBoundary->setParam3(val1);
+    AdapIntgCellBoundary->setCoord3(val2);
 
     AdapIntgCellBoundary->GeomData = GeomData;
     AdapIntgCellBoundary->domNums = domNums;
-    AdapIntgCellBoundary->SetSplitDirection(-1);
+    AdapIntgCellBoundary->setSplitDirection(-1);
 
     //cout << " AAAAAAAAAA .... " << refLev1 << endl;
   
@@ -1630,9 +1630,9 @@ void TreeNode<3>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
 
             GeomData->computeBasisFunctions3D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy, dNN_dz);
 
-            geom[0] = GeomData->ComputeCoord(0, param[0]);
-            geom[1] = GeomData->ComputeCoord(1, param[1]);
-            geom[2] = GeomData->ComputeCoord(2, param[2]);
+            geom[0] = GeomData->computeCoord(0, param[0]);
+            geom[1] = GeomData->computeCoord(1, param[1]);
+            geom[2] = GeomData->computeCoord(2, param[2]);
 
             //printf(" %4d \t %4d \t %12.6f \t %12.6f \t %12.6f \n", side, dir, geom[0], geom[1], geom[2]);
 
@@ -1960,9 +1960,9 @@ void TreeNode<3>::applyNeumannBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal,
             //if(pout) printf(" knotsAtGPs = %12.6f \t xx = %12.6f \t yy = %12.6f \n", knotsAtGPs, xx, yy);
             //printf(" uu = %12.6f \t vv = %12.6f \t dvol = %12.6f \t volume = %12.6f \n", uu, vv, dvol, volume);
 
-            geom[0] = GeomData->ComputeCoord(0, param[0]);
-            geom[1] = GeomData->ComputeCoord(1, param[1]);
-            geom[2] = GeomData->ComputeCoord(2, param[2]);
+            geom[0] = GeomData->computeCoord(0, param[0]);
+            geom[1] = GeomData->computeCoord(1, param[1]);
+            geom[2] = GeomData->computeCoord(2, param[2]);
 
             //r = sqrt(xx*xx+yy*yy);
             //val = 1.0+log(2.0*r);

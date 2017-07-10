@@ -15,7 +15,7 @@ int  HBSplineBase::findCellNumber(const myPoint& geom)
 
   for(ii=0;ii<DIM;ii++)
   {
-    ind[ii] = int( (geom[ii]-origin[ii])/GeomData.GetGridDX(ii) );
+    ind[ii] = int( (geom[ii]-origin[ii])/GeomData.getGridDX(ii) );
 
     if(ind[ii] == nelem[ii])
       ind[ii] -= 1;
@@ -147,13 +147,13 @@ int  HBSplineBase::findCellNumber(const myPoint& geom)
 
 
 
-double  HBSplineBase::ComputeGeometry(const int dir, double param)
+double  HBSplineBase::computeGeometry(const int dir, double param)
 {
   return  (origin[dir] + gridLEN[dir]*param);
 }
 
 
-void  HBSplineBase::ComputeGeometry(const myPoint& param, myPoint& geom)
+void  HBSplineBase::computeGeometry(const myPoint& param, myPoint& geom)
 {
   for(int ii=0;ii<DIM;ii++)
     geom[ii] = origin[ii] + gridLEN[ii]*param[ii];
@@ -188,7 +188,7 @@ void HBSplineBase::setInitialConditions()
 
         elems[ee]->resetMatrixAndVector();
         elems[ee]->setInitialProfile();
-        //elems[ee]->AssembleMatrixAndVector(1, solver->mtx, &(rhsVec(0)));
+        //elems[ee]->assembleMatrixAndVector(1, solver->mtx, &(rhsVec(0)));
       }
     }
 
@@ -287,7 +287,7 @@ void HBSplineBase::setSolver(int slv, int *parm, bool cIO)
             if(solverEigen->initialise(0,0,totalDOF) != 0)
               return;
 
-            //solver->SetSolverAndParameters();
+            //solver->setSolverAndParameters();
 
             //solver->printInfo();
 
@@ -339,7 +339,7 @@ void HBSplineBase::setSolver(int slv, int *parm, bool cIO)
             if(solverPetsc->initialise(0, 0, totalDOF) != 0)
               return;
 
-            solverPetsc->SetSolverAndParameters();
+            solverPetsc->setSolverAndParameters();
 
             //solverPetsc->printInfo();
 
@@ -372,7 +372,7 @@ void HBSplineBase::setSolver(int slv, int *parm, bool cIO)
                 return;
             }
 
-            solverPetsc->SetSolverAndParameters();
+            solverPetsc->setSolverAndParameters();
 
             //solverPetsc->printInfo();
 

@@ -27,7 +27,7 @@ void GeomDataLagrange::build()
 }
 
 
-void GeomDataLagrange::SetNodalPositions(vector<myPoint>&  datatemp)
+void GeomDataLagrange::setNodalPositions(vector<myPoint>&  datatemp)
 {
   int ii, jj, ind;
   double  val;

@@ -2,8 +2,6 @@
 #ifndef incl_AdaptiveBinarytree_h
 #define incl_AdaptiveBinarytree_h
 
-
-
 #include "headersBasic.h"
 #include "util.h"
 #include "GeomDataHBSplines.h"
@@ -66,22 +64,22 @@ class AdaptiveBinarytree
         int getDimension()
         {  return DIM;}
 
-        void SetSideTemp(int dd)
+        void setSideTemp(int dd)
         {  sideTemp = dd;  return ;}
 
-        int GetSideTemp()
+        int getSideTemp()
         {  return sideTemp;}
 
-        void SetParam3(double dd)
+        void setParam3(double dd)
         {  param3 = dd;  return ;}
 
-        int GetParam3()
+        int getParam3()
         {  return param3; }
 
-        void SetCoord3(double dd)
+        void setCoord3(double dd)
         {  coord3 = dd;  return ;}
 
-        int GetCoord3()
+        int getCoord3()
         {  return coord3; }
 
         double  getVolume()
@@ -99,7 +97,7 @@ class AdaptiveBinarytree
         AdaptiveBinarytree_PTR  getParent()
         {  return parent; }
 
-        NodeOrientation  GetOrientation()
+        NodeOrientation  getOrientation()
         {  return  orientation; }
 
         int getNumberOfChildren()
@@ -156,31 +154,22 @@ class AdaptiveBinarytree
         double  getKnotAt(int dir, int loc)
         {  return  knots[dir][loc];  }
 
-        //void SetDomainNumber(int  dd)
-        //{ domainNum = dd;  } 
-
-        //int getDomainNumber()
-        //{  return domainNum; }
-
         int getDomainNumber()
         {  return ( (domNums.size() == 1) ? domNums[0] : -1); }
-
-        //bool isCutElement()
-        //{  return (domainNum == -1); }
 
         bool isCutElement()
         {  return (domNums.size() > 1); }
 
-        void SetSplitDirection(int  dd)
+        void setSplitDirection(int  dd)
         { splitDir = dd;  } 
 
-        int GetSplitDirection()
+        int getSplitDirection()
         {  return  splitDir; }
 
-        void SetSplitCount(int  dd)
+        void setSplitCount(int  dd)
         { splitCount = dd;  } 
 
-        int GetSplitCount()
+        int getSplitCount()
         {  return  splitCount; }
 
         bool  within(myPoint& pt);
@@ -296,7 +285,7 @@ void AdaptiveBinarytree<DIM>::prepareData()
     //cout << knots[0][0] << '\t' << knots[0][1] << '\t' << knots[0][2] << '\t' << knots[0][3] << endl;
     //cout << knots[1][0] << '\t' << knots[1][1] << '\t' << knots[1][2] << '\t' << knots[1][3] << endl;
 
-    JacMultElem = GeomData->GetJacobianFull();
+    JacMultElem = GeomData->getJacobianFull();
 
     for(int ii=0;ii<DIM;ii++)
     {
@@ -310,8 +299,8 @@ void AdaptiveBinarytree<DIM>::prepareData()
       //bbox.printSelf();
       //cout << " ii = " << ii << endl;
 
-      bbox.minBB[ii] = GeomData->ComputeCoord(ii, knots[ii][0]);
-      bbox.maxBB[ii] = GeomData->ComputeCoord(ii, knots[ii][1]);
+      bbox.minBB[ii] = GeomData->computeCoord(ii, knots[ii][0]);
+      bbox.maxBB[ii] = GeomData->computeCoord(ii, knots[ii][1]);
       //cout << bbox.minBB[ii] << '\t' << bbox.maxBB[ii] << endl;
 
       JacMultElem *= (0.5*knots[ii][2]);
@@ -326,44 +315,44 @@ void AdaptiveBinarytree<DIM>::prepareData()
          case 1:
 
                 bbox.minBB[0] = coord3 ;
-                bbox.minBB[1] = GeomData->ComputeCoord(1, knots[0][0]) ;
-                bbox.minBB[2] = GeomData->ComputeCoord(2, knots[1][0]) ;
+                bbox.minBB[1] = GeomData->computeCoord(1, knots[0][0]) ;
+                bbox.minBB[2] = GeomData->computeCoord(2, knots[1][0]) ;
 
                 bbox.maxBB[0] = coord3 ;
-                bbox.maxBB[1] = GeomData->ComputeCoord(1, knots[0][1]) ;
-                bbox.maxBB[2] = GeomData->ComputeCoord(2, knots[1][1]) ;
+                bbox.maxBB[1] = GeomData->computeCoord(1, knots[0][1]) ;
+                bbox.maxBB[2] = GeomData->computeCoord(2, knots[1][1]) ;
                 
-                JacMultElem /= GeomData->GetJacobian(0);
+                JacMultElem /= GeomData->getJacobian(0);
 
         break;
 
         case 2:
         case 3:
 
-                bbox.minBB[0] = GeomData->ComputeCoord(0, knots[0][0]) ;
+                bbox.minBB[0] = GeomData->computeCoord(0, knots[0][0]) ;
                 bbox.minBB[1] = coord3 ;
-                bbox.minBB[2] = GeomData->ComputeCoord(2, knots[1][0]) ;
+                bbox.minBB[2] = GeomData->computeCoord(2, knots[1][0]) ;
 
-                bbox.maxBB[0] = GeomData->ComputeCoord(0, knots[0][1]) ;
+                bbox.maxBB[0] = GeomData->computeCoord(0, knots[0][1]) ;
                 bbox.maxBB[1] = coord3 ;
-                bbox.maxBB[2] = GeomData->ComputeCoord(2, knots[1][1]) ;
+                bbox.maxBB[2] = GeomData->computeCoord(2, knots[1][1]) ;
                 
-                JacMultElem /= GeomData->GetJacobian(1);
+                JacMultElem /= GeomData->getJacobian(1);
 
         break;
 
         case 4:
         case 5:
 
-                bbox.minBB[0] = GeomData->ComputeCoord(0, knots[0][0]) ;
-                bbox.minBB[1] = GeomData->ComputeCoord(1, knots[1][0]) ;
+                bbox.minBB[0] = GeomData->computeCoord(0, knots[0][0]) ;
+                bbox.minBB[1] = GeomData->computeCoord(1, knots[1][0]) ;
                 bbox.minBB[2] = coord3 ;
 
-                bbox.maxBB[0] = GeomData->ComputeCoord(0, knots[0][1]) ;
-                bbox.maxBB[1] = GeomData->ComputeCoord(1, knots[1][1]) ;
+                bbox.maxBB[0] = GeomData->computeCoord(0, knots[0][1]) ;
+                bbox.maxBB[1] = GeomData->computeCoord(1, knots[1][1]) ;
                 bbox.maxBB[2] = coord3 ;
                 
-                JacMultElem /= GeomData->GetJacobian(2);
+                JacMultElem /= GeomData->getJacobian(2);
 
         break;
 

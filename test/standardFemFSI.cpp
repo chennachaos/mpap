@@ -88,23 +88,23 @@ int main(int argc, char* argv[])
       exit(1);
     }
 
-    sfemSolid.SetDimension(2);
+    sfemSolid.setDimension(2);
 
     sfemSolid.setNdof(2);
 
     sfemSolid.readFile( infileSolid );
 
-    sfemSolid.SetControl(tis, tol, rho);
+    sfemSolid.setControl(tis, tol, rho);
 
-    sfemSolid.SolnData.SetTimeIncrementType(tis);
+    sfemSolid.SolnData.setTimeIncrementType(tis);
 
-    sfemSolid.SolnData.SetRho(rho);
+    sfemSolid.SolnData.setSpectralRadius(rho);
 
     sfemSolid.SolnData.SetStaggeredParams(stagParams);
     
-    sfemSolid.SetPhysicsTypetoSolid();
+    sfemSolid.setPhysicsTypetoSolid();
 
-    sfemSolid.SetVTKfilename("FSIsolid");
+    sfemSolid.setVTKfilename("FSIsolid");
 
     //sfemSolid.prepareInputData();
   
@@ -122,7 +122,7 @@ int main(int argc, char* argv[])
 
     StandardFEM  sfemFluid;
 
-    sfemFluid.SetDimension(2);
+    sfemFluid.setDimension(2);
 
     sfemFluid.setNdof(3);
 
@@ -136,15 +136,15 @@ int main(int argc, char* argv[])
 
     sfemFluid.readFile( infileFluid );
 
-    sfemFluid.SetControl(tis, tol, rho);
+    sfemFluid.setControl(tis, tol, rho);
 
-    sfemFluid.SolnData.SetTimeIncrementType(tis);
+    sfemFluid.SolnData.setTimeIncrementType(tis);
 
-    sfemFluid.SolnData.SetRho(rho);
+    sfemFluid.SolnData.setSpectralRadius(rho);
 
-    sfemFluid.SetPhysicsTypetoFluid();
+    sfemFluid.setPhysicsTypetoFluid();
 
-    sfemFluid.SetVTKfilename("FSIfluid");
+    sfemFluid.setVTKfilename("FSIfluid");
 
     //sfemFluid.prepareInputData();
   
@@ -163,7 +163,7 @@ int main(int argc, char* argv[])
 
     StandardFEM  sfemMesh;
 
-    sfemMesh.SetDimension(2);
+    sfemMesh.setDimension(2);
 
     sfemMesh.setNdof(2);
 
@@ -177,15 +177,15 @@ int main(int argc, char* argv[])
 
     sfemMesh.readFile( infileMesh );
 
-    sfemMesh.SetControl(0, tol, rho);
+    sfemMesh.setControl(0, tol, rho);
 
-    sfemMesh.SolnData.SetTimeIncrementType(0);
+    sfemMesh.SolnData.setTimeIncrementType(0);
 
-    sfemMesh.SolnData.SetRho(rho);
+    sfemMesh.SolnData.setSpectralRadius(rho);
 
-    sfemMesh.SetPhysicsTypetoSolid();
+    sfemMesh.setPhysicsTypetoSolid();
 
-    sfemMesh.SetVTKfilename("FSIMesh");
+    sfemMesh.setVTKfilename("FSIMesh");
 
     //sfemFluid.prepareInputData();
   
@@ -286,7 +286,7 @@ int main(int argc, char* argv[])
 
         cout << " solving solid problem ... " << endl;
 
-        sfemSolid.SolveStep(niter);
+        sfemSolid.solveStep(niter);
 
         //printVector(sfemSolid.SolnData.var1Cur);
 
@@ -317,7 +317,7 @@ int main(int argc, char* argv[])
 
         cout << " solving mesh problem ... " << endl;
 
-        sfemMesh.SolveStep(niter);
+        sfemMesh.solveStep(niter);
 
         cout << " solving mesh problem ... DONE " << endl;
 
@@ -357,7 +357,7 @@ int main(int argc, char* argv[])
 
         cout << " solving fluid problem ... " << endl;
 
-        sfemFluid.SolveStep(niter);
+        sfemFluid.solveStep(niter);
 
         cout << " solving fluid problem ... DONE " << endl;
 

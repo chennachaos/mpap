@@ -111,20 +111,20 @@ void HBSplineCutFEM::plotGeomAdapIntegration2D(int val1, bool flag2, int col, bo
               uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
             }
 
-            if(adapNd2->GetOrientation() == -1)
+            if(adapNd2->getOrientation() == -1)
               adapNd3 = NULL;
             else
-              adapNd3 = adapNd2->getNeighbour(neigbour_map1[adapNd2->GetOrientation()]);
+              adapNd3 = adapNd2->getNeighbour(neigbour_map1[adapNd2->getOrientation()]);
 
-            while( adapNd2->GetOrientation() == NW )
+            while( adapNd2->getOrientation() == NW )
             {
               adapNd2 = adapNd2->getParent();
 
-              if(adapNd2->GetOrientation() == -1)
+              if(adapNd2->getOrientation() == -1)
                 adapNd3 = NULL;
               else
       	      {
-                adapNd3 = adapNd2->getNeighbour(neigbour_map1[adapNd2->GetOrientation()]);
+                adapNd3 = adapNd2->getNeighbour(neigbour_map1[adapNd2->getOrientation()]);
 	            }
             }
 
@@ -170,21 +170,21 @@ void HBSplineCutFEM::plotGeomAdapIntegration2D(int val1, bool flag2, int col, bo
               uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
             }
 
-            if(adapNd2->GetOrientation() == -1)
+            if(adapNd2->getOrientation() == -1)
               adapNd3 = NULL;
             else
-              adapNd3 = adapNd2->getNeighbour(neigbour_map2[adapNd2->GetOrientation()]);
+              adapNd3 = adapNd2->getNeighbour(neigbour_map2[adapNd2->getOrientation()]);
 
-            while( adapNd2->GetOrientation() == RIGHT )
+            while( adapNd2->getOrientation() == RIGHT )
             //while(adapNd3 == NULL)
             {
               adapNd2 = adapNd2->getParent();
 
-              if(adapNd2->GetOrientation() == -1)
+              if(adapNd2->getOrientation() == -1)
                 adapNd3 = NULL;
               else
       	      {
-                adapNd3 = adapNd2->getNeighbour(neigbour_map2[adapNd2->GetOrientation()]);
+                adapNd3 = adapNd2->getNeighbour(neigbour_map2[adapNd2->getOrientation()]);
 	            }
             }
 
@@ -308,25 +308,25 @@ void HBSplineCutFEM::plotGeomAdapIntegration3D(int val1, bool flag2, int col, bo
               uGridVTK->InsertNextCell(hexVTK->GetCellType(), hexVTK->GetPointIds());
             }
 
-            if(adapNd2->GetOrientation() == -1)
+            if(adapNd2->getOrientation() == -1)
               adapNd3 = NULL;
             else
-              adapNd3 = adapNd2->getNeighbour(neigbour_map1[adapNd2->GetOrientation()]);
+              adapNd3 = adapNd2->getNeighbour(neigbour_map1[adapNd2->getOrientation()]);
 
-            //cout <<  adapNd2->getID() << '\t' << adapNd2->GetOrientation() << endl;
-            while( adapNd2->GetOrientation() == SW_FRONT )
+            //cout <<  adapNd2->getID() << '\t' << adapNd2->getOrientation() << endl;
+            while( adapNd2->getOrientation() == SW_FRONT )
             //while(adapNd3 == NULL)
             {
               //cout << " inside IF " << endl;
               adapNd2 = adapNd2->getParent();
               //cout << " inside IF " << endl;
 
-              if(adapNd2->GetOrientation() == -1)
+              if(adapNd2->getOrientation() == -1)
                 adapNd3 = NULL;
               else
               {
-                //cout <<  adapNd2->getID() << '\t' << adapNd2->GetOrientation() << endl;
-                adapNd3 = adapNd2->getNeighbour(neigbour_map1[adapNd2->GetOrientation()]);
+                //cout <<  adapNd2->getID() << '\t' << adapNd2->getOrientation() << endl;
+                adapNd3 = adapNd2->getNeighbour(neigbour_map1[adapNd2->getOrientation()]);
               }
               //cout << adapNd2->getID() << endl;
             }
@@ -381,24 +381,24 @@ void HBSplineCutFEM::plotGeomAdapIntegration3D(int val1, bool flag2, int col, bo
               uGridVTK->InsertNextCell(hexVTK->GetCellType(), hexVTK->GetPointIds());
             //}
 
-            if(adapNd2->GetOrientation() == -1)
+            if(adapNd2->getOrientation() == -1)
               adapNd3 = NULL;
             else
-              adapNd3 = adapNd2->getNeighbour(neigbour_map2[adapNd2->GetOrientation()]);
+              adapNd3 = adapNd2->getNeighbour(neigbour_map2[adapNd2->getOrientation()]);
 
-            //cout <<  adapNd2->getID() << '\t' << adapNd2->GetOrientation() << endl;
-            while( adapNd2->GetOrientation() == RIGHT )
+            //cout <<  adapNd2->getID() << '\t' << adapNd2->getOrientation() << endl;
+            while( adapNd2->getOrientation() == RIGHT )
             {
               //cout << " inside IF " << endl;
               adapNd2 = adapNd2->getParent();
               //cout << " inside IF " << endl;
 
-              if(adapNd2->GetOrientation() == -1)
+              if(adapNd2->getOrientation() == -1)
                 adapNd3 = NULL;
               else
 	      {
-                //cout <<  adapNd2->getID() << '\t' << adapNd2->GetOrientation() << endl;
-                adapNd3 = adapNd2->getNeighbour(neigbour_map2[adapNd2->GetOrientation()]);
+                //cout <<  adapNd2->getID() << '\t' << adapNd2->getOrientation() << endl;
+                adapNd3 = adapNd2->getNeighbour(neigbour_map2[adapNd2->getOrientation()]);
 	      }
 
               //cout << adapNd2->getID() << endl;
@@ -508,7 +508,7 @@ void  HBSplineCutFEM::postProcessAdapIntegration1D(int vartype, int vardir, int 
                 d2N_dx2 = nd1->SubDivMat*d2NN_dx2;
               }
               
-              xx[0] = ComputeGeometry(0, uu[ii]);
+              xx[0] = computeGeometry(0, uu[ii]);
 
               pt[ii] = pointsVTK->InsertNextPoint(xx[0], 0.0, 0.0);
               
@@ -624,12 +624,12 @@ void  HBSplineCutFEM::postProcessAdapIntegration2D(int vartype, int vardir, int 
             for(jj=0;jj<vv.size();jj++)
             {
               param[1] = vv[jj];
-              geom[1] = ComputeGeometry(1, vv[jj]);
+              geom[1] = computeGeometry(1, vv[jj]);
 
               for(ii=0;ii<uu.size();ii++)
               {
                 param[0] = uu[ii];
-                geom[0] = ComputeGeometry(0, uu[ii]);
+                geom[0] = computeGeometry(0, uu[ii]);
 
                 pt[count] = pointsVTK->InsertNextPoint(geom[0], geom[1], 0.0);
 
@@ -773,11 +773,11 @@ void  HBSplineCutFEM::postProcessAdapIntegration2D(int vartype, int vardir, int 
             for(jj=0;jj<vv.size();jj++)
             {
               param[1] = vv[jj];
-              geom[1] = ComputeGeometry(1, vv[jj]);
+              geom[1] = computeGeometry(1, vv[jj]);
               for(ii=0;ii<uu.size();ii++)
               {
                 param[0] = uu[ii];
-                geom[0] = ComputeGeometry(0, uu[ii]);
+                geom[0] = computeGeometry(0, uu[ii]);
 
                 pt[count++] = pointsVTK->InsertNextPoint(geom[0], geom[1], 0.0);
 
@@ -908,23 +908,23 @@ void  HBSplineCutFEM::postProcessAdapIntegration2D(int vartype, int vardir, int 
               } // for(jj=0;jj<vv.size();jj++)
             } // if( (adapNd2->getDomainNumber() <= 0) )
 
-            if(adapNd2->GetOrientation() == -1)
+            if(adapNd2->getOrientation() == -1)
               adapNd3 = NULL;
             else
-              adapNd3 = adapNd2->getNeighbour(neigbour_map1[adapNd2->GetOrientation()]);
+              adapNd3 = adapNd2->getNeighbour(neigbour_map1[adapNd2->getOrientation()]);
 
-            //cout <<  adapNd2->getID() << '\t' << adapNd2->GetOrientation() << endl;
-            while( adapNd2->GetOrientation() == NW )
+            //cout <<  adapNd2->getID() << '\t' << adapNd2->getOrientation() << endl;
+            while( adapNd2->getOrientation() == NW )
             {
               adapNd2 = adapNd2->getParent();
 
-              if(adapNd2->GetOrientation() == -1)
+              if(adapNd2->getOrientation() == -1)
                 adapNd3 = NULL;
               else
               {
-                adapNd3 = adapNd2->getNeighbour(neigbour_map1[adapNd2->GetOrientation()]);
+                adapNd3 = adapNd2->getNeighbour(neigbour_map1[adapNd2->getOrientation()]);
               }
-            } //while( adapNd2->GetOrientation() == NW )
+            } //while( adapNd2->getOrientation() == NW )
 
             adapNd2 = adapNd3;
           } // if( adapNd2->isLeaf() )
@@ -1016,23 +1016,23 @@ void  HBSplineCutFEM::postProcessAdapIntegration2D(int vartype, int vardir, int 
               } // for(jj=0;jj<vv.size();jj++)
             } // if( (adapNd2->getDomainNumber() <= 0) )
 
-            if(adapNd2->GetOrientation() == -1)
+            if(adapNd2->getOrientation() == -1)
               adapNd3 = NULL;
             else
-              adapNd3 = adapNd2->getNeighbour(neigbour_map2[adapNd2->GetOrientation()]);
+              adapNd3 = adapNd2->getNeighbour(neigbour_map2[adapNd2->getOrientation()]);
 
-            //cout <<  adapNd2->getID() << '\t' << adapNd2->GetOrientation() << endl;
-            while( adapNd2->GetOrientation() == RIGHT )
+            //cout <<  adapNd2->getID() << '\t' << adapNd2->getOrientation() << endl;
+            while( adapNd2->getOrientation() == RIGHT )
             {
               adapNd2 = adapNd2->getParent();
 
-              if(adapNd2->GetOrientation() == -1)
+              if(adapNd2->getOrientation() == -1)
                 adapNd3 = NULL;
               else
       	      {
-                adapNd3 = adapNd2->getNeighbour(neigbour_map2[adapNd2->GetOrientation()]);
+                adapNd3 = adapNd2->getNeighbour(neigbour_map2[adapNd2->getOrientation()]);
 	            }
-            } //while( adapNd2->GetOrientation() == RIGHT )
+            } //while( adapNd2->getOrientation() == RIGHT )
 
             adapNd2 = adapNd3;
           } // if( adapNd2->isLeaf() )
@@ -1151,17 +1151,17 @@ void  HBSplineCutFEM::postProcessAdapIntegration3D(int vartype, int vardir, int 
             for(kk=0; kk<ww.size(); kk++)
             {
               param[2] = ww[kk];
-              geom[2] = ComputeGeometry(2, ww[kk]);
+              geom[2] = computeGeometry(2, ww[kk]);
 
             for(jj=0;jj<vv.size();jj++)
             {
               param[1] = vv[jj];
-              geom[1] = ComputeGeometry(1, vv[jj]);
+              geom[1] = computeGeometry(1, vv[jj]);
 
               for(ii=0;ii<uu.size();ii++)
               {
                 param[0] = uu[ii];
-                geom[0] = ComputeGeometry(0, uu[ii]);
+                geom[0] = computeGeometry(0, uu[ii]);
 
                 ptIds[count++] = pointsVTK->InsertNextPoint(geom[0], geom[1], geom[2]);
 
@@ -1259,17 +1259,17 @@ void  HBSplineCutFEM::postProcessAdapIntegration3D(int vartype, int vardir, int 
                 for(kk=0; kk<ww.size(); kk++)
                 {
                   param[2] = ww[kk];
-                  geom[2] = ComputeGeometry(2, ww[kk]);
+                  geom[2] = computeGeometry(2, ww[kk]);
 
                 for(jj=0;jj<vv.size();jj++)
                 {
                   param[1] = vv[jj];
-                  geom[1] = ComputeGeometry(1, vv[jj]);
+                  geom[1] = computeGeometry(1, vv[jj]);
 
                 for(ii=0;ii<uu.size();ii++)
                 {
                   param[0] = uu[ii];
-                  geom[0] = ComputeGeometry(0, uu[ii]);
+                  geom[0] = computeGeometry(0, uu[ii]);
 
                   ptIds[count++] = pointsVTK->InsertNextPoint(geom[0], geom[1], geom[2]);
 
@@ -1319,23 +1319,23 @@ void  HBSplineCutFEM::postProcessAdapIntegration3D(int vartype, int vardir, int 
 
             } // if( (adapNd2->getDomainNumber() <= 0) )
 
-            if(adapNd2->GetOrientation() == -1)
+            if(adapNd2->getOrientation() == -1)
               adapNd3 = NULL;
             else
-              adapNd3 = adapNd2->getNeighbour(neigbour_map1[adapNd2->GetOrientation()]);
-              //adapNd3 = adapNd2->getNeighbour(neigbour_map2[adapNd2->GetOrientation()]);
+              adapNd3 = adapNd2->getNeighbour(neigbour_map1[adapNd2->getOrientation()]);
+              //adapNd3 = adapNd2->getNeighbour(neigbour_map2[adapNd2->getOrientation()]);
 
-            while( adapNd2->GetOrientation() == SW_FRONT )
-            //while( adapNd2->GetOrientation() == RIGHT )
+            while( adapNd2->getOrientation() == SW_FRONT )
+            //while( adapNd2->getOrientation() == RIGHT )
             {
               adapNd2 = adapNd2->getParent();
 
-              if(adapNd2->GetOrientation() == -1)
+              if(adapNd2->getOrientation() == -1)
                 adapNd3 = NULL;
               else
               {
-                adapNd3 = adapNd2->getNeighbour(neigbour_map1[adapNd2->GetOrientation()]);
-                //adapNd3 = adapNd2->getNeighbour(neigbour_map2[adapNd2->GetOrientation()]);
+                adapNd3 = adapNd2->getNeighbour(neigbour_map1[adapNd2->getOrientation()]);
+                //adapNd3 = adapNd2->getNeighbour(neigbour_map2[adapNd2->getOrientation()]);
               }
             }
             adapNd2 = adapNd3;

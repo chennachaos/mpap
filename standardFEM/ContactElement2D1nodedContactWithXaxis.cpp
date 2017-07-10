@@ -1,8 +1,8 @@
 
 #include "ContactElement2D1nodedContactWithXaxis.h"
 #include "BasisFunctionsLagrange.h"
-
-#include "ImmersedSolid.h"
+#include "GeomDataLagrange.h"
+#include "SolutionData.h"
 
 
 using namespace std;
@@ -45,7 +45,7 @@ int ContactElement2D1nodedContactWithXaxis::calcStiffnessAndResidual(MatrixXd& K
     double  y1, y2, fact, tol=1.e-12, gn, af, cn=1.0, g0, d1;
 
     Yorig =  GeomData->NodePosOrig[nodeNums[0]][1];
-    disp  =  SolnData->var1Cur[nodeNums[0]*2-1];
+    disp  =  SolnData->var1Cur[nodeNums[0]*2+1];
     lamn  =  SolnData->var1Cur[GeomData->assy4r[forAssyVec[1]]];
 
     gn = - disp; // gn is penetration variable
@@ -78,7 +78,7 @@ int ContactElement2D1nodedContactWithXaxis::calcStiffnessAndResidual(MatrixXd& K
 
 
 /*
-void ContactElement2D1nodedContactWithXaxis::AssembleMatrixAndVector(int start, SparseMatrixXd& mtx, double* rhs)
+void ContactElement2D1nodedContactWithXaxis::assembleMatrixAndVector(int start, SparseMatrixXd& mtx, double* rhs)
 {
   int ii, jj, r;
   

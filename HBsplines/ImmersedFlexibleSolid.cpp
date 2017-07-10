@@ -120,7 +120,7 @@ void  ImmersedFlexibleSolid::prepareMatlProp()
 
 
 
-void  ImmersedFlexibleSolid::SetSolidElements(vector<vector<int> >& elemConn)
+void  ImmersedFlexibleSolid::setSolidElements(vector<vector<int> >& elemConn)
 {
     nElem = elemConn.size() ;
 
@@ -208,9 +208,9 @@ void  ImmersedFlexibleSolid::SetSolidElements(vector<vector<int> >& elemConn)
     //
     ///////////////////////////////////////////////////////////////////
 
-    GeomData.SetDimension(DIM);
+    GeomData.setDimension(DIM);
     GeomData.setNdof(ndof);
-    GeomData.SetNGP(1);
+    GeomData.setNGP(1);
     GeomData.build();
 
     ///////////////////////////////////////////////////////////////////
@@ -225,7 +225,7 @@ void  ImmersedFlexibleSolid::SetSolidElements(vector<vector<int> >& elemConn)
     totalDOF += nElem_Constraint;
 
     SolnData.initialise(totalDOF, 0, 0, 0);
-    SolnData.SetPhysicsTypetoSolid();
+    SolnData.setPhysicsTypetoSolid();
     
     fluidAcce.resize(totalDOF);
     fluidAcce.setZero();
@@ -241,7 +241,7 @@ void  ImmersedFlexibleSolid::SetSolidElements(vector<vector<int> >& elemConn)
 
 
 
-void  ImmersedFlexibleSolid::SetNodalPositions(vector<vector<double> >&  datatemp)
+void  ImmersedFlexibleSolid::setNodalPositions(vector<vector<double> >&  datatemp)
 {
   nNode = datatemp.size() ;
 
@@ -289,7 +289,7 @@ void  ImmersedFlexibleSolid::SetNodalPositions(vector<vector<double> >&  datatem
 
 
 /*
-void  ImmersedFlexibleSolid::SetNodeType(vector<vector<int> >& datatemp)
+void  ImmersedFlexibleSolid::setNodeType(vector<vector<int> >& datatemp)
 {  
   int ii, jj, val;
   vector<int>::iterator itint;
@@ -314,7 +314,7 @@ void  ImmersedFlexibleSolid::SetNodeType(vector<vector<int> >& datatemp)
 
 
 
-void  ImmersedFlexibleSolid::SetBoundaryConditions(vector<vector<double> >& datatemp)
+void  ImmersedFlexibleSolid::setBoundaryConditions(vector<vector<double> >& datatemp)
 {  
   int ii, jj, val;
   
@@ -356,7 +356,8 @@ void ImmersedFlexibleSolid::writeOutput()
     return;
   }
 
-  int  bb, type, nn2=0, dof;
+  int  bb, type, nn2=0, dof, ii, kk;
+  double  val_out=0.0;
 
   for(bb=0; bb<OutputData.size(); bb++)
   {
@@ -373,7 +374,7 @@ void ImmersedFlexibleSolid::writeOutput()
     {
       case  1 : // total force on the
 
-            //if(IsBoundaryConditionTypeLagrange())
+            //if(isBoundaryConditionTypeLagrange())
               //computeTotalForce();
 
             sprintf(tmp," \t %12.6E", totalForce[dof]);
@@ -402,6 +403,17 @@ void ImmersedFlexibleSolid::writeOutput()
 
              sprintf(tmp," \t %12.6E", SolnData.var1DotDot[nn2*ndof+dof]);
 
+      break;
+
+      case  6 : // sum of contact forces
+
+             kk = nNode*ndof;
+             val_out=0.0;
+             for(ii=0; ii<nElem_Constraint; ii++)
+             {
+               val_out += SolnData.var1[kk+ii];
+             }
+             sprintf(tmp," \t %12.6E", val_out);
       break;
 
       default : 
@@ -717,12 +729,12 @@ void ImmersedFlexibleSolid::updateForce()
 
    SolnData.forceTemp.setZero();
 
-    if(IsBoundaryConditionTypeLagrange())
+    if(isBoundaryConditionTypeLagrange())
     {
       for(aa=0;aa<ImmIntgElems.size();aa++)
       {
         //cout << " aa " << aa << endl;
-        ImmIntgElems[aa]->IntegrateForceFlexible(0, 0, SolnData.forceTemp);
+        ImmIntgElems[aa]->integrateForceFlexible(0, 0, SolnData.forceTemp);
         //printVector(vectemp);
       }
     }

@@ -28,35 +28,9 @@ void GaussQuadrature::reset()
 
   gausspoints.clear();
   gaussweights.clear();
-  
-  //vector<myPoint>().swap(gausspoints);   // clear x reallocating
-  //vector<double>().swap(gaussweights);
 
   return;
 }
 
-
-
-
-
-/*
-template <>
-void GaussQuadrature<1>::SetGaussPoints(int nn )
-{
-  return;
-}
-
-template <>
-void GaussQuadrature<2>::SetGaussPoints(int nn )
-{
-  return;
-}
-
-template <>
-void GaussQuadrature<3>::SetGaussPoints(int nn )
-{
-  return;
-}
-*/
 
 

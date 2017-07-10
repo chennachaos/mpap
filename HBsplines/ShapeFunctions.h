@@ -17,15 +17,15 @@ class ShapeFunctions
 
     ShapeFunctions() {}
 
-    void Initialise(int p);
+    void initialise(int p);
     
-    void Initialise(int p, int q);
+    void initialise(int p, int q);
     
-    void Initialise(int p, int q, int r);
+    void initialise(int p, int q, int r);
 
     ~ShapeFunctions() {}
     
-    void SetDimension(int d)
+    void setDimension(int d)
     {
       DIM = d;
     }

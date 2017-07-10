@@ -396,9 +396,9 @@ void MyString::print(void)
 
 
 #ifndef WINDOWS
-  #define DIRECTORY_LETTERS "/1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_~"
+  #define DIRECTORY_LETTERS "/1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_~."
 #else
-  #define DIRECTORY_LETTERS "\\1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_:"
+  #define DIRECTORY_LETTERS "\\1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_:."
 #endif
 #define FILE_LETTERS "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_."
 

@@ -1,6 +1,5 @@
 
 #include "GeomDataHBSplines.h"
-
 #include "ComputerTime.h"
 #include "TimeFunction.h"
 #include "MpapTime.h"
@@ -9,8 +8,6 @@
 #include "ShapeFunctions.h"
 #include "DistFunctions.h"
 #include "Functions.h"
-//#include "headersBoost.h"
-
 #include "BasisFunctionsBSpline.h"
 
 extern ComputerTime       computerTime;
@@ -36,18 +33,6 @@ GeomDataHBSplines::~GeomDataHBSplines()
     delete *pObj; // Note that this is deleting what pObj points to, which is a pointer
   }
   distFuncs.clear(); // Purge the contents so no one tries to delete them again
-
-  /*
-  for(int ii=0;ii<ROWS;ii++)
-    {
-      delete [] ders1[ii];
-      delete [] ders2[ii];
-      delete [] ders3[ii];
-    }
-    delete [] ders1;
-    delete [] ders2;
-    delete [] ders3;
-  */
 }
 
 
@@ -86,8 +71,6 @@ void GeomDataHBSplines::build()
     GenerateCoeffMatrices(degree[0], coeffLeft, coeffRight);
 
     getGaussPoints1D(nGP[0], gausspoints1, gaussweights1);
-    //getGaussPoints1D(nGP[0], gausspoints2, gaussweights2);
-    //getGaussPoints1D(nGP[0], gausspoints3, gaussweights3);
     gausspoints2 = gausspoints1;
     gausspoints3 = gausspoints1;
     
@@ -151,8 +134,6 @@ void GeomDataHBSplines::build()
       gausspoints.resize(ind);
       gaussweights.resize(ind);
 
-      //cout << DIM << '\t' << ind << endl;
-  
       ind=0;
       for(kk=0; kk<nGP[0]; kk++)
       {
@@ -213,26 +194,6 @@ void GeomDataHBSplines::build()
     gwsLeft.push_back(1.0);
     gwsRight.push_back(1.0);
 
-    /*
-    printMatrix(coeffLeft);
-    printf("\n\n");
-    printMatrix(coeffRight);
-    */
-/*
-    ROWS = 3;
-
-    ders1 = new double*[ROWS];
-    ders2 = new double*[ROWS];
-    ders3 = new double*[ROWS];
-
-    for(ii=0;ii<ROWS;ii++)
-    {
-       ders1[ii] = new double[degree[0]+1];
-       ders2[ii] = new double[degree[1]+1];
-       ders3[ii] = new double[degree[2]+1];
-    }
-*/
-
 //
     double  du = 1.0/nelem[0];
     double  dv = 1.0/nelem[1];
@@ -275,7 +236,7 @@ void GeomDataHBSplines::build()
         {
           param[0] = val1 * gausspoints1[gp1] + val2;
 
-          shpfns[lev][ind].Initialise(degree[0], degree[1]);
+          shpfns[lev][ind].initialise(degree[0], degree[1]);
 
           computeBasisFunctions2D(knotBegin, knotIncr, param, shpfns[lev][ind].N, 
                                     shpfns[lev][ind].dN_dx, shpfns[lev][ind].dN_dy,
@@ -287,7 +248,6 @@ void GeomDataHBSplines::build()
           //printf("\n\n\n");
           //printVector(shpfns[lev][ind].dN_dy);
           //printf("\n\n\n");
-
 
           ind++;
         }
@@ -306,7 +266,7 @@ void GeomDataHBSplines::build()
         {
           param[0] = val1 * gausspoints1[gp1] + val2;
 
-          shpfns[lev][ind].Initialise(degree[0], degree[1], degree[2]);
+          shpfns[lev][ind].initialise(degree[0], degree[1], degree[2]);
 
           computeBasisFunctions3D(knotBegin, knotIncr, param, shpfns[lev][ind].N, 
                         shpfns[lev][ind].dN_dx,   shpfns[lev][ind].dN_dy,   shpfns[lev][ind].dN_dz,
@@ -346,15 +306,10 @@ void GeomDataHBSplines::build()
     boundaryNormals.resize(6);
 
     boundaryNormals[0][0] = -1.0; boundaryNormals[0][1] =  0.0; boundaryNormals[0][2] =  0.0;
-
     boundaryNormals[1][0] =  1.0; boundaryNormals[1][1] =  0.0; boundaryNormals[1][2] =  0.0;
-
     boundaryNormals[2][0] =  0.0; boundaryNormals[2][1] = -1.0; boundaryNormals[2][2] =  0.0;
-
     boundaryNormals[3][0] =  0.0; boundaryNormals[3][1] =  1.0; boundaryNormals[3][2] =  0.0;
-
     boundaryNormals[4][0] =  0.0; boundaryNormals[4][1] =  0.0; boundaryNormals[4][2] = -1.0;
-
     boundaryNormals[5][0] =  0.0; boundaryNormals[5][1] =  0.0; boundaryNormals[5][2] =  1.0;
 
     // set boundary Jacobians
@@ -387,9 +342,7 @@ void GeomDataHBSplines::build()
     if(DIM == 3)
     {
       val1 = 0.25 * dv * dw * Jacobian[1] * Jacobian[2];
-      
       val2 = 0.25 * du * dw * Jacobian[0] * Jacobian[2];
-
       val3 = 0.25 * du * dv * Jacobian[0] * Jacobian[1];
 
       for(lev=0; lev<10; lev++)
@@ -668,7 +621,6 @@ void GeomDataHBSplines::initialise(int size1, int size2, int size3, int size4)
 
 void GeomDataHBSplines::printSelf()
 {
-//   cout << " Degree and Jacobian " << degree[0] << '\t' << Jfull << endl;
    return;
 }
 
@@ -695,6 +647,7 @@ void GeomDataHBSplines::computeBasisFunctions1D(const myPoint& start, const myPo
 
     //  dx_du = J;
     //  du_dx = 1.0/dx_du
+    // So,
 
     double  du_dx = 1.0/Jacobian[0];
     
@@ -815,7 +768,6 @@ void GeomDataHBSplines::computeBasisFunctions2D(const myPoint& start, const myPo
 void GeomDataHBSplines::computeBasisFunctions2D(const myPoint& start, const myPoint& incr, const myPoint& param, 
 					   VectorXd& N, VectorXd& dN_dx, VectorXd& dN_dy)
 {
-    //cout << " degree[0] " << degree[0] << '\t' << degree[1] << endl;
     int ROWS = 2, ii, jj, count;
 
     double** ders1 = new double*[ROWS];
@@ -826,10 +778,10 @@ void GeomDataHBSplines::computeBasisFunctions2D(const myPoint& start, const myPo
        ders1[ii] = new double[degree[0]+1];
        ders2[ii] = new double[degree[1]+1];
     }
-    //cout << " degree[0] " << degree[0] << '\t' << degree[1] << endl;
+
     HB_DersBasisFuns(degree[0], start[0], incr[0], param[0], 1, ders1);
     HB_DersBasisFuns(degree[1], start[1], incr[1], param[1], 1, ders2);
-    //cout << " 222222222222222 " << endl;
+
     double  fact3, fact4;
     
     count = 0;
@@ -847,7 +799,7 @@ void GeomDataHBSplines::computeBasisFunctions2D(const myPoint& start, const myPo
           count++;
       }
     }
-    //cout << " 222222222222222 " << endl;
+
     for(ii=0;ii<ROWS;ii++)
     {
       delete [] ders1[ii];
@@ -865,12 +817,12 @@ void GeomDataHBSplines::computeBasisFunctions2D(const myPoint& start, const myPo
 void GeomDataHBSplines::computeBasisFunctionsGhostPenalty2D(const myPoint& start, const myPoint& incr, const myPoint& param, 
 					   VectorXd& N, VectorXd& dN_dx, VectorXd& dN_dy)
 {
-  // derivatives of the basis functions
-  // for ghost-penalty terms
-  // 
-  // compute the highest non-zero derivatives 
-  // for the corresponding degree of B-Splines
-  // 
+    // derivatives of the basis functions
+    // for ghost-penalty terms
+    // 
+    // compute the highest non-zero derivatives 
+    // for the corresponding degree of B-Splines
+    // 
 
     int ROWS = (degree[0]+1), ii, jj, count;
 
@@ -935,12 +887,12 @@ void GeomDataHBSplines::computeBasisFunctionsGhostPenalty2D(const myPoint& start
 void GeomDataHBSplines::computeBasisFunctionsGhostPenalty3D(const myPoint& start, const myPoint& incr, const myPoint& param, 
 					   VectorXd& N, VectorXd& dN_dx, VectorXd& dN_dy, VectorXd& dN_dz)
 {
-  // derivatives of the basis functions
-  // for ghost-penalty terms
-  // 
-  // compute the highest non-zero derivatives 
-  // for the corresponding degree of B-Splines
-  // 
+    // derivatives of the basis functions
+    // for ghost-penalty terms
+    // 
+    // compute the highest non-zero derivatives 
+    // for the corresponding degree of B-Splines
+    // 
 
     int ROWS = (degree[0]+1), ii, jj, kk, count;
 
@@ -1333,8 +1285,6 @@ int  GeomDataHBSplines::doIntersect2D(AABB& bbTemp, bool flag, vector<int>& vecT
         ff = false;
       }
       
-      //cout << " ff = " << ff << '\t' << domTemp << endl;
-      
       if(ff)
         break;
     }
@@ -1373,8 +1323,6 @@ int  GeomDataHBSplines::doIntersect2Dfor3D(int sideTemp, double coord3, AABB& bb
         domVec.push_back(domTemp);
         ff = false;
       }
-      
-      //cout << " ff = " << ff << '\t' << domTemp << endl;
       
       if(ff)
         break;
@@ -1415,8 +1363,6 @@ int  GeomDataHBSplines::doIntersect3D(AABB& bbTemp, bool flag, vector<int>& vecT
         domVec.push_back(domTemp);
         ff = false;
       }
-      
-      //cout << " ff = " << ff << '\t' << domTemp << endl;
       
       if(ff)
         break;

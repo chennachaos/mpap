@@ -129,11 +129,11 @@ void HBSplineCutFEM::plotGeomSubTrias1D(int val1, bool flag2, int col, bool PLOT
           tmp = elems[ii]->getKnots(0);
 
           param[0] = tmp[0];
-          ComputeGeometry(param, geom);
+          computeGeometry(param, geom);
           pt0 = pointsVTK->InsertNextPoint(geom[0], 0.0, 0.0);
 
           param[0] = tmp[1];
-          ComputeGeometry(param, geom);
+          computeGeometry(param, geom);
           pt1 = pointsVTK->InsertNextPoint(geom[0], 0.0, 0.0);
           
           vertexVTK->GetPointIds()->SetId(0, pt0);
@@ -443,12 +443,12 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
             for(jj=0;jj<vv.size();jj++)
             {
               param[1] = vv[jj];
-              geom[1] = ComputeGeometry(1, vv[jj]);
+              geom[1] = computeGeometry(1, vv[jj]);
 
               for(ii=0;ii<uu.size();ii++)
               {
                 param[0] = uu[ii];
-                geom[0] = ComputeGeometry(0, uu[ii]);
+                geom[0] = computeGeometry(0, uu[ii]);
 
                 pt[count] = pointsVTK->InsertNextPoint(geom[0], geom[1], 0.0);
 
@@ -590,11 +590,11 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
             for(jj=0;jj<vv.size();jj++)
             {
               param[1] = vv[jj];
-              geom[1] = ComputeGeometry(1, vv[jj]);
+              geom[1] = computeGeometry(1, vv[jj]);
               for(ii=0;ii<uu.size();ii++)
               {
                 param[0] = uu[ii];
-                geom[0] = ComputeGeometry(0, uu[ii]);
+                geom[0] = computeGeometry(0, uu[ii]);
 
                 pt[count++] = pointsVTK->InsertNextPoint(geom[0], geom[1], 0.0);
 
@@ -789,12 +789,12 @@ void  HBSplineCutFEM::postProcessSubTrias3D(int vartype, int vardir, int nCol, b
           for(jj=0;jj<vv.size();jj++)
           {
               param[1] = vv[jj];
-              geom[1] = ComputeGeometry(1, vv[jj]);
+              geom[1] = computeGeometry(1, vv[jj]);
 
               for(ii=0;ii<uu.size();ii++)
               {
                 param[0] = uu[ii];
-                geom[0] = ComputeGeometry(0, uu[ii]);
+                geom[0] = computeGeometry(0, uu[ii]);
 
                 pt[count] = pointsVTK->InsertNextPoint(geom[0], geom[1], 0.0);
 
@@ -936,17 +936,17 @@ void  HBSplineCutFEM::postProcessSubTrias3D(int vartype, int vardir, int nCol, b
             for(kk=0; kk<ww.size(); kk++)
             {
               param[2] = ww[kk];
-              geom[2] = ComputeGeometry(2, ww[kk]);
+              geom[2] = computeGeometry(2, ww[kk]);
 
             for(jj=0;jj<vv.size();jj++)
             {
               param[1] = vv[jj];
-              geom[1] = ComputeGeometry(1, vv[jj]);
+              geom[1] = computeGeometry(1, vv[jj]);
 
               for(ii=0;ii<uu.size();ii++)
               {
                 param[0] = uu[ii];
-                geom[0] = ComputeGeometry(0, uu[ii]);
+                geom[0] = computeGeometry(0, uu[ii]);
 
                 pt[count++] = pointsVTK->InsertNextPoint(geom[0], geom[1], geom[2]);
 
@@ -1133,7 +1133,7 @@ void HBSplineCutFEM::plotGaussPointsElement()
               if( nd1->getDomainNumber() == -1 )
                 volume += gws[gp];
 
-              ComputeGeometry(param, geom);
+              computeGeometry(param, geom);
 
               //cout << param[0] << '\t' << param[1] << '\t' << param[2] << endl;
               //cout <<  geom[0] << '\t' <<  geom[1] << '\t' <<  geom[2] << endl;
@@ -1236,7 +1236,7 @@ void HBSplineCutFEM::plotGaussPointsDirichletBoundary()
                   //if( nd1->getDomainNumber() == -1 )
                     volume += gws[gp] * JacTemp;
 
-                  ComputeGeometry(param, geom);
+                  computeGeometry(param, geom);
 
                   //cout << param[0] << '\t' << param[1] << '\t' << param[2] << endl;
                   //cout <<  geom[0] << '\t' <<  geom[1] << '\t' <<  geom[2] << endl;
@@ -1335,7 +1335,7 @@ void HBSplineCutFEM::plotGaussPointsNeumannBoundary()
                   //if( nd1->getDomainNumber() == -1 )
                     volume += gws[gp] * JacTemp;
 
-                  ComputeGeometry(param, geom);
+                  computeGeometry(param, geom);
 
                   //cout << param[0] << '\t' << param[1] << '\t' << param[2] << endl;
                   //cout <<  geom[0] << '\t' <<  geom[1] << '\t' <<  geom[2] << endl;

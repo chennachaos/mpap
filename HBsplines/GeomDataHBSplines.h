@@ -2,17 +2,11 @@
 #ifndef incl_GeomDataHBSplines_h
 #define incl_GeomDataHBSplines_h
 
-//#include "headersBoost.h"
-
 #include "ImmersedSolid.h"
 #include "ShapeFunctions.h"
-
 #include "GaussQuadrature.h"
 
-//#include "myPolyList.h"
-
 using namespace myGeom;
-
 
 class  Function;
 class  DistanceFunction;
@@ -24,9 +18,6 @@ class  GeomDataHBSplines
     int  DIM, degree[3], nelem[3], nlbf, ngbf[3], nGP[3], totalNGP, ndof, tis;
     double  origin[3], dX[3], gridLEN[3], Jacobian[3], Jfull, rho;
 
-    //int ROWS;
-    //double  **ders1, **ders2, **ders3;
-
   public:
 
     int firstIter;
@@ -34,7 +25,6 @@ class  GeomDataHBSplines
     vector<bool>  domainInclYesNo, domainFixedYesNo;
 
     vector<double>  gausspoints1, gaussweights1, gausspoints2, gaussweights2, gausspoints3, gaussweights3;
-    //vector<double>  boundaryGPs1, boundaryGWs1, boundaryGPs2, boundaryGWs2, boundaryGPs3, boundaryGWs3;
     vector<double>  gpsLeft, gpsRight, gwsLeft, gwsRight, FluidProps, cutFEMparams;
 
     vector<myPoint>  gausspoints, gausspoints2D, boundaryNormals;
@@ -43,7 +33,6 @@ class  GeomDataHBSplines
     vector<vector<double> >  boundaryJacobians;
     
     vector<GaussQuadrature>  boundaryQuadrature2D;
-
     vector<GaussQuadrature>  boundaryQuadrature3D;
 
     VectorXd  bodyForce, bodyForceCur, bodyForcePrev, bodyForcePrev2, bodyForcePred, bodyForcePredPrev, bodyForcePredPrev2;
@@ -62,7 +51,6 @@ class  GeomDataHBSplines
     Function*  analyDBC;
 
     //vector<bgpolygon_type>  polyImm;
-
     //myPolyList  polyImm;
 
     vector<DistanceFunction*>  distFuncs;
@@ -71,23 +59,22 @@ class  GeomDataHBSplines
 
     GeomDataHBSplines();
 
-
     ~GeomDataHBSplines();
 
-    double  ComputeCoord(int dir, double param)
+    double  computeCoord(int dir, double param)
     { return  (origin[dir] + gridLEN[dir]*param);     }
 
-    void  ComputeCoord(const myPoint& param, myPoint& geom)
+    void  computeCoord(const myPoint& param, myPoint& geom)
     { 
       for(int ii=0; ii<DIM; ii++)
         geom[ii] = origin[ii] + gridLEN[ii]*param[ii];
       return;
     }
 
-    double  ComputeParam(int dir, double val)
+    double  computeParam(int dir, double val)
     { return  ((val-origin[dir])/gridLEN[dir]);     }
 
-    void  ComputeParam(const myPoint& geom, myPoint& param)
+    void  computeParam(const myPoint& geom, myPoint& param)
     {
       for(int ii=0; ii<DIM; ii++)
         param[ii] = (geom[ii]-origin[ii])/gridLEN[ii];
@@ -95,7 +82,7 @@ class  GeomDataHBSplines
       return;
     }
 
-    void  SetDimension(int dim_)
+    void  setDimension(int dim_)
     {  DIM = dim_;    }
 
     void  setNdof(int d)
@@ -104,53 +91,53 @@ class  GeomDataHBSplines
     void  setDegree(int ind, int deg)
     {   degree[ind] = deg;  }
 
-    void  SetNGP(int ind, int nn)
+    void  setNGP(int ind, int nn)
     {    nGP[ind] = nn;     }
 
-    void  SetNelem(int ind, int nn)
+    void  setNumberOfElements(int ind, int nn)
     {    nelem[ind] = nn;     }
 
-    void  SetJacobian(int ind, double J1)
+    void  setJacobian(int ind, double J1)
     {      Jacobian[ind] = J1;     }
 
-    void  SetGridLength(int ind, double L1)
+    void  setGridLength(int ind, double L1)
     {       gridLEN[ind] = L1;     }
 
-    void  SetOrigin(int ind, double L1)
+    void  setOrigin(int ind, double L1)
     {       origin[ind] = L1;     }
 
     int  getNdof()
     {       return  ndof;     }
 
-    int GetDegree(int ind)
+    int getDegree(int ind)
     {       return degree[ind];     }
 
-    int GetNGP(int ind)
+    int getNGP(int ind)
     {       return  nGP[ind];     }
 
-    int GetNGBF(int ind)
+    int getNGBF(int ind)
     {       return  ngbf[ind];     }
 
-    double  GetJacobian(int ind)
+    double  getJacobian(int ind)
     {       return  Jacobian[ind];     }
 
-    double  GetGridLength(int ind)
+    double  getGridLength(int ind)
     {       return  gridLEN[ind];     }
 
-    double  GetGridDX(int ind)
+    double  getGridDX(int ind)
     {       return  dX[ind];     }
 
-    double  GetJacobianFull()
+    double  getJacobianFull()
     {       return  Jfull;     }
 
-    int GetTotalNGP()
+    int getTotalNGP()
     {       return  totalNGP;     }
 
-     void SetTimeIncrementType(int ttt)
-     {  tis = ttt; }
+    void setTimeIncrementType(int ttt)
+    {  tis = ttt; }
 
-     void SetRho(double ttt)
-     {  rho = ttt; }
+    void setSpectralRadius(double ttt)
+    {  rho = ttt; }
 
     void  printSelf();
     void  build();

@@ -3,7 +3,6 @@
 
 
 #include "Solver.h"
-#include "headersEigen.h"
 #include "util.h"
 #include "Domain.h"
 #include "GeomDataLagrange.h"
@@ -11,13 +10,12 @@
 
 #include "headersVTK.h"
 
+#include "LagrangeElement.h"
+
 #include "SolverEigen.h"
 #include "SolverPetsc.h"
-#include <petscmat.h>
-#include <petscksp.h>
 
 
-class LagrangeElement;
 class PropertyItem;
 
 
@@ -106,9 +104,6 @@ class StandardFEM: public Domain
 
         MyString   anlySolnType;
 
-        //List<PropertyItem>  ElemProp, MatlProp;
-        //vector<PropertyItem>  ElemProp, MatlProp;
-
         myPoint  geom, param, normal;
 
         SolutionData  SolnData;
@@ -133,15 +128,12 @@ class StandardFEM: public Domain
         vtkSmartPointer<vtkWedge>                wedgeVTK;
 
         vtkSmartPointer<vtkIntArray>          procIdVTK;
-        //vtkSmartPointer<vtkDoubleArray>          vectors, vectors2, scalars, scalars2;
         vtkSmartPointer<vtkFloatArray>          vecVTK, vecVTK2, scaVTK, scaVTK2, cellDataVTK, cellDataVTK2;
         vtkSmartPointer<vtkXMLUnstructuredGridWriter>  writerUGridVTK;
 
     public:
 
         StandardFEM();
-        
-        //StandardFEM(int deg, int dim1, double XX, double YY);
         
         ~StandardFEM();
 
@@ -151,31 +143,30 @@ class StandardFEM: public Domain
         //
         ///////////////////////////////////////////////////////////
 
-        void SetDimension(int dd)
+        void setDimension(int dd)
         {  ndm = DIM = dd;        }
 
         void setNdof(int dd)
         {  ndf = ndof = dd;        }
 
-        void  SetPhysicsTypetoSolid()
+        void  setPhysicsTypetoSolid()
         {
           PHYSICS_TYPE = PHYSICS_TYPE_SOLID;
-          SolnData.SetPhysicsTypetoSolid();
+          SolnData.setPhysicsTypetoSolid();
           return;
         }
 
-        void  SetPhysicsTypetoFluid()
+        void  setPhysicsTypetoFluid()
         {
           PHYSICS_TYPE = PHYSICS_TYPE_FLUID;
-          SolnData.SetPhysicsTypetoFluid();
+          SolnData.setPhysicsTypetoFluid();
           return;
         }
 
-
-        void  SetVTKfilename(char* ff)
+        void  setVTKfilename(char* ff)
         { std::strcpy(VTKfilename, ff);  return; }
 
-        void SetNodes(const vector<myPoint>&  nodeVec)
+        void  setNodes(const vector<myPoint>&  nodeVec)
         {
           nodePosData = nodeVec;
         }
@@ -190,53 +181,53 @@ class StandardFEM: public Domain
 
         void  readInput(ifstream& fname);
 
-        void SetElementConnectivity(const vector<vector<int> >&  nodeVec)
+        void  setElementConnectivity(const vector<vector<int> >&  nodeVec)
         {
           elemConn = nodeVec;
         }
 
-        void SetNodeType(const vector<vector<bool> >&  nodeVec)
+        void  setNodeType(const vector<vector<bool> >&  nodeVec)
         {
           NodeType = nodeVec;
         }
 
-        void AddElementProperties(const PropertyItem&  elmProp)
+        void  addElementProperties(const PropertyItem&  elmProp)
         {
           //ElemProp.add(elmProp);
           //ElemProp.add(new PropertyItem(ELEMENTTYPE));
           //ElemProp[ElemProp.n-1] = elmProp;
         }
 
-        void AddMaterialProperties(const PropertyItem&  elmProp)
+        void  addMaterialProperties(const PropertyItem&  elmProp)
         {
           //MatlProp.add(elmProp);
           //MatlProp.add(new PropertyItem(MATERIAL));
           //MatlProp[MatlProp.n-1] = elmProp;
         }
 
-        void SetDirichletBCs(const vector<vector<double> >&  nodeVec)
+        void  setDirichletBCs(const vector<vector<double> >&  nodeVec)
         {
           DirichletBCs = nodeVec;
         }
 
-        void SetNodalForces(const vector<vector<double> >&  nodeVec)
+        void  setNodalForces(const vector<vector<double> >&  nodeVec)
         {
           nodeForcesData = nodeVec;
         }
 
-        void SetControl(int tis1, double tol1, double rho1)
+        void  setControl(int tis1, double tol1, double rho1)
         {
           tis = tis1;
           rhoInfty = rho1;
           tol = tol1;
 
-          SolnData.SetTimeIncrementType(tis);
-          SolnData.SetRho(rhoInfty);
+          SolnData.setTimeIncrementType(tis);
+          SolnData.setSpectralRadius(rhoInfty);
         }
 
         virtual void printData(int, int);
         
-        int  SolveStep(int niter);
+        int  solveStep(int niter);
 
         ///////////////////////////////////////////////////////////
         //
@@ -246,7 +237,7 @@ class StandardFEM: public Domain
 
         virtual void printComputerTime(bool reset = true, int detailFlg = 1);
 
-        void AssignBoundaryConditions();
+        void assignBoundaryConditions();
 
         void  prepareElemProp();
         void  prepareMatlProp();
@@ -261,9 +252,9 @@ class StandardFEM: public Domain
 
         void  geometryToParametric(const myPoint& geom, myPoint& param);
 
-        double  ComputeGeometry(const int dir, double param);
+        double  computeGeometry(const int dir, double param);
         
-        void  ComputeGeometry(const myPoint& param, myPoint& geom);
+        void  computeGeometry(const myPoint& param, myPoint& geom);
 
         void  printInfo();
 

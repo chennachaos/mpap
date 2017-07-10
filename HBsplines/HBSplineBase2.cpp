@@ -3,22 +3,22 @@
 
 
 
-void  HBSplineBase::BuildBase()
+void  HBSplineBase::buildBase()
 {
   if(DIM == 1)
-    BuildBase1D();
+    buildBase1D();
   else if(DIM == 2)
-    BuildBase2D();
+    buildBase2D();
   else
-    BuildBase3D();
+    buildBase3D();
   
-  //cout << " HBSplineBase::BuildBase() " << endl;
+  //cout << " HBSplineBase::buildBase() " << endl;
 
   return;
 }
 
 
-void  HBSplineBase::BuildBase1D()
+void  HBSplineBase::buildBase1D()
 {
     int  kk, nn, ii, jj;
 
@@ -96,7 +96,7 @@ void  HBSplineBase::BuildBase1D()
 
 
 
-void  HBSplineBase::BuildBase2D()
+void  HBSplineBase::buildBase2D()
 {
     int  ii, jj, kk, ll, nn0, nn1, count=0, nor, sou, ind1, ind2;
 
@@ -283,7 +283,7 @@ void  HBSplineBase::BuildBase2D()
 
 
 
-void  HBSplineBase::BuildBase3D()
+void  HBSplineBase::buildBase3D()
 {
     int  ii, jj, kk, ll, ee, nn0, nn1, nn2, count=0, eas, wes, nor, sou, fro, bac, ind1, ind2, nelm;
 

@@ -90,14 +90,14 @@ int main(int argc, char* argv[])
       exit(1);
     }
     //cout << " llllllllllll " << endl;
-    femObject.SetDimension(2);
+    femObject.setDimension(2);
 
     femObject.setNdof(3);
 
     femObject.readFile( infile );
     //cout << " llllllllllll " << endl;
 
-    //femObject.SetVTKfilename("ILaplace2DEx1tria20");
+    //femObject.setVTKfilename("ILaplace2DEx1tria20");
 
     femObject.prepareInputData();
   
