@@ -380,16 +380,11 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
     node  *nd1, *nd2;
 
-    //MPI_Comm_size(MPI_COMM_WORLD, &n_mpi_procs);
-    //MPI_Comm_rank(MPI_COMM_WORLD, &this_mpi_proc);
-
     //cout << " this_mpi_proc " << this_mpi_proc << endl;
     //cout << " n_mpi_procs " << n_mpi_procs << endl;
 
     int n_subdomains = n_mpi_procs, subdomain=0;
 
-
-    //tstart = time(0);
     auto tstart = Clock::now();
 
     PetscPrintf(MPI_COMM_WORLD, " preparing cut elements \n");
@@ -398,7 +393,6 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
     auto tend = Clock::now();
 
-    //cout << " preparing()   took " << std::chrono::duration_cast<std::chrono::milliseconds>(tend - tstart).count() << "   milliseconds " << endl;
     PetscPrintf(MPI_COMM_WORLD, " preparing cut elements took %12.6f  milliseconds \n", std::chrono::duration_cast<std::chrono::milliseconds>(tend - tstart).count());
 
     setCoveringUncovering();
@@ -408,7 +402,6 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
     //PetscSynchronizedPrintf(MPI_COMM_WORLD, " nElem = %8d \n", nElem);
     //PetscSynchronizedPrintf(MPI_COMM_WORLD, " nNode = %8d \n", nNode);
-
 
     fluidDOF = nNode*ndof;
 
@@ -469,7 +462,7 @@ int  HBSplineCutFEM::prepareMatrixPattern()
       /////////////////////////////////////////////////////////////////////////////
       //
       // Partition the mesh. This can be done using software libraries
-      // Chaco, Jostle, METIS and Scotch.
+      // Chaco, Jostle, METIS and Scotch, or PETSc's subroutines.
       // Here METIS is used.
       // 
       /////////////////////////////////////////////////////////////////////////////
@@ -486,19 +479,17 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
       cout << " elem_start = " << elem_start << '\t' << elem_end << '\t' << nElem_local << endl;
 
-      //idx_t eptr[nElem+1];
-      //idx_t epart[nElem];
-      //idx_t npart[nNode];
-
       PetscInt  *eptr, *eind, *epart, *npart;
 
       ierr  = PetscMalloc1(nElem+1,  &eptr);  CHKERRQ(ierr);
       ierr  = PetscMalloc1(nElem,    &epart); CHKERRQ(ierr);
       ierr  = PetscMalloc1(nNode,    &npart); CHKERRQ(ierr);
 
+      //ierr  = PetscMalloc1(nElem_local+1,  &eptr);CHKERRQ(ierr);
+
       eptr[0] = 0;
 
-      idx_t npElem_total = 0;
+      PetscInt npElem_total = 0;
       for(ee=0; ee<nElem; ee++)
       {
         npElem_total += elems[fluidElementIds[ee]]->GlobalBasisFuncs.size();
@@ -508,16 +499,9 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
       cout << " npElem_total = " << npElem_total << endl;
 
-      //idx_t eind[npElem_total];
       ierr  = PetscMalloc1(npElem_total,  &eind); CHKERRQ(ierr);
-
-      //PetscInt  *eptr, *eind;
-
-      //ierr  = PetscMalloc1(nElem_local+1,  &eptr);CHKERRQ(ierr);
       //ierr  = PetscMalloc1(nElem_local*npElem,  &eind);CHKERRQ(ierr);
-
       //ierr  = PetscMalloc1(nElem+1,  &eptr);CHKERRQ(ierr);
-      //ierr  = PetscMalloc1(nElem*npElem,  &eind);CHKERRQ(ierr);
 
       //PetscSynchronizedPrintf(PETSC_COMM_WORLD,"%d \n", elem_start);
 
@@ -551,7 +535,6 @@ int  HBSplineCutFEM::prepareMatrixPattern()
         //cout << endl;
       //}
 
-      //PetscInt  nodes_per_side;
       idx_t nodes_per_side;
       
       if(DIM == 2)
@@ -676,6 +659,11 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
       ndofs_local = row_end - row_start + 1;
 
+      ierr  = PetscFree(eptr);  CHKERRQ(ierr);
+      ierr  = PetscFree(eind);  CHKERRQ(ierr);
+      ierr  = PetscFree(epart); CHKERRQ(ierr);
+      ierr  = PetscFree(npart); CHKERRQ(ierr);
+
 
       /////////////////////////////////////////////////////////////
       // 
@@ -734,9 +722,7 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
 
     vector<vector<int> > DDconn;
-
     DDconn.resize(totalDOF);
-
 
     for(ee=0; ee<nElem; ee++)
     {
@@ -794,13 +780,10 @@ int  HBSplineCutFEM::prepareMatrixPattern()
     } // for(e=0;e<fluidElementIds.size();e++)
 
 
-
-
     PetscSynchronizedPrintf(MPI_COMM_WORLD, "\n   Finding global positions DONE \n\n");
 
     //tend = time(0); 
     //cout << "It took "<< difftime(tend, tstart) <<" second(s)."<< endl;
-
 
     SolnData.node_map_new_to_old = node_map_new_to_old;
     SolnData.node_map_old_to_new = node_map_old_to_new;
@@ -851,7 +834,7 @@ int  HBSplineCutFEM::prepareMatrixPattern()
       kk++;
     }
 
-    cout << " iiiiiiiiiiiii " << count_diag << '\t' << count_offdiag << endl;
+    //cout << " iiiiiiiiiiiii " << count_diag << '\t' << count_offdiag << endl;
 
     //Create parallel matrix, specifying only its global dimensions.
     //When using MatCreate(), the matrix format can be specified at
@@ -870,7 +853,7 @@ int  HBSplineCutFEM::prepareMatrixPattern()
     ierr = MatMPIAIJSetPreallocation(solverPetsc->mtx, 20, d_nnz, 20, o_nnz);CHKERRQ(ierr);
     ierr = MatSeqAIJSetPreallocation(solverPetsc->mtx, 20, d_nnz);CHKERRQ(ierr);
 
-    cout << " jjjjjjjjjjjjjjjj " << endl;
+    //cout << " jjjjjjjjjjjjjjjj " << endl;
 
     PetscInt  colTemp[nnz_max_row];
     PetscScalar  arrayD[nnz_max_row];
@@ -896,9 +879,6 @@ int  HBSplineCutFEM::prepareMatrixPattern()
     VecCreate(PETSC_COMM_WORLD, &solverPetsc->reac);
 
     ierr = VecSetSizes(solverPetsc->soln, ndofs_local, totalDOF); CHKERRQ(ierr);
-    //ierr = VecSetSizes(solnPrev, ndofs_local, totalDOF); CHKERRQ(ierr);
-    //ierr = VecSetSizes(rhsVec, ndofs_local, totalDOF); CHKERRQ(ierr);
-    //ierr = VecSetSizes(solverPetsc->reac, ndofs_local, totalDOF); CHKERRQ(ierr);
 
     ierr = VecSetFromOptions(solverPetsc->soln);CHKERRQ(ierr);
     ierr = VecDuplicate(solverPetsc->soln, &solverPetsc->rhsVec);CHKERRQ(ierr);
@@ -913,14 +893,8 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
     GRID_CHANGED = IB_MOVED = false;
 
-    //ierr  = PetscFree(eptr);  CHKERRQ(ierr);
-    //ierr  = PetscFree(eind);  CHKERRQ(ierr);
-    //ierr  = PetscFree(epart); CHKERRQ(ierr);
-    //ierr  = PetscFree(npart); CHKERRQ(ierr);
-
     ierr  = PetscFree(d_nnz); CHKERRQ(ierr);
     ierr  = PetscFree(o_nnz); CHKERRQ(ierr);
-
 
     //printf("\n     HBSplineCutFEM::prepareMatrixPattern()  .... FINISHED ...\n\n");
 

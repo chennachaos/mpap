@@ -20,17 +20,16 @@
 template<>
 void AdaptiveOctree<2>::computeGaussPoints(int refLev2, int inclDom, int chkFlag, int mergeFlag, GaussQuadrature&  quadTemp)
 {
-  if( isLeaf() )
-  {
-    myPoint  param, geom;
-    int  gp, ii;
+    if( isLeaf() )
+    {
+      myPoint  param, geom;
+      int  gp, ii;
 
-    //vector<myPoint>  ptOut;
-    //vector<int>  vecTemp(4);
+      //vector<myPoint>  ptOut;
+      //vector<int>  vecTemp(4);
 
-    //if(level == MAX_LEVEL)
-      //GeomData->doIntersect2D(bbox, false, vecTemp, ptOut, domNums) ;
-
+      //if(level == MAX_LEVEL)
+        //GeomData->doIntersect2D(bbox, false, vecTemp, ptOut, domNums) ;
 
       // the cell is not a cut cell
       if( (domNums.size() == 1) && (domNums[0] == inclDom) )
@@ -116,16 +115,16 @@ void AdaptiveOctree<2>::computeGaussPoints(int refLev2, int inclDom, int chkFlag
           } // if(mergeFlag && refLev2)
       }
     //}
-  }
-  else
-  {
-    for(int gp=0; gp<NUM_CHILDREN; gp++)
-    {
-      child[gp]->computeGaussPoints(refLev2, inclDom, chkFlag, mergeFlag, quadTemp);
     }
-  }
+    else
+    {
+      for(int gp=0; gp<NUM_CHILDREN; gp++)
+      {
+        child[gp]->computeGaussPoints(refLev2, inclDom, chkFlag, mergeFlag, quadTemp);
+      }
+    }
 
-  return;
+    return;
 }
 
 
@@ -133,9 +132,9 @@ void AdaptiveOctree<2>::computeGaussPoints(int refLev2, int inclDom, int chkFlag
 template<>
 void AdaptiveOctree<3>::computeGaussPoints2Dfor3D(int refLev2, int inclDom, int chkFlag, int mergeFlag, GaussQuadrature&  quadTemp)
 {
-cout << " isLeaf() ... 3D " << isLeaf() << endl;
+    cout << " isLeaf() ... 3D " << isLeaf() << endl;
 
-  return;
+    return;
 }
 
 
@@ -143,19 +142,19 @@ cout << " isLeaf() ... 3D " << isLeaf() << endl;
 template<>
 void AdaptiveOctree<2>::computeGaussPoints2Dfor3D(int refLev2, int inclDom, int chkFlag, int mergeFlag, GaussQuadrature&  quadTemp)
 {
-  //cout << " isLeaf() " << isLeaf() << endl;
-  if( isLeaf() )
-  {
-    myPoint  param, geom;
-    int  gp, ii;
+    //cout << " isLeaf() " << isLeaf() << endl;
+    if( isLeaf() )
+    {
+      myPoint  param, geom;
+      int  gp=0, ii=0;
 
-    //vector<myPoint>  ptOut;
-    //vector<int>  vecTemp(4);
+      //vector<myPoint>  ptOut;
+      //vector<int>  vecTemp(4);
 
-    //if(level == MAX_LEVEL)
-      //GeomData->doIntersect2D(bbox, false, vecTemp, ptOut, domNums) ;
+      //if(level == MAX_LEVEL)
+        //GeomData->doIntersect2D(bbox, false, vecTemp, ptOut, domNums) ;
 
-     //cout << " AdaptiveOctree<2>::computeGaussPoints2Dfor3D " << endl;
+      //cout << " AdaptiveOctree<2>::computeGaussPoints2Dfor3D " << endl;
 
       if( (domNums.size() == 1) && (domNums[0] == inclDom) )
       {
@@ -245,16 +244,16 @@ void AdaptiveOctree<2>::computeGaussPoints2Dfor3D(int refLev2, int inclDom, int 
           } // if(mergeFlag && refLev2)
       }
     //}
-  }
-  else
-  {
-    for(int gp=0; gp<NUM_CHILDREN; gp++)
-    {
-      child[gp]->computeGaussPoints2Dfor3D(refLev2, inclDom, chkFlag, mergeFlag, quadTemp);
     }
-  }
+    else
+    {
+      for(int gp=0; gp<NUM_CHILDREN; gp++)
+      {
+        child[gp]->computeGaussPoints2Dfor3D(refLev2, inclDom, chkFlag, mergeFlag, quadTemp);
+      }
+    }
 
-  return;
+    return;
 }
 
 
@@ -262,11 +261,11 @@ void AdaptiveOctree<2>::computeGaussPoints2Dfor3D(int refLev2, int inclDom, int 
 template<>
 void AdaptiveOctree<2>::computeGaussPointsForMerging(int refLev2, int inclDom, int chkFlag, int mergeFlag, GaussQuadrature&  quadTemp)
 {
-  if( isLeaf() )
-  {
-    myPoint  param, geom;
-    int  gp, ii;
-    double  wt=0.0, fact=0.0;
+    if( isLeaf() )
+    {
+        myPoint  param, geom;
+        int  gp=0, ii=0;
+        double  wt=0.0, fact=0.0;
 
         //
         for(gp=0; gp<GeomData->gausspoints.size(); gp++)
@@ -300,16 +299,16 @@ void AdaptiveOctree<2>::computeGaussPointsForMerging(int refLev2, int inclDom, i
             quadTemp.gaussweights.push_back(GeomData->gaussweights[gp]*JacMultElem);
           }
         */
-  }
-  else
-  {
-    for(int gp=0; gp<NUM_CHILDREN; gp++)
-    {
-      child[gp]->computeGaussPointsForMerging(refLev2, inclDom, chkFlag, mergeFlag, quadTemp);
     }
-  }
+    else
+    {
+      for(int gp=0; gp<NUM_CHILDREN; gp++)
+      {
+        child[gp]->computeGaussPointsForMerging(refLev2, inclDom, chkFlag, mergeFlag, quadTemp);
+      }
+    }
 
-  return;
+    return;
 }
 
 
@@ -318,11 +317,11 @@ void AdaptiveOctree<2>::computeGaussPointsForMerging(int refLev2, int inclDom, i
 template<>
 void AdaptiveOctree<2>::computeGaussPointsForMerging2Dfor3D(int refLev2, int inclDom, int chkFlag, int mergeFlag, GaussQuadrature&  quadTemp)
 {
-  if( isLeaf() )
-  {
-    myPoint  param, geom;
-    int  gp, ii;
-    double  wt=0.0, fact=0.0;
+    if( isLeaf() )
+    {
+        myPoint  param, geom;
+        int  gp=0, ii=0;
+        double  wt=0.0, fact=0.0;
 
         //
         for(gp=0; gp<GeomData->gausspoints2D.size(); gp++)
@@ -360,31 +359,31 @@ void AdaptiveOctree<2>::computeGaussPointsForMerging2Dfor3D(int refLev2, int inc
             quadTemp.gaussweights.push_back(GeomData->gaussweights[gp]*JacMultElem);
           }
         */
-  }
-  else
-  {
-    for(int gp=0; gp<NUM_CHILDREN; gp++)
-    {
-      child[gp]->computeGaussPointsForMerging2Dfor3D(refLev2, inclDom, chkFlag, mergeFlag, quadTemp);
     }
-  }
+    else
+    {
+      for(int gp=0; gp<NUM_CHILDREN; gp++)
+      {
+        child[gp]->computeGaussPointsForMerging2Dfor3D(refLev2, inclDom, chkFlag, mergeFlag, quadTemp);
+      }
+    }
 
-  return;
+    return;
 }
 
 
 template<>
 void AdaptiveOctree<3>::computeGaussPoints(int refLev2, int inclDom, int chkFlag, int mergeFlag, GaussQuadrature&  quadTemp)
 {
-  if( isLeaf() )
-  {
-    myPoint  param, geom;
-    int  gp, ii;
-    //vector<myPoint>  ptOut;
-    //vector<int>  vecTemp(8);
+    if( isLeaf() )
+    {
+      myPoint  param, geom;
+      int  gp=0, ii=0;
+      //vector<myPoint>  ptOut;
+      //vector<int>  vecTemp(8);
 
-    //if(level == MAX_LEVEL)
-      //GeomData->doIntersect2D(bbox, false, vecTemp, ptOut, domNums) ;
+      //if(level == MAX_LEVEL)
+        //GeomData->doIntersect2D(bbox, false, vecTemp, ptOut, domNums) ;
 
       //cout << " cut cell " << endl;
       //printVector(domNums);
@@ -475,16 +474,15 @@ void AdaptiveOctree<3>::computeGaussPoints(int refLev2, int inclDom, int chkFlag
           } // if(mergeFlag && refLev2)
       }
     //}
-  }
-  else
-  {
-    for(int gp=0; gp<NUM_CHILDREN; gp++)
-    {
-      child[gp]->computeGaussPoints(refLev2, inclDom, chkFlag, mergeFlag, quadTemp);
     }
-  }
-
-  return;
+    else
+    {
+      for(int gp=0; gp<NUM_CHILDREN; gp++)
+      {
+        child[gp]->computeGaussPoints(refLev2, inclDom, chkFlag, mergeFlag, quadTemp);
+      }
+    }
+    return;
 }
 
 
@@ -492,10 +490,10 @@ void AdaptiveOctree<3>::computeGaussPoints(int refLev2, int inclDom, int chkFlag
 template<>
 void AdaptiveOctree<3>::computeGaussPointsForMerging(int refLev2, int inclDom, int chkFlag, int mergeFlag, GaussQuadrature&  quadTemp)
 {
-  if( isLeaf() )
-  {
-    myPoint  param, geom;
-    int  gp, ii;
+    if( isLeaf() )
+    {
+        myPoint  param, geom;
+        int  gp=0, ii=0;
 
         //
         for(gp=0; gp<GeomData->gausspoints.size(); gp++)
@@ -525,16 +523,16 @@ void AdaptiveOctree<3>::computeGaussPointsForMerging(int refLev2, int inclDom, i
             quadTemp.gaussweights.push_back(8.0*JacMultElem);
           }
         */
-  }
-  else
-  {
-    for(int gp=0; gp<NUM_CHILDREN; gp++)
-    {
-      child[gp]->computeGaussPointsForMerging(refLev2, inclDom, chkFlag, mergeFlag, quadTemp);
     }
-  }
+    else
+    {
+      for(int gp=0; gp<NUM_CHILDREN; gp++)
+      {
+        child[gp]->computeGaussPointsForMerging(refLev2, inclDom, chkFlag, mergeFlag, quadTemp);
+      }
+    }
 
-  return;
+    return;
 }
 
 

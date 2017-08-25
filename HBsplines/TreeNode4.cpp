@@ -674,7 +674,7 @@ void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
 
 
 
-//
+/*
 template<>
 void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
 {
@@ -859,7 +859,7 @@ void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
     
     return;
 }
-//
+*/
 
 
 
@@ -1331,7 +1331,7 @@ double TreeNode<2>::getJacBoundary(int side)
 }
 
 
-//
+/*
 template<>
 void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
 {
@@ -1655,7 +1655,7 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
 
   return;
 }
-//
+*/
 
 
 

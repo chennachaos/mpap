@@ -6,6 +6,8 @@
 #include "myDataIntegrateCutFEM.h"
 #include "ContactElementPointToPoint2D.h"
 #include "QuadratureUtil.h"
+#include "headersEigen.h"
+
 
 #include <omp.h>
 
@@ -321,6 +323,8 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
     //#pragma omp parallel
       //printf("Number of threads: %i \n",omp_get_num_procs());
 
+      MatrixXd  matM, matK;
+
     tstart = time(0);
     //#pragma omp parallel for
     for(ii=0;ii<activeElements.size();ii++)
@@ -341,19 +345,25 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
       Klocal = MatrixXd::Zero(nr, nr);
       Flocal = VectorXd::Zero(nr);
 
+      matM = MatrixXd::Zero(nr, nr);
+      matK = MatrixXd::Zero(nr, nr);
+
       //cout << " AAAAAAAAAAAAAAAAA " << endl;
       nd->calcStiffnessAndResidualGFEM(Klocal, Flocal);
+      matK = Klocal;
       //cout << " AAAAAAAAAAAAAAAAA " << endl;
       //printMatrix(Klocal);
       //printf("\n\n");
       //printVector(Flocal);
+      Klocal.setZero();
       nd->applyDirichletBCsGFEM(Klocal, Flocal);
+      matM = Klocal;
       //cout << " BBBBBBBBBBBBBBBBB " << endl;
-      nd->applyNeumannBCsGFEM(Klocal, Flocal);
+      //nd->applyNeumannBCsGFEM(Klocal, Flocal);
       //cout << " BBBBBBBBBBBBBBBBB " << endl;
-       //printMatrix(Klocal);
-       //printf("\n\n");
-       //printVector(Flocal);
+      //printMatrix(Klocal);
+      //printf("\n\n");
+      //printVector(Flocal);
 
        //cout << " AAAAAAAAAAAAAAAAA " << endl;
        //nd->calcStiffnessAndResidualLSFEM(1, Klocal, Flocal);
@@ -375,6 +385,21 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
         //solverEigen->assembleVector(velDOF, 0, nd->forAssyVec, Flocal);
       //cout << " AAAAAAAAAAAAAAAAA " << endl;
     }
+
+    //solverEigen->computeConditionNumber();
+    //cout << " AAAAAAAAAAAAAAAAA " << endl;
+    // for computing CI
+    //GeneralizedSelfAdjointEigenSolver<MatrixXd> es(matK, matM);
+    // for computing penalty parameter
+    GeneralizedSelfAdjointEigenSolver<MatrixXd> es(matM, matK);
+    //cout << " AAAAAAAAAAAAAAAAA " << endl;
+    VectorXd  eig_vals = es.eigenvalues();
+    cout << "The eigenvalues of the pencil (A,B) are:" << endl << eig_vals << endl;
+
+    printf("\n %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% \n");
+    printf("\n\n\n Maximum eigenvalue = %12.6f \n\n\n", eig_vals.maxCoeff() );
+    //printf("\n\n\n CI value = %14.10f \n\n\n", pow(eig_vals.maxCoeff(),1.0/3.0) );
+    printf("\n %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% \n");
 
     //
     if(pointBCs.size() > 0)

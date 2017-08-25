@@ -36,12 +36,12 @@ void AdaptiveBinarytree<2>::subDivide(int refLev)
     if(level == (2*refLev) )
       return;
 
-    int ii, levTemp, jj, bb, splitDirTemp=0;
+    int ii=0, jj=0, bb=0, splitDirTemp=0;
 
     // find the split direction based on the Inside/Outside from of the current cell
     // and the split direction of the parent
 
-    levTemp = level+1;
+    int  levTemp = level+1;
 
     if(splitDir == -1)
     {
@@ -142,8 +142,6 @@ void AdaptiveBinarytree<2>::subDivide(int refLev)
       child[ii]->subDivide(refLev);
     }
 
-    //cout << " ddddddddddd " << endl;
-
     return;
 }
 
@@ -168,18 +166,15 @@ void AdaptiveBinarytree<3>::subDivide(int refLev)
     if( domNums.size() == 1 )
       return;
 
-
     if(level == (3*refLev) )
       return;
 
-    //cout << " bbbbbbbbbbb " << endl;
-
-    int ii, levTemp, jj, bb, splitDirTemp=0;
+    int ii=0, jj=0, bb=0, splitDirTemp=0;
 
     // find the split direction based on the Inside/Outside from of the current cell
     // and the split direction of the parent
 
-    levTemp = level+1;
+    int  levTemp = level+1;
 
     //if( (cornerInOut[0] == cornerInOut[1]) && (cornerInOut[2] == cornerInOut[3]) )
       //splitDirTemp = 1;
@@ -197,8 +192,6 @@ void AdaptiveBinarytree<3>::subDivide(int refLev)
       //levTemp = level;
     //}
     
-    //cout << " ccccccccccc " << endl;
-
     NUM_CHILDREN = 2;
     child      = new AdaptiveBinarytree_PTR[NUM_CHILDREN];
 
@@ -293,8 +286,6 @@ void AdaptiveBinarytree<3>::subDivide(int refLev)
       child[ii]->setSplitDirection(splitDirTemp);
       child[ii]->subDivide(refLev);
     }
-
-    //cout << " bbbbbbbbbbbb " << endl;
 
     return;
 }
@@ -403,54 +394,55 @@ void AdaptiveBinarytree<3>::printSelf()
 template<>
 void AdaptiveBinarytree<2>::mergeGaussPoints(int refLev2, int inclDom, int dummy1, int& nGPsMerge, myPoint& ptTemp, double& wt)
 {
-  AdaptiveBinarytree<2>  *adapIntegNodeLocal = new AdaptiveBinarytree<2>(0);
+    AdaptiveBinarytree<2>  *adapIntegNodeLocal = new AdaptiveBinarytree<2>(0);
 
-  adapIntegNodeLocal->setKnots(knots[0][0], knots[0][1], knots[1][0], knots[1][1]);
+    adapIntegNodeLocal->setKnots(knots[0][0], knots[0][1], knots[1][0], knots[1][1]);
 
-  adapIntegNodeLocal->GeomData = GeomData;
-  adapIntegNodeLocal->domNums = domNums;
-  adapIntegNodeLocal->setSplitDirection(splitDir);
+    adapIntegNodeLocal->GeomData = GeomData;
+    adapIntegNodeLocal->domNums = domNums;
+    adapIntegNodeLocal->setSplitDirection(splitDir);
 
-  adapIntegNodeLocal->setSideTemp(sideTemp);
-  adapIntegNodeLocal->setParam3(param3);
-  adapIntegNodeLocal->setCoord3(coord3);
+    adapIntegNodeLocal->setSideTemp(sideTemp);
+    adapIntegNodeLocal->setParam3(param3);
+    adapIntegNodeLocal->setCoord3(coord3);
 
-  adapIntegNodeLocal->prepareData();
-  adapIntegNodeLocal->subDivide(refLev2);
+    adapIntegNodeLocal->prepareData();
+    adapIntegNodeLocal->subDivide(refLev2);
   
-  GaussQuadrature  QuadratureLocal;
+    GaussQuadrature  QuadratureLocal;
 
-  int mergeFlag=0;
+    int mergeFlag=0;
 
-  if(sideTemp == -1)
-    adapIntegNodeLocal->computeGaussPointsForMerging(0, inclDom, 1, mergeFlag, QuadratureLocal);
-  else
-    adapIntegNodeLocal->computeGaussPointsForMerging2Dfor3D(0, inclDom, 1, mergeFlag, QuadratureLocal);
+    if(sideTemp == -1)
+      adapIntegNodeLocal->computeGaussPointsForMerging(0, inclDom, 1, mergeFlag, QuadratureLocal);
+    else
+      adapIntegNodeLocal->computeGaussPointsForMerging2Dfor3D(0, inclDom, 1, mergeFlag, QuadratureLocal);
 
-  // parametric domain to integration master-quadrilateral domain
-  int  ii, gp;
-  myPoint  param, geom;
-  wt = 0.0;
-  ptTemp.setZero();
-  param.setZero();
-  for(gp=0; gp<QuadratureLocal.gausspoints.size(); gp++)
-  {
-    for(ii=0; ii<2; ii++)
-      param[ii] = QuadratureLocal.gausspoints[gp][ii] ;
+    // parametric domain to integration master-quadrilateral domain
+    int  ii=0, gp=0;
+    myPoint  param, geom;
 
-    //cout << gp << '\t' << geom[0] << '\t' << geom[1] << '\t' << QuadratureLocal.gaussweights[gp] << endl;
-    wt +=  QuadratureLocal.gaussweights[gp];
+    ptTemp.setZero();
+    param.setZero();
+    wt = 0.0;
+    for(gp=0; gp<QuadratureLocal.gausspoints.size(); gp++)
+    {
+      for(ii=0; ii<2; ii++)
+        param[ii] = QuadratureLocal.gausspoints[gp][ii] ;
+
+      //cout << gp << '\t' << geom[0] << '\t' << geom[1] << '\t' << QuadratureLocal.gaussweights[gp] << endl;
+      wt +=  QuadratureLocal.gaussweights[gp];
     
-    ptTemp += param;
-  }
+      ptTemp += param;
+    }
 
-  nGPsMerge = QuadratureLocal.gausspoints.size();
+    nGPsMerge = QuadratureLocal.gausspoints.size();
 
-  ptTemp /= nGPsMerge;
+    ptTemp /= nGPsMerge;
 
-  delete  adapIntegNodeLocal;
+    delete  adapIntegNodeLocal;
 
-  return;
+    return;
 }
 
 
@@ -460,46 +452,48 @@ void AdaptiveBinarytree<2>::mergeGaussPoints(int refLev2, int inclDom, int dummy
 template<>
 void AdaptiveBinarytree<3>::mergeGaussPoints(int refLev2, int inclDom, int dummy1, int& nGPsMerge, myPoint& ptTemp, double& wt)
 {
-  AdaptiveBinarytree<3>  *adapIntegNodeLocal = new AdaptiveBinarytree<3>(0);
+    AdaptiveBinarytree<3>  *adapIntegNodeLocal = new AdaptiveBinarytree<3>(0);
 
-  adapIntegNodeLocal->setKnots(knots[0][0], knots[0][1], knots[1][0], knots[1][1], knots[2][0], knots[2][1]);
+    adapIntegNodeLocal->setKnots(knots[0][0], knots[0][1], knots[1][0], knots[1][1], knots[2][0], knots[2][1]);
 
-  adapIntegNodeLocal->GeomData = GeomData;
-  adapIntegNodeLocal->domNums = domNums;
-  adapIntegNodeLocal->setSplitDirection(-1);
+    adapIntegNodeLocal->GeomData = GeomData;
+    adapIntegNodeLocal->domNums = domNums;
+    adapIntegNodeLocal->setSplitDirection(-1);
 
-  adapIntegNodeLocal->prepareData();
-  adapIntegNodeLocal->subDivide(refLev2);
+    adapIntegNodeLocal->prepareData();
+    adapIntegNodeLocal->subDivide(refLev2);
   
-  GaussQuadrature  QuadratureLocal;
+    GaussQuadrature  QuadratureLocal;
 
-  int mergeFlag=0;
+    int mergeFlag=0;
 
-  adapIntegNodeLocal->computeGaussPointsForMerging(0, inclDom, 1, mergeFlag, QuadratureLocal);
+    adapIntegNodeLocal->computeGaussPointsForMerging(0, inclDom, 1, mergeFlag, QuadratureLocal);
 
-  // parametric domain to integration master-quadrilateral domain
-  int  ii, gp;
-  myPoint  param, geom;
-  wt = 0.0;
-  ptTemp.setZero();
-  param.setZero();
-  for(gp=0; gp<QuadratureLocal.gausspoints.size(); gp++)
-  {
-    for(ii=0; ii<3; ii++)
-      param[ii] = QuadratureLocal.gausspoints[gp][ii] ;
+    // parametric domain to integration master-quadrilateral domain
+    int  ii=0, gp=0;
+    myPoint  param, geom;
 
-    wt +=  QuadratureLocal.gaussweights[gp];
+    ptTemp.setZero();
+    param.setZero();
+
+    wt = 0.0;
+    for(gp=0; gp<QuadratureLocal.gausspoints.size(); gp++)
+    {
+      for(ii=0; ii<3; ii++)
+        param[ii] = QuadratureLocal.gausspoints[gp][ii] ;
+
+      wt +=  QuadratureLocal.gaussweights[gp];
     
-    ptTemp += param;
-  }
+      ptTemp += param;
+    }
 
-  nGPsMerge = QuadratureLocal.gausspoints.size();
+    nGPsMerge = QuadratureLocal.gausspoints.size();
 
-  ptTemp /= nGPsMerge;
+    ptTemp /= nGPsMerge;
 
-  delete  adapIntegNodeLocal;
+    delete  adapIntegNodeLocal;
 
-  return;
+    return;
 }
 
 

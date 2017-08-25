@@ -1,6 +1,5 @@
 
 #include "TreeNode.h"
-
 #include "GeomDataHBSplines.h"
 #include "SolutionData.h"
 
@@ -32,17 +31,13 @@ bool  TreeNode<3>::isBoundary()
 template<>
 void TreeNode<1>::subDivide()
 {
-    //assert("Current Cell is a LEAF and Subdivision starts" && isLeaf());
-    
     if( !isLeaf() )
       return;
     
     NUM_CHILDREN = 2;
     child  = new TreeNode_PTR[NUM_CHILDREN];
 
-    int ii, temp;
-    
-    temp = level+1;
+    int ii=0, temp = level+1;
     
     for(ii=0;ii<NUM_CHILDREN;ii++)
     {
@@ -58,9 +53,7 @@ void TreeNode<1>::subDivide()
          child[ii]->setGhostOn();
     }
     
-    double  mid(0.0);
-
-    mid = 0.5*(knots[0][0] + knots[0][1]);
+    double  mid = 0.5*(knots[0][0] + knots[0][1]);
 
     TreeNode_PTR  tmpnode;
     
@@ -102,6 +95,8 @@ void TreeNode<1>::subDivide()
          tmpnode->setNeighbour(LEFT,child[RIGHT]);
        }
     }
+
+    return;
 }
 
 
@@ -109,18 +104,14 @@ void TreeNode<1>::subDivide()
 template<>
 void TreeNode<2>::subDivide()
 {
-    //assert("Current Cell is a LEAF and Subdivision starts" && isLeaf());
-
     if( !isLeaf() )
       return;
 
-    int ii, temp, jj;
+    int ii=0, jj=0, temp = level+1;
 
     NUM_CHILDREN = 4;
     child      = new TreeNode_PTR[NUM_CHILDREN];
 
-    temp = level+1;
-    
     for(ii=0;ii<NUM_CHILDREN;ii++)
     {
        child[ii] = new TreeNode<2>(temp);
@@ -147,10 +138,8 @@ void TreeNode<2>::subDivide()
     //cout << " child[NW]->orientation " << '\t' << NW << '\t' << child[NW]->orientation << endl;
     //cout << " child[NE]->orientation " << '\t' << NE << '\t' << child[NE]->orientation << endl;
 
-    double  midu(0.0), midv(0.0);
-    
-    midu = 0.5*(knots[0][1] + knots[0][0]);
-    midv = 0.5*(knots[1][1] + knots[1][0]);
+    double  midu = 0.5*(knots[0][1] + knots[0][0]);
+    double  midv = 0.5*(knots[1][1] + knots[1][0]);
 
     child[SW]->setKnots(Dir1, knots[0][0], midu);
     child[SW]->setKnots(Dir2, knots[1][0], midv);
@@ -271,18 +260,14 @@ void TreeNode<2>::subDivide()
 template<>
 void TreeNode<3>::subDivide()
 {
-    //assert("Current Cell is a LEAF and Subdivision starts" && isLeaf());
-
     if( !isLeaf() )
       return;
 
-    int ii, temp, jj;
+    int  ii=0, jj=0, temp = level+1;
 
     NUM_CHILDREN = 8;
     child = new TreeNode_PTR[NUM_CHILDREN];
 
-    temp = level+1;
-    
     for(ii=0;ii<NUM_CHILDREN;ii++)
     {
        child[ii] = new TreeNode<3>(temp);
@@ -312,12 +297,9 @@ void TreeNode<3>::subDivide()
     //
     // set the knots
 
-
-    double  midu, midv, midw;
-    
-    midu = 0.5*(knots[0][0] + knots[0][1]);
-    midv = 0.5*(knots[1][0] + knots[1][1]);
-    midw = 0.5*(knots[2][0] + knots[2][1]);
+    double  midu = 0.5*(knots[0][0] + knots[0][1]);
+    double  midv = 0.5*(knots[1][0] + knots[1][1]);
+    double  midw = 0.5*(knots[2][0] + knots[2][1]);
 
     child[SW_BACK ]->setKnots(Dir1, knots[0][0], midu);
     child[SW_FRONT]->setKnots(Dir1, knots[0][0], midu);
@@ -329,7 +311,6 @@ void TreeNode<3>::subDivide()
     child[NE_BACK ]->setKnots(Dir1, midu,        knots[0][1]);
     child[NE_FRONT]->setKnots(Dir1, midu,        knots[0][1]);
 
-
     child[SW_BACK ]->setKnots(Dir2, knots[1][0], midv);
     child[SW_FRONT]->setKnots(Dir2, knots[1][0], midv);
     child[SE_BACK ]->setKnots(Dir2, knots[1][0], midv);
@@ -339,7 +320,6 @@ void TreeNode<3>::subDivide()
     child[NW_FRONT]->setKnots(Dir2, midv,        knots[1][1]);
     child[NE_BACK ]->setKnots(Dir2, midv,        knots[1][1]);
     child[NE_FRONT]->setKnots(Dir2, midv,        knots[1][1]);
-
 
     child[SW_BACK ]->setKnots(Dir3, knots[2][0], midw);
     child[SE_BACK ]->setKnots(Dir3, knots[2][0], midw);
@@ -599,8 +579,6 @@ void TreeNode<3>::subDivide()
        }
     }
 
-
-
     return;
 }
 
@@ -609,13 +587,13 @@ void TreeNode<3>::subDivide()
 template<>
 void TreeNode<1>::unRefine()
 {
-   if(child == NULL)
-   {
+    if(child == NULL)
+    {
       cout << " This element has no children. So can't unrefine it ... " << endl;
       return;
-   }
+    }
    
-   int  ii, jj;
+    int  ii=0, jj=0;
 
     TreeNode_PTR  tmpnode, nd;
 
@@ -642,14 +620,9 @@ void TreeNode<1>::unRefine()
     child[LEFT]->deactivate();
     child[RIGHT]->deactivate();
 
-cout << " AAAAAAAAAA " << endl;
+    cout << " AAAAAAAAAA " << endl;
 
-//   for(ii=0;ii<NUM_CHILDREN;ii++)
-//      child[ii] = NULL;
-
-//   child = NULL;
-
-   return;
+    return;
 }
 
 
@@ -688,56 +661,57 @@ bool  TreeNode<1>::isGhost()
 template<>
 void TreeNode<1>::printSelf()
 {
-      if(!isGhost())
-      {
-            printf("\t   ID          = %5d\n", id);
-            printf("\t   Level       = %5d\n", level);
-            printf("\t   Degree      = %5d\n", degree[0]);
-            printf("\t   Ghost       = %5d\n", isGhost());
-            if(parent == NULL)
-              printf("\t   Parent      = %5d\n", -1);
-            else
-              printf("\t   Parent      = %5d\n", parent->getID());
+    if(!isGhost())
+    {
+        printf("\t   ID          = %5d\n", id);
+        printf("\t   Level       = %5d\n", level);
+        printf("\t   Degree      = %5d\n", degree[0]);
+        printf("\t   Ghost       = %5d\n", isGhost());
+        if(parent == NULL)
+          printf("\t   Parent      = %5d\n", -1);
+        else
+          printf("\t   Parent      = %5d\n", parent->getID());
 
-            printf("\t   children    = %5d\n", NUM_CHILDREN);
-            printf("\t   Basis Functions --->  \n");
-            if( !LocalBasisFuncs.empty() )
-            {
-               printf("\t\t");
-               for(int jj=0;jj<LocalBasisFuncs.size();jj++)
-                 printf("\t%5d\t", LocalBasisFuncs[jj]);
-               printf("\n");
-            }
-            else
-              printf(" NONE \n");
-            printf("\t   Parameters ... \n");
-            printf("\t\t direction #%5d ---> \t%12.6f \t %12.6f\n", 1, knots[0][0], knots[0][1]);
+        printf("\t   children    = %5d\n", NUM_CHILDREN);
+        printf("\t   Basis Functions --->  \n");
+        if( !LocalBasisFuncs.empty() )
+        {
+            printf("\t\t");
+            for(int jj=0;jj<LocalBasisFuncs.size();jj++)
+              printf("\t%5d\t", LocalBasisFuncs[jj]);
+            printf("\n");
+        }
+        else
+          printf(" NONE \n");
+        
+        printf("\t   Parameters ... \n");
+        printf("\t\t direction #%5d ---> \t%12.6f \t %12.6f\n", 1, knots[0][0], knots[0][1]);
 
-            printf("\n\t   Neighbours ... \n");
-            if(neighbours != NULL)
-            {
-               if(neighbours[LEFT] != NULL)
-                 printf("\t\t LEFT  neighbour ID   = %5d \n", neighbours[LEFT]->getID());
+        printf("\n\t   Neighbours ... \n");
+        if(neighbours != NULL)
+        {
+            if(neighbours[LEFT] != NULL)
+              printf("\t\t LEFT  neighbour ID   = %5d \n", neighbours[LEFT]->getID());
 
-               if(neighbours[RIGHT] != NULL)
-                 printf("\t\t RIGHT neighbour ID   = %5d \n", neighbours[RIGHT]->getID());
-            }
-            else
-              printf("\t\t No Neighbours \n");
+            if(neighbours[RIGHT] != NULL)
+              printf("\t\t RIGHT neighbour ID   = %5d \n", neighbours[RIGHT]->getID());
+        }
+        else
+          printf("\t\t No Neighbours \n");
 
-            printf("\n\t   Children ... \n");
-            if(child != NULL)
-            {
-               if(child[LEFT] != NULL)
-                 printf("\t\t LEFT  neighbour ID   = %5d \n", child[LEFT]->getID());
+        printf("\n\t   Children ... \n");
+        if(child != NULL)
+        {
+          if(child[LEFT] != NULL)
+            printf("\t\t LEFT  neighbour ID   = %5d \n", child[LEFT]->getID());
 
-               if(child[RIGHT] != NULL)
-                 printf("\t\t RIGHT neighbour ID   = %5d \n", child[RIGHT]->getID());
-            }
-            else
-              printf("\t\t No Children \n");
-            printf("\n\n");
-
+          if(child[RIGHT] != NULL)
+            printf("\t\t RIGHT neighbour ID   = %5d \n", child[RIGHT]->getID());
+        }
+        else
+          printf("\t\t No Children \n");
+        
+        printf("\n\n");
     }
 }
 
@@ -749,75 +723,78 @@ void TreeNode<1>::printSelf()
 template<>
 void TreeNode<2>::printSelf()
 {
-            printf("\t   ID          = %5d\n", id);
-            printf("\t   Level       = %5d\n", level);
-            printf("\t   Degree      = ");
-            for(int ii=0;ii<2;ii++)
-              printf("%5d\t", degree[ii]);
-            printf("\n");
-            if(parent == NULL)
-              printf("\t   Parent      = %5d\n", -1);
-            else
-              printf("\t   Parent      = %5d\n", parent->getID());
+    printf("\t   ID          = %5d\n", id);
+    printf("\t   Level       = %5d\n", level);
+    printf("\t   Degree      = ");
+    for(int ii=0;ii<2;ii++)
+      printf("%5d\t", degree[ii]);
+    printf("\n");
+    
+    if(parent == NULL)
+      printf("\t   Parent      = %5d\n", -1);
+    else
+      printf("\t   Parent      = %5d\n", parent->getID());
 
-            printf("\t   Basis Functions --->  \n");
-            if( !LocalBasisFuncs.empty() )
-            {
-               printf("\t\t");
-               for(int jj=0;jj<LocalBasisFuncs.size();jj++)
-                 printf("\t%5d\t", LocalBasisFuncs[jj]);
-               printf("\n");
-            }
-            else
-              printf(" NONE \n");
-            printf("\t   Parameters ... \n");
-            for(int ii=0;ii<2;ii++)
-            {
-               printf("\t\t direction #%5d ---> \t%12.6f \t %12.6f\n", (ii+1), knots[ii][0], knots[ii][1]);
-            }
+    printf("\t   Basis Functions --->  \n");
+    if( !LocalBasisFuncs.empty() )
+    {
+      printf("\t\t");
+      for(int jj=0;jj<LocalBasisFuncs.size();jj++)
+        printf("\t%5d\t", LocalBasisFuncs[jj]);
+      printf("\n");
+    }
+    else
+      printf(" NONE \n");
+    
+    printf("\t   Parameters ... \n");
+    for(int ii=0;ii<2;ii++)
+    {
+      printf("\t\t direction #%5d ---> \t%12.6f \t %12.6f\n", (ii+1), knots[ii][0], knots[ii][1]);
+    }
 
-            printf("\n\t   Neighbours ... \n");
-            if(neighbours != NULL)
-            {
-               if(neighbours[EAST] != NULL)
-                 printf("\t\t EAST   neighbour ID   = %5d \n", neighbours[EAST]->getID());
+    printf("\n\t   Neighbours ... \n");
+    if(neighbours != NULL)
+    {
+      if(neighbours[EAST] != NULL)
+        printf("\t\t EAST   neighbour ID   = %5d \n", neighbours[EAST]->getID());
 
-               if(neighbours[WEST] != NULL)
-                 printf("\t\t WEST   neighbour ID   = %5d \n", neighbours[WEST]->getID());
+      if(neighbours[WEST] != NULL)
+        printf("\t\t WEST   neighbour ID   = %5d \n", neighbours[WEST]->getID());
 
-               if(neighbours[NORTH] != NULL)
-                 printf("\t\t NORTH  neighbour ID   = %5d \n", neighbours[NORTH]->getID());
+      if(neighbours[NORTH] != NULL)
+        printf("\t\t NORTH  neighbour ID   = %5d \n", neighbours[NORTH]->getID());
 
-               if(neighbours[SOUTH] != NULL)
-                 printf("\t\t SOUTH  neighbour ID   = %5d \n", neighbours[SOUTH]->getID());
+      if(neighbours[SOUTH] != NULL)
+        printf("\t\t SOUTH  neighbour ID   = %5d \n", neighbours[SOUTH]->getID());
 
-            }
-            else
-              printf("\t\t No Neighbours \n\n");
+    }
+    else
+      printf("\t\t No Neighbours \n\n");
 
-            printf("\n\t   children ... \n");
-            if(child != NULL)
-            {
-               //printf("\t  # of children    = %5d\n", NUM_CHILDREN);
+    printf("\n\t   children ... \n");
+    if(child != NULL)
+    {
+      //printf("\t  # of children    = %5d\n", NUM_CHILDREN);
                
-               if(child[SW] != NULL)
-                 printf("\t\t SW   child ID   = %5d \n", child[SW]->getID());
+      if(child[SW] != NULL)
+        printf("\t\t SW   child ID   = %5d \n", child[SW]->getID());
 
-               if(child[SE] != NULL)
-                 printf("\t\t SE   child ID   = %5d \n", child[SE]->getID());
+      if(child[SE] != NULL)
+        printf("\t\t SE   child ID   = %5d \n", child[SE]->getID());
 
-               if(child[NW] != NULL)
-                 printf("\t\t NW   child ID   = %5d \n", child[NW]->getID());
+      if(child[NW] != NULL)
+        printf("\t\t NW   child ID   = %5d \n", child[NW]->getID());
 
-               if(child[NE] != NULL)
-                 printf("\t\t NE   child ID   = %5d \n", child[NE]->getID());
+      if(child[NE] != NULL)
+        printf("\t\t NE   child ID   = %5d \n", child[NE]->getID());
 
-            }
-            else
-              printf("\t\t No children \n");
-            printf("\n\n");
+    }
+    else
+      printf("\t\t No children \n");
+    
+    printf("\n\n");
 
-   return;
+    return;
 }
 
 
@@ -825,117 +802,120 @@ void TreeNode<2>::printSelf()
 template<>
 void TreeNode<3>::printSelf()
 {
-            printf("\t   ID          = %5d\n", id);
-            printf("\t   Level       = %5d\n", level);
-            printf("\t   Degree      = ");
-            for(int ii=0;ii<3;ii++)
-              printf("%5d\t", degree[ii]);
-            printf("\n");
-            if(parent == NULL)
-              printf("\t   Parent      = %5d\n", -1);
-            else
-              printf("\t   Parent      = %5d\n", parent->getID());
+    printf("\t   ID          = %5d\n", id);
+    printf("\t   Level       = %5d\n", level);
+    printf("\t   Degree      = ");
+    for(int ii=0;ii<3;ii++)
+      printf("%5d\t", degree[ii]);
+    printf("\n");
+            
+    if(parent == NULL)
+      printf("\t   Parent      = %5d\n", -1);
+    else
+      printf("\t   Parent      = %5d\n", parent->getID());
 
-            printf("\t   Basis Functions --->  \n");
-            if( !LocalBasisFuncs.empty() )
-            {
-               printf("\t\t");
-               for(int jj=0;jj<LocalBasisFuncs.size();jj++)
-                 printf("\t%5d\t", LocalBasisFuncs[jj]);
-               printf("\n");
-            }
-            else
-              printf(" NONE \n");
-            printf("\t   Parameters ... \n");
-            for(int ii=0;ii<3;ii++)
-            {
-               printf("\t\t direction #%5d ---> \t%12.6f \t %12.6f\n", (ii+1), knots[ii][0], knots[ii][1]);
-            }
+    printf("\t   Basis Functions --->  \n");
+    if( !LocalBasisFuncs.empty() )
+    {
+      printf("\t\t");
+      for(int jj=0;jj<LocalBasisFuncs.size();jj++)
+        printf("\t%5d\t", LocalBasisFuncs[jj]);
+      printf("\n");
+    }
+    else
+      printf(" NONE \n");
+    
+    printf("\t   Parameters ... \n");
+    for(int ii=0;ii<3;ii++)
+    {
+      printf("\t\t direction #%5d ---> \t%12.6f \t %12.6f\n", (ii+1), knots[ii][0], knots[ii][1]);
+    }
 
-            printf("\n\t   Neighbours ... \n");
-            if(neighbours != NULL)
-            {
-               if(neighbours[WEST]  != NULL)
-                 printf("\t\t WEST   neighbour ID   = %5d \n", neighbours[WEST]->getID());
-               else
-                 printf("\t\t WEST   neighbour ID   = %5d \n", -1);
+    printf("\n\t   Neighbours ... \n");
+    if(neighbours != NULL)
+    {
+      if(neighbours[WEST]  != NULL)
+        printf("\t\t WEST   neighbour ID   = %5d \n", neighbours[WEST]->getID());
+      else
+        printf("\t\t WEST   neighbour ID   = %5d \n", -1);
 
-               if(neighbours[EAST]  != NULL)
-                 printf("\t\t EAST   neighbour ID   = %5d \n", neighbours[EAST]->getID());
-               else
-                 printf("\t\t EAST   neighbour ID   = %5d \n", -1);
+      if(neighbours[EAST]  != NULL)
+        printf("\t\t EAST   neighbour ID   = %5d \n", neighbours[EAST]->getID());
+      else
+        printf("\t\t EAST   neighbour ID   = %5d \n", -1);
 
-               if(neighbours[SOUTH] != NULL)
-                 printf("\t\t SOUTH  neighbour ID   = %5d \n", neighbours[SOUTH]->getID());
-               else
-                 printf("\t\t SOUTH  neighbour ID   = %5d \n", -1);
+      if(neighbours[SOUTH] != NULL)
+        printf("\t\t SOUTH  neighbour ID   = %5d \n", neighbours[SOUTH]->getID());
+      else
+        printf("\t\t SOUTH  neighbour ID   = %5d \n", -1);
 
-               if(neighbours[NORTH] != NULL)
-                 printf("\t\t NORTH  neighbour ID   = %5d \n", neighbours[NORTH]->getID());
-               else
-                 printf("\t\t NORTH  neighbour ID   = %5d \n", -1);
+      if(neighbours[NORTH] != NULL)
+        printf("\t\t NORTH  neighbour ID   = %5d \n", neighbours[NORTH]->getID());
+      else
+        printf("\t\t NORTH  neighbour ID   = %5d \n", -1);
 
-               if(neighbours[FRONT] != NULL)
-                 printf("\t\t FRONT  neighbour ID   = %5d \n", neighbours[FRONT]->getID());
-               else
-                 printf("\t\t FRONT  neighbour ID   = %5d \n", -1);
+      if(neighbours[FRONT] != NULL)
+        printf("\t\t FRONT  neighbour ID   = %5d \n", neighbours[FRONT]->getID());
+      else
+        printf("\t\t FRONT  neighbour ID   = %5d \n", -1);
 
-               if(neighbours[BACK]  != NULL)
-                 printf("\t\t BACK   neighbour ID   = %5d \n", neighbours[BACK]->getID());
-               else
-                 printf("\t\t BACK   neighbour ID   = %5d \n", -1);
-            }
-            else
-              printf("\t\t No Neighbours \n\n");
+      if(neighbours[BACK]  != NULL)
+        printf("\t\t BACK   neighbour ID   = %5d \n", neighbours[BACK]->getID());
+      else
+        printf("\t\t BACK   neighbour ID   = %5d \n", -1);
+    }
+    else
+      printf("\t\t No Neighbours \n\n");
 
-            printf("\n\t   children ... \n");
-            if(child != NULL)
-            {
-               //printf("\t  # of children    = %5d\n", NUM_CHILDREN);
+    printf("\n\t   children ... \n");
+    if(child != NULL)
+    {
+      //printf("\t  # of children    = %5d\n", NUM_CHILDREN);
                
-               if(child[SW] != NULL)
-                 printf("\t\t SW   child ID   = %5d \n", child[SW]->getID());
+      if(child[SW] != NULL)
+        printf("\t\t SW   child ID   = %5d \n", child[SW]->getID());
 
-               if(child[SE] != NULL)
-                 printf("\t\t SE   child ID   = %5d \n", child[SE]->getID());
+      if(child[SE] != NULL)
+        printf("\t\t SE   child ID   = %5d \n", child[SE]->getID());
 
-               if(child[NW] != NULL)
-                 printf("\t\t NW   child ID   = %5d \n", child[NW]->getID());
+      if(child[NW] != NULL)
+        printf("\t\t NW   child ID   = %5d \n", child[NW]->getID());
 
-               if(child[NE] != NULL)
-                 printf("\t\t NE   child ID   = %5d \n", child[NE]->getID());
+      if(child[NE] != NULL)
+        printf("\t\t NE   child ID   = %5d \n", child[NE]->getID());
 
-            }
-            else
-              printf("\t\t No children \n");
-            printf("\n\n");
+    }
+    else
+      printf("\t\t No children \n");
+    
+    printf("\n\n");
 
-   return;
+    return;
 }
 
 
 template<>
 bool  TreeNode<1>::pointLiesInside(const myPoint& pt)
 {
-  if( (pt[0] >= knots[0][0]) && (pt[0] <= knots[0][1]) )
-    return true;
-  else
-    return false;
+    if( (pt[0] >= knots[0][0]) && (pt[0] <= knots[0][1]) )
+      return true;
+    else
+      return false;
 }
 
 
 template<>
 bool  TreeNode<2>::pointLiesInside(const myPoint& pt)
 {
-  if( (pt[0] >= knots[0][0]) && (pt[0] <= knots[0][1]) )
-  {
-    if( (pt[1] >= knots[1][0]) && (pt[1] <= knots[1][1]) )
-      return true;
+    if( (pt[0] >= knots[0][0]) && (pt[0] <= knots[0][1]) )
+    {
+      if( (pt[1] >= knots[1][0]) && (pt[1] <= knots[1][1]) )
+        return true;
+      else
+        return false;
+    }
     else
       return false;
-  }
-  else
-    return false;
 }
 
 
@@ -943,20 +923,20 @@ bool  TreeNode<2>::pointLiesInside(const myPoint& pt)
 template<>
 bool  TreeNode<3>::pointLiesInside(const myPoint& pt)
 {
-  if( (pt[0] >= knots[0][0]) && (pt[0] <= knots[0][1]) )
-  {
-    if( (pt[1] >= knots[1][0]) && (pt[1] <= knots[1][1]) )
+    if( (pt[0] >= knots[0][0]) && (pt[0] <= knots[0][1]) )
     {
-      if( (pt[2] >= knots[2][0]) && (pt[2] <= knots[2][1]) )
-        return true;
+      if( (pt[1] >= knots[1][0]) && (pt[1] <= knots[1][1]) )
+      {
+        if( (pt[2] >= knots[2][0]) && (pt[2] <= knots[2][1]) )
+          return true;
+        else
+          return false;
+      }
       else
         return false;
     }
     else
       return false;
-  }
-  else
-    return false;
 }
 
 

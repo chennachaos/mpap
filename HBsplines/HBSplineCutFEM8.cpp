@@ -28,7 +28,7 @@ void HBSplineCutFEM::plotGeomAdapIntegration1D(int val1, bool flag2, int col, bo
 
 void HBSplineCutFEM::plotGeomAdapIntegration2D(int val1, bool flag2, int col, bool PLOT_KNOT_LINES, int* resln)
 {
-    int  bb, ee, ll, kk, ii, totalNGP=0;
+    int  bb=0, ee=0, ll=0, kk=0, ii=0, totalNGP=0;
     double  volTotal=0.0;
 
     vtkIdType  pt[50], cellId;
@@ -39,7 +39,6 @@ void HBSplineCutFEM::plotGeomAdapIntegration2D(int val1, bool flag2, int col, bo
     NodeOrientation  neigbour_map2[] = {RIGHT, LEFT};
 
     AABB  bbTemp;
-
 
     for(ee=0; ee<activeElements.size(); ee++)
     {
@@ -196,7 +195,6 @@ void HBSplineCutFEM::plotGeomAdapIntegration2D(int val1, bool flag2, int col, bo
           }
         }
         */
-
       } //else
       //
       //cout << " aaaaaaaaaa " << endl;
@@ -223,13 +221,10 @@ void HBSplineCutFEM::plotGeomAdapIntegration3D(int val1, bool flag2, int col, bo
 {
     //prepareCutElements();
 
-    int  ii, ee, ll, kk, totalNGP=0;
+    int  ii=0, ee=0, ll=0, kk=0, totalNGP=0;
 
     vtkIdType  ptIds[8];
 
-    time_t tstart, tend;
-    //tstart = time(0);
-    
     node* ndTemp;
 
     AABB  bbTemp;
@@ -433,7 +428,7 @@ void HBSplineCutFEM::plotGeomAdapIntegration3D(int val1, bool flag2, int col, bo
 
 void  HBSplineCutFEM::postProcessAdapIntegration1D(int vartype, int vardir, int nCol, bool umnxflag, double umin, double umax, int* resln)
 {
-    int  ee, ii, jj, kk, nlocal, index;
+    int  ee=0, ii=0, jj=0, kk=0, nlocal=0, index=0;
 
     nlocal = degree[0]+1;
 
@@ -441,7 +436,7 @@ void  HBSplineCutFEM::postProcessAdapIntegration1D(int vartype, int vardir, int 
     VectorXd  NN(nlocal), dNN_dx(nlocal), d2NN_dx2(nlocal);
     myPoint  knotIncr, knotBegin, knotEnd;
 
-    double   fact, incr1, *tmp1, xx[2], val[3], xIntf=0.5;
+    double   fact=0, incr1=0, *tmp1, xx[2], val[3], xIntf=0.5;
 
     vector<double>  uu, uu1, uu2;
 
@@ -567,12 +562,9 @@ void  HBSplineCutFEM::postProcessAdapIntegration1D(int vartype, int vardir, int 
 
 void  HBSplineCutFEM::postProcessAdapIntegration2D(int vartype, int vardir, int nCol, bool umnxflag, double umin, double umax, int* resln)
 {
-    //cout << " jjjjjjjjjjjjjjjjjj " << endl;
-
-    int  dd, ii, jj, kk, ll, count, nlocal, index, ind1, ind2, e, ee, gcount, ind, domTemp;
-    vtkIdType pt[50], cellId;
-
-    nlocal = (degree[0]+1) * (degree[1] + 1);
+    int  dd=0, ii=0, jj=0, kk=0, ll=0, count=0, index=0;
+    int  ind1=0, ind2=0, e=0, ee=0, gcount=0, ind=0, domTemp=0;
+    int  nlocal = (degree[0]+1) * (degree[1] + 1);
 
     VectorXd  NN(nlocal), N(nlocal), dN_dx(nlocal), dN_dy(nlocal), dNN_dx(nlocal), dNN_dy(nlocal), tempVec, tempVec2, d2N_dx2(nlocal), d2N_dy2(nlocal);
     VectorXd  vectmp(nlocal), rhsTemp;
@@ -583,19 +575,19 @@ void  HBSplineCutFEM::postProcessAdapIntegration2D(int vartype, int vardir, int 
     NodeOrientation  neigbour_map2[] = {RIGHT, LEFT};
     vector<double>  uu, vv;
 
-    time_t tstart, tend;
-    
+    vtkIdType pt[50], cellId;
+
     AABB  bbTemp;
 
     node* ndTemp;
 
-  if(ndf == 1)
-  {
-    index = 0;
-    for(ee=0; ee<activeElements.size(); ee++)
+    if(ndf == 1)
     {
-      ndTemp = elems[activeElements[ee]];
-      //cout << " Node # " << nd->getID() << endl;
+      index = 0;
+      for(ee=0; ee<activeElements.size(); ee++)
+      {
+        ndTemp = elems[activeElements[ee]];
+        //cout << " Node # " << nd->getID() << endl;
 
         tmp0 = ndTemp->getKnots(Dir1);
         tmp1 = ndTemp->getKnots(Dir2);
@@ -661,7 +653,7 @@ void  HBSplineCutFEM::postProcessAdapIntegration2D(int vartype, int vardir, int 
 
             cellDataVTK->InsertNextValue(ndTemp->getDomainNumber() );
             cellDataVTK2->InsertNextValue(ndTemp->getSubdomainId());
-	  }
+	        }
         } //if( !nd->isCutElement() )
         else // the element is cutCell
         {
@@ -729,8 +721,7 @@ void  HBSplineCutFEM::postProcessAdapIntegration2D(int vartype, int vardir, int 
   }
   else // for Stokes and Navier-Stokes
   {
-    double vec[3];
-    vec[0] = vec[1] = vec[2] = 0.0;
+    double vec[3]={0.0, 0.0, 0.0}; //    vec[0] = vec[1] = vec[2] = 0.0;
 
     vecVTK->SetNumberOfComponents(3);
     //vecVTK->SetNumberOfTuples(count);
@@ -825,247 +816,247 @@ void  HBSplineCutFEM::postProcessAdapIntegration2D(int vartype, int vardir, int 
             //cout << " ooooooooooooo " << endl;
         } //if( !nd->isCutElement() )
 
-      if( ndTemp->getDomainNumber() == -1 )
-      {
-        //
-        /////////////////////////////////////////////////////////////
-        //  method 1 - octree
-        /////////////////////////////////////////////////////////////
-
-        typedef  typename  node::adapTreePTR  adapTreePTR;
-
-        adapTreePTR  adapNd1, adapNd2, adapNd3;
-
-        adapNd2 = ndTemp->adapIntegNode;
-
-        while( adapNd2 != NULL )
+        if( ndTemp->getDomainNumber() == -1 )
         {
-          if( adapNd2->isLeaf() )
+          //
+          /////////////////////////////////////////////////////////////
+          //  method 1 - octree
+          /////////////////////////////////////////////////////////////
+
+          typedef  typename  node::adapTreePTR  adapTreePTR;
+
+          adapTreePTR  adapNd1, adapNd2, adapNd3;
+
+          adapNd2 = ndTemp->adapIntegNode;
+
+          while( adapNd2 != NULL )
           {
-            if( (adapNd2->getDomainNumber() == 0) || (adapNd2->getDomainNumber() == -1) )
-            //if( (adapNd2->getDomainNumber() <= 0) )
+            if( adapNd2->isLeaf() )
             {
-              bbTemp = adapNd2->getAABB();
-
-              pt[0] = pointsVTK->InsertNextPoint(bbTemp.minBB[0], bbTemp.minBB[1], 0.0);
-              pt[1] = pointsVTK->InsertNextPoint(bbTemp.maxBB[0], bbTemp.minBB[1], 0.0);
-              pt[3] = pointsVTK->InsertNextPoint(bbTemp.minBB[0], bbTemp.maxBB[1], 0.0);
-              pt[2] = pointsVTK->InsertNextPoint(bbTemp.maxBB[0], bbTemp.maxBB[1], 0.0);
-
-              for(ll=0;ll<4;ll++)
-                quadVTK->GetPointIds()->SetId(ll, pt[ll]);
-
-              cellDataVTK->InsertNextValue( adapNd2->getDomainNumber() );
-              //cellDataVTK2->InsertNextValue( adapNd2->getLevel() );
-              cellDataVTK2->InsertNextValue(ndTemp->getSubdomainId());
-
-              uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
-
-              tmp0 = adapNd2->getKnots(Dir1);
-              tmp1 = adapNd2->getKnots(Dir2);
-
-              incr1 = tmp0[2] ;
-              incr2 = tmp1[2] ;
-
-              fact = incr1/resln[0];
-              create_vector(tmp0[0], tmp0[1], fact, uu);
-
-              fact = incr2/resln[1];
-              create_vector(tmp1[0], tmp1[1], fact, vv);
-
-              for(jj=0;jj<vv.size();jj++)
+              if( (adapNd2->getDomainNumber() == 0) || (adapNd2->getDomainNumber() == -1) )
+              //if( (adapNd2->getDomainNumber() <= 0) )
               {
-                param[1] = vv[jj];
-                for(ii=0;ii<uu.size();ii++)
+                bbTemp = adapNd2->getAABB();
+
+                pt[0] = pointsVTK->InsertNextPoint(bbTemp.minBB[0], bbTemp.minBB[1], 0.0);
+                pt[1] = pointsVTK->InsertNextPoint(bbTemp.maxBB[0], bbTemp.minBB[1], 0.0);
+                pt[3] = pointsVTK->InsertNextPoint(bbTemp.minBB[0], bbTemp.maxBB[1], 0.0);
+                pt[2] = pointsVTK->InsertNextPoint(bbTemp.maxBB[0], bbTemp.maxBB[1], 0.0);
+
+                for(ll=0;ll<4;ll++)
+                  quadVTK->GetPointIds()->SetId(ll, pt[ll]);
+
+                cellDataVTK->InsertNextValue( adapNd2->getDomainNumber() );
+                //cellDataVTK2->InsertNextValue( adapNd2->getLevel() );
+                cellDataVTK2->InsertNextValue(ndTemp->getSubdomainId());
+
+                uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
+
+                tmp0 = adapNd2->getKnots(Dir1);
+                tmp1 = adapNd2->getKnots(Dir2);
+
+                incr1 = tmp0[2] ;
+                incr2 = tmp1[2] ;
+
+                fact = incr1/resln[0];
+                create_vector(tmp0[0], tmp0[1], fact, uu);
+
+                fact = incr2/resln[1];
+                create_vector(tmp1[0], tmp1[1], fact, vv);
+
+                for(jj=0;jj<vv.size();jj++)
                 {
-                  param[0] = uu[ii];
-
-                  GeomData.computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy);
-
-                  if(ndTemp->getParent() == NULL)
+                  param[1] = vv[jj];
+                  for(ii=0;ii<uu.size();ii++)
                   {
-                    N = NN;
-                    dN_dx = dNN_dx;
-                    dN_dy = dNN_dy;
-                  }
-                  else
-                  {
-                    N = ndTemp->SubDivMat*NN;
-                    dN_dx = ndTemp->SubDivMat*dNN_dx;
-                    dN_dy = ndTemp->SubDivMat*dNN_dy;
-                  }
+                    param[0] = uu[ii];
 
-                  vec[0] = ndTemp->computeValue(0, N);
-                  vec[1] = ndTemp->computeValue(1, N);
-                  fact   = ndTemp->computeValue(2, N);
+                    GeomData.computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy);
 
-                  vecVTK->InsertNextTuple(vec);
-                  //vecVTK2->InsertNextTuple(vec);
-                  scaVTK->InsertNextValue(fact);
-                  fact = ndTemp->computeValue(1, dN_dx) - ndTemp->computeValue(0, dN_dy);
-                  scaVTK2->InsertNextValue(fact);
-                } // for(ii=0;ii<uu.size();ii++)
-              } // for(jj=0;jj<vv.size();jj++)
-            } // if( (adapNd2->getDomainNumber() <= 0) )
+                    if(ndTemp->getParent() == NULL)
+                    {
+                      N = NN;
+                      dN_dx = dNN_dx;
+                      dN_dy = dNN_dy;
+                    }
+                    else
+                    {
+                      N = ndTemp->SubDivMat*NN;
+                      dN_dx = ndTemp->SubDivMat*dNN_dx;
+                      dN_dy = ndTemp->SubDivMat*dNN_dy;
+                    }
 
-            if(adapNd2->getOrientation() == -1)
-              adapNd3 = NULL;
-            else
-              adapNd3 = adapNd2->getNeighbour(neigbour_map1[adapNd2->getOrientation()]);
+                    vec[0] = ndTemp->computeValue(0, N);
+                    vec[1] = ndTemp->computeValue(1, N);
+                    fact   = ndTemp->computeValue(2, N);
 
-            //cout <<  adapNd2->getID() << '\t' << adapNd2->getOrientation() << endl;
-            while( adapNd2->getOrientation() == NW )
-            {
-              adapNd2 = adapNd2->getParent();
+                    vecVTK->InsertNextTuple(vec);
+                    //vecVTK2->InsertNextTuple(vec);
+                    scaVTK->InsertNextValue(fact);
+                    fact = ndTemp->computeValue(1, dN_dx) - ndTemp->computeValue(0, dN_dy);
+                    scaVTK2->InsertNextValue(fact);
+                  } // for(ii=0;ii<uu.size();ii++)
+                } // for(jj=0;jj<vv.size();jj++)
+              } // if( (adapNd2->getDomainNumber() <= 0) )
 
               if(adapNd2->getOrientation() == -1)
                 adapNd3 = NULL;
               else
-              {
                 adapNd3 = adapNd2->getNeighbour(neigbour_map1[adapNd2->getOrientation()]);
-              }
-            } //while( adapNd2->getOrientation() == NW )
 
-            adapNd2 = adapNd3;
-          } // if( adapNd2->isLeaf() )
-          else
-          {
-            adapNd2 = adapNd2->getChild(0);
-          }
-        } // while( adapNd2 != NULL )
-        //
-        //cout << " AAAAAAAAAA " << endl;
-
-        /*
-        /////////////////////////////////////////////////////////////
-        //  method 2 - bindarytree
-        /////////////////////////////////////////////////////////////
-
-        typedef  typename  node::adapTreePTR  adapTreePTR;
-
-        adapTreePTR  adapNd1, adapNd2, adapNd3;
-
-        adapNd2 = ndTemp->adapIntegNode;
-
-        while( adapNd2 != NULL )
-        {
-          if( adapNd2->isLeaf() )
-          {
-            if( (adapNd2->getDomainNumber() <= 0) )
-            {
-              bbTemp = adapNd2->getAABB();
-
-              pt[0] = pointsVTK->InsertNextPoint(bbTemp.minBB[0], bbTemp.minBB[1], 0.0);
-              pt[1] = pointsVTK->InsertNextPoint(bbTemp.maxBB[0], bbTemp.minBB[1], 0.0);
-              pt[3] = pointsVTK->InsertNextPoint(bbTemp.minBB[0], bbTemp.maxBB[1], 0.0);
-              pt[2] = pointsVTK->InsertNextPoint(bbTemp.maxBB[0], bbTemp.maxBB[1], 0.0);
-
-              for(ll=0;ll<4;ll++)
-                quadVTK->GetPointIds()->SetId(ll, pt[ll]);
-
-              cellDataVTK->InsertNextValue( adapNd2->getDomainNumber() );
-              //cellDataVTK2->InsertNextValue( adapNd2->getLevel() );
-              cellDataVTK2->InsertNextValue(ndTemp->getSubdomainId());
-
-              uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
-
-              tmp0 = adapNd2->getKnots(Dir1);
-              tmp1 = adapNd2->getKnots(Dir2);
-
-              incr1 = tmp0[2] ;
-              incr2 = tmp1[2] ;
-
-              fact = incr1/resln[0];
-              create_vector(tmp0[0], tmp0[1], fact, uu);
-
-              fact = incr2/resln[1];
-              create_vector(tmp1[0], tmp1[1], fact, vv);
-
-              for(jj=0;jj<vv.size();jj++)
+              //cout <<  adapNd2->getID() << '\t' << adapNd2->getOrientation() << endl;
+              while( adapNd2->getOrientation() == NW )
               {
-                param[1] = vv[jj];
-                for(ii=0;ii<uu.size();ii++)
+                adapNd2 = adapNd2->getParent();
+
+                if(adapNd2->getOrientation() == -1)
+                  adapNd3 = NULL;
+                else
                 {
-                  param[0] = uu[ii];
+                  adapNd3 = adapNd2->getNeighbour(neigbour_map1[adapNd2->getOrientation()]);
+                }
+              } //while( adapNd2->getOrientation() == NW )
 
-                  GeomData.computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy);
-
-                  if(ndTemp->getParent() == NULL)
-                  {
-                    N = NN;
-                    dN_dx = dNN_dx;
-                    dN_dy = dNN_dy;
-                  }
-                  else
-                  {
-                    N = ndTemp->SubDivMat*NN;
-                    dN_dx = ndTemp->SubDivMat*dNN_dx;
-                    dN_dy = ndTemp->SubDivMat*dNN_dy;
-                  }
-
-                  vec[0] = ndTemp->computeValue(0, N);
-                  vec[1] = ndTemp->computeValue(1, N);
-                  fact   = ndTemp->computeValue(2, N);
-
-                  vecVTK->InsertNextTuple(vec);
-                  //vecVTK2->InsertNextTuple(vec);
-                  scaVTK->InsertNextValue(fact);
-                  fact = ndTemp->computeValue(1, dN_dx) - ndTemp->computeValue(0, dN_dy);
-                  scaVTK2->InsertNextValue(fact);
-                } // for(ii=0;ii<uu.size();ii++)
-              } // for(jj=0;jj<vv.size();jj++)
-            } // if( (adapNd2->getDomainNumber() <= 0) )
-
-            if(adapNd2->getOrientation() == -1)
-              adapNd3 = NULL;
+              adapNd2 = adapNd3;
+            } // if( adapNd2->isLeaf() )
             else
-              adapNd3 = adapNd2->getNeighbour(neigbour_map2[adapNd2->getOrientation()]);
-
-            //cout <<  adapNd2->getID() << '\t' << adapNd2->getOrientation() << endl;
-            while( adapNd2->getOrientation() == RIGHT )
             {
-              adapNd2 = adapNd2->getParent();
+              adapNd2 = adapNd2->getChild(0);
+            }
+          } // while( adapNd2 != NULL )
+          //
+          //cout << " AAAAAAAAAA " << endl;
+
+          /*
+          /////////////////////////////////////////////////////////////
+          //  method 2 - bindarytree
+          /////////////////////////////////////////////////////////////
+
+          typedef  typename  node::adapTreePTR  adapTreePTR;
+
+          adapTreePTR  adapNd1, adapNd2, adapNd3;
+
+          adapNd2 = ndTemp->adapIntegNode;
+
+          while( adapNd2 != NULL )
+          {
+            if( adapNd2->isLeaf() )
+            {
+              if( (adapNd2->getDomainNumber() <= 0) )
+              {
+                bbTemp = adapNd2->getAABB();
+
+                pt[0] = pointsVTK->InsertNextPoint(bbTemp.minBB[0], bbTemp.minBB[1], 0.0);
+                pt[1] = pointsVTK->InsertNextPoint(bbTemp.maxBB[0], bbTemp.minBB[1], 0.0);
+                pt[3] = pointsVTK->InsertNextPoint(bbTemp.minBB[0], bbTemp.maxBB[1], 0.0);
+                pt[2] = pointsVTK->InsertNextPoint(bbTemp.maxBB[0], bbTemp.maxBB[1], 0.0);
+
+                for(ll=0;ll<4;ll++)
+                  quadVTK->GetPointIds()->SetId(ll, pt[ll]);
+
+                cellDataVTK->InsertNextValue( adapNd2->getDomainNumber() );
+                //cellDataVTK2->InsertNextValue( adapNd2->getLevel() );
+                cellDataVTK2->InsertNextValue(ndTemp->getSubdomainId());
+
+                uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
+
+                tmp0 = adapNd2->getKnots(Dir1);
+                tmp1 = adapNd2->getKnots(Dir2);
+
+                incr1 = tmp0[2] ;
+                incr2 = tmp1[2] ;
+
+                fact = incr1/resln[0];
+                create_vector(tmp0[0], tmp0[1], fact, uu);
+
+                fact = incr2/resln[1];
+                create_vector(tmp1[0], tmp1[1], fact, vv);
+
+                for(jj=0;jj<vv.size();jj++)
+                {
+                  param[1] = vv[jj];
+                  for(ii=0;ii<uu.size();ii++)
+                  {
+                    param[0] = uu[ii];
+
+                    GeomData.computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy);
+
+                    if(ndTemp->getParent() == NULL)
+                    {
+                      N = NN;
+                      dN_dx = dNN_dx;
+                      dN_dy = dNN_dy;
+                    }
+                    else
+                    {
+                      N = ndTemp->SubDivMat*NN;
+                      dN_dx = ndTemp->SubDivMat*dNN_dx;
+                      dN_dy = ndTemp->SubDivMat*dNN_dy;
+                    }
+
+                    vec[0] = ndTemp->computeValue(0, N);
+                    vec[1] = ndTemp->computeValue(1, N);
+                    fact   = ndTemp->computeValue(2, N);
+
+                    vecVTK->InsertNextTuple(vec);
+                    //vecVTK2->InsertNextTuple(vec);
+                    scaVTK->InsertNextValue(fact);
+                    fact = ndTemp->computeValue(1, dN_dx) - ndTemp->computeValue(0, dN_dy);
+                    scaVTK2->InsertNextValue(fact);
+                  } // for(ii=0;ii<uu.size();ii++)
+                } // for(jj=0;jj<vv.size();jj++)
+              } // if( (adapNd2->getDomainNumber() <= 0) )
 
               if(adapNd2->getOrientation() == -1)
                 adapNd3 = NULL;
               else
-      	      {
                 adapNd3 = adapNd2->getNeighbour(neigbour_map2[adapNd2->getOrientation()]);
-	            }
-            } //while( adapNd2->getOrientation() == RIGHT )
 
-            adapNd2 = adapNd3;
-          } // if( adapNd2->isLeaf() )
-          else
-          {
-            adapNd2 = adapNd2->getChild(0);
-          }
-        } // while( adapNd2 != NULL )
-        */          //cout << " AAAAAAAAAA " << endl;
-      } // else
+              //cout <<  adapNd2->getID() << '\t' << adapNd2->getOrientation() << endl;
+              while( adapNd2->getOrientation() == RIGHT )
+              {
+                adapNd2 = adapNd2->getParent();
+
+                if(adapNd2->getOrientation() == -1)
+                  adapNd3 = NULL;
+                else
+      	        {
+                  adapNd3 = adapNd2->getNeighbour(neigbour_map2[adapNd2->getOrientation()]);
+	              }
+              } //while( adapNd2->getOrientation() == RIGHT )
+
+              adapNd2 = adapNd3;
+            } // if( adapNd2->isLeaf() )
+            else
+            {
+              adapNd2 = adapNd2->getChild(0);
+            }
+          } // while( adapNd2 != NULL )
+          */          //cout << " AAAAAAAAAA " << endl;
+        } // else
+      }
+
+      //cout << " jjjjjjjjjjjjjjjjjj " << endl;
+      vecVTK->SetName("vel");
+      //vecVTK2->SetName("force");
+      scaVTK->SetName("pres");
+      scaVTK2->SetName("vortz");
+
+      //assign nodal coordinates and field data to uGridVTK
+      // no need to create lookup table here. All this stuff can be done in Paraview
+
+      uGridVTK->SetPoints(pointsVTK);
+
+      uGridVTK->GetPointData()->SetScalars(scaVTK);
+      uGridVTK->GetPointData()->SetVectors(vecVTK);
+      //uGridVTK->GetPointData()->AddArray(vecVTK2);
+      uGridVTK->GetPointData()->AddArray(scaVTK2);
+
+      uGridVTK->GetCellData()->SetScalars(cellDataVTK);
+      uGridVTK->GetCellData()->AddArray(cellDataVTK2);
+
+      //cout << " jjjjjjjjjjjjjjjjjj " << endl;
     }
-
-    //cout << " jjjjjjjjjjjjjjjjjj " << endl;
-    vecVTK->SetName("vel");
-    //vecVTK2->SetName("force");
-    scaVTK->SetName("pres");
-    scaVTK2->SetName("vortz");
-
-    //assign nodal coordinates and field data to uGridVTK
-    // no need to create lookup table here. All this stuff can be done in Paraview
-
-    uGridVTK->SetPoints(pointsVTK);
-
-    uGridVTK->GetPointData()->SetScalars(scaVTK);
-    uGridVTK->GetPointData()->SetVectors(vecVTK);
-    //uGridVTK->GetPointData()->AddArray(vecVTK2);
-    uGridVTK->GetPointData()->AddArray(scaVTK2);
-
-    uGridVTK->GetCellData()->SetScalars(cellDataVTK);
-    uGridVTK->GetCellData()->AddArray(cellDataVTK2);
-
-    //cout << " jjjjjjjjjjjjjjjjjj " << endl;
-  }
 
     return;
 }

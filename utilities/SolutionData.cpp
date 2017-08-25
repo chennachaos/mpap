@@ -232,7 +232,7 @@ void  SolutionData::timeUpdate()
     //cout << " mpapTime.dt    = " << mpapTime.dt << endl;
     //cout << " mpapTime.prev  = " << mpapTime.prev << endl;
     //cout << " mpapTime.prev2 = " << mpapTime.prev2 << endl;
-    cout << " knp1 = " << knp1 << endl;
+    //cout << " knp1 = " << knp1 << endl;
     
     VectorXd  tempForce(force.rows());
     

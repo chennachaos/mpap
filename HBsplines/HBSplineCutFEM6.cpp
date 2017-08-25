@@ -14,7 +14,6 @@ using namespace std;
 void  HBSplineCutFEM::computeTotalBodyForce(int index)
 {
   cout << " HBSplineCutFEM::computeTotalBodyForce() ... not implemented yet ... " << endl;
-
   return;
 }
 
@@ -28,7 +27,7 @@ void  HBSplineCutFEM::solveSolidProblem()
     //computeTotalForce(bb);
     //ImmersedBodyObjects[bb]->updateForce(&(totalForce(0)));
 
-    cout << " kkkkkkkkkkk " << endl;
+    //cout << " kkkkkkkkkkk " << endl;
     ImmersedBodyObjects[bb]->solveTimeStep();
 
     //IB_MOVED = (IB_MOVED || ImmersedBodyObjects[bb]->updatePointPositions() );
@@ -1372,13 +1371,10 @@ void  HBSplineCutFEM::computeTotalForce2D(int bb)
       return;
     }
 
-    int  aa, ii, jj, kk, nlb, nlf, nlocal, gp, nGauss;
+    int  aa=0, ii=0, jj=0, kk=0, nlb=0, nlocal=0, gp=0, nGauss=0;
+    int  nlf = (degree[0]+1) * (degree[1]+1);
 
-    nlf = 1;
-    for(ii=0; ii<DIM; ii++)
-      nlf *= (degree[ii]+1);
-
-    double  dvol, PENALTY, detJ, fact;
+    double  dvol=0.0, PENALTY=0.0, detJ=0.0, fact=0.0;
 
     VectorXd  Nb, fluidAcceOnSolid;
     myPoint   vel, velSpec, acceSpec, trac, acceFluid, centroid;
@@ -1400,49 +1396,48 @@ void  HBSplineCutFEM::computeTotalForce2D(int bb)
     ImmersedIntegrationElement  *lme;
     myPoly*  poly;
 
-          PENALTY = ImmersedBodyObjects[bb]->getPenaltyParameter();
+    PENALTY = ImmersedBodyObjects[bb]->getPenaltyParameter();
 
-          nlb = ImmersedBodyObjects[bb]->ImmIntgElems[0]->pointNums.size();
+    nlb = ImmersedBodyObjects[bb]->ImmIntgElems[0]->pointNums.size();
 
-          nGauss = (int) cutFEMparams[1];
+    Nb.resize(nlb);
 
-          Nb.resize(nlb);
+    nGauss = (int) cutFEMparams[1];
+    getGaussPoints1D(nGauss, gausspoints, gaussweights);
 
-          getGaussPoints1D(nGauss, gausspoints, gaussweights);
+    bool rigidflag = ImmersedBodyObjects[bb]->isRigidBody() ;
 
-          bool rigidflag = ImmersedBodyObjects[bb]->isRigidBody() ;
+    if(rigidflag)
+    {
+      totalForce.resize(6);
+      fluidAcceOnSolid.resize(6);
+    }
+    else
+    {
+      aa = ImmersedBodyObjects[bb]->SolnData.var1.rows();
+      totalForce.resize(aa);
+      fluidAcceOnSolid.resize(aa);
+    }
 
-          if(rigidflag)
+    totalForce.setZero();
+    fluidAcceOnSolid.setZero();
+
+    centroid = ImmersedBodyObjects[bb]->getCentroid(2);
+
+    //cout << " centroid = " << centroid[0] << '\t' << centroid[1] << endl;
+    //centroid[0] = 73.0;
+    //centroid[1] = 60.0;
+
+    for(aa=0; aa<ImmersedBodyObjects[bb]->ImmIntgElems.size(); aa++)
+    {
+      lme  = ImmersedBodyObjects[bb]->ImmIntgElems[aa];
+      poly = ImmersedBodyObjects[bb]->ImmersedFaces[aa];
+
+      //cout << " aa = " << aa << '\t' << lme->isActive() << endl;
+      if( lme->isActive() )
+      {
+          for(gp=0; gp<nGauss; gp++)
           {
-            totalForce.resize(6);
-            fluidAcceOnSolid.resize(6);
-          }
-          else
-          {
-            aa = ImmersedBodyObjects[bb]->SolnData.var1.rows();
-            totalForce.resize(aa);
-            fluidAcceOnSolid.resize(aa);
-          }
-
-          totalForce.setZero();
-          fluidAcceOnSolid.setZero();
-
-          centroid = ImmersedBodyObjects[bb]->getCentroid(2);
-
-          //cout << " centroid = " << centroid[0] << '\t' << centroid[1] << endl;
-          //centroid[0] = 73.0;
-          //centroid[1] = 60.0;
-
-        for(aa=0; aa<ImmersedBodyObjects[bb]->ImmIntgElems.size(); aa++)
-        {
-          lme  = ImmersedBodyObjects[bb]->ImmIntgElems[aa];
-          poly = ImmersedBodyObjects[bb]->ImmersedFaces[aa];
-
-          //cout << " aa = " << aa << '\t' << lme->isActive() << endl;
-          if( lme->isActive() )
-          {
-            for(gp=0; gp<nGauss; gp++)
-            {
               param[0] = gausspoints[gp];
 
               poly->computeBasisFunctions(param, geom, Nb, detJ);
@@ -1522,13 +1517,12 @@ void  HBSplineCutFEM::computeTotalForce2D(int bb)
                   //fluidAcceOnSolid[kk+1] += (Nb[ii]*fact)*(acceFluid[1] - acceSpec[1]);
                 }
               }
-
               //cout << " uuuuuuuuuuu " << endl;
-            }//for(gp=0...
-          } // if( lme->isActive() )
-        }//for(aa=0...
+          }//for(gp=0...
+      } // if( lme->isActive() )
+    }//for(aa=0...
 
-  ImmersedBodyObjects[bb]->fluidAcce = stagParams[4]*fluidAcceOnSolid;
+    ImmersedBodyObjects[bb]->fluidAcce = stagParams[4]*fluidAcceOnSolid;
 
   return;
 }
@@ -1544,11 +1538,10 @@ void  HBSplineCutFEM::computeTotalForce3D(int bb)
       return;
     }
 
-    int  aa, ii, jj, nlb, nlocal, gp, nGauss;
+    int  aa=0, ii=0, jj=0, nlb=0, nlocal=0, gp=0, nGauss=0;
+    int  nlf = (degree[0]+1)*(degree[1]+1)*(degree[2]+1);
 
-    int nlf = (degree[0]+1)*(degree[1]+1)*(degree[2]+1);
-
-    double  dvol, PENALTY, detJ;
+    double  dvol=0.0, PENALTY=0.0, detJ=0.0;
 
     VectorXd  Nb;
     myPoint   vel, velSpec, trac, ptTemp, centroid, FluidAcce;
@@ -1568,49 +1561,49 @@ void  HBSplineCutFEM::computeTotalForce3D(int bb)
     ImmersedIntegrationElement  *lme;
     myPoly*  poly;
 
-          PENALTY = ImmersedBodyObjects[bb]->getPenaltyParameter();
+    PENALTY = ImmersedBodyObjects[bb]->getPenaltyParameter();
 
-          nlb = ImmersedBodyObjects[bb]->ImmIntgElems[0]->pointNums.size();
+    nlb = ImmersedBodyObjects[bb]->ImmIntgElems[0]->pointNums.size();
 
-          Nb.resize(nlb);
+    Nb.resize(nlb);
 
-          nGauss = (int) cutFEMparams[1];
+    nGauss = (int) cutFEMparams[1];
 
-          if(nlb == 3)
-            getGaussPointsTriangle(nGauss, gausspoints1, gausspoints2, gaussweights);
-          else
-            getGaussPointsQuad(nGauss, gausspoints1, gausspoints2, gaussweights);
+    if(nlb == 3)
+      getGaussPointsTriangle(nGauss, gausspoints1, gausspoints2, gaussweights);
+    else
+      getGaussPointsQuad(nGauss, gausspoints1, gausspoints2, gaussweights);
 
-          //printVector(gausspoints);          printf("\n\n\n\n");
-          //printVector(gaussweights);          printf("\n\n\n\n");
+    //printVector(gausspoints);          printf("\n\n\n\n");
+    //printVector(gaussweights);          printf("\n\n\n\n");
 
-          bool rigidflag = ImmersedBodyObjects[bb]->isRigidBody() ;
+    bool rigidflag = ImmersedBodyObjects[bb]->isRigidBody() ;
 
-          if(rigidflag)
-            totalForce.resize(6);
-          else
+    if(rigidflag)
+      totalForce.resize(6);
+    else
+    {
+      aa = ImmersedBodyObjects[bb]->getNumberOfNodes()*DIM;
+      totalForce.resize(aa);
+    }
+
+    totalForce.setZero();
+
+    centroid.setZero();
+    //centroid = ImmersedBodyObjects[bb]->getCentroid(2);
+
+    //cout << " ImmersedBodyObjects[bb]->ImmIntgElems.size() = " << ImmersedBodyObjects[bb]->ImmIntgElems.size() << endl;
+
+    for(aa=0; aa<ImmersedBodyObjects[bb]->ImmIntgElems.size(); aa++)
+    {
+      lme  = ImmersedBodyObjects[bb]->ImmIntgElems[aa];
+      poly = ImmersedBodyObjects[bb]->ImmersedFaces[aa];
+
+      //cout << " aa = " << aa << '\t' << lme->isActive() << '\t' << bb << endl;
+      if( lme->isActive() )
+      {
+          for(gp=0; gp<nGauss; gp++)
           {
-            aa = ImmersedBodyObjects[bb]->getNumberOfNodes()*DIM;
-            totalForce.resize(aa);
-          }
-
-          totalForce.setZero();
-
-          centroid.setZero();
-          //centroid = ImmersedBodyObjects[bb]->getCentroid(2);
-
-          //cout << " ImmersedBodyObjects[bb]->ImmIntgElems.size() = " << ImmersedBodyObjects[bb]->ImmIntgElems.size() << endl;
-
-        for(aa=0; aa<ImmersedBodyObjects[bb]->ImmIntgElems.size(); aa++)
-        {
-          lme  = ImmersedBodyObjects[bb]->ImmIntgElems[aa];
-          poly = ImmersedBodyObjects[bb]->ImmersedFaces[aa];
-
-          //cout << " aa = " << aa << '\t' << lme->isActive() << '\t' << bb << endl;
-          if( lme->isActive() )
-          {
-            for(gp=0; gp<nGauss; gp++)
-            {
               param[0] = gausspoints1[gp];
               param[1] = gausspoints2[gp];
 
@@ -1685,8 +1678,8 @@ void  HBSplineCutFEM::computeTotalForce3D(int bb)
 
               //cout << " uuuuuuuuuuu " << endl;
             }//for(gp=0...
-          } // if( lme->isActive() )
-        }//for(aa=0...
+        } // if( lme->isActive() )
+    }//for(aa=0...
 
     //printf("Force in X-direction = %12.6f \n", totalForce[0]);
     //printf("Force in Y-direction = %12.6f \n", totalForce[1]);

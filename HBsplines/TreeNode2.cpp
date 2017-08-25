@@ -3,11 +3,7 @@
 #include <string.h>
 #include "MpapTime.h"
 #include "Functions.h"
-
 #include "FunctionsBiology.h"
-
-//#include "UtilBase.h"
-
 #include "BasisFunctionsBSpline.h"
 #include "myDataIntegrateCutFEM.h"
 

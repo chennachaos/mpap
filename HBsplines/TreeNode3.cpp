@@ -892,7 +892,7 @@ void TreeNode<2>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, doub
 */
 
 
-/*
+//
 template<>
 void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
 {
@@ -904,7 +904,7 @@ void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
 
     int ii, jj, gp1, gp2, TI, TIp1, TIp2, count, TJ, TJp1, TJp2;
    
-    double  Jac, dvol, force;
+    double  Jac, dvol, force, bb1;
 
     VectorXd  NN(totnlbf), dNN_dx(totnlbf), dNN_dy(totnlbf);
     VectorXd  N, dN_dx, dN_dy;
@@ -956,6 +956,13 @@ void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
 
         Klocal += ((dvol*mu)*(dN_dx*dN_dx.transpose()+dN_dy*dN_dy.transpose()));
 
+        //for(ii=0;ii<totnlbf2;ii++)
+        //{
+          //bb1 = dvol*dN_dx(ii);
+          //for(jj=0;jj<totnlbf2;jj++)
+            //Klocal(ii, jj) += (bb1*dN_dx(jj));
+        //}
+
         //cout << " AAAAAAAAAAA " << endl;
         Flocal += (dvol*(N*force - dN_dx*(mu*computeValue(0,dN_dx)) - dN_dy*(mu*computeValue(0,dN_dy))) );
         //cout << " AAAAAAAAAAA " << endl;
@@ -967,7 +974,7 @@ void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
 
   return;
 }
-*/
+//
 
 
 /*
@@ -1048,6 +1055,104 @@ void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
 */
 
 
+
+
+template<>
+void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
+{
+  // for computing eigenvalues for stabilisation/penalty parameter
+
+  if( DirichletData.size() > 0 )
+  {
+    int ii, jj, aa, gp1, gp2, TI, TIp1, TIp2, index, TJ, TJp1, TJp2, dir, side;
+    double  Ta, Tb, res, JacMultLoc, af, NitscheFact;
+    double  dvol, specVal, PENALTY, Jac, fact, trac;
+    bool  isNitsche;
+
+    myPoint  param, geom, normal;
+    VectorXd  N(totnlbf), dN_dx(totnlbf), dN_dy(totnlbf);
+    VectorXd  NN(totnlbf), dNN_dx(totnlbf), dNN_dy(totnlbf);
+
+    vector<double>  boundaryGPs1, boundaryGWs1, boundaryGPs2, boundaryGWs2;
+
+    bool   axsy = ((int)elmDat[2] == 1);
+
+    double  rho = elmDat[3];
+    double  mu  = elmDat[4];
+
+    double  hx = bbox.maxBB[0]-bbox.minBB[0];
+    double  hy = bbox.maxBB[1]-bbox.minBB[1];
+
+      for(aa=0;aa<DirichletData.size();aa++)
+      {
+       // printVector(DirichletData[aa]);
+
+        isNitsche = false;
+        side        = (int) (DirichletData[aa][0] - 1);
+        dir         = (int) (DirichletData[aa][1] - 1);
+        specVal     = DirichletData[aa][2];
+        PENALTY     = DirichletData[aa][3];
+        isNitsche   = ( (int) DirichletData[aa][4] == 1 );
+        NitscheFact = DirichletData[aa][5];
+
+        GeomData->getBoundaryNormal2D(side, normal);
+        GeomData->setBoundaryGPs2D(side, boundaryGPs1, boundaryGWs1, boundaryGPs2, boundaryGWs2);
+
+        JacMultLoc = TreeNode<2>::getJacBoundary(side);
+        
+        for(gp2=0;gp2<boundaryGPs2.size();gp2++)
+        {
+            param[1] = 0.5 * (knots[1][2] * boundaryGPs2[gp2] + knots[1][3]);
+        for(gp1=0;gp1<boundaryGPs1.size();gp1++)
+        {
+            param[0] = 0.5 * (knots[0][2] * boundaryGPs1[gp1] + knots[0][3]);
+ 
+            dvol = JacMultLoc * boundaryGWs2[gp2] * boundaryGWs1[gp1] ;
+            
+            //printf(" %4d \t %4d \t %12.6f \t %12.6f \n", side, dir, vv, uu);
+
+            GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy );
+
+            if(parent == NULL)
+            {
+              N = NN;
+              dN_dx = dNN_dx;
+              dN_dy = dNN_dy;
+            }
+            else
+            {
+              N = SubDivMat*NN;
+              dN_dx = SubDivMat*dNN_dx;
+              dN_dy = SubDivMat*dNN_dy;
+            }
+
+            //for(ii=0;ii<totnlbf;ii++)
+            //printf(" \t %14.8f \n", NN[ii]);
+
+            //printf("\n\n tracX and tracY ... %12.6f \t %12.6f  \t %12.6f  \t %12.6f  \t %12.6f  \t %12.6f  \t %12.6f \n\n\n", xx, yy, val, val, Jac, JacMult, dvol);
+            //if(pout) printf(" knotsAtGPs = %12.6f \t xx = %12.6f \t yy = %12.6f \n", knotsAtGPs, xx, yy);
+            //printf(" uu = %12.6f \t vv = %12.6f \t dvol = %12.6f \t volume = %12.6f \n", uu, vv, dvol, volume);
+
+            for(ii=0;ii<totnlbf2;ii++)
+            {
+              Ta = dvol*(normal[0]*dN_dx(ii)+normal[1]*dN_dy(ii));
+
+              for(jj=0;jj<totnlbf2;jj++)
+              {
+                Klocal(ii, jj) += Ta*(normal[0]*dN_dx(jj)+normal[1]*dN_dy(jj));
+              }
+            }
+        }// for(gp1=0...
+        }// for(gp2=0...
+      } // for(aa=0;aa<DirichletData.size();aa++)
+  } // if(DirichletData.size() > 0)
+
+  //printMatrix(Klocal);
+
+  return;
+}
+
+
 /*
 template<>
 void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
@@ -1069,12 +1174,11 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
 
     bool   axsy = ((int)elmDat[2] == 1);
 
+    double  rho = elmDat[3];
     double  mu  = elmDat[4];
-    double  rho = elmDat[5];
 
     double  hx = bbox.maxBB[0]-bbox.minBB[0];
     double  hy = bbox.maxBB[1]-bbox.minBB[1];
-
 
     af = SolnData->td(2);
 
@@ -1200,6 +1304,8 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
         }// for(gp2=0...
       } // for(aa=0;aa<DirichletData.size();aa++)
   } // if(DirichletData.size() > 0)
+
+  //printMatrix(Klocal);
 
   return;
 }

@@ -7,10 +7,8 @@
 #include "MpapTime.h"
 #include "TimeFunction.h"
 
-
 extern MpapTime mpapTime;
 extern List<TimeFunction> timeFunction;
-
 
 
 
@@ -32,7 +30,6 @@ ImmersedSolid::ImmersedSolid()
   polyDataVTK =  vtkSmartPointer<vtkPolyData>::New();
 
   selectEnclosedPoints   =   vtkSmartPointer<vtkSelectEnclosedPoints>::New();
-
   selectEnclosedPoints2  =   vtkSmartPointer<vtkSelectEnclosedPoints>::New();
 
   selectEnclosedPoints->CheckSurfaceOn();
@@ -140,33 +137,34 @@ bool ImmersedSolid::converged()
 
 bool ImmersedSolid::diverging(double factor)
 {
-  if (rNormPrev > -0.1 && (rNorm / rNormPrev) > factor) return true;
+    if(rNormPrev > -0.1 && (rNorm / rNormPrev) > factor)
+      return true;
 
-  if (localStiffnessError != 0) return true;
+    if(localStiffnessError != 0)
+      return true;
 
-  if (prgNAN(rNorm)) return true;
+    if(prgNAN(rNorm))
+      return true;
 
-  return false;
+    return false;
 }
-
-
 
 
 
 
 void  ImmersedSolid::setImmersedIntegrationElements(vector<vector<int> >& datatemp)
 {
-  int ii, jj, kk, ind;
-  kk = datatemp[0].size()-1 ;
+    int ii=0, jj=0, ind=0;
+    int kk = datatemp[0].size()-1 ;
 
-  //cout << " datatemp.size() = " << datatemp.size() << '\t' << kk << endl;
+    //cout << " datatemp.size() = " << datatemp.size() << '\t' << kk << endl;
 
-  nImmInt = datatemp.size();
+    nImmInt = datatemp.size();
 
-  ImmersedIntegrationElement* lme;
+    ImmersedIntegrationElement* lme;
 
-  for(ii=0; ii<datatemp.size(); ii++)
-  {
+    for(ii=0; ii<datatemp.size(); ii++)
+    {
       lme = new ImmersedIntegrationElement();
 
       lme->SolnData = &(SolnData);
@@ -189,24 +187,24 @@ void  ImmersedSolid::setImmersedIntegrationElements(vector<vector<int> >& datate
       }
 
       ImmIntgElems.push_back(lme);
-  }
+    }
 
-  //cout << " nImmInt " << nImmInt << endl;
+    //cout << " nImmInt " << nImmInt << endl;
 
-  return;
+    return;
 }
 
 
 
 void  ImmersedSolid::setDataForOutput(vector<vector<int> >& vectemp)
 {
-  OutputData.resize(vectemp.size());
-  for(int ii=0; ii<vectemp.size(); ii++)
-  {
-    OutputData[ii] = vectemp[ii];
-  }
+    OutputData.resize(vectemp.size());
+    for(int ii=0; ii<vectemp.size(); ii++)
+    {
+      OutputData[ii] = vectemp[ii];
+    }
 
-  return;
+    return;
 }
 
 
@@ -215,7 +213,7 @@ void  ImmersedSolid::setDataForOutput(vector<vector<int> >& vectemp)
 
 void ImmersedSolid::setImmersedElemActiveFlag(vector<int>& datatemp)
 {
-  return;
+    return;
 }
 
 
@@ -224,10 +222,10 @@ void ImmersedSolid::setImmersedElemActiveFlag(vector<int>& datatemp)
 
 void  ImmersedSolid::computeCentroid(int index)
 {
-  centroid.setZero();
+    centroid.setZero();
   
-  switch(index)
-  {
+    switch(index)
+    {
       case 0: // original configuration
 
         for(int aa=0; aa<nNode; aa++)
@@ -248,22 +246,22 @@ void  ImmersedSolid::computeCentroid(int index)
           centroid += GeomData.NodePosCur[aa];
 
       break;
-  }
+    }
 
-  centroid /= nNode;
+    centroid /= nNode;
 
-  bool printOut = 0;
-  if(printOut)
-  {
-    printf("\n  Centroid of the immersed body ... %5d \n", id);
-    printf(" X-dir \t Y-dir \t Z-dir \n ");
-    if(DIM == 2)
-      printf(" %12.6f \t  %12.6f \t  %12.6f \n", centroid[0], centroid[1], 0.0);
-    else
-      printf(" %12.6f \t  %12.6f \t  %12.6f \n", centroid[0], centroid[1], centroid[2]);
-  }
+    bool printOut = 0;
+    if(printOut)
+    {
+      printf("\n  Centroid of the immersed body ... %5d \n", id);
+      printf(" X-dir \t Y-dir \t Z-dir \n ");
+      if(DIM == 2)
+        printf(" %12.6f \t  %12.6f \t  %12.6f \n", centroid[0], centroid[1], 0.0);
+      else
+        printf(" %12.6f \t  %12.6f \t  %12.6f \n", centroid[0], centroid[1], centroid[2]);
+    }
 
-  return;
+    return;
 }
 
 
@@ -271,13 +269,13 @@ void  ImmersedSolid::computeCentroid(int index)
 
 void  ImmersedSolid::computeAABB(int index)
 {
-  bbox.initialize();
+    bbox.initialize();
 
-  int ii, aa;
-  double  val;
+    int  ii=0, aa=0;
+    double  val=0.0;
 
-  switch(index)
-  {
+    switch(index)
+    {
       case 0: // original configuration
 
         for(aa=0; aa<nNode; aa++)
@@ -333,14 +331,14 @@ void  ImmersedSolid::computeAABB(int index)
         }
 
       break;
-  }
+    }
 
-  //bbox.printSelf();
+    //bbox.printSelf();
   
-  for(ii=0; ii<ImmersedFaces.size(); ii++)
-    ImmersedFaces[ii]->computeAABB();
+    for(ii=0; ii<ImmersedFaces.size(); ii++)
+      ImmersedFaces[ii]->computeAABB();
 
-  return;
+    return;
 }
 
 
@@ -379,14 +377,14 @@ void  ImmersedSolid::computeTotalForce()
 
 void ImmersedSolid::initialise_solid_state()
 {
-  SolnData.var1 = SolnData.var1Prev + mpapTime.dt*SolnData.var1DotPrev ;
-  SolnData.var1Dot = SolnData.var1DotPrev;
+    SolnData.var1 = SolnData.var1Prev + mpapTime.dt*SolnData.var1DotPrev ;
+    SolnData.var1Dot = SolnData.var1DotPrev;
   
-  updateIterStep();
+    updateIterStep();
   
-  SolnData.var1PrevIter = SolnData.var1;
+    SolnData.var1PrevIter = SolnData.var1;
 
-  return;
+    return;
 }
 
 

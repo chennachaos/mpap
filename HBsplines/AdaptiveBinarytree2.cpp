@@ -97,17 +97,16 @@ void AdaptiveBinarytree<2>::computeGaussPoints(int flag, GaussQuadrature&  quadT
 template<>
 void AdaptiveBinarytree<2>::computeGaussPoints(int refLev2, int inclDom, int chkFlag, int mergeFlag, GaussQuadrature&  quadTemp)
 {
-  if( isLeaf() )
-  {
-    myPoint  param, geom;
-    int  gp, ii;
+    if( isLeaf() )
+    {
+      myPoint  param, geom;
+      int  gp=0, ii=0;
 
-    //vector<myPoint>  ptOut;
-    //vector<int>  vecTemp(4);
+      //vector<myPoint>  ptOut;
+      //vector<int>  vecTemp(4);
 
-    //if(level == MAX_LEVEL)
-      //GeomData->doIntersect2D(bbox, false, vecTemp, ptOut, domNums) ;
-
+      //if(level == MAX_LEVEL)
+        //GeomData->doIntersect2D(bbox, false, vecTemp, ptOut, domNums) ;
 
       if( (domNums.size() == 1) && (domNums[0] == inclDom) )
       {
@@ -192,41 +191,43 @@ void AdaptiveBinarytree<2>::computeGaussPoints(int refLev2, int inclDom, int chk
           } // if(mergeFlag && refLev2)
       }
     //}
-  }
-  else
-  {
-    for(int gp=0; gp<NUM_CHILDREN; gp++)
-    {
-      child[gp]->computeGaussPoints(refLev2, inclDom, chkFlag, mergeFlag, quadTemp);
     }
-  }
+    else
+    {
+      for(int gp=0; gp<NUM_CHILDREN; gp++)
+      {
+        child[gp]->computeGaussPoints(refLev2, inclDom, chkFlag, mergeFlag, quadTemp);
+      }
+    }
 
-  return;
+    return;
 }
 
 
 template<>
 void AdaptiveBinarytree<3>::computeGaussPoints2Dfor3D(int refLev2, int inclDom, int chkFlag, int mergeFlag, GaussQuadrature&  quadTemp)
 {
-  cout << " isLeaf() ... 3D " << isLeaf() << endl;
-  return;
+    cout << " isLeaf() ... 3D " << isLeaf() << endl;
+    return;
 }
+
+
 
 template<>
 void AdaptiveBinarytree<2>::computeGaussPoints2Dfor3D(int refLev2, int inclDom, int chkFlag, int mergeFlag, GaussQuadrature&  quadTemp)
 {
-  if( isLeaf() )
-  {
-    myPoint  param, geom;
-    int  gp, ii;
+    if( isLeaf() )
+    {
+      myPoint  param, geom;
+      int  gp=0, ii=0;
 
-    //vector<myPoint>  ptOut;
-    //vector<int>  vecTemp(4);
+      //vector<myPoint>  ptOut;
+      //vector<int>  vecTemp(4);
 
-    //if(level == MAX_LEVEL)
-      //GeomData->doIntersect2D(bbox, false, vecTemp, ptOut, domNums) ;
+      //if(level == MAX_LEVEL)
+        //GeomData->doIntersect2D(bbox, false, vecTemp, ptOut, domNums) ;
 
-     //cout << " AdaptiveBinarytree<2>::computeGaussPoints2Dfor3D " << endl;
+      //cout << " AdaptiveBinarytree<2>::computeGaussPoints2Dfor3D " << endl;
 
       if( (domNums.size() == 1) && (domNums[0] == inclDom) )
       {
@@ -316,16 +317,16 @@ void AdaptiveBinarytree<2>::computeGaussPoints2Dfor3D(int refLev2, int inclDom, 
           } // if(mergeFlag && refLev2)
       }
     //}
-  }
-  else
-  {
-    for(int gp=0; gp<NUM_CHILDREN; gp++)
-    {
-      child[gp]->computeGaussPoints2Dfor3D(refLev2, inclDom, chkFlag, mergeFlag, quadTemp);
     }
-  }
+    else
+    {
+      for(int gp=0; gp<NUM_CHILDREN; gp++)
+      {
+        child[gp]->computeGaussPoints2Dfor3D(refLev2, inclDom, chkFlag, mergeFlag, quadTemp);
+      }
+    }
 
-  return;
+    return;
 }
 
 
@@ -333,10 +334,10 @@ void AdaptiveBinarytree<2>::computeGaussPoints2Dfor3D(int refLev2, int inclDom, 
 template<>
 void AdaptiveBinarytree<2>::computeGaussPointsForMerging(int refLev2, int inclDom, int chkFlag, int mergeFlag, GaussQuadrature&  quadTemp)
 {
-  if( isLeaf() )
-  {
-      myPoint  param, geom;
-      int  gp, ii;
+    if( isLeaf() )
+    {
+        myPoint  param, geom;
+        int  gp=0, ii=0;
 
         //
         for(gp=0; gp<GeomData->gausspoints.size(); gp++)
@@ -370,16 +371,16 @@ void AdaptiveBinarytree<2>::computeGaussPointsForMerging(int refLev2, int inclDo
             quadTemp.gaussweights.push_back(GeomData->gaussweights[gp]*JacMultElem);
           }
         */
-  }
-  else
-  {
-    for(int gp=0; gp<NUM_CHILDREN; gp++)
-    {
-      child[gp]->computeGaussPointsForMerging(refLev2, inclDom, chkFlag, mergeFlag, quadTemp);
     }
-  }
+    else
+    {
+      for(int gp=0; gp<NUM_CHILDREN; gp++)
+      {
+        child[gp]->computeGaussPointsForMerging(refLev2, inclDom, chkFlag, mergeFlag, quadTemp);
+      }
+    }
 
-  return;
+    return;
 }
 
 
@@ -388,11 +389,11 @@ void AdaptiveBinarytree<2>::computeGaussPointsForMerging(int refLev2, int inclDo
 template<>
 void AdaptiveBinarytree<2>::computeGaussPointsForMerging2Dfor3D(int refLev2, int inclDom, int chkFlag, int mergeFlag, GaussQuadrature&  quadTemp)
 {
-  if( isLeaf() )
-  {
-    myPoint  param, geom;
-    int  gp, ii;
-    double  wt=0.0, fact=0.0;
+    if( isLeaf() )
+    {
+        myPoint  param, geom;
+        int  gp=0, ii=0;
+        double  wt=0.0, fact=0.0;
 
         //
         for(gp=0; gp<GeomData->gausspoints2D.size(); gp++)
@@ -430,57 +431,58 @@ void AdaptiveBinarytree<2>::computeGaussPointsForMerging2Dfor3D(int refLev2, int
             quadTemp.gaussweights.push_back(GeomData->gaussweights[gp]*JacMultElem);
           }
         */
-  }
-  else
-  {
-    for(int gp=0; gp<NUM_CHILDREN; gp++)
-    {
-      child[gp]->computeGaussPointsForMerging2Dfor3D(refLev2, inclDom, chkFlag, mergeFlag, quadTemp);
     }
-  }
+    else
+    {
+      for(int gp=0; gp<NUM_CHILDREN; gp++)
+      {
+        child[gp]->computeGaussPointsForMerging2Dfor3D(refLev2, inclDom, chkFlag, mergeFlag, quadTemp);
+      }
+    }
 
-  return;
+    return;
 }
 
 
 template<>
 void AdaptiveBinarytree<3>::computeGaussPoints(int refLev2, int inclDom, int chkFlag, int mergeFlag, GaussQuadrature&  quadTemp)
 {
-  if( isLeaf() )
-  {
-    myPoint  param, geom;
-    int  gp, ii;
-    //vector<myPoint>  ptOut;
-    //vector<int>  vecTemp(8);
+    if( isLeaf() )
+    {
+        myPoint  param, geom;
+        int  gp=0, ii=0;
 
-    //if(level == MAX_LEVEL)
-      //GeomData->doIntersect2D(bbox, false, vecTemp, ptOut, domNums) ;
+        //vector<myPoint>  ptOut;
+        //vector<int>  vecTemp(8);
 
-      //cout << " cut cell " << endl;
-      //printVector(domNums);
+        //if(level == MAX_LEVEL)
+          //GeomData->doIntersect2D(bbox, false, vecTemp, ptOut, domNums) ;
 
-      if( (domNums.size() == 1) && (domNums[0] == inclDom) )
-      {
-        for(gp=0; gp<GeomData->gausspoints.size(); gp++)
+        //cout << " cut cell " << endl;
+        //printVector(domNums);
+
+        if( (domNums.size() == 1) && (domNums[0] == inclDom) )
         {
-          // parametric domain to integration master-quadrilateral domain
+          for(gp=0; gp<GeomData->gausspoints.size(); gp++)
+          {
+            // parametric domain to integration master-quadrilateral domain
 
-          for(ii=0; ii<3; ii++)
-            param[ii] = 0.5*(knots[ii][2] * GeomData->gausspoints[gp][ii] + knots[ii][3]);
+            for(ii=0; ii<3; ii++)
+              param[ii] = 0.5*(knots[ii][2] * GeomData->gausspoints[gp][ii] + knots[ii][3]);
 
-          GeomData->computeCoord(param, geom);
+            GeomData->computeCoord(param, geom);
 
             //if( GeomData->within(geom) == inclDom )
             //{
               quadTemp.gausspoints.push_back(param);
               quadTemp.gaussweights.push_back(GeomData->gaussweights[gp]*JacMultElem);
             //}
+          }
         }
-      }
-      else 
-      {
-        //cout << " cut cell " << endl;
-          // merge Gauss points from all the levels below refLev1
+        else 
+        {
+          //cout << " cut cell " << endl;
+            // merge Gauss points from all the levels below refLev1
         
           int count=0;
 
@@ -543,16 +545,16 @@ void AdaptiveBinarytree<3>::computeGaussPoints(int refLev2, int inclDom, int chk
           } // if(mergeFlag && refLev2)
       }
     //}
-  }
-  else
-  {
-    for(int gp=0; gp<NUM_CHILDREN; gp++)
-    {
-      child[gp]->computeGaussPoints(refLev2, inclDom, chkFlag, mergeFlag, quadTemp);
     }
-  }
+    else
+    {
+      for(int gp=0; gp<NUM_CHILDREN; gp++)
+      {
+        child[gp]->computeGaussPoints(refLev2, inclDom, chkFlag, mergeFlag, quadTemp);
+      }
+    }
 
-  return;
+    return;
 }
 
 
@@ -560,10 +562,10 @@ void AdaptiveBinarytree<3>::computeGaussPoints(int refLev2, int inclDom, int chk
 template<>
 void AdaptiveBinarytree<3>::computeGaussPointsForMerging(int refLev2, int inclDom, int chkFlag, int mergeFlag, GaussQuadrature&  quadTemp)
 {
-  if( isLeaf() )
-  {
-    myPoint  param, geom;
-    int  gp, ii;
+    if( isLeaf() )
+    {
+        myPoint  param, geom;
+        int  gp=0, ii=0;
 
         //
         for(gp=0; gp<GeomData->gausspoints.size(); gp++)
@@ -593,16 +595,16 @@ void AdaptiveBinarytree<3>::computeGaussPointsForMerging(int refLev2, int inclDo
             quadTemp.gaussweights.push_back(8.0*JacMultElem);
           }
         */
-  }
-  else
-  {
-    for(int gp=0; gp<NUM_CHILDREN; gp++)
-    {
-      child[gp]->computeGaussPointsForMerging(refLev2, inclDom, chkFlag, mergeFlag, quadTemp);
     }
-  }
+    else
+    {
+      for(int gp=0; gp<NUM_CHILDREN; gp++)
+      {
+        child[gp]->computeGaussPointsForMerging(refLev2, inclDom, chkFlag, mergeFlag, quadTemp);
+      }
+    }
 
-  return;
+    return;
 }
 
 

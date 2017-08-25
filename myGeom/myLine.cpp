@@ -212,7 +212,8 @@ int  myLine::computeBasisFunctions(myPoint& param, myPoint& geom, VectorXd&  Nb,
 
     Lagrange_BasisFuns1D(nVert-1, param[0], &Nb[0], &dN1[0]);
 
-    //cout << xx[0] << '\t' << xx[1] << endl;
+    //cout << ptList[0][0] << '\t' << ptList[0][1] << endl;
+    //cout << ptList[1][0] << '\t' << ptList[1][1] << endl; cout << endl;
 
     double dx=0.0, dy=0.0;
     geom.setZero();

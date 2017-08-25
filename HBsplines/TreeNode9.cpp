@@ -8,14 +8,12 @@
 #include "myDataIntegrateCutFEM.h"
 #include "myPoly.h"
 #include "stabilisationRoutines.h"
-
-extern  MpapTime  mpapTime;
-extern List<TimeFunction> timeFunction;
-
-
 #include "myLine.h"
 #include "myTria.h"
 
+
+extern  MpapTime  mpapTime;
+extern List<TimeFunction> timeFunction;
 
 using namespace myGeom;
 
@@ -1537,12 +1535,12 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
     // 
     ///////////////////////////////////////
 
-    int ii, jj, gp, nGauss, tempId, count=0;
-    int TI, TIp1, TIp2, TJ, TJp1, TJp2;
+    int  ii=0, jj=0, gp=0, nGauss=0, tempId=0, count=0;
+    int  TI=0, TIp1=0, TIp2=0, TJ=0, TJp1=0, TJp2=0;
 
-    double  JacTemp, Jac, dvol, stabParam, CI=4.0;
-    double  fact, fact2, b1, b2, b3, b4, b5, b6, b7, b8;
-    double  pres, Da, Db, rad, urdr, urdr2, h2, h, tau[3];
+    double  JacTemp=0.0, Jac=0.0, dvol=0.0, stabParam=0.0, CI=4.0;
+    double  fact=0.0, fact2=0.0, b1=0.0, b2=0.0, b3=0.0, b4=0.0, b5=0.0, b6=0.0, b7=0.0, b8=0.0;
+    double  pres=0.0, Da=0.0, Db=0.0, rad=0.0, urdr=0.0, urdr2=0.0, h2=0.0, h=0.0, tau[3];
 
     //double beta[6]; get_stabilisation_beta_wulf(beta);
 
@@ -1558,12 +1556,12 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
     bool   axsy = ((int)elmDat[2] == 1);
     double  rho = elmDat[3];
     double  mu  = elmDat[4];
-    double  bforce[2]   = {elmDat[5], elmDat[6]};
-    double af = SolnData->td(2);
-    double am = SolnData->td(1);
-    double acceFact = am*SolnData->td(9);
-    double dt = mpapTime.dt;
-    double muTaf = mu*af;
+    double  bforce[2] = {elmDat[5], elmDat[6]};
+    double  af = SolnData->td(2);
+    double  am = SolnData->td(1);
+    double  acceFact = am*SolnData->td(9);
+    double  dt = mpapTime.dt;
+    double  muTaf = mu*af;
 
     double *gws;
     myPoint *gps;

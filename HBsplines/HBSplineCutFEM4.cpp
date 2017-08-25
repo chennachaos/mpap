@@ -68,15 +68,13 @@ void HBSplineCutFEM::addExternalForces()
 
 int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool zeroRes)
 {
-    PetscPrintf(MPI_COMM_WORLD, "     HBSplineCutFEM: generating coefficient Matrices ...\n\n");
-
     assert( SOLVER_TYPE == SOLVER_TYPE_PETSC );
 
-    //char fct[] = "HBSplineCutFEM::calcStiffnessAndResidual";
-    //computerTime.go(fct);
+    PetscPrintf(MPI_COMM_WORLD, "     HBSplineCutFEM: generating coefficient Matrices ...\n\n");
 
-    int  ii, ee, nr, nc, dd, start=0, pp, dof, dir, domTemp=0, bb, kk;
-    double  PENALTY;
+    int  ii=0, ee=0, nr=0, nc=0, dd=0, start=0, pp=0;
+    int  dof=0, dir=0, domTemp=0, bb=0, kk=0;
+    double  PENALTY=0.0;
 
     IterNum   = (iterCount == 1);
 
@@ -90,15 +88,10 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
     // stiffness and residual for the background fluid grid
     ////////////////////////////////////////////////////////
 
-    //tstart = time(0);
-    //tstart = MPI_Wtime();
     auto tstart = Clock::now();
 
     solverPetsc->zeroMtx();
 
-    //cout << " wwwwwwwwwww " << endl;
-
-    //#pragma omp parallel for
     for(ee=0; ee<fluidElementIds.size(); ee++)
     {
       node *nd = elems[fluidElementIds[ee]];
@@ -113,7 +106,6 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
         {
           nr = nd->forAssyVec.size();
 
-          //cout << nr << '\t' << nc << endl;
           MatrixXd  Klocal;
           VectorXd  Flocal;
 
@@ -137,7 +129,6 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
           //printf("\n\n\n");
           //printVector(Flocal);
 
-          //#pragma omp critical
           solverPetsc->assembleMatrixAndVectorCutFEM(start, start, nd->forAssyVec, grid_to_proc_DOF, Klocal, Flocal);
           //cout << " CCCCCCCCCCCCCCCC " << endl;
         }
@@ -178,13 +169,7 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
         node *nd;
         nd = elems[ee];
 
-        int nr = nd->forAssyVec.size();
-
-        //MatrixXd  Klocal;
-        //VectorXd  Flocal;
-
-        //Klocal = MatrixXd::Zero(nr, nc);
-        //Flocal = VectorXd::Zero(nr);
+        nr = nd->forAssyVec.size();
 
         myData.K1 = MatrixXd::Zero(nr, nr);
         myData.F1 = VectorXd::Zero(nr);
@@ -194,7 +179,6 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
         solverPetsc->assembleMatrixAndVector(0, 0, nd->forAssyVec, nd->forAssyVec, myData.K1, myData.F1);
       }
     }
-
 
     //cout << " rhsVec " << endl;
     //       printVector(&(solver->rhsVec(0)), totalDOF);
@@ -214,9 +198,9 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
       kk = fluidDOF;
       for(bb=0; bb<ImmersedBodyObjects.size(); bb++)
       {
-        cout << " ppppppppppp " << kk << endl;
+        //cout << " ppppppppppp " << kk << endl;
         ImmersedBodyObjects[bb]->assembleGlobalMatrixAndVectorCutFEM(kk, kk, solverPetsc);
-        cout << " ppppppppppp " << endl;
+        //cout << " ppppppppppp " << endl;
         kk += ImmersedBodyObjects[bb]->getTotalDOF();
       }
     }
@@ -242,23 +226,13 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
     {
       //VecView(solverPetsc->rhsVec, PETSC_VIEWER_STDOUT_WORLD);
 
-      //printVector(grid_to_proc_DOF);
-      //printVector(SolnData.var1);
-
       cerr << "  NAN found "  << endl;
       exit(0);
     }
 
     PetscPrintf(MPI_COMM_WORLD, "  %5d \t %11.4e\n", iterCount, rNorm);
 
-    //ctimCalcStiffRes += computerTime.stop(fct);
-    //computerTime.stopAndPrint(fct);
-
-    //PetscPrintf(MPI_COMM_WORLD, "     HBSplineCutFEM: generating coefficient Matrices ...DONE  \n\n");
-
     auto tend = Clock::now();
-    //tend = time(0);
-    //tend = MPI_Wtime();
     PetscPrintf(MPI_COMM_WORLD, "HBSplineCutFEM::calcStiffnessAndResidual() took %d millisecond(s) \n\n ", std::chrono::duration_cast<std::chrono::milliseconds>(tend - tstart).count());
 
     iterCount++;
@@ -281,13 +255,10 @@ int HBSplineCutFEM::factoriseSolveAndUpdate()
 
   //cout << " rhsVec " << endl;        printVector(&(solver->rhsVec(0)), totalDOF);
 
-  //auto tstart = Clock::now();
-  Clock::time_point tstart = Clock::now();
-
+  auto tstart = Clock::now();
 
   //VecView(solverPetsc->rhsVec, PETSC_VIEWER_STDOUT_WORLD);
-
-  //tstart = time(0);
+  //MatView(solverPetsc->mtx, PETSC_VIEWER_STDOUT_WORLD);
 
   solverPetsc->factoriseAndSolve();
 
@@ -344,20 +315,8 @@ int HBSplineCutFEM::factoriseSolveAndUpdate()
   //printVector(SolnData.var1);
   //printf("\n\n\n");
 
-  //computerTime.stopAndPrint(fct);
-  //ctimFactSolvUpdt += computerTime.stop(fct);
-
-  //cout << " result " << endl;        printVector(&(soln(0)), totalDOF);
-
-  //cout << "     HBSplineCutFEM: solving the matrix system ...DONE  \n\n";
-
-  //auto tend = Clock::now();
-  Clock::time_point tend = Clock::now();
-  //tend = MPI_Wtime();
-  //cout << " HBSplineCutFEM::factoriseSolveAndUpdate() took " << std::chrono::duration_cast<std::chrono::milliseconds>(tend - tstart).count() << " millisecond(s) " << endl;
+  auto tend = Clock::now();
   PetscPrintf(MPI_COMM_WORLD, "HBSplineCutFEM::factoriseSolveAndUpdate() took %d millisecond(s) \n ", std::chrono::duration_cast<std::chrono::milliseconds>(tend - tstart).count());
-
-  //computerTime.stopAndPrint(fct);
 
   return 0;
 }
@@ -373,7 +332,7 @@ void HBSplineCutFEM::computeElementErrors(int index)
       return;
     }
 
-    int  ii, ee, count=0, dd, domTemp;
+    int  ii=0, ee=0, count=0, dd=0, domTemp=0;
     node  *nd;
 
     totalError = 0.0;
@@ -393,7 +352,6 @@ void HBSplineCutFEM::computeElementErrors(int index)
               nd->calcError(index, domTemp);
             
               //cout << ee << '\t' << elems[ee]->getError() << endl;
-              //totalError += ( elems[ee]->getError() * elems[ee]->getError() );
               totalError +=  nd->getError();
             //}
           //}
@@ -415,8 +373,6 @@ void HBSplineCutFEM::computeElementErrors(int index)
        totalError /= count;
     }
     
-    //printf(" \n\n \t totalError = %12.6E \n\n " , totalError);
-    
     if(index < 3)
       printf(" \n\n \t L2 Error = %12.6E \n\n " , totalError);
     else
@@ -429,8 +385,6 @@ void HBSplineCutFEM::computeElementErrors(int index)
     tmpStr.append(tmp);
 
     prgWriteToTFile(tmpStr);
-    
-
 
     return;
 }

@@ -13,7 +13,7 @@ class ImmersedRigidSolid : public ImmersedSolid
 {
     public:
 
-        int size;
+        int ndofRigidbody;
         MatrixXd  matM, matC, matK, Klocal, Kglobal;
         VectorXd  Flocal, rhsVec;
 

@@ -24,27 +24,30 @@ ImmersedRigidSolid::ImmersedRigidSolid(int dd)
 
   int ii, jj;
   
-  size = 3*(DIM-1);
+  ndofRigidbody = 3*(DIM-1);
   
   //cout << " DIM  = " << DIM  << endl;
-  //cout << " size = " << size << endl;
+  //cout << " ndofRigidbody = " << ndofRigidbody << endl;
 
-  matM.resize(size, size);
+  matM.resize(ndofRigidbody, ndofRigidbody);
   matM.setZero();
   matC = matM;
   matK = matM;
   Klocal = matM;
-  Flocal.resize(size);
+  Flocal.resize(ndofRigidbody);
 
-  dofData.resize(size,-1);
+  dofData.resize(ndofRigidbody,-1);
 
   SolnData.initialise(3, 0, 0, 0);
   SolnData.setPhysicsTypetoSolid();
+
+  preLoad.resize(ndofRigidbody, 0.0);
+  initForcePred.resize(ndofRigidbody, 0.0);
   
   PRESC_MOTION = false;
   //PRESC_MOTION = true;
   
-  PrescMotionTimeFuncs.resize(size, -1);
+  PrescMotionTimeFuncs.resize(ndofRigidbody, -1);
 }
 
 
@@ -181,13 +184,13 @@ void ImmersedRigidSolid::printSelf()
 
 void ImmersedRigidSolid::setMass(vector<double>& tempVec)
 {
-  assert( tempVec.size() >= size*size );
+  assert( tempVec.size() >= ndofRigidbody*ndofRigidbody );
   
   int ii, jj, kk=0;
 
-  for(ii=0;ii<size;ii++)
+  for(ii=0;ii<ndofRigidbody;ii++)
   {
-    for(jj=0;jj<size;jj++)
+    for(jj=0;jj<ndofRigidbody;jj++)
       matM(ii, jj) = tempVec[kk++];
   }
   
@@ -197,13 +200,13 @@ void ImmersedRigidSolid::setMass(vector<double>& tempVec)
 
 void ImmersedRigidSolid::setDamping(vector<double>& tempVec)
 {
-  assert( tempVec.size() >= size*size );
+  assert( tempVec.size() >= ndofRigidbody*ndofRigidbody );
 
   int ii, jj, kk=0;
 
-  for(ii=0;ii<size;ii++)
+  for(ii=0;ii<ndofRigidbody;ii++)
   {
-    for(jj=0;jj<size;jj++)
+    for(jj=0;jj<ndofRigidbody;jj++)
       matC(ii, jj) = tempVec[kk++];
   }
   
@@ -213,13 +216,13 @@ void ImmersedRigidSolid::setDamping(vector<double>& tempVec)
 
 void ImmersedRigidSolid::setStiffness(vector<double>& tempVec)
 {
-  assert( tempVec.size() >= size*size );
+  assert( tempVec.size() >= ndofRigidbody*ndofRigidbody );
 
   int ii, jj, kk=0;
 
-  for(ii=0;ii<size;ii++)
+  for(ii=0;ii<ndofRigidbody;ii++)
   {
-    for(jj=0;jj<size;jj++)
+    for(jj=0;jj<ndofRigidbody;jj++)
       matK(ii, jj) = tempVec[kk++];
   }
   
@@ -258,7 +261,7 @@ void ImmersedRigidSolid::setPrescribedMotion(vector<int>& vectemp)
 
 void ImmersedRigidSolid::setPreload(vector<double>& tempVec)
 {
-  assert( tempVec.size() >= size );
+  assert( tempVec.size() >= ndofRigidbody );
 
   preLoad = tempVec;
 
@@ -267,7 +270,7 @@ void ImmersedRigidSolid::setPreload(vector<double>& tempVec)
 
 void  ImmersedRigidSolid::setInitialForcePredictor(vector<double>& tempVec)
 {
-  assert( tempVec.size() >= size );
+  assert( tempVec.size() >= ndofRigidbody );
 
   initForcePred = tempVec;
 
@@ -319,7 +322,24 @@ void  ImmersedRigidSolid::setNodalPositions(vector<vector<double> >&  datatemp)
 
       GeomData.acceNew[ii][jj]  = 0.0;
       GeomData.acceCur[ii][jj]  = 0.0;
+    }
+  }
 
+  if(DIM == 2)
+  {
+    for(ii=0;ii<nNode;ii++)
+    {
+      GeomData.NodePosOrig[ii][2] = 0.0;
+      GeomData.NodePosCur[ii][2]  = 0.0;
+      GeomData.NodePosNew[ii][2]  = 0.0;
+      GeomData.NodePosPrev[ii][2]  = 0.0;
+      GeomData.NodePosPrevCur[ii][2]  = 0.0;
+
+      GeomData.specValNew[ii][2]  = 0.0;
+      GeomData.specValCur[ii][2]  = 0.0;
+
+      GeomData.acceNew[ii][2]  = 0.0;
+      GeomData.acceCur[ii][2]  = 0.0;
     }
   }
 
@@ -340,6 +360,10 @@ void ImmersedRigidSolid::initialise()
   setSolver(1);
   setTimeParam();
   computeInitialAcceleration();
+
+  SolnData.force[0] = initForcePred[1];
+
+  SolnData.forcePrev = SolnData.force;
 
   return;
 }
@@ -368,8 +392,15 @@ void ImmersedRigidSolid::prepareMatrixPattern()
   {
     int  ii, jj, kk, ll, ind;
   
-    //cout << " dofData " << endl;
-    //printVector(dofData);
+    //int size_temp = ndofRigidbody;
+    
+    // increase system size for contacts with Lagrange multipliers
+    // contacts for limiting rigid-solid motion
+    // two contacts for each DOF
+    //   - one in negative direction
+    //   - one is positive direction
+
+    //size_temp += 2*ndofRigidbody;
 
     totalDOF = 0;
     for(ii=0;ii<dofData.size();ii++)
@@ -389,7 +420,7 @@ void ImmersedRigidSolid::prepareMatrixPattern()
       }
     }
 
-    //cout << " size     " << size << endl;
+    //cout << " ndofRigidbody     " << ndofRigidbody << endl;
     //cout << " totalDOF " << totalDOF << endl;
     //cout << " assy4r " << endl;
     //printVector(assy4r);
@@ -481,6 +512,18 @@ void  ImmersedRigidSolid::updatePointPositions2D()
     myPoint  centroidNew, centroidCur;
     MatrixXd  RotNew(3, 3), RotCur(3, 3);
     
+    geom.setZero();
+    param.setZero();
+    rOrig.setZero();
+    rNew.setZero();
+    vNew.setZero();
+    dCentNew.setZero();
+    dCentCur.setZero();
+    vCentNew.setZero();
+    vCentCur.setZero();
+    centroidNew.setZero();
+    centroidCur.setZero();
+
     RotNew.setZero();
     RotCur.setZero();
 
@@ -497,10 +540,12 @@ void  ImmersedRigidSolid::updatePointPositions2D()
 
       dCentCur[0] = 0.0;
       dCentCur[1] = SolnData.var1Cur[0];
+      dCentCur[2] = 0.0;
       thetaCur    = 0.0;
 
       vCentCur[0] = 0.0;
       vCentCur[1] = SolnData.var1DotCur[0];
+      vCentCur[2] = 0.0;
       omegaCur    = 0.0;
 
       //dCentCur[0] = 0.0;
@@ -528,10 +573,12 @@ void  ImmersedRigidSolid::updatePointPositions2D()
 
       dCentNew[0] = 0.0;
       dCentNew[1] = SolnData.var1[0];
+      dCentNew[2] = 0.0;
       thetaNew    = 0.0;
 
       vCentNew[0] = 0.0;
       vCentNew[1] = SolnData.var1Dot[0];
+      vCentNew[2] = 0.0;
       omegaNew    = 0.0;
 
       //dCentNew[0] = 0.0;
@@ -552,6 +599,9 @@ void  ImmersedRigidSolid::updatePointPositions2D()
       //cout << " velo    " << vCentCur[0] << '\t' << vCentCur[1] << '\t' << omegaCur << endl;
 
       computeCentroid(0);
+      //centroid[2] = 0.0;
+      //centroidCur[2] = 0.0;
+      //centroidNew[2] = 0.0;
 
       centroidCur[0] = centroid[0] + dCentCur[0];
       centroidCur[1] = centroid[1] + dCentCur[1];
@@ -592,7 +642,7 @@ void  ImmersedRigidSolid::updatePointPositions2D()
 
         for(ii=0;ii<DIM;ii++)
         {
-          //cout << bb << '\t' << ii << endl;
+          //cout << bb << '\t' << ii << '\t' << rNew[ii] << endl;
           GeomData.NodePosCur[bb][ii]  = rNew[ii];
           GeomData.specValCur[bb][ii]  = vNew[ii];
         }
@@ -600,11 +650,11 @@ void  ImmersedRigidSolid::updatePointPositions2D()
       }
     }
 
-      A = 80.0*PI/180.0;
-      //A = 0.2;
-      B = 5.0;
-      F = 0.1666*1.1;
-      //F = 1.1;
+    A = 80.0*PI/180.0;
+    //A = 0.2;
+    B = 5.0;
+    F = 0.1666*1.1;
+    //F = 1.1;
 
     t0 = 1.0/F;
     //t0 = 2.0*t0;
@@ -1564,10 +1614,10 @@ void ImmersedRigidSolid::calcCouplingMatrices()
     int  aa, nlb, ii, jj, kk, ind1, ind2;
     MatrixXd  Ktemp, Ktemp2;
 
-    Khorz.resize(size, nNode*DIM);
+    Khorz.resize(ndofRigidbody, nNode*DIM);
     Khorz.setZero();
 
-    Kvert.resize(nNode*DIM, size);
+    Kvert.resize(nNode*DIM, ndofRigidbody);
     Kvert.setZero();
 
     for(aa=0;aa<ImmIntgElems.size();aa++)
@@ -1581,7 +1631,7 @@ void ImmersedRigidSolid::calcCouplingMatrices()
       //printMatrix(Ktemp2);
       //printf("\n\n");
 
-      for(ii=0;ii<size;ii++)
+      for(ii=0;ii<ndofRigidbody;ii++)
       {
         for(jj=0;jj<nlb;jj++)
         {

@@ -832,7 +832,7 @@ int StandardFEM::solveStep(int niter)
 
 int StandardFEM::calcStiffnessAndResidual(int printRes, bool zeroMtx, bool zeroRes)
 {
-  //cout << "     StandardFEM: generating coefficient Matrices ...\n\n";
+  cout << "     StandardFEM: generating coefficient Matrices ...\n\n";
 
   char fct[] = "StandardFEM::calcStiffnessAndResidual";
 
@@ -910,11 +910,11 @@ int StandardFEM::calcStiffnessAndResidual(int printRes, bool zeroMtx, bool zeroR
       //cout << " MMMMMMMMMMM " << endl;
       solverEigen->assembleMatrixAndVector(0, 0, elems[ee]->forAssyVec, Klocal, Flocal);
     }
+
+    //cout << solverEigen->mtx << endl;
   }
 
   //cout << " MMMMMMMMMMM " << endl;
-
-  //cout << solver->mtx << endl;
 
    //cout << " solver->rhsVec " << endl;        printVector(solver->rhsVec);
 

@@ -1,7 +1,6 @@
 
 #include "AdaptiveOctree.h"
 
-
 template<> int AdaptiveOctree<1>::nodecount = 0;
 template<> int AdaptiveOctree<2>::nodecount = 0;
 template<> int AdaptiveOctree<3>::nodecount = 0;
@@ -23,7 +22,6 @@ void AdaptiveOctree<1>::subDivide(int lev)
     if(level == lev)
       return;
 
-
     vector<myPoint>  ptOut;
     vector<int>  vecTemp(4);
 
@@ -32,15 +30,11 @@ void AdaptiveOctree<1>::subDivide(int lev)
     if( domNums.size() == 1 )
       return;
 
-    //cout << " bbbbbbbbbbb " << endl;
-
 
     NUM_CHILDREN = 2;
     child  = new AdaptiveOctree_PTR[NUM_CHILDREN];
 
-    int ii, temp;
-    
-    temp = level+1;
+    int  ii=0, temp = level+1;
     
     for(ii=0;ii<NUM_CHILDREN;ii++)
     {
@@ -49,9 +43,7 @@ void AdaptiveOctree<1>::subDivide(int lev)
       child[ii]->setParent(this);
     }
 
-    double  mid(0.0);
-
-    mid = 0.5*(knots[0][0] + knots[0][1]);
+    double  mid = 0.5*(knots[0][0] + knots[0][1]);
 
     AdaptiveOctree_PTR  tmpnode;
     
@@ -94,18 +86,14 @@ void AdaptiveOctree<1>::subDivide(int lev)
       }
     }
 
-    //cout << " bbbbbbbbbbb " << endl;
     for(ii=0;ii<NUM_CHILDREN;ii++)
       child[ii]->prepareData();
-
-    //cout << " bbbbbbbbbbb " << endl;
 
     if(level < lev)
     {
       for(ii=0;ii<NUM_CHILDREN;ii++)
         child[ii]->subDivide(lev);
     }
-    //cout << " bbbbbbbbbbb " << endl;
     
     return;
 }
@@ -132,18 +120,17 @@ void AdaptiveOctree<2>::subDivide(int refLev)
     if( domNums.size() == 1 )
       return;
 
-
     if(level == refLev )
       return;
 
 
-    int ii, levTemp, jj, bb;
+    int  ii=0, jj=0, bb=0;
 
     NUM_CHILDREN = 4;
 
-    child      = new AdaptiveOctree_PTR[NUM_CHILDREN];
+    child  = new AdaptiveOctree_PTR[NUM_CHILDREN];
 
-    levTemp = level+1;
+    int  levTemp = level+1;
 
     for(ii=0;ii<NUM_CHILDREN;ii++)
     {
@@ -158,7 +145,7 @@ void AdaptiveOctree<2>::subDivide(int refLev)
     child[NE]->orientation = NE;
 
 
-    double  midu(0.0), midv(0.0);
+    double  midu=0.0, midv=0.0;
     
     midu = 0.5*(knots[0][1] + knots[0][0]);
     midv = 0.5*(knots[1][1] + knots[1][0]);
@@ -273,8 +260,6 @@ void AdaptiveOctree<2>::subDivide(int refLev)
     }
     //
 
-    //cout << " bbbbbbbbbbbb " << endl;
-
     for(ii=0;ii<NUM_CHILDREN;ii++)
     {
       child[ii]->GeomData = GeomData;
@@ -284,11 +269,8 @@ void AdaptiveOctree<2>::subDivide(int refLev)
       child[ii]->setCoord3(coord3);
       child[ii]->prepareData();
 
-      //cout << " eeeeeeeeee " << endl;
       child[ii]->subDivide(refLev);
     }
-
-    //cout << " ddddddddddd " << endl;
 
     return;
 }
@@ -305,7 +287,6 @@ void AdaptiveOctree<3>::subDivide(int refLev)
     if( !isLeaf() || (refLev < 1) )
       return;
 
-
     vector<myPoint>  ptOut;
     vector<int>  cornerInOut(8);
 
@@ -317,12 +298,12 @@ void AdaptiveOctree<3>::subDivide(int refLev)
     if(level == refLev )
       return;
 
-    int ii, levTemp, jj, bb;
+    int  ii=0, jj=0, bb=0;
 
     NUM_CHILDREN = 8;
     child = new AdaptiveOctree_PTR[NUM_CHILDREN];
 
-    levTemp = level+1;
+    int  levTemp = level+1;
     
     for(ii=0;ii<NUM_CHILDREN;ii++)
     {
@@ -346,12 +327,9 @@ void AdaptiveOctree<3>::subDivide(int refLev)
     //
     // set the knots
 
-
-    double  midu, midv, midw;
-    
-    midu = 0.5*(knots[0][0] + knots[0][1]);
-    midv = 0.5*(knots[1][0] + knots[1][1]);
-    midw = 0.5*(knots[2][0] + knots[2][1]);
+    double  midu = 0.5*(knots[0][0] + knots[0][1]);
+    double  midv = 0.5*(knots[1][0] + knots[1][1]);
+    double  midw = 0.5*(knots[2][0] + knots[2][1]);
 
     child[SW_BACK ]->setKnots(Dir1, knots[0][0], midu);
     child[SW_FRONT]->setKnots(Dir1, knots[0][0], midu);
@@ -363,7 +341,6 @@ void AdaptiveOctree<3>::subDivide(int refLev)
     child[NE_BACK ]->setKnots(Dir1, midu,        knots[0][1]);
     child[NE_FRONT]->setKnots(Dir1, midu,        knots[0][1]);
 
-
     child[SW_BACK ]->setKnots(Dir2, knots[1][0], midv);
     child[SW_FRONT]->setKnots(Dir2, knots[1][0], midv);
     child[SE_BACK ]->setKnots(Dir2, knots[1][0], midv);
@@ -373,7 +350,6 @@ void AdaptiveOctree<3>::subDivide(int refLev)
     child[NW_FRONT]->setKnots(Dir2, midv,        knots[1][1]);
     child[NE_BACK ]->setKnots(Dir2, midv,        knots[1][1]);
     child[NE_FRONT]->setKnots(Dir2, midv,        knots[1][1]);
-
 
     child[SW_BACK ]->setKnots(Dir3, knots[2][0], midw);
     child[SE_BACK ]->setKnots(Dir3, knots[2][0], midw);
@@ -633,8 +609,6 @@ void AdaptiveOctree<3>::subDivide(int refLev)
       }
     }
 
-    //cout << " ddddddddddd " << endl;
-
     for(ii=0;ii<NUM_CHILDREN;ii++)
     {
       child[ii]->GeomData = GeomData;
@@ -643,8 +617,6 @@ void AdaptiveOctree<3>::subDivide(int refLev)
 
       child[ii]->subDivide(refLev);
     }
-
-    //cout << " bbbbbbbbbbb " << endl;
 
     return;
 }
@@ -655,46 +627,46 @@ void AdaptiveOctree<3>::subDivide(int refLev)
 template<>
 void AdaptiveOctree<1>::printSelf()
 {
-            printf("\t   ID          = %5d\n", id);
-            printf("\t   Level       = %5d\n", level);
+    printf("\t   ID          = %5d\n", id);
+    printf("\t   Level       = %5d\n", level);
 
-            if(parent == NULL)
-              printf("\t   Parent      = %5d\n", -1);
-            else
-              printf("\t   Parent      = %5d\n", parent->getID());
+    if(parent == NULL)
+      printf("\t   Parent      = %5d\n", -1);
+    else
+      printf("\t   Parent      = %5d\n", parent->getID());
 
-            printf("\t   children    = %5d\n", NUM_CHILDREN);
+    printf("\t   children    = %5d\n", NUM_CHILDREN);
 
-            printf("\t   Parameters ... \n");
-            printf("\t\t direction #%5d ---> \t%12.6f \t %12.6f\n", 1, knots[0][0], knots[0][1]);
+    printf("\t   Parameters ... \n");
+    printf("\t\t direction #%5d ---> \t%12.6f \t %12.6f\n", 1, knots[0][0], knots[0][1]);
 
-            printf("\n\t   Neighbours ... \n");
-            if(neighbours != NULL)
-            {
-               if(neighbours[LEFT] != NULL)
-                 printf("\t\t LEFT  neighbour ID   = %5d \n", neighbours[LEFT]->getID());
+    printf("\n\t   Neighbours ... \n");
+    if(neighbours != NULL)
+    {
+      if(neighbours[LEFT] != NULL)
+        printf("\t\t LEFT  neighbour ID   = %5d \n", neighbours[LEFT]->getID());
 
-               if(neighbours[RIGHT] != NULL)
-                 printf("\t\t RIGHT neighbour ID   = %5d \n", neighbours[RIGHT]->getID());
-            }
-            else
-              printf("\t\t No Neighbours \n");
+      if(neighbours[RIGHT] != NULL)
+        printf("\t\t RIGHT neighbour ID   = %5d \n", neighbours[RIGHT]->getID());
+    }
+    else
+      printf("\t\t No Neighbours \n");
 
-            printf("\n\t   Children ... \n");
-            if(child != NULL)
-            {
-               if(child[LEFT] != NULL)
-                 printf("\t\t LEFT  neighbour ID   = %5d \n", child[LEFT]->getID());
+    printf("\n\t   Children ... \n");
+    if(child != NULL)
+    {
+      if(child[LEFT] != NULL)
+        printf("\t\t LEFT  neighbour ID   = %5d \n", child[LEFT]->getID());
 
-               if(child[RIGHT] != NULL)
-                 printf("\t\t RIGHT neighbour ID   = %5d \n", child[RIGHT]->getID());
-            }
-            else
-              printf("\t\t No Children \n");
-            printf("\n\n");
+      if(child[RIGHT] != NULL)
+        printf("\t\t RIGHT neighbour ID   = %5d \n", child[RIGHT]->getID());
+    }
+    else
+      printf("\t\t No Children \n");
+
+    printf("\n\n");
+    return;
 }
-
-
 
 
 
@@ -702,62 +674,63 @@ void AdaptiveOctree<1>::printSelf()
 template<>
 void AdaptiveOctree<2>::printSelf()
 {
-            printf("\t   ID          = %5d\n", id);
-            printf("\t   Level       = %5d\n", level);
+    printf("\t   ID          = %5d\n", id);
+    printf("\t   Level       = %5d\n", level);
 
-            if(parent == NULL)
-              printf("\t   Parent      = %5d\n", -1);
-            else
-              printf("\t   Parent      = %5d\n", parent->getID());
+    if(parent == NULL)
+      printf("\t   Parent      = %5d\n", -1);
+    else
+      printf("\t   Parent      = %5d\n", parent->getID());
 
-            printf("\t   Parameters ... \n");
-            for(int ii=0;ii<2;ii++)
-            {
-               printf("\t\t direction #%5d ---> \t%12.6f \t %12.6f\n", (ii+1), knots[ii][0], knots[ii][1]);
-            }
+    printf("\t   Parameters ... \n");
+    for(int ii=0;ii<2;ii++)
+    {
+      printf("\t\t direction #%5d ---> \t%12.6f \t %12.6f\n", (ii+1), knots[ii][0], knots[ii][1]);
+    }
 
-            printf("\n\t   Neighbours ... \n");
-            if(neighbours != NULL)
-            {
-               if(neighbours[EAST] != NULL)
-                 printf("\t\t EAST   neighbour ID   = %5d \n", neighbours[EAST]->getID());
+    printf("\n\t   Neighbours ... \n");
+    if(neighbours != NULL)
+    {
+      if(neighbours[EAST] != NULL)
+        printf("\t\t EAST   neighbour ID   = %5d \n", neighbours[EAST]->getID());
 
-               if(neighbours[WEST] != NULL)
-                 printf("\t\t WEST   neighbour ID   = %5d \n", neighbours[WEST]->getID());
+      if(neighbours[WEST] != NULL)
+        printf("\t\t WEST   neighbour ID   = %5d \n", neighbours[WEST]->getID());
 
-               if(neighbours[NORTH] != NULL)
-                 printf("\t\t NORTH  neighbour ID   = %5d \n", neighbours[NORTH]->getID());
+      if(neighbours[NORTH] != NULL)
+        printf("\t\t NORTH  neighbour ID   = %5d \n", neighbours[NORTH]->getID());
 
-               if(neighbours[SOUTH] != NULL)
-                 printf("\t\t SOUTH  neighbour ID   = %5d \n", neighbours[SOUTH]->getID());
+      if(neighbours[SOUTH] != NULL)
+        printf("\t\t SOUTH  neighbour ID   = %5d \n", neighbours[SOUTH]->getID());
 
-            }
-            else
-              printf("\t\t No Neighbours \n\n");
+    }
+    else
+      printf("\t\t No Neighbours \n\n");
 
-            printf("\n\t   children ... \n");
-            if(child != NULL)
-            {
-               //printf("\t  # of children    = %5d\n", NUM_CHILDREN);
+    printf("\n\t   children ... \n");
+    if(child != NULL)
+    {
+      //printf("\t  # of children    = %5d\n", NUM_CHILDREN);
                
-               if(child[SW] != NULL)
-                 printf("\t\t SW   child ID   = %5d \n", child[SW]->getID());
+      if(child[SW] != NULL)
+        printf("\t\t SW   child ID   = %5d \n", child[SW]->getID());
 
-               if(child[SE] != NULL)
-                 printf("\t\t SE   child ID   = %5d \n", child[SE]->getID());
+      if(child[SE] != NULL)
+        printf("\t\t SE   child ID   = %5d \n", child[SE]->getID());
 
-               if(child[NW] != NULL)
-                 printf("\t\t NW   child ID   = %5d \n", child[NW]->getID());
+      if(child[NW] != NULL)
+        printf("\t\t NW   child ID   = %5d \n", child[NW]->getID());
 
-               if(child[NE] != NULL)
-                 printf("\t\t NE   child ID   = %5d \n", child[NE]->getID());
+      if(child[NE] != NULL)
+        printf("\t\t NE   child ID   = %5d \n", child[NE]->getID());
 
-            }
-            else
-              printf("\t\t No children \n");
-            printf("\n\n");
+    }
+    else
+      printf("\t\t No children \n");
+    
+    printf("\n\n");
 
-   return;
+    return;
 }
 
 
@@ -765,81 +738,82 @@ void AdaptiveOctree<2>::printSelf()
 template<>
 void AdaptiveOctree<3>::printSelf()
 {
-            printf("\t   ID          = %5d\n", id);
-            printf("\t   Level       = %5d\n", level);
+    printf("\t   ID          = %5d\n", id);
+    printf("\t   Level       = %5d\n", level);
 
-            if(parent == NULL)
-              printf("\t   Parent      = %5d\n", -1);
-            else
-              printf("\t   Parent      = %5d\n", parent->getID());
+    if(parent == NULL)
+      printf("\t   Parent      = %5d\n", -1);
+    else
+      printf("\t   Parent      = %5d\n", parent->getID());
 
-            printf("\t   Basis Functions --->  \n");
+    printf("\t   Basis Functions --->  \n");
 
-            printf("\t   Parameters ... \n");
-            for(int ii=0;ii<3;ii++)
-            {
-               printf("\t\t direction #%5d ---> \t%12.6f \t %12.6f\n", (ii+1), knots[ii][0], knots[ii][1]);
-            }
+    printf("\t   Parameters ... \n");
+    for(int ii=0;ii<3;ii++)
+    {
+      printf("\t\t direction #%5d ---> \t%12.6f \t %12.6f\n", (ii+1), knots[ii][0], knots[ii][1]);
+    }
 
-            printf("\n\t   Neighbours ... \n");
-            if(neighbours != NULL)
-            {
-               if(neighbours[WEST]  != NULL)
-                 printf("\t\t WEST   neighbour ID   = %5d \n", neighbours[WEST]->getID());
-               else
-                 printf("\t\t WEST   neighbour ID   = %5d \n", -1);
+    printf("\n\t   Neighbours ... \n");
+    if(neighbours != NULL)
+    {
+      if(neighbours[WEST]  != NULL)
+        printf("\t\t WEST   neighbour ID   = %5d \n", neighbours[WEST]->getID());
+      else
+        printf("\t\t WEST   neighbour ID   = %5d \n", -1);
 
-               if(neighbours[EAST]  != NULL)
-                 printf("\t\t EAST   neighbour ID   = %5d \n", neighbours[EAST]->getID());
-               else
-                 printf("\t\t EAST   neighbour ID   = %5d \n", -1);
+      if(neighbours[EAST]  != NULL)
+        printf("\t\t EAST   neighbour ID   = %5d \n", neighbours[EAST]->getID());
+      else
+        printf("\t\t EAST   neighbour ID   = %5d \n", -1);
 
-               if(neighbours[SOUTH] != NULL)
-                 printf("\t\t SOUTH  neighbour ID   = %5d \n", neighbours[SOUTH]->getID());
-               else
-                 printf("\t\t SOUTH  neighbour ID   = %5d \n", -1);
+      if(neighbours[SOUTH] != NULL)
+        printf("\t\t SOUTH  neighbour ID   = %5d \n", neighbours[SOUTH]->getID());
+      else
+        printf("\t\t SOUTH  neighbour ID   = %5d \n", -1);
 
-               if(neighbours[NORTH] != NULL)
-                 printf("\t\t NORTH  neighbour ID   = %5d \n", neighbours[NORTH]->getID());
-               else
-                 printf("\t\t NORTH  neighbour ID   = %5d \n", -1);
+      if(neighbours[NORTH] != NULL)
+        printf("\t\t NORTH  neighbour ID   = %5d \n", neighbours[NORTH]->getID());
+      else
+        printf("\t\t NORTH  neighbour ID   = %5d \n", -1);
 
-               if(neighbours[FRONT] != NULL)
-                 printf("\t\t FRONT  neighbour ID   = %5d \n", neighbours[FRONT]->getID());
-               else
-                 printf("\t\t FRONT  neighbour ID   = %5d \n", -1);
+      if(neighbours[FRONT] != NULL)
+        printf("\t\t FRONT  neighbour ID   = %5d \n", neighbours[FRONT]->getID());
+      else
+        printf("\t\t FRONT  neighbour ID   = %5d \n", -1);
 
-               if(neighbours[BACK]  != NULL)
-                 printf("\t\t BACK   neighbour ID   = %5d \n", neighbours[BACK]->getID());
-               else
-                 printf("\t\t BACK   neighbour ID   = %5d \n", -1);
-            }
-            else
-              printf("\t\t No Neighbours \n\n");
+      if(neighbours[BACK]  != NULL)
+        printf("\t\t BACK   neighbour ID   = %5d \n", neighbours[BACK]->getID());
+      else
+        printf("\t\t BACK   neighbour ID   = %5d \n", -1);
+    }
+    else
+      printf("\t\t No Neighbours \n\n");
 
-            printf("\n\t   children ... \n");
-            if(child != NULL)
-            {
-               //printf("\t  # of children    = %5d\n", NUM_CHILDREN);
+    printf("\n\t   children ... \n");
+    if(child != NULL)
+    {
+      //printf("\t  # of children    = %5d\n", NUM_CHILDREN);
                
-               if(child[SW] != NULL)
-                 printf("\t\t SW   child ID   = %5d \n", child[SW]->getID());
+      if(child[SW] != NULL)
+        printf("\t\t SW   child ID   = %5d \n", child[SW]->getID());
 
-               if(child[SE] != NULL)
-                 printf("\t\t SE   child ID   = %5d \n", child[SE]->getID());
+      if(child[SE] != NULL)
+        printf("\t\t SE   child ID   = %5d \n", child[SE]->getID());
 
-               if(child[NW] != NULL)
-                 printf("\t\t NW   child ID   = %5d \n", child[NW]->getID());
+      if(child[NW] != NULL)
+        printf("\t\t NW   child ID   = %5d \n", child[NW]->getID());
 
-               if(child[NE] != NULL)
-                 printf("\t\t NE   child ID   = %5d \n", child[NE]->getID());
+      if(child[NE] != NULL)
+        printf("\t\t NE   child ID   = %5d \n", child[NE]->getID());
 
-            }
-            else
-              printf("\t\t No children \n");
-            printf("\n\n");
+    }
+    else
+      printf("\t\t No children \n");
+    
+    printf("\n\n");
 
-   return;
+    return;
 }
 
 
@@ -848,65 +822,65 @@ void AdaptiveOctree<3>::printSelf()
 template<>
 void AdaptiveOctree<2>::mergeGaussPoints(int refLev2, int inclDom, int dummy1, int& nGPsMerge, myPoint& ptTemp, double& wt)
 {
-  AdaptiveOctree<2>  *adapIntegNodeLocal = new AdaptiveOctree<2>(0);
+    AdaptiveOctree<2>  *adapIntegNodeLocal = new AdaptiveOctree<2>(0);
 
-//  cout << knots[0][0] << '\t' << knots[0][1] << '\t' << knots[0][2] << '\t' << knots[0][3] << endl;
-//  cout << knots[1][0] << '\t' << knots[1][1] << '\t' << knots[1][2] << '\t' << knots[1][3] << endl;
+    //  cout << knots[0][0] << '\t' << knots[0][1] << '\t' << knots[0][2] << '\t' << knots[0][3] << endl;
+    //  cout << knots[1][0] << '\t' << knots[1][1] << '\t' << knots[1][2] << '\t' << knots[1][3] << endl;
 
-  adapIntegNodeLocal->setKnots(knots[0][0], knots[0][1], knots[1][0], knots[1][1]);
+    adapIntegNodeLocal->setKnots(knots[0][0], knots[0][1], knots[1][0], knots[1][1]);
 
-  //cout << " AAAAAAAAAA " << endl;
+    //cout << " AAAAAAAAAA " << endl;
 
-  adapIntegNodeLocal->GeomData = GeomData;
-  adapIntegNodeLocal->domNums = domNums;
+    adapIntegNodeLocal->GeomData = GeomData;
+    adapIntegNodeLocal->domNums = domNums;
 
-  //cout << " AAAAAAAAAA .... " << refLev << endl;
+    //cout << " AAAAAAAAAA .... " << refLev << endl;
 
-  adapIntegNodeLocal->setSideTemp(sideTemp);
-  adapIntegNodeLocal->setParam3(param3);
-  adapIntegNodeLocal->setCoord3(coord3);
-
-  adapIntegNodeLocal->prepareData();
-  adapIntegNodeLocal->subDivide(refLev2);
+    adapIntegNodeLocal->setSideTemp(sideTemp);
+    adapIntegNodeLocal->setParam3(param3);
+    adapIntegNodeLocal->setCoord3(coord3);
+    adapIntegNodeLocal->prepareData();
+    adapIntegNodeLocal->subDivide(refLev2);
   
-  //cout << " AAAAAAAAAA .... " << refLev << endl;
+    //cout << " AAAAAAAAAA .... " << refLev << endl;
 
-  GaussQuadrature  QuadratureLocal;
+    GaussQuadrature  QuadratureLocal;
 
-  int mergeFlag=0;
+    int mergeFlag=0;
 
-  if(sideTemp == -1)
-    adapIntegNodeLocal->computeGaussPointsForMerging(0, inclDom, 1, mergeFlag, QuadratureLocal);
-  else
-    adapIntegNodeLocal->computeGaussPointsForMerging2Dfor3D(0, inclDom, 1, mergeFlag, QuadratureLocal);
+    if(sideTemp == -1)
+      adapIntegNodeLocal->computeGaussPointsForMerging(0, inclDom, 1, mergeFlag, QuadratureLocal);
+    else
+      adapIntegNodeLocal->computeGaussPointsForMerging2Dfor3D(0, inclDom, 1, mergeFlag, QuadratureLocal);
 
-  // parametric domain to integration master-quadrilateral domain
-  int  ii, gp;
-  myPoint  param, geom;
-  wt = 0.0;
-  ptTemp.setZero();
-  param.setZero();
-  for(gp=0; gp<QuadratureLocal.gausspoints.size(); gp++)
-  {
-    for(ii=0; ii<2; ii++)
-      param[ii] = QuadratureLocal.gausspoints[gp][ii] ;
+    // parametric domain to integration master-quadrilateral domain
+    int  ii=0, gp=0;
+    myPoint  param, geom;
+    ptTemp.setZero();
+    param.setZero();
 
-    //GeomData->computeCoord(param, geom);
-    //ptTemp += geom;
+    wt = 0.0;
+    for(gp=0; gp<QuadratureLocal.gausspoints.size(); gp++)
+    {
+      for(ii=0; ii<2; ii++)
+        param[ii] = QuadratureLocal.gausspoints[gp][ii] ;
 
-    //cout << gp << '\t' << geom[0] << '\t' << geom[1] << '\t' << QuadratureLocal.gaussweights[gp] << endl;
-    wt +=  QuadratureLocal.gaussweights[gp];
+      //GeomData->computeCoord(param, geom);
+      //ptTemp += geom;
+
+      //cout << gp << '\t' << geom[0] << '\t' << geom[1] << '\t' << QuadratureLocal.gaussweights[gp] << endl;
+      wt +=  QuadratureLocal.gaussweights[gp];
     
-    ptTemp += param;
-  }
+      ptTemp += param;
+    }
 
-  nGPsMerge = QuadratureLocal.gausspoints.size();
+    nGPsMerge = QuadratureLocal.gausspoints.size();
 
-  ptTemp /= nGPsMerge;
+    ptTemp /= nGPsMerge;
 
-  delete  adapIntegNodeLocal;
+    delete  adapIntegNodeLocal;
 
-  return;
+    return;
 }
 
 
@@ -916,57 +890,54 @@ void AdaptiveOctree<2>::mergeGaussPoints(int refLev2, int inclDom, int dummy1, i
 template<>
 void AdaptiveOctree<3>::mergeGaussPoints(int refLev2, int inclDom, int dummy1, int& nGPsMerge, myPoint& ptTemp, double& wt)
 {
-  AdaptiveOctree<3>  *adapIntegNodeLocal = new AdaptiveOctree<3>(0);
+    AdaptiveOctree<3>  *adapIntegNodeLocal = new AdaptiveOctree<3>(0);
 
-//  cout << knots[0][0] << '\t' << knots[0][1] << '\t' << knots[0][2] << '\t' << knots[0][3] << endl;
-//  cout << knots[1][0] << '\t' << knots[1][1] << '\t' << knots[1][2] << '\t' << knots[1][3] << endl;
+    //cout << knots[0][0] << '\t' << knots[0][1] << '\t' << knots[0][2] << '\t' << knots[0][3] << endl;
+    //cout << knots[1][0] << '\t' << knots[1][1] << '\t' << knots[1][2] << '\t' << knots[1][3] << endl;
 
-  adapIntegNodeLocal->setKnots(knots[0][0], knots[0][1], knots[1][0], knots[1][1], knots[2][0], knots[2][1]);
+    adapIntegNodeLocal->setKnots(knots[0][0], knots[0][1], knots[1][0], knots[1][1], knots[2][0], knots[2][1]);
 
-  //cout << " AAAAAAAAAA " << endl;
+    adapIntegNodeLocal->GeomData = GeomData;
+    adapIntegNodeLocal->domNums = domNums;
 
-  adapIntegNodeLocal->GeomData = GeomData;
-  adapIntegNodeLocal->domNums = domNums;
-
-  //cout << " AAAAAAAAAA .... " << refLev << endl;
+    adapIntegNodeLocal->prepareData();
+    adapIntegNodeLocal->subDivide(refLev2);
   
-  adapIntegNodeLocal->prepareData();
-  adapIntegNodeLocal->subDivide(refLev2);
-  
-  //cout << " AAAAAAAAAA .... " << refLev << endl;
+    //cout << " AAAAAAAAAA .... " << refLev << endl;
 
-  GaussQuadrature  QuadratureLocal;
+    GaussQuadrature  QuadratureLocal;
 
-  int mergeFlag=0;
+    int mergeFlag=0;
 
-  adapIntegNodeLocal->computeGaussPointsForMerging(0, inclDom, 1, mergeFlag, QuadratureLocal);
+    adapIntegNodeLocal->computeGaussPointsForMerging(0, inclDom, 1, mergeFlag, QuadratureLocal);
 
-  // parametric domain to integration master-quadrilateral domain
-  int  ii, gp;
-  myPoint  param, geom;
-  wt = 0.0;
-  ptTemp.setZero();
-  param.setZero();
-  for(gp=0; gp<QuadratureLocal.gausspoints.size(); gp++)
-  {
-    for(ii=0; ii<3; ii++)
-      param[ii] = QuadratureLocal.gausspoints[gp][ii] ;
+    // parametric domain to integration master-quadrilateral domain
+    int  ii=0, gp=0;
+    myPoint  param, geom;
 
-    //GeomData->computeCoord(param, geom);
-    //ptTemp += geom;
+    ptTemp.setZero();
+    param.setZero();
+    wt = 0.0;
+    for(gp=0; gp<QuadratureLocal.gausspoints.size(); gp++)
+    {
+      for(ii=0; ii<3; ii++)
+        param[ii] = QuadratureLocal.gausspoints[gp][ii] ;
 
-    wt +=  QuadratureLocal.gaussweights[gp];
+      //GeomData->computeCoord(param, geom);
+      //ptTemp += geom;
+
+      wt +=  QuadratureLocal.gaussweights[gp];
     
-    ptTemp += param;
-  }
+      ptTemp += param;
+    }
 
-  nGPsMerge = QuadratureLocal.gausspoints.size();
+    nGPsMerge = QuadratureLocal.gausspoints.size();
 
-  ptTemp /= nGPsMerge;
+    ptTemp /= nGPsMerge;
 
-  delete  adapIntegNodeLocal;
+    delete  adapIntegNodeLocal;
 
-  return;
+   return;
 }
 
 

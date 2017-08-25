@@ -1,7 +1,5 @@
 
-
 #include "GeomDataHBSplines.h"
-
 #include "ComputerTime.h"
 #include "TimeFunction.h"
 #include "MpapTime.h"
@@ -10,10 +8,7 @@
 #include "ShapeFunctions.h"
 #include "DistFunctions.h"
 #include "Functions.h"
-//#include "headersBoost.h"
-
 #include "BasisFunctionsBSpline.h"
-
 
 
 
@@ -107,7 +102,7 @@ void GeomDataHBSplines::getBoundaryNormal3D(int side, myPoint& normal)
 
 void  GeomDataHBSplines::setBoundaryGPs1D(int side, vector<double>& boundaryGPs1, vector<double>& boundaryGWs1 )
 {
-  return;
+    return;
 }
 
 
@@ -261,16 +256,16 @@ void  GeomDataHBSplines::setBoundaryGPs3D(int side, vector<double>& boundaryGPs1
 
 void  GeomDataHBSplines::setBoundaryGPs1D(int side, GaussQuadrature& quadTemp )
 {
-  return;
+    return;
 }
 
 
 
 void  GeomDataHBSplines::setBoundaryGPs2D(int side, GaussQuadrature& quadTemp)
 {
-    int  ii, jj, kk;
+    int  ii=0, jj=0, kk=0;
     myPoint  ptTemp;
-    double  wt;
+    double  wt=0.0;
     ptTemp[2] = 0.0;
 
     switch(side)
@@ -362,9 +357,9 @@ void  GeomDataHBSplines::setBoundaryGPs2D(int side, GaussQuadrature& quadTemp)
 
 void  GeomDataHBSplines::setBoundaryGPs3D(int side, GaussQuadrature& quadTemp)
 {
-    int  ii, jj, kk;
+    int  ii=0, jj=0, kk=0;
     myPoint  ptTemp;
-    double  wt;
+    double  wt=0.0;
 
     switch(side)
     {

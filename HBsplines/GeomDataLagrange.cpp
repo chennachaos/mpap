@@ -29,20 +29,20 @@ void GeomDataLagrange::build()
 
 void GeomDataLagrange::setNodalPositions(vector<myPoint>&  datatemp)
 {
-  int ii, jj, ind;
-  double  val;
+    int  ii=0, jj=0, ind=0;
+    double  val=0.0;
   
-  nNode = datatemp.size();
+    nNode = datatemp.size();
 
-  NodePosOrig.resize(nNode);
-  NodePosCur.resize(nNode);
-  NodePosNew.resize(nNode);
+    NodePosOrig.resize(nNode);
+    NodePosCur.resize(nNode);
+    NodePosNew.resize(nNode);
 
-  specValCur.resize(nNode);
-  specValNew.resize(nNode);
+    specValCur.resize(nNode);
+    specValNew.resize(nNode);
 
-  for(ii=0;ii<nNode;ii++)
-  {
+    for(ii=0;ii<nNode;ii++)
+    {
       for(jj=0;jj<DIM;jj++)
       {
         //cout << ii << '\t' << jj << '\t' << datatemp[ii][jj] << endl;
@@ -57,46 +57,47 @@ void GeomDataLagrange::setNodalPositions(vector<myPoint>&  datatemp)
       }
     }
 
-  /*
-  for(ii=0;ii<datatemp.size();ii++)
-  {
-      cout << datatemp[ii][0]  << '\t' << datatemp[ii][1] << endl;
-      cout << SolidSolnData.NodePosOrig[ii][0] << '\t' << SolidSolnData.NodePosOrig[ii][1] << endl;
-  }
-  */
+    if(DIM == 2)
+    {
+      for(ii=0;ii<nNode;ii++)
+      {
+        NodePosOrig[ii][jj] = 0.0;
+        NodePosCur[ii][jj]  = 0.0;
+        NodePosNew[ii][jj]  = 0.0;
 
-  return;
+        specValCur[ii][jj]  = 0.0;
+        specValNew[ii][jj]  = 0.0;
+      }
+    }
+
+    return;
 }
 
 
 
 void GeomDataLagrange::updateNodePositions(double* data)
 {
-  int ii, jj, ind;
+    int  ii=0, jj=0, ind=0;
   
-  nNode = NodePosCur.size();
+    nNode = NodePosCur.size();
 
-  for(ii=0;ii<nNode;ii++)
-  {
-    ind = DIM*ii;
-    for(jj=0;jj<DIM;jj++)
+    for(ii=0;ii<nNode;ii++)
     {
-      NodePosNew[ii][jj] = NodePosOrig[ii][jj] + data[ind+jj];
-      NodePosCur[ii][jj] = NodePosOrig[ii][jj] + data[ind+jj];
+      ind = DIM*ii;
+      for(jj=0;jj<DIM;jj++)
+      {
+        NodePosNew[ii][jj] = NodePosOrig[ii][jj] + data[ind+jj];
+        NodePosCur[ii][jj] = NodePosOrig[ii][jj] + data[ind+jj];
+      }
     }
-  }
 
-  //for(ii=0;ii<nNode;ii++)
-    //cout << NodePosCur[ii][0] << '\t' << NodePosCur[ii][1] << endl;
-  //printf("\n\n");
-  
-   return;
+    return;
 }
 
 void GeomDataLagrange::printSelf()
 {
-//   cout << " Degree and Jacobian " << degree[0] << '\t' << Jfull << endl;
-   return;
+  //   cout << " Degree and Jacobian " << degree[0] << '\t' << Jfull << endl;
+  return;
 }
 
 
@@ -110,7 +111,7 @@ void GeomDataLagrange::reset()
 
 void GeomDataLagrange::computeBasisFunctions1D(double uu, double *N, double *dN_dx)
 {
-    int  ROWS = 2, ii;
+    int  ROWS = 2, ii=0;
 /*
     double** ders = new double*[ROWS], du_dx;
 
@@ -143,21 +144,21 @@ void GeomDataLagrange::computeBasisFunctions1D(double uu, double *N, double *dN_
 
 void GeomDataLagrange::computeBasisFunctions2D(int deg, double* param, double *N)
 {
-  int  ii, jj, count = deg + 1;
+    int  ii=0, jj=0, count = deg + 1;
 
-  vector<double>  N1(count), N2(count);
+    vector<double>  N1(count), N2(count);
 
-  Lagrange_BasisFuns1D(deg, param[0], &N1[0]);
-  Lagrange_BasisFuns1D(deg, param[1], &N2[0]);
+    Lagrange_BasisFuns1D(deg, param[0], &N1[0]);
+    Lagrange_BasisFuns1D(deg, param[1], &N2[0]);
 
-  count = 0;
-  for(jj=0; jj<=deg; jj++)
-  {
-    for(ii=0; ii<=deg; ii++)
-      N[count++]   =  N2[jj] *  N1[ii];
-  }
+    count = 0;
+    for(jj=0; jj<=deg; jj++)
+    {
+      for(ii=0; ii<=deg; ii++)
+        N[count++]   =  N2[jj] *  N1[ii];
+    }
 
-  return;
+    return;
 }
 
 
@@ -165,7 +166,7 @@ void GeomDataLagrange::computeBasisFunctions2D(int deg, double* param, double *N
 
 void  GeomDataLagrange::computeBasisFunctions2D(bool flag, int type, int degree, double* param, vector<int>& nodeNums, double *N, double *dN_dx, double *dN_dy, double& Jac)
 {
-    int  ii, jj, count, nlbf;
+    int  ii=0, jj=0, count=0, nlbf=0;
 
     if(type == 1) // triangular elements
     {
@@ -236,68 +237,67 @@ void  GeomDataLagrange::computeBasisFunctions2D(bool flag, int type, int degree,
        }
     }
 
-  Jac  = B[0][0]*B[1][1] - B[0][1]*B[1][0];
+    Jac  = B[0][0]*B[1][1] - B[0][1]*B[1][0];
 
-  //printf("Bmat  \t%20.18f\t%20.18f\t%20.18f\t%20.18f\t%20.18f \n\n", B[0][0], B[0][1], B[1][0], B[1][1], Jac);
+    //printf("Bmat  \t%20.18f\t%20.18f\t%20.18f\t%20.18f\t%20.18f \n\n", B[0][0], B[0][1], B[1][0], B[1][1], Jac);
 
-  detinv = 1.0/Jac ;
+    detinv = 1.0/Jac ;
 
-  Binv[0][0] =  B[1][1] * detinv;
-  Binv[0][1] = -B[0][1] * detinv;
-  Binv[1][0] = -B[1][0] * detinv;
-  Binv[1][1] =  B[0][0] * detinv;
+    Binv[0][0] =  B[1][1] * detinv;
+    Binv[0][1] = -B[0][1] * detinv;
+    Binv[1][0] = -B[1][0] * detinv;
+    Binv[1][1] =  B[0][0] * detinv;
 
-  // Compute derivatives of basis functions w.r.t physical coordinates
-  for(ii=0; ii<nlbf; ii++)
-  {
-    dN_dx[ii] = dN_du1[ii] * Binv[0][0] + dN_du2[ii] * Binv[0][1];
-    dN_dy[ii] = dN_du1[ii] * Binv[1][0] + dN_du2[ii] * Binv[1][1];
-  }
+    // Compute derivatives of basis functions w.r.t physical coordinates
+    for(ii=0; ii<nlbf; ii++)
+    {
+      dN_dx[ii] = dN_du1[ii] * Binv[0][0] + dN_du2[ii] * Binv[0][1];
+      dN_dy[ii] = dN_du1[ii] * Binv[1][0] + dN_du2[ii] * Binv[1][1];
+    }
   
-  return;
+    return;
 }
 
 
 
 void  GeomDataLagrange::computeDeformationGradient2D(bool flag, vector<int>& nodeNums, double* dN_dx, double* dN_dy, double* F, double& detF)
 {
+    /////////////////////////////////////////////
+    //                                         //
+    //    F(1,1) = F[0]   //   F(1,2) = F[1]   //
+    //                                         //
+    //    F(2,1) = F[2]   //   F(2,2) = F[3]   //
+    //                                         //
+    /////////////////////////////////////////////
 
-      /////////////////////////////////////////////
-      //                                         //
-      //    F(1,1) = F[0]   //   F(1,2) = F[1]   //
-      //                                         //
-      //    F(2,1) = F[2]   //   F(2,2) = F[3]   //
-      //                                         //
-      /////////////////////////////////////////////
+    //   confflag = 1 --> coordiantes from current configuration
+    //                    shape function derivatives w.r.t reference configuration
 
-      //   confflag = 1 --> coordiantes from current configuration
-      //                    shape function derivatives w.r.t reference configuration
+    //   confflag = 2 ==> coordiantes from reference configuration
+    //                    shape function derivatives w.r.t current configuration
 
-      //   confflag = 2 ==> coordiantes from reference configuration
-      //                    shape function derivatives w.r.t current configuration
+    double  xx=0.0, yy=0.0;
 
-      double  xx, yy;
+    F[0] = F[1] = F[2] = F[3] = 0.0;
 
-      F[0] = F[1] = F[2] = F[3] = 0.0;
+    for(int ii=0; ii<nodeNums.size(); ii++)
+    {
+      xx = NodePosCur[node_map_new_to_old[nodeNums[ii]]][0];
+      yy = NodePosCur[node_map_new_to_old[nodeNums[ii]]][1];
 
-      for(int ii=0; ii<nodeNums.size(); ii++)
-      {
-        xx = NodePosCur[node_map_new_to_old[nodeNums[ii]]][0];
-        yy = NodePosCur[node_map_new_to_old[nodeNums[ii]]][1];
+      //xx = NodePosCur[nodeNums[ii]][0];
+      //yy = NodePosCur[nodeNums[ii]][1];
+      //cout << xx << '\t' << yy << endl;
 
-        //xx = NodePosCur[nodeNums[ii]][0];
-        //yy = NodePosCur[nodeNums[ii]][1];
-        //cout << xx << '\t' << yy << endl;
+      F[0] += xx * dN_dx[ii];
+      F[2] += xx * dN_dy[ii];
+      F[1] += yy * dN_dx[ii];
+      F[3] += yy * dN_dy[ii];
+    }
 
-        F[0] += xx * dN_dx[ii];
-        F[2] += xx * dN_dy[ii];
-        F[1] += yy * dN_dx[ii];
-        F[3] += yy * dN_dy[ii];
-      }
+    detF = F[0]*F[3] - F[1]*F[2];
 
-      detF = F[0]*F[3] - F[1]*F[2];
-
-  return;
+    return;
 }
 
 
@@ -306,25 +306,25 @@ void  GeomDataLagrange::computeDeformationGradient2D(bool flag, vector<int>& nod
 
 void GeomDataLagrange::computeBasisFunctions3D(int deg, double* param, double *N)
 {
-  int  ii, jj, kk, count = deg + 1;
+    int  ii=0, jj=0, kk=0, count = deg + 1;
 
-  vector<double>  N1(count), N2(count), N3(count);
+    vector<double>  N1(count), N2(count), N3(count);
 
-  Lagrange_BasisFuns1D(deg, param[0], &N1[0]);
-  Lagrange_BasisFuns1D(deg, param[1], &N2[0]);
-  Lagrange_BasisFuns1D(deg, param[2], &N3[0]);
+    Lagrange_BasisFuns1D(deg, param[0], &N1[0]);
+    Lagrange_BasisFuns1D(deg, param[1], &N2[0]);
+    Lagrange_BasisFuns1D(deg, param[2], &N3[0]);
 
-  count = 0;
-  for(kk=0; kk<=deg; kk++)
-  {
-    for(jj=0; jj<=deg; jj++)
+    count = 0;
+    for(kk=0; kk<=deg; kk++)
     {
-      for(ii=0; ii<=deg; ii++)
-        N[count++]   =  N3[kk] * N2[jj] * N1[ii];
+      for(jj=0; jj<=deg; jj++)
+      {
+        for(ii=0; ii<=deg; ii++)
+          N[count++]   =  N3[kk] * N2[jj] * N1[ii];
+      }
     }
-  }
 
-  return;
+    return;
 }
 
 
@@ -333,7 +333,7 @@ void GeomDataLagrange::computeBasisFunctions3D(int deg, double* param, double *N
 
 void  GeomDataLagrange::computeBasisFunctions3D(bool flag, int type, int degree, double* param, vector<int>& nodeNums, double *N, double *dN_dx, double *dN_dy, double *dN_dz, double& Jac)
 {
-    int  ii, jj, kk, count, nlbf;
+    int  ii=0, jj=0, kk=0, count=0, nlbf=0;
 
     if(type == 1) // tetrahedral elements
     {
@@ -348,7 +348,7 @@ void  GeomDataLagrange::computeBasisFunctions3D(bool flag, int type, int degree,
 
     vector<double>  N1(count), N2(count), N3(count), dN1(count), dN2(count), dN3(count);
     vector<double>  dN_du1(nlbf), dN_du2(nlbf), dN_du3(nlbf);
-    double  xx, yy, zz;
+    double  xx=0.0, yy=0.0, zz=0.0;
     MatrixXd  B(3,3), Binv(3,3);
 
     if(type == 1) // tetrahedral elements
@@ -430,20 +430,18 @@ void  GeomDataLagrange::computeBasisFunctions3D(bool flag, int type, int degree,
       }
     }
 
-  Jac  = B.determinant();
-  Binv = B.inverse();
+    Jac  = B.determinant();
+    Binv = B.inverse();
 
-  //printMatrix(B);
+    // Compute derivatives of basis functions w.r.t physical coordinates
+    for(ii=0; ii<nlbf; ii++)
+    {
+      dN_dx[ii] = dN_du1[ii] * Binv(0,0) + dN_du2[ii] * Binv(0,1) + dN_du3[ii] * Binv(0,2);
+      dN_dy[ii] = dN_du1[ii] * Binv(1,0) + dN_du2[ii] * Binv(1,1) + dN_du3[ii] * Binv(1,2);
+      dN_dz[ii] = dN_du1[ii] * Binv(2,0) + dN_du2[ii] * Binv(2,1) + dN_du3[ii] * Binv(2,2);
+    }
 
-  // Compute derivatives of basis functions w.r.t physical coordinates
-  for(ii=0; ii<nlbf; ii++)
-  {
-    dN_dx[ii] = dN_du1[ii] * Binv(0,0) + dN_du2[ii] * Binv(0,1) + dN_du3[ii] * Binv(0,2);
-    dN_dy[ii] = dN_du1[ii] * Binv(1,0) + dN_du2[ii] * Binv(1,1) + dN_du3[ii] * Binv(1,2);
-    dN_dz[ii] = dN_du1[ii] * Binv(2,0) + dN_du2[ii] * Binv(2,1) + dN_du3[ii] * Binv(2,2);
-  }
-
-  return;
+    return;
 }
 
 
@@ -451,14 +449,14 @@ void  GeomDataLagrange::computeBasisFunctions3D(bool flag, int type, int degree,
 
 void  GeomDataLagrange::computeDeformationGradient3D(bool flag, vector<int>& nodeNums, double* dN_dx, double* dN_dy, double* dN_dz, double* F, double& detF)
 {
-      double  xx, yy, zz;
+    double  xx=0.0, yy=0.0, zz=0.0;
 
-      F[0] = F[1] = F[2] = 0.0;
-      F[3] = F[4] = F[5] = 0.0;
-      F[6] = F[7] = F[8] = 0.0;
+    F[0] = F[1] = F[2] = 0.0;
+    F[3] = F[4] = F[5] = 0.0;
+    F[6] = F[7] = F[8] = 0.0;
 
-      for(int ii=0; ii<nodeNums.size(); ii++)
-      {
+    for(int ii=0; ii<nodeNums.size(); ii++)
+    {
         xx = NodePosCur[node_map_new_to_old[nodeNums[ii]]][0];
         yy = NodePosCur[node_map_new_to_old[nodeNums[ii]]][1];
         zz = NodePosCur[node_map_new_to_old[nodeNums[ii]]][2];
@@ -476,11 +474,11 @@ void  GeomDataLagrange::computeDeformationGradient3D(bool flag, vector<int>& nod
         F[2] += zz * dN_dx[ii];
         F[5] += zz * dN_dy[ii];
         F[8] += zz * dN_dz[ii];
-      }
+    }
 
-      detF = F[0]*(F[4]*F[8] - F[5]*F[7]) - F[3]*(F[1]*F[8] - F[2]*F[7]) + F[6]*(F[1]*F[5] - F[2]*F[4]);
+    detF = F[0]*(F[4]*F[8] - F[5]*F[7]) - F[3]*(F[1]*F[8] - F[2]*F[7]) + F[6]*(F[1]*F[5] - F[2]*F[4]);
 
-  return;
+    return;
 }
 
 

@@ -1,6 +1,5 @@
 
 #include "ImmersedFlexibleSolid.h"
-
 #include "SolverMA41Eigen.h"
 #include "MpapTime.h"
 #include "TimeFunction.h"
@@ -30,11 +29,11 @@ void ImmersedFlexibleSolid::initialise()
 
 void ImmersedFlexibleSolid::setSolver(int slv, int *parm, bool cIO)
 {
-   //if(solver != NULL)
-     //delete solver;
-   //solver = NULL;
+    //if(solver != NULL)
+      //delete solver;
+    //solver = NULL;
 
-    int numProc;
+    int numProc=0;
 
     switch(slv)
     {
@@ -95,9 +94,10 @@ void ImmersedFlexibleSolid::prepareMatrixPattern()
 {
     //printf("\n     ImmersedFlexibleSolid::prepareMatrixPattern()  .... STARTED ...\n");
 
-    int  r, c, r1, c1, count=0, count1=0, count2=0, ii, jj, iii, e, ee, ind;
-    int *tt, *tt1, *tt2,  val1, val2, n1, n2, kk, e1, a, b, ll, pp, nnz;
-    int nRow, nCol, ind1, ind2, ndof_temp1;
+    int  r=0, c=0, r1=0, c1=0, count=0, count1=0, count2=0;
+    int  ii=0, jj=0, iii=0, e=0, ee=0, ind=0, val1=0, val2=0;
+    int  *tt, *tt1, *tt2, n1=0, n2=0, kk=0, e1=0, a=0, b=0, ll=0, pp=0, nnz=0;
+    int  nRow=0, nCol=0, ind1=0, ind2=0, ndof_temp1=0;
 
     ndof = elems[0]->getNdofPerNode();
     ndof_temp1 = ndof;
@@ -390,31 +390,31 @@ void ImmersedFlexibleSolid::prepareMatrixPattern()
 
 void ImmersedFlexibleSolid::solveTimeStep()
 {
-  printf("\n Solving Immersed Flexible Solid \n");
-  //printf("\n External force norm = %12.6E \n", forceCur.norm());
+    printf("\n Solving Immersed Flexible Solid \n");
+    //printf("\n External force norm = %12.6E \n", forceCur.norm());
 
-  int  ii, ee;
+    int  ii=0, ee=0;
 
-  //printVector(SolnData.forceCur);
+    //printVector(SolnData.forceCur);
 
-  for(ii=0;ii<10;ii++)
-  {
-    calcStiffnessAndResidual(1, 1, 1);
+    for(ii=0;ii<10;ii++)
+    {
+      calcStiffnessAndResidual(1, 1, 1);
 
-    printf("\t %5d \t %12.6E\n", ii, rNorm);
-    //printf("\t %5d \t %5d \t %12.6E\n", ii, firstIter, rNorm);
+      printf("\t %5d \t %12.6E\n", ii, rNorm);
+      //printf("\t %5d \t %5d \t %12.6E\n", ii, firstIter, rNorm);
 
-    if(converged())
-      break;
+      if(converged())
+        break;
 
-    factoriseSolveAndUpdate();
+      factoriseSolveAndUpdate();
 
-    updateIterStep();
-  }
+      updateIterStep();
+    }
 
-  printf("\n Solving Immersed Flexible Solid ..... DONE  \n\n");
+    printf("\n Solving Immersed Flexible Solid ..... DONE  \n\n");
 
-  return;
+    return;
 }
 
 
@@ -424,24 +424,24 @@ void ImmersedFlexibleSolid::solveTimeStep()
 
 int ImmersedFlexibleSolid::calcStiffnessAndResidual(int printRes, bool zeroMtx, bool zeroRes)
 {
-  //cout << "     ImmersedFlexibleSolid: generating coefficient Matrices ...\n\n";
+    //cout << "     ImmersedFlexibleSolid: generating coefficient Matrices ...\n\n";
 
-  if(solver == NULL)
-  {
-    COUT << "You need to select a solver first!\n\n";
-    return 1;
-  }
+    if(solver == NULL)
+    {
+      COUT << "You need to select a solver first!\n\n";
+      return 1;
+    }
 
-  solver->zeroMtx();
+    solver->zeroMtx();
 
-  if(firstIter)
-    rNorm = -1.0;
+    if(firstIter)
+      rNorm = -1.0;
 
-  MatrixXd  Klocal;
-  VectorXd  Flocal;
+    MatrixXd  Klocal;
+    VectorXd  Flocal;
 
-  for(int ee=0;ee<nElem;ee++)  // loop over all the elements
-  {
+    for(int ee=0;ee<nElem;ee++)  // loop over all the elements
+    {
       //cout << "       elem... : " << (ee+1) << endl;
 
       elems[ee]->calcStiffnessAndResidual(Klocal, Flocal);
@@ -454,35 +454,35 @@ int ImmersedFlexibleSolid::calcStiffnessAndResidual(int printRes, bool zeroMtx, 
       //elems[ee]->assembleElementVector(false, false, &(solver->rhsVec(0)), &(SolnData.reac(0)), 0, 0);
 
       solver->assembleMatrixAndVector(0, 0, elems[ee]->forAssyVec, Klocal, Flocal);
-  }
+    }
 
-  //cout << " solver->rhsVec " << endl;        printVector(solver->rhsVec);
+    //cout << " solver->rhsVec " << endl;        printVector(solver->rhsVec);
 
-  //printf("\n rhsVec norm = %12.6E \n", solver->rhsVec.norm());
+    //printf("\n rhsVec norm = %12.6E \n", solver->rhsVec.norm());
 
-  //applyBoundaryConditions(0, 0, solver->mtx, &(solver->rhsVec(0)));
+    //applyBoundaryConditions(0, 0, solver->mtx, &(solver->rhsVec(0)));
 
-  applyExternalForces();
+    applyExternalForces();
 
-  // rhs due to external forces
-  //rhsVec += rhsVec2;
+    // rhs due to external forces
+    //rhsVec += rhsVec2;
 
-  //solver->rhsVec(totalDOF-2) += 0.5;
+    //solver->rhsVec(totalDOF-2) += 0.5;
 
-  //cout << " rhsVec " << endl;        printVector(&(rhsVec[0]), totalDOF);
+    //cout << " rhsVec " << endl;        printVector(&(rhsVec[0]), totalDOF);
 
-  //printf("\n rhsVec norm = %12.6E \n", solver->rhsVec.norm());
+    //printf("\n rhsVec norm = %12.6E \n", solver->rhsVec.norm());
 
-  firstIter = false;
-  SolnData.firstIter = firstIter;
-  rNormPrev = rNorm;
-  rNorm     = solver->rhsVec.norm();
+    firstIter = false;
+    SolnData.firstIter = firstIter;
+    rNormPrev = rNorm;
+    rNorm     = solver->rhsVec.norm();
 
-  if (printRes > 1) { COUT << "ImmersedFlexibleSolid"; printf("  %11.4e\n",rNorm);}
+    if (printRes > 1) { COUT << "ImmersedFlexibleSolid"; printf("  %11.4e\n",rNorm);}
 
-  solver->currentStatus = ASSEMBLY_OK;
+    solver->currentStatus = ASSEMBLY_OK;
 
-  return 0;
+    return 0;
 }
 
 
@@ -490,13 +490,12 @@ int ImmersedFlexibleSolid::calcStiffnessAndResidual(int printRes, bool zeroMtx, 
 
 int ImmersedFlexibleSolid::applyBoundaryConditions(int start1, int start2, SparseMatrixXd& globalK, double* rhs)
 {   
-  int ii, jj, nn, dof, aa, ind;
-  double specVal, PENALTY=1.0e8, af;
+    int  ii=0, jj=0, nn=0, dof=0, aa=0, ind=0;
+    double  specVal=0.0, PENALTY=1.0e8;
+    double  af = SolnData.td(2);
 
-  af = SolnData.td(2);
-
-  for(aa=0;aa<DirichletBCs.size();aa++)
-  {
+    for(aa=0;aa<DirichletBCs.size();aa++)
+    {
       nn  = (int) (DirichletBCs[aa][0] - 1);
       dof = (int) (DirichletBCs[aa][1] - 1);
       specVal = DirichletBCs[aa][2];
@@ -510,22 +509,22 @@ int ImmersedFlexibleSolid::applyBoundaryConditions(int start1, int start2, Spars
       ind += start1;
       globalK.coeffRef(ind, ind) += af*PENALTY;
       rhs[ind]   += (PENALTY*specVal);
-  }
+    }
 
-  return 0;
+    return 0;
 }
 
 
 
 int  ImmersedFlexibleSolid::applyExternalForces()
 {
-  //printVector(SolnData.forceCur);
+    //printVector(SolnData.forceCur);
 
-  for(int ii=0;ii<totalDOF;ii++)
-  {
-    solver->rhsVec[ii] += SolnData.forceCur[assy4r[ii]];
-    //solver->rhsVec[ii] += fluidAcceCur[assy4r[ii]];
-  }
+    for(int ii=0;ii<totalDOF;ii++)
+    {
+      solver->rhsVec[ii] += SolnData.forceCur[assy4r[ii]];
+      //solver->rhsVec[ii] += fluidAcceCur[assy4r[ii]];
+    }
 
   /*
   ///////////////////
@@ -592,10 +591,10 @@ int  ImmersedFlexibleSolid::applyExternalForces()
 
 void ImmersedFlexibleSolid::calcForceVector()
 {
-  //for(int ee=0;ee<nElem;ee++)
-    //elems[ee]->calcExternalForces();
+    //for(int ee=0;ee<nElem;ee++)
+      //elems[ee]->calcExternalForces();
 
-  return;
+    return;
 }
 
 
@@ -603,46 +602,43 @@ void ImmersedFlexibleSolid::calcForceVector()
 
 int ImmersedFlexibleSolid::factoriseSolveAndUpdate()
 {
-  //char fct[] = "ImmersedFlexibleSolid::factoriseSolveAndUpdate";
-  //computerTime.go(fct);
+    //cout << " residue_new " << endl;        printVector(&(solver->rhsVec[0]), totalDOF);
 
-  //cout << " residue_new " << endl;        printVector(&(solver->rhsVec[0]), totalDOF);
+    solver->factoriseAndSolve();
 
-  solver->factoriseAndSolve();
+    soln.setZero();
+    // update solution vector
+    for(int kk=0;kk<totalDOF;kk++)
+      soln[assy4r[kk]] = solver->soln[kk];
 
-  soln.setZero();
-  // update solution vector
-  for(int kk=0;kk<totalDOF;kk++)
-    soln[assy4r[kk]] = solver->soln[kk];
+    SolnData.var1 += soln;
+    //SolnData.var1Dot += soln;
 
-  SolnData.var1 += soln;
-  //SolnData.var1Dot += soln;
+    //printVector(SolnData.var1);
 
-  //printVector(SolnData.var1);
+    //printf("\n\n\n");
 
-  //printf("\n\n\n");
+    //cout << " result " << endl;        printVector(&(SolnData.var1[0]), totalDOF);
 
-  //cout << " result " << endl;        printVector(&(SolnData.var1[0]), totalDOF);
+    //ctimFactSolvUpdt += computerTime.stop(fct);
 
-  //ctimFactSolvUpdt += computerTime.stop(fct);
-
-  return 0;
+    return 0;
 }
 
 
 
 void ImmersedFlexibleSolid::calcCouplingMatrices()
 {
-  //////////////////////////////////////////
-  // off-diagonal matrices
-  //////////////////////////////////////////
+    //////////////////////////////////////////
+    // off-diagonal matrices
+    //////////////////////////////////////////
 
-    int  aa, nlb, ii, jj, kk, ind1, ind2, nlbS, nlbL;
-    int  TI, TIp1, TIp2, TJ, TJp1;
+    int  aa=0, nlb=0, ii=0, jj=0, kk=0, nlbS=0, nlbL=0;
+    int  TI=0, TIp1=0, TIp2=0, TJ=0, TJp1=0;
     MatrixXd  Ktemp, Ktemp2;
 
-    ind1 = nNode*ndof;
-    ind2 = nNode*DIM;
+    int  ind1 = nNode*ndof;
+    int  ind2 = nNode*DIM;
 
     Khorz.resize(ind1, ind2);
     Khorz.setZero();
@@ -704,64 +700,64 @@ void ImmersedFlexibleSolid::calcCouplingMatrices()
 
 int ImmersedFlexibleSolid::assembleGlobalMatrixAndVector(int start1, int start2, SparseMatrixXd& mtx, double* rhs)
 {
-  if(totalDOF <= 0)
-    return 1;
+    if(totalDOF <= 0)
+      return 1;
 
-  int ee, ii, jj, k1, k2, r, c;
+    int ee=0, ii=0, jj=0, k1=0, k2=0, r=0, c=0;
 
-  for(ee=0;ee<nElem;ee++)  // loop over all the elements
-  {
-    //cout << "       elem... : " << (ee+1) << endl;
+    for(ee=0;ee<nElem;ee++)  // loop over all the elements
+    {
+      //cout << "       elem... : " << (ee+1) << endl;
 
-    //elems[ee]->resetMatrixAndVector();
+      //elems[ee]->resetMatrixAndVector();
 
-    elems[ee]->calcStiffnessAndResidual();
+      elems[ee]->calcStiffnessAndResidual();
 
-    //cout << " MMMMMMMMMMM " << endl;
-    elems[ee]->assembleElementMatrixAndVector(start2, mtx, rhs);
-  }
+      //cout << " MMMMMMMMMMM " << endl;
+      elems[ee]->assembleElementMatrixAndVector(start2, mtx, rhs);
+    }
 
-  //cout << " aaaaaaaaaaaaaaa " << endl;
-  for(ii=0;ii<totalDOF;ii++)
-    rhs[start2+ii] += SolnData.forceCur[assy4r[ii]];
+    //cout << " aaaaaaaaaaaaaaa " << endl;
+    for(ii=0;ii<totalDOF;ii++)
+      rhs[start2+ii] += SolnData.forceCur[assy4r[ii]];
 
-  applyBoundaryConditions(start1, start2, mtx, rhs);
+    applyBoundaryConditions(start1, start2, mtx, rhs);
   
-  //calcCouplingMatrices();
+    //calcCouplingMatrices();
 
 //
-  double af = SolnData.td[2];
+    double af = SolnData.td[2];
 
-  for(ii=0;ii<totalDOF;ii++)
-  {
-    r  = start2 + ii;
-    k1 = assy4r[ii];
-
-    for(jj=0;jj<forAssyCoupledHorz[ii].size();jj++)
+    for(ii=0;ii<totalDOF;ii++)
     {
-      c = start1 + forAssyCoupledHorz[ii][jj];
+      r  = start2 + ii;
+      k1 = assy4r[ii];
 
-      mtx.coeffRef(r, c) += -af;
-      mtx.coeffRef(c, r) += -af;
+      for(jj=0;jj<forAssyCoupledHorz[ii].size();jj++)
+      {
+        c = start1 + forAssyCoupledHorz[ii][jj];
+
+        mtx.coeffRef(r, c) += -af;
+        mtx.coeffRef(c, r) += -af;
+      }
     }
-  }
 //
 
 /*
-  for(ii=0;ii<totalDOF;ii++)
-  {
-    r  = start2 + ii;
-    k1 = assy4r[ii];
-
-    for(jj=0;jj<forAssyCoupledHorz[ii].size();jj++)
+    for(ii=0;ii<totalDOF;ii++)
     {
-      k2 = forAssyCoupledHorz[ii][jj];
-      c = start1 + k2;
+      r  = start2 + ii;
+      k1 = assy4r[ii];
 
-      mtx.coeffRef(r, c) += Khorz(k1, k2);
-      mtx.coeffRef(c, r) += Kvert(k2, k1);
+      for(jj=0;jj<forAssyCoupledHorz[ii].size();jj++)
+      {
+        k2 = forAssyCoupledHorz[ii][jj];
+        c = start1 + k2;
+
+        mtx.coeffRef(r, c) += Khorz(k1, k2);
+        mtx.coeffRef(c, r) += Kvert(k2, k1);
+      }
     }
-  }
 */
 
   return 0;
@@ -786,36 +782,36 @@ int ImmersedFlexibleSolid::AppendSolidMatrixPatternCutFEM(int start1, int start2
 
 int ImmersedFlexibleSolid::assembleGlobalMatrixAndVectorCutFEM(int start1, int start2, SolverPetsc* solverTemp)
 {
-  int ee, ii, jj, ind;
+    int ee=0, ii=0, jj=0, ind=0;
 
-  MatrixXd  Klocal;
-  VectorXd  Flocal;
+    MatrixXd  Klocal;
+    VectorXd  Flocal;
 
-  for(ee=0; ee<nElem; ee++)  // loop over all the elements
-  {
+    for(ee=0; ee<nElem; ee++)  // loop over all the elements
+    {
       //cout << "       elem... : " << (ee+1) << endl;
 
       elems[ee]->calcStiffnessAndResidual(Klocal, Flocal);
 
       solverTemp->assembleMatrixAndVector(start1, start2, elems[ee]->forAssyVec, elems[ee]->forAssyVec, Klocal, Flocal);
-  }
+    }
 
-  //cout << " solver->rhsVec " << endl;        printVector(solver->rhsVec);
+    //cout << " solver->rhsVec " << endl;        printVector(solver->rhsVec);
 
-  //printf("\n rhsVec norm = %12.6E \n", solver->rhsVec.norm());
+    //printf("\n rhsVec norm = %12.6E \n", solver->rhsVec.norm());
 
-  applyBoundaryConditions(start1, start2, solverTemp->mtx, solverTemp->rhsVec);
+    applyBoundaryConditions(start1, start2, solverTemp->mtx, solverTemp->rhsVec);
 
-  //applyExternalForces();
+    //applyExternalForces();
 
-  //cout << " aaaaaaaaaaaaaaa " << endl;
-  for(ii=0;ii<totalDOF;ii++)
-  {
-    ind = start2+ii;
-    VecSetValue(solverTemp->rhsVec, ind, SolnData.forceCur[assy4r[ii]], ADD_VALUES);
-  }
+    //cout << " aaaaaaaaaaaaaaa " << endl;
+    for(ii=0;ii<totalDOF;ii++)
+    {
+      ind = start2+ii;
+      VecSetValue(solverTemp->rhsVec, ind, SolnData.forceCur[assy4r[ii]], ADD_VALUES);
+    }
 
-  return 0;
+    return 0;
 }
 
 
@@ -823,14 +819,14 @@ int ImmersedFlexibleSolid::assembleGlobalMatrixAndVectorCutFEM(int start1, int s
 
 int ImmersedFlexibleSolid::applyBoundaryConditions(int start1, int start2, Mat mtxTemp, Vec rhsTemp)
 {   
-  int ii, jj, nn, dof, aa, ind;
-  double specVal, PENALTY=1.0e8, stiff, res;
+    int  ii=0, jj=0, nn=0, dof=0, aa=0, ind=0;
+    double  specVal=0.0, PENALTY=1.0e8, stiff=0.0, res=0.0;
 
-  double  af = SolnData.td(2);
-  double  velFact = SolnData.td(10);
+    double  af = SolnData.td(2);
+    double  velFact = SolnData.td(10);
 
-  for(aa=0;aa<DirichletBCs.size();aa++)
-  {
+    for(aa=0;aa<DirichletBCs.size();aa++)
+    {
       nn  = (int) (DirichletBCs[aa][0] - 1);
       dof = (int) (DirichletBCs[aa][1] - 1);
       specVal = DirichletBCs[aa][2];
@@ -848,9 +844,9 @@ int ImmersedFlexibleSolid::applyBoundaryConditions(int start1, int start2, Mat m
 
       MatSetValue(mtxTemp, ind, ind, stiff, ADD_VALUES);
       VecSetValue(rhsTemp, ind, res, ADD_VALUES);
-  }
+    }
 
-  return 0;
+    return 0;
 }
 
 

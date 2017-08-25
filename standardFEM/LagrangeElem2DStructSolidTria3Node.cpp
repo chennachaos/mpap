@@ -23,8 +23,8 @@ LagrangeElem2DStructSolidTria3Node::LagrangeElem2DStructSolidTria3Node()
   if (debug) cout << " constructor LagrangeElem2DStructSolidTria3Node\n\n";
 
   degree = 1;
-  npElem = 4;
-  nlbf   = 4;
+  npElem = 3;
+  nlbf   = 3;
   ndof   = 2;
   nsize  = nlbf*ndof;
 
@@ -43,8 +43,8 @@ void LagrangeElem2DStructSolidTria3Node::prepareElemData()
   int ii, jj;
 
   degree = 1;
-  npElem = 4;
-  nlbf   = 4;
+  npElem = 3;
+  nlbf   = 3;
   ndof   = 2;
   nsize  = nlbf*ndof;
 
@@ -105,7 +105,7 @@ int LagrangeElem2DStructSolidTria3Node::calcStiffnessAndResidual(MatrixXd& Kloca
 
   double  stre[4], cc[4][4], bc[2][4], param[2], bforce[2];
 
-  int   err,  isw,  count,  count1, index, ll = 0, ii, jj, gp1, gp2, TI, TIp1, TJ, TJp1;
+  int   err,  isw,  count,  count1, index, ll = 0, ii, jj, gp, TI, TIp1, TJ, TJp1;
   int   ind1, ind2, kk;
   
   double  BULK = matDat[0] ;
@@ -127,13 +127,28 @@ int LagrangeElem2DStructSolidTria3Node::calcStiffnessAndResidual(MatrixXd& Kloca
   //printf(" %14.12f \t %14.12f \t %14.12f \t %14.12f \n ", rho, af, d1, aa);
   //printf(" %5d \t %5d \t %5d \t %5d \n ", nodeNums[0], nodeNums[1], nodeNums[2], nodeNums[3]);
 
-  double xNode[4], yNode[4], xx, yy;
+  double xNode[3], yNode[3], xx, yy;
 
-    for(ii=0;ii<npElem;ii++)
-    {
-      xNode[ii] = GeomData->NodePosOrig[nodeNums[ii]][0];
-      yNode[ii] = GeomData->NodePosOrig[nodeNums[ii]][1];
-    }
+  for(ii=0;ii<npElem;ii++)
+  {
+    //xNode[ii] = GeomData->NodePosOrig[SolnData->node_map_new_to_old[nodeNums[ii]]][0];
+    //yNode[ii] = GeomData->NodePosOrig[SolnData->node_map_new_to_old[nodeNums[ii]]][1];
+
+    xNode[ii] = GeomData->NodePosOrig[nodeNums[ii]][0];
+    yNode[ii] = GeomData->NodePosOrig[nodeNums[ii]][1];
+  }
+
+    cout << xNode[0] << endl;
+    cout << yNode[0] << endl;
+    cout << xNode[1] << endl;
+    cout << yNode[1] << endl;
+    cout << xNode[2] << endl;
+    cout << yNode[2] << endl;
+    
+
+  double totVolume = 0.5*(xNode[0]*(yNode[1]-yNode[2]) + xNode[1]*(yNode[2]-yNode[0]) + xNode[2]*(yNode[0]-yNode[1]));
+
+  cout << " volume = " << totVolume << endl;
 
     for(ii=0;ii<npElem;ii++)
     {
@@ -151,13 +166,14 @@ int LagrangeElem2DStructSolidTria3Node::calcStiffnessAndResidual(MatrixXd& Kloca
   //printf(" %14.12f \t %14.12f \t %14.12f \t %14.12f \n ", xNode[0], xNode[1], xNode[2], xNode[3]);
   //printf(" %14.12f \t %14.12f \t %14.12f \t %14.12f \n\n\n ", yNode[0], yNode[1], yNode[2], yNode[3]);
 
-    if(Klocal.rows() != nsize)
-    {
-      Klocal.resize(nsize, nsize);
-      Flocal.resize(nsize);
-    }
-    Klocal.setZero();
-    Flocal.setZero();
+  if(Klocal.rows() != nsize)
+  {
+    Klocal.resize(nsize, nsize);
+    Flocal.resize(nsize);
+  }
+
+  Klocal.setZero();
+  Flocal.setZero();
   Mlocal.setZero();
 
   count = 1;   ll = 0;   err = 0;   isw = 3;
@@ -167,22 +183,22 @@ int LagrangeElem2DStructSolidTria3Node::calcStiffnessAndResidual(MatrixXd& Kloca
 
   nGP = (int) elmDat[0] ;
 
-  vector<double>  gausspoints1, gaussweights1;
+  vector<double>  gausspoints1, gausspoints2, gaussweights;
 
-  getGaussPoints1D(nGP, gausspoints1, gaussweights1);
+  getGaussPointsTriangle(nGP, gausspoints1, gausspoints2, gaussweights);
 
 
-  for(gp2=0;gp2<nGP;gp2++)
-  {
-    JacMult = gaussweights1[gp2] * thick;
+    for(gp=0;gp<nGP;gp++)
+    {
+          param[0] = gausspoints1[gp];
+          param[1] = gausspoints2[gp];
 
-    param[1] = gausspoints1[gp2];
+          GeomData->computeBasisFunctions2D(0, 1, degree, param, nodeNums, &N(0), &dN_dx(0), &dN_dy(0), Jac);
 
-  for(gp1=0;gp1<nGP;gp1++)
-  {
-        param[0] = gausspoints1[gp1];
+          fact = gaussweights[gp];
 
-        GeomData->computeBasisFunctions2D(0, 2, degree, param, nodeNums, &N(0), &dN_dx(0), &dN_dy(0), Jac);
+          dvol0 = Jac * fact;
+          dvol = dvol0;
 
           xx = yy= 0.0;
           for(ii=0;ii<nlbf;ii++)
@@ -194,10 +210,6 @@ int LagrangeElem2DStructSolidTria3Node::calcStiffnessAndResidual(MatrixXd& Kloca
         //for(ii=0; ii<nlbf; ii++)
           //cout << N[ii] << '\t' << dN_dx[ii] << '\t' << dN_dy[ii] << endl;
 
-        fact = gaussweights1[gp1] * JacMult;
-
-        dvol0 = Jac * fact;
-        dvol = dvol0;
 
         //if(axsy)
           //dvol *= 2.0*PI*yy;
@@ -331,9 +343,7 @@ int LagrangeElem2DStructSolidTria3Node::calcStiffnessAndResidual(MatrixXd& Kloca
               }
           }
         }
-
-  }//gp1
-  }//gp2
+  }//gp
 
   //printMatrix(Klocal);  printf("\n\n\n");  printVector(Flocal);
 

@@ -62,24 +62,24 @@ void HBSplineCutFEM::plotGeom(int val1, bool flag2, int col, bool PLOT_KNOT_LINE
     cellDataVTK2->SetNumberOfComponents(1);
     //vecVTK->SetNumberOfTuples(count);
 
-  if(CUTCELL_INTEGRATION_TYPE == 1)
-  {
-    if(ndm == 1)
-      plotGeomSubTrias1D(val1, flag2, col, PLOT_KNOT_LINES, resln);
-    else if(ndm == 2)
-      plotGeomSubTrias2D(val1, flag2, col, PLOT_KNOT_LINES, resln);
+    if(CUTCELL_INTEGRATION_TYPE == 1)
+    {
+      if(ndm == 1)
+        plotGeomSubTrias1D(val1, flag2, col, PLOT_KNOT_LINES, resln);
+      else if(ndm == 2)
+        plotGeomSubTrias2D(val1, flag2, col, PLOT_KNOT_LINES, resln);
+      else
+        plotGeomSubTrias3D(val1, flag2, col, PLOT_KNOT_LINES, resln);
+    }
     else
-      plotGeomSubTrias3D(val1, flag2, col, PLOT_KNOT_LINES, resln);
-  }
-  else
-  {
-    if(ndm == 1)
-      plotGeomAdapIntegration1D(val1, flag2, col, PLOT_KNOT_LINES, resln);
-    else if(ndm == 2)
-      plotGeomAdapIntegration2D(val1, flag2, col, PLOT_KNOT_LINES, resln);
-    else
-      plotGeomAdapIntegration3D(val1, flag2, col, PLOT_KNOT_LINES, resln);
-  }
+    {
+      if(ndm == 1)
+        plotGeomAdapIntegration1D(val1, flag2, col, PLOT_KNOT_LINES, resln);
+      else if(ndm == 2)
+        plotGeomAdapIntegration2D(val1, flag2, col, PLOT_KNOT_LINES, resln);
+      else
+        plotGeomAdapIntegration3D(val1, flag2, col, PLOT_KNOT_LINES, resln);
+    }
 
     uGridVTK->SetPoints(pointsVTK);
 
@@ -115,7 +115,7 @@ void HBSplineCutFEM::plotGeom(int val1, bool flag2, int col, bool PLOT_KNOT_LINE
 
 void HBSplineCutFEM::plotGeomSubTrias1D(int val1, bool flag2, int col, bool PLOT_KNOT_LINES, int* resln)
 { 
-    int ii, jj, n1, n2, ind1, ind2, ll;
+    int  ii=0, jj=0, n1=0, n2=0, ind1=0, ind2=0, ll=0;
 
     vtkIdType pt0, pt1, pt2;
     double  *tmp;
@@ -156,7 +156,7 @@ void HBSplineCutFEM::plotGeomSubTrias1D(int val1, bool flag2, int col, bool PLOT
 
 void HBSplineCutFEM::plotGeomSubTrias2D(int val1, bool flag2, int col, bool PLOT_KNOT_LINES, int* resln)
 { 
-    int  ee, ii, kk, ll, typetemp, totalNGP=0;
+    int  ee=0, ii=0, kk=0, ll=0, typetemp=0, totalNGP=0;
 
     vtkIdType  ptIds[20],  ptId, cellId;
     node *ndTemp;
@@ -229,7 +229,7 @@ void HBSplineCutFEM::plotGeomSubTrias2D(int val1, bool flag2, int col, bool PLOT
 
 void HBSplineCutFEM::plotGeomSubTrias3D(int val1, bool flag2, int col, bool PLOT_KNOT_LINES, int* resln)
 { 
-    int  ee, ii, kk, ll, typetemp, totalNGP=0;
+    int  ee=0, ii=0, kk=0, ll=0, typetemp=0, totalNGP=0;
 
     vtkIdType  ptIds[20],  ptId, cellId;
     node *ndTemp;
@@ -237,8 +237,7 @@ void HBSplineCutFEM::plotGeomSubTrias3D(int val1, bool flag2, int col, bool PLOT
     
     AABB  bbTemp;
 
-
-    for(ee=0;ee<activeElements.size();ee++)
+    for(ee=0; ee<activeElements.size(); ee++)
     {
         ndTemp = elems[activeElements[ee]];
 
@@ -369,8 +368,6 @@ void  HBSplineCutFEM::postProcessFlow(int vartype, int vardir, int nCol, bool um
 
     writerUGridVTK->Write();
 
-    //cout << " jjjjjjjjjjjjjjjjjj " << endl;
-    
     for(int bb=0;bb<ImmersedBodyObjects.size();bb++)
     {
       ImmersedBodyObjects[bb]->postProcess(filecount);
@@ -392,96 +389,97 @@ void  HBSplineCutFEM::postProcessSubTrias1D(int vartype, int vardir, int nCol, b
 
 void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, bool umnxflag, double umin, double umax, int* resln)
 {
-    int  dd, ii, jj, kk, ll, count, nlocal, index, ind1, ind2, e, ee, gcount, ind, domTemp;
-    vtkIdType pt[50], cellId;
-
-    nlocal = (degree[0]+1) * (degree[1] + 1);
+    int  dd=0, ii=0, jj=0, kk=0, ll=0, count=0, index=0;
+    int  ind1=0, ind2=0, e=0, ee=0, gcount=0, ind=0, domTemp=0;
+    int nlocal = (degree[0]+1) * (degree[1] + 1);
 
     VectorXd  NN(nlocal), N(nlocal), dN_dx(nlocal), dN_dy(nlocal), dNN_dx(nlocal), dNN_dy(nlocal), tempVec, tempVec2, d2N_dx2(nlocal), d2N_dy2(nlocal);
     VectorXd  vectmp(nlocal), rhsTemp;
     myPoint  knotIncr, knotBegin;
 
-    double   fact, *tmp0, *tmp1, incr1, incr2, val1;
+    double   fact=0.0, incr1=0.0, incr2=0.0, val1=0.0, *tmp0, *tmp1;
 
     vector<double>  uu, vv;
 
     node* ndTemp;
 
-  if(ndf == 1)
-  {
-    index = 0;
-    for(ee=0; ee<activeElements.size(); ee++)
+    vtkIdType pt[50], cellId;
+
+    if(ndf == 1)
     {
-      ndTemp = elems[activeElements[ee]];
-      //cout << " Node # " << nd->getID() << endl;
+      index = 0;
+      for(ee=0; ee<activeElements.size(); ee++)
+      {
+        ndTemp = elems[activeElements[ee]];
+        //cout << " Node # " << nd->getID() << endl;
 
-        tmp0 = ndTemp->getKnots(Dir1);
-        tmp1 = ndTemp->getKnots(Dir2);
+          tmp0 = ndTemp->getKnots(Dir1);
+          tmp1 = ndTemp->getKnots(Dir2);
 
-        knotBegin = ndTemp->getKnotBegin();
-        knotIncr  = ndTemp->getKnotIncrement();
+          knotBegin = ndTemp->getKnotBegin();
+          knotIncr  = ndTemp->getKnotIncrement();
 
-        //printf("\t tmp[0] and tmp[1]  ... : %12.8f\t%12.8f\n", tmp[0], tmp[1] );
+          //printf("\t tmp[0] and tmp[1]  ... : %12.8f\t%12.8f\n", tmp[0], tmp[1] );
 
-        incr1 = tmp0[2] ;
-        incr2 = tmp1[2] ;
+          incr1 = tmp0[2] ;
+          incr2 = tmp1[2] ;
 
-        //if( !(ndTemp->isCutElement()) )
-        if( ndTemp->getDomainNumber() < 10 )
-        {
-          //if( ndTemp->getDomainNumber() == 0 )
-          //{
-            fact = incr1/resln[0];
-            create_vector(tmp0[0], tmp0[1], fact, uu);
+          //if( !(ndTemp->isCutElement()) )
+          if( ndTemp->getDomainNumber() < 10 )
+          {
+            //if( ndTemp->getDomainNumber() == 0 )
+            //{
+              fact = incr1/resln[0];
+              create_vector(tmp0[0], tmp0[1], fact, uu);
 
-            fact = incr2/resln[1];
-            create_vector(tmp1[0], tmp1[1], fact, vv);
+              fact = incr2/resln[1];
+              create_vector(tmp1[0], tmp1[1], fact, vv);
 
-            //create the coordinates of the pointsVTK (nodes in FEM)
+              //create the coordinates of the pointsVTK (nodes in FEM)
 
-            count = 0;
-            for(jj=0;jj<vv.size();jj++)
-            {
-              param[1] = vv[jj];
-              geom[1] = computeGeometry(1, vv[jj]);
-
-              for(ii=0;ii<uu.size();ii++)
+              count = 0;
+              for(jj=0;jj<vv.size();jj++)
               {
-                param[0] = uu[ii];
-                geom[0] = computeGeometry(0, uu[ii]);
+                param[1] = vv[jj];
+                geom[1] = computeGeometry(1, vv[jj]);
 
-                pt[count] = pointsVTK->InsertNextPoint(geom[0], geom[1], 0.0);
+                for(ii=0;ii<uu.size();ii++)
+                {
+                  param[0] = uu[ii];
+                  geom[0] = computeGeometry(0, uu[ii]);
 
-                GeomData.computeBasisFunctions2D(knotBegin, knotIncr, param, NN);
+                  pt[count] = pointsVTK->InsertNextPoint(geom[0], geom[1], 0.0);
 
-                if(ndTemp->getParent() == NULL)
-                  N = NN;
-                else
-                  N = ndTemp->SubDivMat*NN;
+                  GeomData.computeBasisFunctions2D(knotBegin, knotIncr, param, NN);
 
-                if(domTemp == 0)
-                  fact = ndTemp->computeValue(0, N);
-                else
-                  fact = ndTemp->computeValue2(0, N);
+                  if(ndTemp->getParent() == NULL)
+                    N = NN;
+                  else
+                    N = ndTemp->SubDivMat*NN;
 
-                scaVTK->InsertNextValue(fact);
-                scaVTK2->InsertNextValue(fact - GeomData.analyDBC->computeValue(0, geom[0], geom[1]) );
+                  if(domTemp == 0)
+                    fact = ndTemp->computeValue(0, N);
+                  else
+                    fact = ndTemp->computeValue2(0, N);
 
-                count++;
-              } //for(ii=0;ii<uu.size();ii++)
-            } //for(jj=0;jj<vv.size();jj++)
+                  scaVTK->InsertNextValue(fact);
+                  scaVTK2->InsertNextValue(fact - GeomData.analyDBC->computeValue(0, geom[0], geom[1]) );
 
-            quadVTK->GetPointIds()->SetId(0, pt[0]);
-            quadVTK->GetPointIds()->SetId(1, pt[1]);
-            quadVTK->GetPointIds()->SetId(2, pt[3]);
-            quadVTK->GetPointIds()->SetId(3, pt[2]);
+                  count++;
+                } //for(ii=0;ii<uu.size();ii++)
+              } //for(jj=0;jj<vv.size();jj++)
 
-            //cout << ndTemp->getID() << '\t' << ndTemp->getSubdomainId() << endl;
+              quadVTK->GetPointIds()->SetId(0, pt[0]);
+              quadVTK->GetPointIds()->SetId(1, pt[1]);
+              quadVTK->GetPointIds()->SetId(2, pt[3]);
+              quadVTK->GetPointIds()->SetId(3, pt[2]);
 
-            uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
-            cellDataVTK->InsertNextValue(0);
-            cellDataVTK2->InsertNextValue(ndTemp->getSubdomainId());
-	  //}
+              //cout << ndTemp->getID() << '\t' << ndTemp->getSubdomainId() << endl;
+
+              uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
+              cellDataVTK->InsertNextValue(0);
+              cellDataVTK2->InsertNextValue(ndTemp->getSubdomainId());
+	    //}
         } //if( !nd->isCutElement() )
         else // the element is cutCell
         {
@@ -528,38 +526,36 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
           } //  for(ii=0; ii<nd->subTrias.size(); ii++)
           //cout << " AAAAAAAAAA " << endl;
         } // else
+      }
+
+      scaVTK->SetName("value");
+      scaVTK2->SetName("force");
+
+      uGridVTK->SetPoints(pointsVTK);
+
+      //assign nodal coordinates and field data to uGridVTK
+      // no need to create lookup table here. All this stuff can be done in Paraview
+
+      uGridVTK->GetPointData()->SetScalars(scaVTK);
+      uGridVTK->GetPointData()->AddArray(scaVTK2);
+      uGridVTK->GetCellData()->SetScalars(cellDataVTK2);
     }
-
-    scaVTK->SetName("value");
-    scaVTK2->SetName("force");
-
-    uGridVTK->SetPoints(pointsVTK);
-
-    //assign nodal coordinates and field data to uGridVTK
-    // no need to create lookup table here. All this stuff can be done in Paraview
-
-    uGridVTK->GetPointData()->SetScalars(scaVTK);
-    uGridVTK->GetPointData()->AddArray(scaVTK2);
-
-    uGridVTK->GetCellData()->SetScalars(cellDataVTK2);
-
-  }
-  else // for Stokes and Navier-Stokes
-  {
-    double vec[3];
-    vec[0] = vec[1] = vec[2] = 0.0;
-
-    vecVTK->SetNumberOfComponents(3);
-    //vecVTK->SetNumberOfTuples(count);
-    vecVTK2->SetNumberOfComponents(3);
-    //vecVTK2->SetNumberOfTuples(count);
-    //scaVTK->SetNumberOfTuples(count);
-    //scaVTK2->SetNumberOfTuples(count);
-
-    //cout << " Node aaaaaaaaaaa " << endl;
-
-    for(ee=0; ee<activeElements.size(); ee++)
+    else // for Stokes and Navier-Stokes
     {
+      double vec[3]={0.0, 0.0 ,0.0};
+      //vec[0] = vec[1] = vec[2] = 0.0;
+
+      vecVTK->SetNumberOfComponents(3);
+      //vecVTK->SetNumberOfTuples(count);
+      vecVTK2->SetNumberOfComponents(3);
+      //vecVTK2->SetNumberOfTuples(count);
+      //scaVTK->SetNumberOfTuples(count);
+      //scaVTK2->SetNumberOfTuples(count);
+
+      //cout << " Node aaaaaaaaaaa " << endl;
+
+      for(ee=0; ee<activeElements.size(); ee++)
+      {
         ndTemp = elems[activeElements[ee]];
         //cout << " Node # " << nd->getID() << endl;
 
@@ -654,7 +650,7 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
             poly = ndTemp->subTrias[ii];
 
             if( poly->getDomainNumber() == 0 )
-	    {
+	          {
               for(kk=0; kk<3; kk++)
               {
                 geom = poly->GetPoint(kk);
@@ -704,29 +700,28 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
           } //  for(ii=0; ii<nd->subTrias.size(); ii++)
           //cout << " AAAAAAAAAA " << endl;
         } // else
+      }
+
+      //cout << " jjjjjjjjjjjjjjjjjj " << endl;
+      vecVTK->SetName("vel");
+      vecVTK2->SetName("acce");
+      scaVTK->SetName("pres");
+      scaVTK2->SetName("vortz");
+
+      //assign nodal coordinates and field data to uGridVTK
+      // no need to create lookup table here. All this stuff can be done in Paraview
+
+      uGridVTK->SetPoints(pointsVTK);
+
+      uGridVTK->GetPointData()->SetScalars(scaVTK);
+      uGridVTK->GetPointData()->SetVectors(vecVTK);
+      uGridVTK->GetPointData()->AddArray(vecVTK2);
+      uGridVTK->GetPointData()->AddArray(scaVTK2);
+
+      uGridVTK->GetCellData()->SetScalars(cellDataVTK2);
     }
 
-    //cout << " jjjjjjjjjjjjjjjjjj " << endl;
-    vecVTK->SetName("vel");
-    vecVTK2->SetName("acce");
-    scaVTK->SetName("pres");
-    scaVTK2->SetName("vortz");
-
-    //assign nodal coordinates and field data to uGridVTK
-    // no need to create lookup table here. All this stuff can be done in Paraview
-
-    uGridVTK->SetPoints(pointsVTK);
-
-    uGridVTK->GetPointData()->SetScalars(scaVTK);
-    uGridVTK->GetPointData()->SetVectors(vecVTK);
-    uGridVTK->GetPointData()->AddArray(vecVTK2);
-    uGridVTK->GetPointData()->AddArray(scaVTK2);
-
-    uGridVTK->GetCellData()->SetScalars(cellDataVTK2);
-    //cout << " jjjjjjjjjjjjjjjjjj " << endl;
-  }
-
-  return;
+    return;
 }
 
 
@@ -734,30 +729,30 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
 
 void  HBSplineCutFEM::postProcessSubTrias3D(int vartype, int vardir, int nCol, bool umnxflag, double umin, double umax, int* resln)
 {
-    int  dd, ii, jj, kk, ll, count, nlocal, index, ind1, ind2, e, ee, gcount, ind, domTemp;
-    vtkIdType pt[50], cellId;
-
-    nlocal = (degree[0]+1) * (degree[1] + 1) * (degree[2] + 1);
+    int  dd=0, ii=0, jj=0, kk=0, ll=0, count=0, index=0;
+    int  ind1=0, ind2=0, e=0, ee=0, gcount=0, ind=0, domTemp=0;
+    int  nlocal = (degree[0]+1) * (degree[1] + 1) * (degree[2] + 1);
 
     VectorXd  NN(nlocal), dNN_dx(nlocal), dNN_dy(nlocal), dNN_dz(nlocal),  tempVec, tempVec2;
     VectorXd  N(nlocal), dN_dx(nlocal), dN_dy(nlocal), dN_dz(nlocal);
     VectorXd  vectmp(nlocal), rhsTemp;
     myPoint  knotIncr, knotBegin;
 
-    double   fact, *tmp0, *tmp1, *tmp2, incr1, incr2, incr3, val1;
+    double   fact=0.0, incr1=0.0, incr2=0.0, incr3=0.0, val1=0.0, *tmp0, *tmp1, *tmp2;
 
     vector<double>  uu, vv, ww;
 
     node*  ndTemp;
 
+    vtkIdType pt[50], cellId;
 
-  if(ndf == 1)
-  {
-    index = 0;
-    for(ee=0; ee<activeElements.size(); ee++)
+    if(ndf == 1)
     {
-      ndTemp = elems[activeElements[ee]];
-      //cout << " Node # " << nd->getID() << endl;
+      index = 0;
+      for(ee=0; ee<activeElements.size(); ee++)
+      {
+        ndTemp = elems[activeElements[ee]];
+        //cout << " Node # " << nd->getID() << endl;
 
         tmp0 = ndTemp->getKnots(Dir1);
         tmp1 = ndTemp->getKnots(Dir2);
@@ -872,36 +867,36 @@ void  HBSplineCutFEM::postProcessSubTrias3D(int vartype, int vardir, int nCol, b
           } //  for(ii=0; ii<nd->subTrias.size(); ii++)
           //cout << " AAAAAAAAAA " << endl;
         } // else
+      }
+
+      scaVTK->SetName("value");
+      scaVTK2->SetName("force");
+
+      uGridVTK->SetPoints(pointsVTK);
+
+      //assign nodal coordinates and field data to uGridVTK
+      // no need to create lookup table here. All this stuff can be done in Paraview
+
+      uGridVTK->GetPointData()->SetScalars(scaVTK);
+      uGridVTK->GetPointData()->AddArray(scaVTK2);
+      // create a write object and write uGridVTK to it
     }
-
-    scaVTK->SetName("value");
-    scaVTK2->SetName("force");
-
-    uGridVTK->SetPoints(pointsVTK);
-
-    //assign nodal coordinates and field data to uGridVTK
-    // no need to create lookup table here. All this stuff can be done in Paraview
-
-    uGridVTK->GetPointData()->SetScalars(scaVTK);
-    uGridVTK->GetPointData()->AddArray(scaVTK2);
-    // create a write object and write uGridVTK to it
-  }
-  else // for Stokes and Navier-Stokes
-  {
-    double vec[3];
-    vec[0] = vec[1] = vec[2] = 0.0;
-
-    vecVTK->SetNumberOfComponents(3);
-    //vecVTK->SetNumberOfTuples(count);
-    vecVTK2->SetNumberOfComponents(3);
-    //vecVTK2->SetNumberOfTuples(count);
-    //scaVTK->SetNumberOfTuples(count);
-    //scaVTK2->SetNumberOfTuples(count);
-
-    //cout << " Node aaaaaaaaaaa " << endl;
-
-    for(ee=0; ee<activeElements.size(); ee++)
+    else // for Stokes and Navier-Stokes
     {
+      double vec[3]={0.0, 0.0, 0.0};
+      //vec[0] = vec[1] = vec[2] = 0.0;
+
+      vecVTK->SetNumberOfComponents(3);
+      //vecVTK->SetNumberOfTuples(count);
+      vecVTK2->SetNumberOfComponents(3);
+      //vecVTK2->SetNumberOfTuples(count);
+      //scaVTK->SetNumberOfTuples(count);
+      //scaVTK2->SetNumberOfTuples(count);
+
+      //cout << " Node aaaaaaaaaaa " << endl;
+
+      for(ee=0; ee<activeElements.size(); ee++)
+      {
         ndTemp = elems[activeElements[ee]];
         //cout << " Node # " << nd->getID() << endl;
 
@@ -935,16 +930,16 @@ void  HBSplineCutFEM::postProcessSubTrias3D(int vartype, int vardir, int nCol, b
             count = 0;
             for(kk=0; kk<ww.size(); kk++)
             {
-              param[2] = ww[kk];
-              geom[2] = computeGeometry(2, ww[kk]);
+                param[2] = ww[kk];
+                geom[2] = computeGeometry(2, ww[kk]);
 
             for(jj=0;jj<vv.size();jj++)
             {
-              param[1] = vv[jj];
-              geom[1] = computeGeometry(1, vv[jj]);
+                param[1] = vv[jj];
+                geom[1] = computeGeometry(1, vv[jj]);
 
-              for(ii=0;ii<uu.size();ii++)
-              {
+            for(ii=0;ii<uu.size();ii++)
+            {
                 param[0] = uu[ii];
                 geom[0] = computeGeometry(0, uu[ii]);
 
@@ -977,7 +972,7 @@ void  HBSplineCutFEM::postProcessSubTrias3D(int vartype, int vardir, int nCol, b
                 scaVTK->InsertNextValue(fact);
                 scaVTK2->InsertNextValue(fact);
 
-              } // for(ii=0;ii<uu.size();ii++)
+            } // for(ii=0;ii<uu.size();ii++)
             } // for(jj=0;jj<vv.size();jj++)
             } // for(kk=0; kk<ww.size(); kk++)
 
@@ -1007,7 +1002,7 @@ void  HBSplineCutFEM::postProcessSubTrias3D(int vartype, int vardir, int nCol, b
             poly = ndTemp->subTrias[ii];
             domTemp = poly->getDomainNumber();
             if( domainInclYesNo[domTemp] )
-	    {
+	          {
               for(kk=0; kk<4; kk++)
               {
                 geom = poly->GetPoint(kk);
@@ -1053,29 +1048,29 @@ void  HBSplineCutFEM::postProcessSubTrias3D(int vartype, int vardir, int nCol, b
           } //  for(ii=0; ii<nd->subTrias.size(); ii++)
           //cout << " AAAAAAAAAA " << endl;
         } // else
+      }
+
+      //cout << " jjjjjjjjjjjjjjjjjj " << endl;
+      vecVTK->SetName("vel");
+      //vecVTK2->SetName("force");
+      scaVTK->SetName("pres");
+      //scaVTK2->SetName("vortz");
+
+      //assign nodal coordinates and field data to uGridVTK
+      // no need to create lookup table here. All this stuff can be done in Paraview
+
+      uGridVTK->SetPoints(pointsVTK);
+
+      uGridVTK->GetPointData()->SetScalars(scaVTK);
+      uGridVTK->GetPointData()->SetVectors(vecVTK);
+      //uGridVTK->GetPointData()->AddArray(vecVTK2);
+      //uGridVTK->GetPointData()->AddArray(scaVTK2);
+      //cout << " jjjjjjjjjjjjjjjjjj " << endl;
+
+      uGridVTK->GetCellData()->SetScalars(cellDataVTK2);
     }
 
-    //cout << " jjjjjjjjjjjjjjjjjj " << endl;
-    vecVTK->SetName("vel");
-    //vecVTK2->SetName("force");
-    scaVTK->SetName("pres");
-    //scaVTK2->SetName("vortz");
-
-    //assign nodal coordinates and field data to uGridVTK
-    // no need to create lookup table here. All this stuff can be done in Paraview
-
-    uGridVTK->SetPoints(pointsVTK);
-
-    uGridVTK->GetPointData()->SetScalars(scaVTK);
-    uGridVTK->GetPointData()->SetVectors(vecVTK);
-    //uGridVTK->GetPointData()->AddArray(vecVTK2);
-    //uGridVTK->GetPointData()->AddArray(scaVTK2);
-    //cout << " jjjjjjjjjjjjjjjjjj " << endl;
-
-    uGridVTK->GetCellData()->SetScalars(cellDataVTK2);
-  }
-
-  return;
+    return;
 }
 
 
@@ -1086,7 +1081,7 @@ void HBSplineCutFEM::plotGaussPointsElement()
     vtkSmartPointer<vtkPoints>               pointsVTK2  =  vtkSmartPointer<vtkPoints>::New();
     vtkSmartPointer<vtkVertex>               vertexVTK2  =  vtkSmartPointer<vtkVertex>::New();
 
-    int ee, ll, ii, gp, nGauss;
+    int  ee=0, ll=0, ii=0, gp=0, nGauss=0;
 
     vtkIdType  ptId;
     double  volume=0.0, *tmp[3], *gws;
@@ -1182,7 +1177,7 @@ void HBSplineCutFEM::plotGaussPointsDirichletBoundary()
     vtkSmartPointer<vtkPoints>               pointsVTK2  =  vtkSmartPointer<vtkPoints>::New();
     vtkSmartPointer<vtkVertex>               vertexVTK2  =  vtkSmartPointer<vtkVertex>::New();
 
-    int  aa, ee, ll, ii, gp, side, nGauss, levTemp;
+    int  aa=0, ee=0, ll=0, ii=0, gp=0, side=0, nGauss=0, levTemp=0;
 
     vtkIdType  ptId;
     double  volume=0.0, *tmp[3], *gws, JacTemp;
@@ -1247,7 +1242,7 @@ void HBSplineCutFEM::plotGaussPointsDirichletBoundary()
 
                   uGridVTK2->InsertNextCell(vertexVTK2->GetCellType(), vertexVTK2->GetPointIds());
               } // for(gp=0;
-	  } //for(aa=0;aa<nd1->DirichletData.size();aa++)
+	        } //for(aa=0;aa<nd1->DirichletData.size();aa++)
         }
       }
     }
@@ -1281,10 +1276,10 @@ void HBSplineCutFEM::plotGaussPointsNeumannBoundary()
     vtkSmartPointer<vtkPoints>               pointsVTK2  =  vtkSmartPointer<vtkPoints>::New();
     vtkSmartPointer<vtkVertex>               vertexVTK2  =  vtkSmartPointer<vtkVertex>::New();
 
-    int  aa, ee, ll, ii, gp, side, nGauss, levTemp;
+    int  aa=0, ee=0, ll=0, ii=0, gp=0, side=0, nGauss=0, levTemp=0;
 
     vtkIdType  ptId;
-    double  volume=0.0, *tmp[3], *gws, JacTemp;
+    double  volume=0.0, *tmp[3], *gws, JacTemp=0.0;
     myPoint *gps;
     node*  nd1;
 
@@ -1346,7 +1341,7 @@ void HBSplineCutFEM::plotGaussPointsNeumannBoundary()
 
                   uGridVTK2->InsertNextCell(vertexVTK2->GetCellType(), vertexVTK2->GetPointIds());
               } // for(gp=0;
-	  } //for(aa=0;aa<nd1->DirichletData.size();aa++)
+      	  } //for(aa=0;aa<nd1->DirichletData.size();aa++)
         }
       }
     }

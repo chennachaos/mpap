@@ -1,5 +1,4 @@
 #include "ImmersedSolid.h"
-
 #include "SolutionData.h"
 #include "GeomDataLagrange.h"
 #include "ImmersedIntegrationElement.h"
@@ -11,17 +10,16 @@
 
 extern Files files;
 
-
 using namespace myGeom;
 
 
 
 void ImmersedSolid::adjustBoundaryPoints(double* minVal, double* maxVal)
 {
-  int ii, jj;
-  double  tol1=1.0e-8, tol2=1.0e-6;
+    int ii=0, jj=0;
+    double  tol1=1.0e-8, tol2=1.0e-6;
 
-  myPoint  pt1, pt2;
+    myPoint  pt1, pt2;
 
     for(ii=0; ii<GeomData.NodePosOrig.size(); ii++)
     {
@@ -47,7 +45,7 @@ void ImmersedSolid::adjustBoundaryPoints(double* minVal, double* maxVal)
       }
     }
 
-  return;
+    return;
 }
 
 
@@ -314,12 +312,11 @@ void ImmersedSolid::updateImmersedFaces()
 void  ImmersedSolid::setImmersedFaces()
 {
   //cout << "  ImmersedSolid::setImmersedFaces()  " << endl;
-
   // set the immersed faces for cutFEM purposes
 
   myPoly* poly;
   myPoint  pt1, pt2, pt3, pt4, normal;
-  int ii, jj, kk;
+  int ii=0, jj=0, kk=0;
 
   vtkSmartPointer<vtkPoints>     pointsVTK   =  vtkSmartPointer<vtkPoints>::New();
   vtkSmartPointer<vtkLine>       lineVTK     =  vtkSmartPointer<vtkLine>::New();
@@ -545,12 +542,9 @@ void ImmersedSolid::updateImmersedFaces()
   //if(totalDOF == 0)
     //return;
 
-  //cout << " totalDOF = " << totalDOF << endl;
-  //cout << " nImmInt = " << nImmInt << endl;
-
   vtkSmartPointer<vtkPoints>     pointsVTK   =  vtkSmartPointer<vtkPoints>::New();
 
-  int ii, jj;
+  int ii=0, jj=0;
 
   myPoint  pt1, pt2, pt3, pt4, normal;
   vtkIdType  ptId;
@@ -648,7 +642,7 @@ int ImmersedSolid::within(myPoint& ptTemp)
   if( !(bbox.within(ptTemp)) )
     return 0;
 
-  int i, c=0;
+  int i=0, c=0;
 
   if(DIM == 2)
   {
@@ -716,12 +710,9 @@ int  ImmersedSolid::doIntersect2D(AABB&  bbTemp, bool flag, vector<int>& vecCorn
   if( !(bbox.doIntersect(bbTemp)) )
     return 0;
 
-//  return 1;
+    //cout << " ImmersedFaces.size() = " << ImmersedFaces.size() << endl;
 
-
-  //cout << " ImmersedFaces.size() = " << ImmersedFaces.size() << endl;
-
-    int val, ii, jj, c, pp;
+    int  val=0, ii=0, jj=0, c=0, pp=0;
     myPoint  ptTemp;
     vector<myPoint>  ptVec(4);
     
@@ -840,14 +831,14 @@ int  ImmersedSolid::doIntersect2Dfor3D(int sideTemp, double coord3, AABB&  bbTem
 
   // this subroutine is for faces of boundary elements in 3D
 
-  //if( !(bbox.doIntersect(bbTemp)) )
-    //return 0;
+  if( !(bbox.doIntersect(bbTemp)) )
+    return 0;
 
     //bbTemp.printSelf();
     //cout << " coord3 = " << coord3 << endl;
     //cout << " sideTemp = " << sideTemp << endl;
 
-    int val;
+    int  val=0;
 
     if(sideTemp == 0 || sideTemp == 1)
     {
@@ -957,13 +948,12 @@ int  ImmersedSolid::doIntersect3D(AABB&  bbTemp, bool flag, vector<int>& vecTemp
   // if the boundingbox 'bbTemp' intersects the boundingbox of the IB then
   // the IB may intersect the cell and needs further testing
   
-  //bb2.printSelf();
+    //bb2.printSelf();
 
-  //if( !(bbox.doIntersect(bbTemp)) )
-    //return 0;
+    if( !(bbox.doIntersect(bbTemp)) )
+      return 0;
 
-
-    int val, ii, jj, c, pp;
+    int val=0, ii=0, jj=0, c=0, pp=0;
     myPoint  ptTemp;
     vector<myPoint>  ptVec(8);
 
