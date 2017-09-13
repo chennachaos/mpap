@@ -8,6 +8,8 @@
 #include "Files.h"
 #include "util.h"
 
+//#include "myCGALroutines2.h"
+
 extern Files files;
 
 using namespace myGeom;
@@ -16,6 +18,8 @@ using namespace myGeom;
 
 void ImmersedSolid::adjustBoundaryPoints(double* minVal, double* maxVal)
 {
+    //cout << " ImmersedSolid::adjustBoundaryPoints .... needs to be modified " << endl;
+
     int ii=0, jj=0;
     double  tol1=1.0e-8, tol2=1.0e-6;
 
@@ -29,15 +33,12 @@ void ImmersedSolid::adjustBoundaryPoints(double* minVal, double* maxVal)
       for(jj=0; jj<DIM; jj++)
       {
         if( abs(pt1[jj]-minVal[jj]) < tol1 )
-        //if( CompareDoubles(pt1[jj], minVal[jj]) )
         {
-          //cout << pt1[0] << '\t' << pt1[1] << '\t' << pt1[2] << endl;
           GeomData.NodePosOrig[ii][jj] -= tol2;
           GeomData.NodePosCur[ii][jj]  -= tol2;
         }
 
         if( abs(pt1[jj]-maxVal[jj]) < tol1 )
-        //if( CompareDoubles(pt1[jj], maxVal[jj]) )
         {
           GeomData.NodePosOrig[ii][jj] += tol2;
           GeomData.NodePosCur[ii][jj]  += tol2;
@@ -49,10 +50,10 @@ void ImmersedSolid::adjustBoundaryPoints(double* minVal, double* maxVal)
 }
 
 
-/*
+//
 void  ImmersedSolid::setImmersedFaces()
 {
-  cout << "  ImmersedSolid::setImmersedFaces()  " << endl;
+  //cout << "  ImmersedSolid::setImmersedFaces()  " << endl;
 
   // set the immersed faces for cutFEM purposes
 
@@ -73,14 +74,13 @@ void  ImmersedSolid::setImmersedFaces()
 
   vtkIdType  pts[10];
 
-  cout << " nImmInt = " << nImmInt << '\t' << GeomData.NodePosOrig.size() << '\t' << DIM << endl;
+  //cout << " nImmInt = " << nImmInt << '\t' << GeomData.NodePosOrig.size() << '\t' << DIM << endl;
 
   if(DIM == 2)
   {
     for(ii=0; ii<GeomData.NodePosOrig.size(); ii++)
     {
       pt1 = GeomData.NodePosOrig[ii];
-      //cout << pt1[0] << '\t' << pt1[1] << '\t' << pt1[2] << endl;
       pts[0] = pointsVTK->InsertNextPoint(pt1[0], pt1[1], 0.0);
 
       vertexVTK2->GetPointIds()->SetId(0, pts[0]);
@@ -92,8 +92,6 @@ void  ImmersedSolid::setImmersedFaces()
     {
       pt1 = GeomData.NodePosOrig[ImmIntgElems[ii]->pointNums[0]];
       pt2 = GeomData.NodePosOrig[ImmIntgElems[ii]->pointNums[1]];
-
-      //cout << " ii = " << ii << '\t' << ImmIntgElems[ii]->pointNums[0] << '\t' << ImmIntgElems[ii]->pointNums[1] << endl;
 
       poly = new myLine(pt1, pt2);
 
@@ -154,14 +152,12 @@ void  ImmersedSolid::setImmersedFaces()
     for(ii=0; ii<GeomData.NodePosOrig.size(); ii++)
     {
       pt1 = GeomData.NodePosOrig[ii];
-      //cout << pt1[0] << '\t' << pt1[1] << '\t' << pt1[2] << endl;
+
       pts[0] = pointsVTK->InsertNextPoint(pt1[0], pt1[1], pt1[2]);
     }
 
     for(ii=0; ii<nImmInt; ii++)
     {
-      //cout << ii << '\t' << ImmIntgElems[ii]->pointNums.size() << endl;
-
       if(ImmIntgElems[ii]->pointNums.size() == 3) // triangle
       {
         pt1 = GeomData.NodePosOrig[ImmIntgElems[ii]->pointNums[0]];
@@ -266,12 +262,6 @@ void  ImmersedSolid::setImmersedFaces()
 
 void ImmersedSolid::updateImmersedFaces()
 {
-  //if(totalDOF == 0)
-    //return;
-
-  //cout << " totalDOF = " << totalDOF << endl;
-  //cout << " nImmInt = " << nImmInt << endl;
-
   vtkSmartPointer<vtkPoints>     pointsVTK   =  vtkSmartPointer<vtkPoints>::New();
 
   int ii, jj;
@@ -304,16 +294,19 @@ void ImmersedSolid::updateImmersedFaces()
 
   return;
 }
-
-*/
-
+//
 
 
+/*
+// set the immersed faces for cutFEM purposes
 void  ImmersedSolid::setImmersedFaces()
 {
-  //cout << "  ImmersedSolid::setImmersedFaces()  " << endl;
-  // set the immersed faces for cutFEM purposes
+    cout << "  ImmersedSolid::setImmersedFaces()  " << endl;
 
+    //////////////////
+    // CGAL
+    //////////////////
+    
   myPoly* poly;
   myPoint  pt1, pt2, pt3, pt4, normal;
   int ii=0, jj=0, kk=0;
@@ -404,123 +397,132 @@ void  ImmersedSolid::setImmersedFaces()
     //printf("\n Polygon # %d area = %16.12f \n\n", id, area );
   }
 
-  if(DIM == 3)
-  {
-    double  vec[3];
-    triaNormal->SetNumberOfComponents(3);
-
-    for(ii=0; ii<GeomData.NodePosOrig.size(); ii++)
+    if(DIM == 3)
     {
-      pt1 = GeomData.NodePosOrig[ii];
-      //cout << pt1[0] << '\t' << pt1[1] << '\t' << pt1[2] << endl;
-      pts[0] = pointsVTK->InsertNextPoint(pt1[0], pt1[1], pt1[2]);
-    }
+        int  nodesPerFace = ImmIntgElems[0]->pointNums.size(); // assumed that all the faces are of same type - triangle or quadrilateral
+        double  vec[3];
+        triaNormal->SetNumberOfComponents(3);
 
-    treeCGAL.clear();
-    trianglesCGAL.clear();
+        pointsCGAL.clear();
 
-    for(ii=0; ii<nImmInt; ii++)
-    {
-      //cout << ii << '\t' << ImmIntgElems[ii]->pointNums.size() << endl;
+        for(ii=0; ii<GeomData.NodePosOrig.size(); ii++)
+        {
+          pt1 = GeomData.NodePosOrig[ii];
+          //cout << pt1[0] << '\t' << pt1[1] << '\t' << pt1[2] << endl;
+          pts[0] = pointsVTK->InsertNextPoint(pt1[0], pt1[1], pt1[2]);
 
-      if(ImmIntgElems[ii]->pointNums.size() == 3) // triangle
-      {
-        pt1 = GeomData.NodePosOrig[ImmIntgElems[ii]->pointNums[0]];
-        pt2 = GeomData.NodePosOrig[ImmIntgElems[ii]->pointNums[1]];
-        pt3 = GeomData.NodePosOrig[ImmIntgElems[ii]->pointNums[2]];
+          pointsCGAL.push_back(CGAL_Point(pt1[0], pt1[1], pt1[2]));
+        }
 
-        poly = new myTria(pt1, pt2, pt3);
+        facesCGAL.clear();
 
-        ImmersedFaces.push_back(poly);
+        for(ii=0; ii<nImmInt; ii++)
+        {
+          //cout << ii << '\t' << nodesPerFace << endl;
 
-        CGAL_Point  pta(pt1[0], pt1[1], pt1[2]);
-        CGAL_Point  ptb(pt2[0], pt2[1], pt2[2]);
-        CGAL_Point  ptc(pt3[0], pt3[1], pt3[2]);
+          for(jj=0; jj<nodesPerFace; jj++)
+            facesCGAL.push_back(ImmIntgElems[ii]->pointNums[jj]);
 
-        trianglesCGAL.push_back(CGAL_Triangle(pta, ptb, ptc));
-        //treeCGAL.insert(CGAL_Triangle(pta, ptb, ptc));
 
-        triaVTK->GetPointIds()->SetId(0, ImmIntgElems[ii]->pointNums[0]);
-        triaVTK->GetPointIds()->SetId(1, ImmIntgElems[ii]->pointNums[1]);
-        triaVTK->GetPointIds()->SetId(2, ImmIntgElems[ii]->pointNums[2]);
+          if(nodesPerFace == 3) // triangle
+          {
+            pt1 = GeomData.NodePosOrig[ImmIntgElems[ii]->pointNums[0]];
+            pt2 = GeomData.NodePosOrig[ImmIntgElems[ii]->pointNums[1]];
+            pt3 = GeomData.NodePosOrig[ImmIntgElems[ii]->pointNums[2]];
 
-        polyList->InsertNextCell(triaVTK);
+            poly = new myTria(pt1, pt2, pt3);
 
-        triaStatus->InsertNextValue(ImmIntgElems[ii]->isActive());
+            ImmersedFaces.push_back(poly);
 
-        poly->computeNormal();
+            triaVTK->GetPointIds()->SetId(0, ImmIntgElems[ii]->pointNums[0]);
+            triaVTK->GetPointIds()->SetId(1, ImmIntgElems[ii]->pointNums[1]);
+            triaVTK->GetPointIds()->SetId(2, ImmIntgElems[ii]->pointNums[2]);
 
-        poly->computeNormal(pt1, normal);
+            polyList->InsertNextCell(triaVTK);
 
-        vec[0] = normal[0];  vec[1] = normal[1];  vec[2] = normal[2];
+            triaStatus->InsertNextValue(ImmIntgElems[ii]->isActive());
 
-        triaNormal->InsertNextTuple(vec);
-      }
-      else if(ImmIntgElems[ii]->pointNums.size() == 4) // quad
-      {
-        pt1 = GeomData.NodePosOrig[ImmIntgElems[ii]->pointNums[0]];
-        pt2 = GeomData.NodePosOrig[ImmIntgElems[ii]->pointNums[1]];
-        pt3 = GeomData.NodePosOrig[ImmIntgElems[ii]->pointNums[2]];
-        pt4 = GeomData.NodePosOrig[ImmIntgElems[ii]->pointNums[3]];
+            poly->computeNormal();
 
-        poly = new myQuad(pt1, pt2, pt3, pt4);
+            poly->computeNormal(pt1, normal);
 
-        ImmersedFaces.push_back(poly);
+            vec[0] = normal[0];  vec[1] = normal[1];  vec[2] = normal[2];
 
-        CGAL_Point  pta(pt1[0], pt1[1], pt1[2]);
-        CGAL_Point  ptb(pt2[0], pt2[1], pt2[2]);
-        CGAL_Point  ptc(pt3[0], pt3[1], pt3[2]);
-        CGAL_Point  ptd(pt4[0], pt4[1], pt4[2]);
+            triaNormal->InsertNextTuple(vec);
+          }
+          else if(nodesPerFace == 4) // quad
+          {
+            pt1 = GeomData.NodePosOrig[ImmIntgElems[ii]->pointNums[0]];
+            pt2 = GeomData.NodePosOrig[ImmIntgElems[ii]->pointNums[1]];
+            pt3 = GeomData.NodePosOrig[ImmIntgElems[ii]->pointNums[2]];
+            pt4 = GeomData.NodePosOrig[ImmIntgElems[ii]->pointNums[3]];
 
-        trianglesCGAL.push_back(CGAL_Triangle(pta, ptb, ptd));
-        trianglesCGAL.push_back(CGAL_Triangle(pta, ptd, ptc));
+            poly = new myQuad(pt1, pt2, pt3, pt4);
 
-        //treeCGAL.insert(CGAL_Triangle(pta, ptb, ptc));
-        //treeCGAL.insert(CGAL_Triangle(pta, ptc, ptd));
+            ImmersedFaces.push_back(poly);
 
-        quadVTK->GetPointIds()->SetId(0, ImmIntgElems[ii]->pointNums[0]);
-        quadVTK->GetPointIds()->SetId(1, ImmIntgElems[ii]->pointNums[1]);
-        quadVTK->GetPointIds()->SetId(2, ImmIntgElems[ii]->pointNums[3]);
-        quadVTK->GetPointIds()->SetId(3, ImmIntgElems[ii]->pointNums[2]);
+            quadVTK->GetPointIds()->SetId(0, ImmIntgElems[ii]->pointNums[0]);
+            quadVTK->GetPointIds()->SetId(1, ImmIntgElems[ii]->pointNums[1]);
+            quadVTK->GetPointIds()->SetId(2, ImmIntgElems[ii]->pointNums[3]);
+            quadVTK->GetPointIds()->SetId(3, ImmIntgElems[ii]->pointNums[2]);
 
-        polyList->InsertNextCell(quadVTK);
+            polyList->InsertNextCell(quadVTK);
 
-        triaStatus->InsertNextValue(ImmIntgElems[ii]->isActive());
+            triaStatus->InsertNextValue(ImmIntgElems[ii]->isActive());
 
-        poly->computeNormal();
+            poly->computeNormal();
 
-        poly->computeNormal(pt1, normal);
+            poly->computeNormal(pt1, normal);
 
-        vec[0] = normal[0];  vec[1] = normal[1];  vec[2] = normal[2];
+            vec[0] = normal[0];  vec[1] = normal[1];  vec[2] = normal[2];
 
-        triaNormal->InsertNextTuple(vec);
-      }
-      else
-      {
-        cout << " Error in ImmersedSolid::setImmersedFaces()  " << endl;
-      }
-    }
+            triaNormal->InsertNextTuple(vec);
+          }
+          else
+          {
+            cout << " Error in ImmersedSolid::setImmersedFaces()  " << endl;
+          }
+        }
 
-    // constructs AABB tree
-    treeCGAL.insert(trianglesCGAL.begin(), trianglesCGAL.end());
-    treeCGAL.accelerate_distance_queries();
+        treeCGAL.clear();
 
-    polyDataVTK->SetPoints(pointsVTK);
-    polyDataVTK->SetPolys(polyList);
+        // build a polyhedron from the loaded arrays
+        //CGAL_Polyhedron  polyhedronTemp;
+        polyhedron_builder<HalfedgeDS>  poly_builder( pointsCGAL, facesCGAL, nodesPerFace );
+        polyhedronTemp.delegate( poly_builder );
 
-    triaStatus->SetName("Active");
-    triaNormal->SetName("normal");
+        treeCGAL.insert(polyhedronTemp.facets_begin(), polyhedronTemp.facets_end(), polyhedronTemp);
+        treeCGAL.accelerate_distance_queries();
 
-    polyDataVTK->GetCellData()->SetScalars(triaStatus);
-    polyDataVTK->GetCellData()->SetVectors(triaNormal);
+        //CGAL_Point_inside point_inside_tester(treeCGAL);
 
-    vtkSmartPointer<vtkXMLPolyDataWriter>  writerPolyData =     vtkSmartPointer<vtkXMLPolyDataWriter>::New();
-    //vtkSmartPointer<vtkMassProperties>  massProp =     vtkSmartPointer<vtkMassProperties>::New();
+        //point_inside_tester = new CGAL_Point_inside(treeCGAL);
 
-    char fname1[200];
-    sprintf(fname1,"%s%s%d%s", files.Ofile.asCharArray(), "-immersedsolid-", id,".vtp");
+        point_inside_tester = createPointerToCGALPointInsideFromCGALTree(treeCGAL);
 
-    writerPolyData->SetFileName(fname1);
+
+        CGAL::Bounded_side res = (*point_inside_tester)(CGAL_Point(0.5, 0.2, 0.2));
+        if( (res == CGAL::ON_BOUNDED_SIDE) || (res == CGAL::ON_BOUNDARY) )
+        { cout << " 11111 ---- 1111111111 " << endl; }
+        else
+        { cout << " 00000 ---- 0000000000 " << endl; }
+
+        polyDataVTK->SetPoints(pointsVTK);
+        polyDataVTK->SetPolys(polyList);
+
+        triaStatus->SetName("Active");
+        triaNormal->SetName("normal");
+
+        polyDataVTK->GetCellData()->SetScalars(triaStatus);
+        polyDataVTK->GetCellData()->SetVectors(triaNormal);
+
+        vtkSmartPointer<vtkXMLPolyDataWriter>  writerPolyData =     vtkSmartPointer<vtkXMLPolyDataWriter>::New();
+        //vtkSmartPointer<vtkMassProperties>  massProp =     vtkSmartPointer<vtkMassProperties>::New();
+
+        char fname1[200];
+        sprintf(fname1,"%s%s%d%s", files.Ofile.asCharArray(), "-immersedsolid-", id,".vtp");
+
+        writerPolyData->SetFileName(fname1);
 
 #if VTK_MAJOR_VERSION == 5
     writerPolyData->SetInput(polyDataVTK);
@@ -533,102 +535,115 @@ void  ImmersedSolid::setImmersedFaces()
     writerPolyData->Write();
   }
 
+    cout << "  ImmersedSolid::setImmersedFaces()  " << endl;
+
   return;
 }
 
 
+
 void ImmersedSolid::updateImmersedFaces()
 {
-  //if(totalDOF == 0)
-    //return;
-
-  vtkSmartPointer<vtkPoints>     pointsVTK   =  vtkSmartPointer<vtkPoints>::New();
-
-  int ii=0, jj=0;
-
-  myPoint  pt1, pt2, pt3, pt4, normal;
-  vtkIdType  ptId;
-
-  for(ii=0; ii<GeomData.NodePosCur.size(); ii++)
-  {
-    pt1 = GeomData.NodePosCur[ii];
-    //cout << pt1[0] << '\t' << pt1[1] << '\t' << pt1[2] << endl;
-    ptId = pointsVTK->InsertNextPoint(pt1[0], pt1[1], pt1[2]);
-  }
-
-  if(DIM == 3)
-  {
-    //cout << " bbbbbbbbbbbbbb " << endl;
-
-    polyDataVTK->SetPoints(pointsVTK);
-
-    //////////////////
-    // VTK
-    //////////////////
-    //selectEnclosedPoints->Initialize(polyDataVTK);
+    cout << " ImmersedSolid::updateImmersedFaces() ... " << endl;
+    
+    //if(totalDOF == 0)
+      //return;
 
     //////////////////
     // CGAL
     //////////////////
     
-    treeCGAL.clear();
-    trianglesCGAL.clear();
-    
-    for(ii=0; ii<nImmInt; ii++)
+    vtkSmartPointer<vtkPoints>     pointsVTK   =  vtkSmartPointer<vtkPoints>::New();
+
+    int ii=0, jj=0;
+
+    myPoint  pt1, pt2, pt3, pt4, normal;
+    vtkIdType  ptId;
+
+    pointsCGAL.clear();
+
+    for(ii=0; ii<GeomData.NodePosCur.size(); ii++)
     {
-      //cout << ii << '\t' << ImmIntgElems[ii]->pointNums.size() << endl;
+      pt1 = GeomData.NodePosCur[ii];
+      //cout << pt1[0] << '\t' << pt1[1] << '\t' << pt1[2] << endl;
+      ptId = pointsVTK->InsertNextPoint(pt1[0], pt1[1], pt1[2]);
 
-      if(ImmIntgElems[ii]->pointNums.size() == 3) // triangle
-      {
-        pt1 = GeomData.NodePosCur[ImmIntgElems[ii]->pointNums[0]];
-        pt2 = GeomData.NodePosCur[ImmIntgElems[ii]->pointNums[1]];
-        pt3 = GeomData.NodePosCur[ImmIntgElems[ii]->pointNums[2]];
-
-        CGAL_Point  pta(pt1[0], pt1[1], pt1[2]);
-        CGAL_Point  ptb(pt2[0], pt2[1], pt2[2]);
-        CGAL_Point  ptc(pt3[0], pt3[1], pt3[2]);
-
-        trianglesCGAL.push_back(CGAL_Triangle(pta, ptb, ptc));
-        //treeCGAL.insert(CGAL_Triangle(pta, ptb, ptc));
-      }
-      else if(ImmIntgElems[ii]->pointNums.size() == 4) // quad
-      {
-        pt1 = GeomData.NodePosCur[ImmIntgElems[ii]->pointNums[0]];
-        pt2 = GeomData.NodePosCur[ImmIntgElems[ii]->pointNums[1]];
-        pt3 = GeomData.NodePosCur[ImmIntgElems[ii]->pointNums[2]];
-        pt4 = GeomData.NodePosCur[ImmIntgElems[ii]->pointNums[3]];
-
-        CGAL_Point  pta(pt1[0], pt1[1], pt1[2]);
-        CGAL_Point  ptb(pt2[0], pt2[1], pt2[2]);
-        CGAL_Point  ptc(pt3[0], pt3[1], pt3[2]);
-        CGAL_Point  ptd(pt4[0], pt4[1], pt4[2]);
-
-        trianglesCGAL.push_back(CGAL_Triangle(pta, ptb, ptd));
-        trianglesCGAL.push_back(CGAL_Triangle(pta, ptd, ptc));
-      }
-      else
-      {
-        cout << " Error in ImmersedSolid::setImmersedFaces()  " << endl;
-      }
+      pointsCGAL.push_back(CGAL_Point(pt1[0], pt1[1], pt1[2]));
     }
 
-    treeCGAL.insert(trianglesCGAL.begin(), trianglesCGAL.end());
-    treeCGAL.accelerate_distance_queries();
-  } // if(DIM == 3)
+    int  nodesPerFace = ImmIntgElems[0]->pointNums.size(); // assumed that all the faces are of same type - triangle or quadrilateral
 
-  //cout << " treeCGAL size = " << treeCGAL.size() << endl;
+    if(DIM == 3)
+    {
+        //cout << " bbbbbbbbbbbbbb " << endl;
+        polyDataVTK->SetPoints(pointsVTK);
 
-  for(ii=0; ii<nImmInt; ii++)
-  {
-    for(jj=0; jj<ImmIntgElems[ii]->pointNums.size(); jj++)
-      ImmersedFaces[ii]->updatePoint(jj, GeomData.NodePosCur[ImmIntgElems[ii]->pointNums[jj]] );
+        for(ii=0; ii<nImmInt; ii++)
+        {
+          //cout << ii << '\t' << ImmIntgElems[ii]->pointNums.size() << endl;
 
-    ImmersedFaces[ii]->computeNormal();
-    ImmersedFaces[ii]->computeAABB();
-  }
+          if(nodesPerFace == 3) // triangle
+          {
+            pt1 = GeomData.NodePosCur[ImmIntgElems[ii]->pointNums[0]];
+            pt2 = GeomData.NodePosCur[ImmIntgElems[ii]->pointNums[1]];
+            pt3 = GeomData.NodePosCur[ImmIntgElems[ii]->pointNums[2]];
+          }
+          else if(nodesPerFace == 4) // quad
+          {
+            pt1 = GeomData.NodePosCur[ImmIntgElems[ii]->pointNums[0]];
+            pt2 = GeomData.NodePosCur[ImmIntgElems[ii]->pointNums[1]];
+            pt3 = GeomData.NodePosCur[ImmIntgElems[ii]->pointNums[2]];
+            pt4 = GeomData.NodePosCur[ImmIntgElems[ii]->pointNums[3]];
+          }
+          else
+          {
+            cout << " Error in ImmersedSolid::setImmersedFaces()  " << endl;
+          }
+        }
 
-  return;
+        // build a polyhedron from the loaded arrays
+        CGAL_Polyhedron  polyhedronTemp;
+        polyhedron_builder<HalfedgeDS>  poly_builder( pointsCGAL, facesCGAL, nodesPerFace );
+        polyhedronTemp.delegate( poly_builder );
+
+        treeCGAL.clear();
+        treeCGAL.insert(polyhedronTemp.facets_begin(), polyhedronTemp.facets_end(), polyhedronTemp);
+        treeCGAL.accelerate_distance_queries();
+
+        if(point_inside_tester != NULL)
+          delete  point_inside_tester;
+
+        point_inside_tester = NULL;
+
+        //point_inside_tester = new CGAL_Point_inside(treeCGAL);
+
+        point_inside_tester = createPointerToCGALPointInsideFromCGALTree(treeCGAL);
+
+        //cout << "checking = " << checkBoundedSideCGAL((*point_inside_tester)(CGAL_Point(0.0, 0.0, 0.0))) << endl;
+
+        CGAL::Bounded_side res = (*point_inside_tester)(CGAL_Point(0.5, 0.2, 0.2));
+
+        if( (res == CGAL::ON_BOUNDED_SIDE) || (res == CGAL::ON_BOUNDARY) )
+        { cout << " 11111 " << endl;  }
+        else
+        { cout << " 00000 " << endl;  }
+
+    } // if(DIM == 3)
+
+    //cout << " treeCGAL size = " << treeCGAL.size() << endl;
+
+    for(ii=0; ii<nImmInt; ii++)
+    {
+      for(jj=0; jj<nodesPerFace; jj++)
+        ImmersedFaces[ii]->updatePoint(jj, GeomData.NodePosCur[ImmIntgElems[ii]->pointNums[jj]] );
+
+      ImmersedFaces[ii]->computeNormal();
+      ImmersedFaces[ii]->computeAABB();
+    }
+
+    return;
 }
+*/
 
 
 
@@ -659,17 +674,23 @@ int ImmersedSolid::within(myPoint& ptTemp)
   }
   else
   {
-    //return  selectEnclosedPoints->IsInsideSurface( ptTemp[0], ptTemp[1], ptTemp[2] );
+    c =  selectEnclosedPoints->IsInsideSurface( ptTemp[0], ptTemp[1], ptTemp[2] );
 
+    //
     //CGAL_Point  ray_begin(ptTemp[0], ptTemp[1], ptTemp[2]);
     //CGAL_Point  ray_end(1000.0, ptTemp[1], ptTemp[2]);
     // counts #intersections
     //CGAL_Ray ray_query(ray_begin, ray_end);
 
-    c = treeCGAL.number_of_intersected_primitives(CGAL_Ray(
-                 CGAL_Point(ptTemp[0], ptTemp[1], ptTemp[2]),
-                 CGAL_Point(1000.0,    ptTemp[1], ptTemp[2]))) % 2;
+    //c = treeCGAL.number_of_intersected_primitives(CGAL_Ray(
+    //            CGAL_Point(ptTemp[0], ptTemp[1], ptTemp[2]),
+    //             CGAL_Point(1000.0,    ptTemp[1], ptTemp[2]))) % 2;
     //std::cout << nints << " intersections with ray query" << std::endl;
+
+    //CGAL::Bounded_side res = (*point_inside_tester)(CGAL_Point(ptTemp[0], ptTemp[1], ptTemp[2]));
+
+    //c = checkBoundedSideCGAL((*point_inside_tester)(CGAL_Point(ptTemp[0], ptTemp[1], ptTemp[2])));
+    //
   }
 
   return c;
@@ -840,76 +861,57 @@ int  ImmersedSolid::doIntersect2Dfor3D(int sideTemp, double coord3, AABB&  bbTem
 
     int  val=0;
 
+    //
+    // using VTK subroutines
+
     if(sideTemp == 0 || sideTemp == 1)
     {
-      //vecTemp[0] = selectEnclosedPoints->IsInsideSurface( coord3, bbTemp.minBB[1], bbTemp.minBB[2] );
-      //vecTemp[1] = selectEnclosedPoints->IsInsideSurface( coord3, bbTemp.maxBB[1], bbTemp.minBB[2] );
-      //vecTemp[2] = selectEnclosedPoints->IsInsideSurface( coord3, bbTemp.minBB[1], bbTemp.maxBB[2] );
-      //vecTemp[3] = selectEnclosedPoints->IsInsideSurface( coord3, bbTemp.maxBB[1], bbTemp.maxBB[2] );
-
-      vecTemp[0] = treeCGAL.number_of_intersected_primitives(CGAL_Ray(
-                    CGAL_Point(coord3, bbTemp.minBB[1], bbTemp.minBB[2]), 
-                    CGAL_Point(1000.0, bbTemp.minBB[1], bbTemp.minBB[2]))) % 2;
-
-      vecTemp[1] = treeCGAL.number_of_intersected_primitives(CGAL_Ray(
-                    CGAL_Point(coord3, bbTemp.maxBB[1], bbTemp.minBB[2]), 
-                    CGAL_Point(1000.0, bbTemp.maxBB[1], bbTemp.minBB[2]))) % 2;
-
-      vecTemp[2] = treeCGAL.number_of_intersected_primitives(CGAL_Ray(
-                    CGAL_Point(coord3, bbTemp.minBB[1], bbTemp.maxBB[2]), 
-                    CGAL_Point(1000.0, bbTemp.minBB[1], bbTemp.maxBB[2]))) % 2;
-
-      vecTemp[3] = treeCGAL.number_of_intersected_primitives(CGAL_Ray(
-                    CGAL_Point(coord3, bbTemp.maxBB[1], bbTemp.maxBB[2]), 
-                    CGAL_Point(1000.0, bbTemp.maxBB[1], bbTemp.maxBB[2]))) % 2;
-
+      vecTemp[0] = selectEnclosedPoints->IsInsideSurface( coord3, bbTemp.minBB[1], bbTemp.minBB[2] );
+      vecTemp[1] = selectEnclosedPoints->IsInsideSurface( coord3, bbTemp.maxBB[1], bbTemp.minBB[2] );
+      vecTemp[2] = selectEnclosedPoints->IsInsideSurface( coord3, bbTemp.minBB[1], bbTemp.maxBB[2] );
+      vecTemp[3] = selectEnclosedPoints->IsInsideSurface( coord3, bbTemp.maxBB[1], bbTemp.maxBB[2] );
     }
     else if(sideTemp == 2 || sideTemp == 3)
     {
-      //vecTemp[0] = selectEnclosedPoints->IsInsideSurface( bbTemp.minBB[0], coord3, bbTemp.minBB[2] );
-      //vecTemp[1] = selectEnclosedPoints->IsInsideSurface( bbTemp.maxBB[0], coord3, bbTemp.minBB[2] );
-      //vecTemp[2] = selectEnclosedPoints->IsInsideSurface( bbTemp.minBB[0], coord3, bbTemp.maxBB[2] );
-      //vecTemp[3] = selectEnclosedPoints->IsInsideSurface( bbTemp.maxBB[0], coord3, bbTemp.maxBB[2] );
-
-      vecTemp[0] = treeCGAL.number_of_intersected_primitives(CGAL_Ray(
-                    CGAL_Point(bbTemp.minBB[0], coord3, bbTemp.minBB[2]), 
-                    CGAL_Point(1000.0,          coord3, bbTemp.minBB[2]))) % 2;
-
-      vecTemp[1] = treeCGAL.number_of_intersected_primitives(CGAL_Ray(
-                    CGAL_Point(bbTemp.maxBB[0], coord3, bbTemp.minBB[2]), 
-                    CGAL_Point(1000.0,          coord3, bbTemp.minBB[2]))) % 2;
-
-      vecTemp[2] = treeCGAL.number_of_intersected_primitives(CGAL_Ray(
-                    CGAL_Point(bbTemp.minBB[0], coord3, bbTemp.maxBB[2]), 
-                    CGAL_Point(1000.0,          coord3, bbTemp.maxBB[2]))) % 2;
-
-      vecTemp[3] = treeCGAL.number_of_intersected_primitives(CGAL_Ray(
-                    CGAL_Point(bbTemp.maxBB[0], coord3, bbTemp.maxBB[2]), 
-                    CGAL_Point(1000.0,          coord3, bbTemp.maxBB[2]))) % 2;
+      vecTemp[0] = selectEnclosedPoints->IsInsideSurface( bbTemp.minBB[0], coord3, bbTemp.minBB[2] );
+      vecTemp[1] = selectEnclosedPoints->IsInsideSurface( bbTemp.maxBB[0], coord3, bbTemp.minBB[2] );
+      vecTemp[2] = selectEnclosedPoints->IsInsideSurface( bbTemp.minBB[0], coord3, bbTemp.maxBB[2] );
+      vecTemp[3] = selectEnclosedPoints->IsInsideSurface( bbTemp.maxBB[0], coord3, bbTemp.maxBB[2] );
     }
     else if(sideTemp == 4 || sideTemp == 5)
     {
-      //vecTemp[0] = selectEnclosedPoints->IsInsideSurface( bbTemp.minBB[0], bbTemp.minBB[1], coord3 );
-      //vecTemp[1] = selectEnclosedPoints->IsInsideSurface( bbTemp.maxBB[0], bbTemp.minBB[1], coord3 );
-      //vecTemp[2] = selectEnclosedPoints->IsInsideSurface( bbTemp.minBB[0], bbTemp.maxBB[1], coord3 );
-      //vecTemp[3] = selectEnclosedPoints->IsInsideSurface( bbTemp.maxBB[0], bbTemp.maxBB[1], coord3 );
-
-      vecTemp[0] = treeCGAL.number_of_intersected_primitives(CGAL_Ray(
-                    CGAL_Point(bbTemp.minBB[0], bbTemp.minBB[1], coord3), 
-                    CGAL_Point(1000.0,          bbTemp.minBB[1], coord3))) % 2;
-
-      vecTemp[1] = treeCGAL.number_of_intersected_primitives(CGAL_Ray(
-                    CGAL_Point(bbTemp.maxBB[0], bbTemp.minBB[1], coord3), 
-                    CGAL_Point(1000.0,          bbTemp.minBB[1], coord3))) % 2;
-
-      vecTemp[2] = treeCGAL.number_of_intersected_primitives(CGAL_Ray(
-                    CGAL_Point(bbTemp.minBB[0], bbTemp.maxBB[1], coord3), 
-                    CGAL_Point(1000.0,          bbTemp.maxBB[1], coord3))) % 2;
-
-      vecTemp[0] = treeCGAL.number_of_intersected_primitives(CGAL_Ray(
-                    CGAL_Point(bbTemp.maxBB[0], bbTemp.maxBB[1], coord3), 
-                    CGAL_Point(1000.0,          bbTemp.maxBB[1], coord3))) % 2;
+      vecTemp[0] = selectEnclosedPoints->IsInsideSurface( bbTemp.minBB[0], bbTemp.minBB[1], coord3 );
+      vecTemp[1] = selectEnclosedPoints->IsInsideSurface( bbTemp.maxBB[0], bbTemp.minBB[1], coord3 );
+      vecTemp[2] = selectEnclosedPoints->IsInsideSurface( bbTemp.minBB[0], bbTemp.maxBB[1], coord3 );
+      vecTemp[3] = selectEnclosedPoints->IsInsideSurface( bbTemp.maxBB[0], bbTemp.maxBB[1], coord3 );
     }
+    //
+
+    /*
+    // using CGAL subroutines
+
+    if(sideTemp == 0 || sideTemp == 1)
+    {
+      vecTemp[0] = checkBoundedSideCGAL((*point_inside_tester)(CGAL_Point(coord3, bbTemp.minBB[1], bbTemp.minBB[2])));
+      vecTemp[1] = checkBoundedSideCGAL((*point_inside_tester)(CGAL_Point(coord3, bbTemp.maxBB[1], bbTemp.minBB[2])));
+      vecTemp[2] = checkBoundedSideCGAL((*point_inside_tester)(CGAL_Point(coord3, bbTemp.minBB[1], bbTemp.maxBB[2])));
+      vecTemp[3] = checkBoundedSideCGAL((*point_inside_tester)(CGAL_Point(coord3, bbTemp.maxBB[1], bbTemp.maxBB[2])));
+    }
+    else if(sideTemp == 2 || sideTemp == 3)
+    {
+      vecTemp[0] = checkBoundedSideCGAL((*point_inside_tester)(CGAL_Point(bbTemp.minBB[0], coord3, bbTemp.minBB[2])));
+      vecTemp[1] = checkBoundedSideCGAL((*point_inside_tester)(CGAL_Point(bbTemp.maxBB[0], coord3, bbTemp.minBB[2])));
+      vecTemp[2] = checkBoundedSideCGAL((*point_inside_tester)(CGAL_Point(bbTemp.minBB[0], coord3, bbTemp.maxBB[2])));
+      vecTemp[3] = checkBoundedSideCGAL((*point_inside_tester)(CGAL_Point(bbTemp.maxBB[0], coord3, bbTemp.maxBB[2])));
+    }
+    else if(sideTemp == 4 || sideTemp == 5)
+    {
+      vecTemp[0] = checkBoundedSideCGAL((*point_inside_tester)(CGAL_Point(bbTemp.minBB[0], bbTemp.minBB[1], coord3)));
+      vecTemp[1] = checkBoundedSideCGAL((*point_inside_tester)(CGAL_Point(bbTemp.maxBB[0], bbTemp.minBB[1], coord3)));
+      vecTemp[2] = checkBoundedSideCGAL((*point_inside_tester)(CGAL_Point(bbTemp.minBB[0], bbTemp.maxBB[1], coord3)));
+      vecTemp[3] = checkBoundedSideCGAL((*point_inside_tester)(CGAL_Point(bbTemp.maxBB[0], bbTemp.maxBB[1], coord3)));
+    }
+    */
     //printVector(vecTemp);
 
     if( std::equal(vecTemp.begin()+1, vecTemp.end(), vecTemp.begin()) )
@@ -958,49 +960,81 @@ int  ImmersedSolid::doIntersect3D(AABB&  bbTemp, bool flag, vector<int>& vecTemp
     vector<myPoint>  ptVec(8);
 
     //bbTemp.printSelf();
+
+    //
+    // using VTK subroutines
     
-    //vecTemp[0] = selectEnclosedPoints->IsInsideSurface( bbTemp.minBB[0], bbTemp.minBB[1], bbTemp.minBB[2] );
-    //vecTemp[1] = selectEnclosedPoints->IsInsideSurface( bbTemp.maxBB[0], bbTemp.minBB[1], bbTemp.minBB[2] );
-    //vecTemp[2] = selectEnclosedPoints->IsInsideSurface( bbTemp.minBB[0], bbTemp.maxBB[1], bbTemp.minBB[2] );
-    //vecTemp[3] = selectEnclosedPoints->IsInsideSurface( bbTemp.maxBB[0], bbTemp.maxBB[1], bbTemp.minBB[2] );
+    vecTemp[0] = selectEnclosedPoints->IsInsideSurface( bbTemp.minBB[0], bbTemp.minBB[1], bbTemp.minBB[2] );
+    vecTemp[1] = selectEnclosedPoints->IsInsideSurface( bbTemp.maxBB[0], bbTemp.minBB[1], bbTemp.minBB[2] );
+    vecTemp[2] = selectEnclosedPoints->IsInsideSurface( bbTemp.minBB[0], bbTemp.maxBB[1], bbTemp.minBB[2] );
+    vecTemp[3] = selectEnclosedPoints->IsInsideSurface( bbTemp.maxBB[0], bbTemp.maxBB[1], bbTemp.minBB[2] );
 
-    //vecTemp[4] = selectEnclosedPoints->IsInsideSurface( bbTemp.minBB[0], bbTemp.minBB[1], bbTemp.maxBB[2] );
-    //vecTemp[5] = selectEnclosedPoints->IsInsideSurface( bbTemp.maxBB[0], bbTemp.minBB[1], bbTemp.maxBB[2] );
-    //vecTemp[6] = selectEnclosedPoints->IsInsideSurface( bbTemp.minBB[0], bbTemp.maxBB[1], bbTemp.maxBB[2] );
-    //vecTemp[7] = selectEnclosedPoints->IsInsideSurface( bbTemp.maxBB[0], bbTemp.maxBB[1], bbTemp.maxBB[2] );
+    vecTemp[4] = selectEnclosedPoints->IsInsideSurface( bbTemp.minBB[0], bbTemp.minBB[1], bbTemp.maxBB[2] );
+    vecTemp[5] = selectEnclosedPoints->IsInsideSurface( bbTemp.maxBB[0], bbTemp.minBB[1], bbTemp.maxBB[2] );
+    vecTemp[6] = selectEnclosedPoints->IsInsideSurface( bbTemp.minBB[0], bbTemp.maxBB[1], bbTemp.maxBB[2] );
+    vecTemp[7] = selectEnclosedPoints->IsInsideSurface( bbTemp.maxBB[0], bbTemp.maxBB[1], bbTemp.maxBB[2] );
+    //
 
-    vecTemp[0] = treeCGAL.number_of_intersected_primitives(CGAL_Ray(
-                    CGAL_Point(bbTemp.minBB[0], bbTemp.minBB[1], bbTemp.minBB[2]), 
-                    CGAL_Point(100.0,           bbTemp.minBB[1], bbTemp.minBB[2]))) % 2;
+    /*
+    // using CGAL subroutines
 
-    vecTemp[1] = treeCGAL.number_of_intersected_primitives(CGAL_Ray(
-                    CGAL_Point(bbTemp.maxBB[0], bbTemp.minBB[1], bbTemp.minBB[2]), 
-                    CGAL_Point(100.0,           bbTemp.minBB[1], bbTemp.minBB[2]))) % 2;
+    CGAL::Bounded_side  res;
 
-    vecTemp[2] = treeCGAL.number_of_intersected_primitives(CGAL_Ray(
-                    CGAL_Point(bbTemp.minBB[0], bbTemp.maxBB[1], bbTemp.minBB[2]), 
-                    CGAL_Point(100.0,           bbTemp.maxBB[1], bbTemp.minBB[2]))) % 2;
+    //vecTemp[0] = checkBoundedSideCGAL((*point_inside_tester)(CGAL_Point(bbTemp.minBB[0], bbTemp.minBB[1], bbTemp.minBB[2])));
+    //cout << "ooooooooooo " << vecTemp[0] << endl;
+    res = (*point_inside_tester)(CGAL_Point(bbTemp.minBB[0], bbTemp.minBB[1], bbTemp.minBB[2]));
+    if( (res == CGAL::ON_BOUNDED_SIDE) || (res == CGAL::ON_BOUNDARY) )
+    { vecTemp[0] = 1;   cout << " 11111  111111 1111111" << endl;  }
+    else
+    { vecTemp[0] = 0;   cout << " 00000  000000 0000000 0" << endl;  }
 
-    vecTemp[3] = treeCGAL.number_of_intersected_primitives(CGAL_Ray(
-                    CGAL_Point(bbTemp.maxBB[0], bbTemp.maxBB[1], bbTemp.minBB[2]), 
-                    CGAL_Point(100.0,           bbTemp.maxBB[1], bbTemp.minBB[2]))) % 2;
+    res = (*point_inside_tester)(CGAL_Point(bbTemp.maxBB[0], bbTemp.minBB[1], bbTemp.minBB[2]));
+    if( (res == CGAL::ON_BOUNDED_SIDE) || (res == CGAL::ON_BOUNDARY) )
+    { vecTemp[1] = 1;   cout << " 11111  111111 1111111" << endl;  }
+    else
+    { vecTemp[1] = 0;   cout << " 00000  000000 0000000 1" << endl;  }
 
-    vecTemp[4] = treeCGAL.number_of_intersected_primitives(CGAL_Ray(
-                    CGAL_Point(bbTemp.minBB[0], bbTemp.minBB[1], bbTemp.maxBB[2]), 
-                    CGAL_Point(100.0,           bbTemp.minBB[1], bbTemp.maxBB[2]))) % 2;
+    //vecTemp[2] = checkBoundedSideCGAL((*point_inside_tester)(CGAL_Point(bbTemp.minBB[0], bbTemp.maxBB[1], bbTemp.minBB[2])));
 
-    vecTemp[5] = treeCGAL.number_of_intersected_primitives(CGAL_Ray(
-                    CGAL_Point(bbTemp.maxBB[0], bbTemp.minBB[1], bbTemp.maxBB[2]), 
-                    CGAL_Point(100.0,           bbTemp.minBB[1], bbTemp.maxBB[2]))) % 2;
+    res = (*point_inside_tester)(CGAL_Point(bbTemp.minBB[0], bbTemp.maxBB[1], bbTemp.minBB[2]));
+    //vecTemp[2] = checkBoundedSideCGAL(res);
+    if( (res == CGAL::ON_BOUNDED_SIDE) || (res == CGAL::ON_BOUNDARY) )
+    { vecTemp[2] = 1;    cout << " 11111  111111 1111111" << endl;  }
+    else
+    { vecTemp[2] = 0;  cout << " 00000  000000 0000000 2" << endl;}
 
-    vecTemp[6] = treeCGAL.number_of_intersected_primitives(CGAL_Ray(
-                    CGAL_Point(bbTemp.minBB[0], bbTemp.maxBB[1], bbTemp.maxBB[2]), 
-                    CGAL_Point(100.0,           bbTemp.maxBB[1], bbTemp.maxBB[2]))) % 2;
+    res = (*point_inside_tester)(CGAL_Point(bbTemp.maxBB[0], bbTemp.maxBB[1], bbTemp.minBB[2]));
+    if( (res == CGAL::ON_BOUNDED_SIDE) || (res == CGAL::ON_BOUNDARY) )
+    { vecTemp[3] = 1;    cout << " 11111  111111 1111111" << endl;  }
+    else
+    { vecTemp[3] = 0;  cout << " 00000  000000 0000000 3" << endl;}
 
-    vecTemp[7] = treeCGAL.number_of_intersected_primitives(CGAL_Ray(
-                    CGAL_Point(bbTemp.maxBB[0], bbTemp.maxBB[1], bbTemp.maxBB[2]), 
-                    CGAL_Point(100.0,           bbTemp.maxBB[1], bbTemp.maxBB[2]))) % 2;
+    res = (*point_inside_tester)(CGAL_Point(bbTemp.minBB[0], bbTemp.minBB[1], bbTemp.maxBB[2]));
+    if( (res == CGAL::ON_BOUNDED_SIDE) || (res == CGAL::ON_BOUNDARY) )
+    { vecTemp[4] = 1;    cout << " 11111  111111 1111111" << endl;  }
+    else
+    { vecTemp[4] = 0;  cout << " 00000  000000 0000000 4" << endl;}
 
+    res = (*point_inside_tester)(CGAL_Point(bbTemp.maxBB[0], bbTemp.minBB[1], bbTemp.maxBB[2]));
+    if( (res == CGAL::ON_BOUNDED_SIDE) || (res == CGAL::ON_BOUNDARY) )
+    { vecTemp[5] = 1;    cout << " 11111  111111 1111111" << endl;  }
+    else
+    { vecTemp[5] = 0;  cout << " 00000  000000 0000000 5" << endl;}
+
+    res = point_inside_tester->operator()(CGAL_Point(bbTemp.minBB[0], bbTemp.maxBB[1], bbTemp.maxBB[2]));
+    if( (res == CGAL::ON_BOUNDED_SIDE) || (res == CGAL::ON_BOUNDARY) )
+    { vecTemp[6] = 1;    cout << " 11111  111111 1111111" << endl;  }
+    else
+    { vecTemp[6] = 0;  cout << " 00000  000000 0000000 6" << endl;}
+
+    cout << bbTemp.maxBB[0] << '\t' << bbTemp.maxBB[1] << '\t' << bbTemp.maxBB[2] << endl;
+    res = point_inside_tester->operator()(CGAL_Point(bbTemp.maxBB[0], bbTemp.maxBB[1]+0.0001, bbTemp.maxBB[2]));
+    cout << " res = " << res << endl;
+    if( (res == CGAL::ON_BOUNDED_SIDE) || (res == CGAL::ON_BOUNDARY) )
+    { vecTemp[7] = 1;    cout << " 11111  111111 1111111" << endl;  }
+    else
+    { vecTemp[7] = 0;  cout << " 00000  000000 0000000 7" << endl;}
+    */
 
     //printVector(vecTemp);
 

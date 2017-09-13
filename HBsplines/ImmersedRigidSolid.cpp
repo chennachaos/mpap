@@ -22,13 +22,8 @@ ImmersedRigidSolid::ImmersedRigidSolid(int dd)
 {
   DIM = dd;
 
-  int ii, jj;
-  
   ndofRigidbody = 3*(DIM-1);
   
-  //cout << " DIM  = " << DIM  << endl;
-  //cout << " ndofRigidbody = " << ndofRigidbody << endl;
-
   matM.resize(ndofRigidbody, ndofRigidbody);
   matM.setZero();
   matC = matM;
@@ -289,7 +284,7 @@ void  ImmersedRigidSolid::setRigidBodyMotionLimits(vector<vector<double> >& temp
 void  ImmersedRigidSolid::setNodalPositions(vector<vector<double> >&  datatemp)
 {
   nNode = datatemp.size();
-  cout << " nNode  = " << nNode << endl;
+  //cout << " nNode  = " << nNode << endl;
 
   GeomData.NodePosOrig.resize(nNode);
   GeomData.NodePosCur.resize(nNode);
@@ -1267,9 +1262,21 @@ void ImmersedRigidSolid::updateForce(double* data)
 {
   //cout << totalForce[0] << '\t' << totalForce[1] << endl;
 
-  totalForce[0]  = -data[0];
-  totalForce[1]  = -data[1];
-  totalForce[2]  = -data[5];
+  if(DIM == 2)
+  {
+    totalForce[0]  = -data[0];
+    totalForce[1]  = -data[1];
+    totalForce[2]  = -data[5];
+  }
+  else if(DIM == 3)
+  {
+    totalForce[0]  = -data[0];
+    totalForce[1]  = -data[1];
+    totalForce[2]  = -data[2];
+    totalForce[3]  = -data[3];
+    totalForce[4]  = -data[4];
+    totalForce[5]  = -data[5];
+  }
 
   //SolnData.forceTemp[0] = totalForce[0];  // Fx
   //SolnData.forceTemp[1] = totalForce[1];  // Fy
@@ -1309,7 +1316,7 @@ void ImmersedRigidSolid::solveTimeStep()
 {
   if( totalDOF > 0 )
   {
-    printf("\n Solving Immersed Rigid Solid \n");
+    //printf("\n Solving Immersed Rigid Solid \n");
   
     tol = 1.0e-6;
 
@@ -1331,8 +1338,6 @@ void ImmersedRigidSolid::solveTimeStep()
     }
     //printf("\n Solving Immersed Rigid Solid ..... DONE  \n\n");
   }
-
-  printf("\n Solving Immersed Rigid Solid ..... DONE  \n\n");
 
   return;
 }
@@ -1390,7 +1395,7 @@ int ImmersedRigidSolid::calcStiffnessAndResidual(int solver_type, bool zeroMtx, 
   //Kglobal(0,0) = SolnData.td[5]*matM(2,2) + SolnData.td[6]*matC(2,2) + SolnData.td[7]*matK(2,2);
   //rhsVec(0)    = SolnData.forceCur(0) - matM(2,2)*SolnData.var1DotDotCur[0] - matC(2,2)*SolnData.var1DotCur[0] - matK(2,2)*SolnData.var1Cur[0];
 
-  rhsVec(0)   -= preLoad[1] ;
+  rhsVec(0)   += preLoad[1] ;
 
   //cout << " contact force = " << veloCur(1) << '\t' << velo(1) << '\t' << veloPrev(1) << endl;
 

@@ -105,7 +105,7 @@ int SolverPetsc::zeroMtx()
 int SolverPetsc::free()
 {
   //PetscPrintf(MPI_COMM_WORLD, "SolverPetsc::free() \n");
-  cout << "SolverPetsc::free() " << endl;
+  //cout << "SolverPetsc::free() " << endl;
 
   //ierr = KSPReset(ksp);CHKERRQ(ierr);
   //cout << " ierr = " << ierr << endl;
@@ -123,7 +123,7 @@ int SolverPetsc::free()
   //cout << " ierr = " << ierr << endl;
 
   //PetscPrintf(MPI_COMM_WORLD, "SolverPetsc::free() \n");
-  cout << "SolverPetsc::free() " << endl;
+  //cout << "SolverPetsc::free() " << endl;
   return 1;
 }
 
@@ -233,7 +233,7 @@ int SolverPetsc::solve()
 
   if(reason<0)
   {
-    printf("Divergence.\n");
+    PetscPrintf(MPI_COMM_WORLD, "Divergence.\n");
   }
   else
   {

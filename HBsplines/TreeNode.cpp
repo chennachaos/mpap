@@ -943,10 +943,3 @@ bool  TreeNode<3>::pointLiesInside(const myPoint& pt)
 
 
 
-
-
-
-
-
-
-

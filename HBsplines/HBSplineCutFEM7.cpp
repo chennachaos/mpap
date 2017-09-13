@@ -10,6 +10,7 @@
 #include "DistFunctions.h"
 #include "AABB.h"
 
+#include "vtkXMLPUnstructuredGridWriter.h"
 
 extern ComputerTime       computerTime;
 extern MpapTime mpapTime;
@@ -19,12 +20,10 @@ using namespace myGeom;
 
 
 
-
-
 void HBSplineCutFEM::plotGeom(int val1, bool flag2, int col, bool PLOT_KNOT_LINES, int* resln)
 {
-    if(this_mpi_proc != 0)
-      return;
+    //if(this_mpi_proc != 0)
+      //return;
 
     PetscPrintf(MPI_COMM_WORLD, "     HBSplineCutFEM: plotgeometry ...\n\n");
 
@@ -81,6 +80,8 @@ void HBSplineCutFEM::plotGeom(int val1, bool flag2, int col, bool PLOT_KNOT_LINE
         plotGeomAdapIntegration3D(val1, flag2, col, PLOT_KNOT_LINES, resln);
     }
 
+    MPI_Barrier(MPI_COMM_WORLD);
+
     uGridVTK->SetPoints(pointsVTK);
 
     cellDataVTK->SetName("ElemType");
@@ -89,12 +90,41 @@ void HBSplineCutFEM::plotGeom(int val1, bool flag2, int col, bool PLOT_KNOT_LINE
     uGridVTK->GetCellData()->SetScalars(cellDataVTK);
     uGridVTK->GetCellData()->AddArray(cellDataVTK2);
 
+    uGridVTK->Squeeze();
 
-    char fname[50];
+    MPI_Barrier(MPI_COMM_WORLD);
 
-    sprintf(fname,"%s%s", files.Ofile.asCharArray(),"-geom.vtu");
+    /////////////////////
+    // write VTK files
 
-    writerUGridVTK->SetFileName(fname);
+    // write parallel vtu master (pvtu) file
+
+    char fnameMaster[50];
+
+    sprintf(fnameMaster,"%s%s", files.Ofile.asCharArray(),"-geom.pvtu");
+
+    vtkSmartPointer<vtkXMLPUnstructuredGridWriter> writeruGridP  =  vtkSmartPointer<vtkXMLPUnstructuredGridWriter>::New();
+
+    writeruGridP->SetFileName(fnameMaster);
+#if VTK_MAJOR_VERSION == 5
+    writeruGridP->SetInput(uGridVTK);
+#else
+    writeruGridP->SetInputData(uGridVTK);
+#endif
+    writeruGridP->SetNumberOfPieces(n_mpi_procs);
+    writeruGridP->SetStartPiece(0);
+    writeruGridP->SetEndPiece(n_mpi_procs-1);
+    writeruGridP->Write();
+
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    // write individual vtu files
+    char fnameLocal[50];
+
+    sprintf(fnameLocal,"%s%s%d%s", files.Ofile.asCharArray(),"-geom_",this_mpi_proc,".vtu");
+
+    writerUGridVTK->SetFileName(fnameLocal);
+    writerUGridVTK->SetNumberOfPieces(1);
 
 #if VTK_MAJOR_VERSION == 5
     writerUGridVTK->SetInput(uGridVTK);
@@ -104,7 +134,7 @@ void HBSplineCutFEM::plotGeom(int val1, bool flag2, int col, bool PLOT_KNOT_LINE
 
     writerUGridVTK->Write();
 
-    plotGaussPointsElement();
+    //plotGaussPointsElement();
     //plotGaussPointsDirichletBoundary();
     //plotGaussPointsNeumannBoundary();
 
@@ -305,8 +335,8 @@ void HBSplineCutFEM::plotGeomSubTrias3D(int val1, bool flag2, int col, bool PLOT
 
 void  HBSplineCutFEM::postProcessFlow(int vartype, int vardir, int nCol, bool umnxflag, double umin, double umax, int* resln)
 {
-    if(this_mpi_proc != 0)
-      return;
+    //if(this_mpi_proc != 0)
+      //return;
 
     uGridVTK->Reset();
     pointsVTK->Reset();
@@ -351,15 +381,40 @@ void  HBSplineCutFEM::postProcessFlow(int vartype, int vardir, int nCol, bool um
 
     cellDataVTK2->SetName("SubdomId");
 
-    char fname[100];
+    MPI_Barrier(MPI_COMM_WORLD);
 
-    sprintf(fname,"%s%s%06d%s", files.Ofile.asCharArray(),"-",filecount, ".vtu");
+    /////////////////////
+    // write VTK files
 
-    //printf(" fname = %s \n", fname);
+    // write parallel vtu master (pvtu) file
 
-    //cout << " ddddddddddddddddd " << endl;
+    char fnameMaster[100];
 
-    writerUGridVTK->SetFileName(fname);
+    sprintf(fnameMaster,"%s%s%06d%s", files.Ofile.asCharArray(),"-",filecount,".pvtu");
+
+    vtkSmartPointer<vtkXMLPUnstructuredGridWriter> writeruGridP  =  vtkSmartPointer<vtkXMLPUnstructuredGridWriter>::New();
+
+    writeruGridP->SetFileName(fnameMaster);
+#if VTK_MAJOR_VERSION == 5
+    writeruGridP->SetInput(uGridVTK);
+#else
+    writeruGridP->SetInputData(uGridVTK);
+#endif
+    writeruGridP->SetNumberOfPieces(n_mpi_procs);
+    writeruGridP->SetStartPiece(0);
+    writeruGridP->SetEndPiece(n_mpi_procs-1);
+    writeruGridP->Write();
+
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    // write individual vtu files
+
+    char fnameLocal[100];
+
+    sprintf(fnameLocal,"%s%s%06d%s%d%s", files.Ofile.asCharArray(),"-",filecount,"_",this_mpi_proc,".vtu");
+
+    writerUGridVTK->SetFileName(fnameLocal);
+
 #if VTK_MAJOR_VERSION == 5
     writerUGridVTK->SetInput(uGridVTK);
 #else
@@ -746,6 +801,8 @@ void  HBSplineCutFEM::postProcessSubTrias3D(int vartype, int vardir, int nCol, b
 
     vtkIdType pt[50], cellId;
 
+    auto tstart = Clock::now();
+
     if(ndf == 1)
     {
       index = 0;
@@ -1070,7 +1127,10 @@ void  HBSplineCutFEM::postProcessSubTrias3D(int vartype, int vardir, int nCol, b
       uGridVTK->GetCellData()->SetScalars(cellDataVTK2);
     }
 
-    return;
+  auto tend = Clock::now(); 
+  PetscPrintf(MPI_COMM_WORLD, "\n HBSplineCutFEM::postProcessAdapIntegration3D() took %d millisecond(s) \n ", std::chrono::duration_cast<std::chrono::milliseconds>(tend - tstart).count());
+
+  return;
 }
 
 
@@ -1366,7 +1426,6 @@ void HBSplineCutFEM::plotGaussPointsNeumannBoundary()
 
     return;
 }
-
 
 
 

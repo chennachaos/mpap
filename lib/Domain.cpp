@@ -97,7 +97,7 @@ void Domain::readInputData(std::ifstream &Ifile, MyString &line)
  
   switch (domain[ROOTDOMAIN].key.whichBegins(line))
   {
-    case  0: cout << "     DOMAIN: reading dimensions ...\n\n";
+    case  0: //cout << "     DOMAIN: reading dimensions ...\n\n";
 	   
 	     line.getNextLine(Ifile);
 	     

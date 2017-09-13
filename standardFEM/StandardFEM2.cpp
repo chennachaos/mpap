@@ -1,5 +1,4 @@
 
-
 #include "SolverPardisoEigen.h"
 #include "SolverMA41Eigen.h"
 #include "StandardFEM.h"
@@ -16,23 +15,18 @@
 extern MpapTime mpapTime;
 extern List<TimeFunction> timeFunction;
 
-//typedef int idx_t ;
+typedef int idx_t;
 
 
 void StandardFEM::setSolver(int slv, int *parm, bool cIO)
 {
-   //if(solver != NULL)
-     //delete solver;
-   //solver = NULL;
+    //if(solver != NULL)
+      //delete solver;
+    //solver = NULL;
 
-    //Eigen::setNbThreads(0); 
     Eigen::initParallel();
     
-    //cout << " Eigen::getNbThreads() = " << Eigen::nbThreads() << endl;
-
-    char fct[] = "StandardFEM::setSolver";
-    
-    int numProc;
+    int numProc=1;
 
     switch(slv)
     {
@@ -42,16 +36,12 @@ void StandardFEM::setSolver(int slv, int *parm, bool cIO)
 
             solverEigen = (SolverEigen*) new SolverMA41Eigen;
 
-            //cout << " kkkkkkkkkkkkkkk " << endl;
             prepareMatrixPattern();
 
-            //printInfo();
             solverEigen->printInfo();
 
             if(solverEigen->initialise(0,0,totalDOF) != 0)
               return;
-
-            //cout << " kkkkkkkkkkkkkkk " << endl;
 
         break;
 
@@ -66,10 +56,8 @@ void StandardFEM::setSolver(int slv, int *parm, bool cIO)
 
             prepareMatrixPattern();
 
-            cout << " kkkkkkkkkk " << totalDOF << endl;
             if(solverEigen->initialise(0,0,totalDOF) != 0)
               return;
-            cout << " kkkkkkkkkk " << totalDOF << endl;
             //solver->setSolverAndParameters();
 
             solverEigen->printInfo();
@@ -87,10 +75,7 @@ void StandardFEM::setSolver(int slv, int *parm, bool cIO)
 
             numProc = min(MAX_PROCESSORS,numProc);
 
-            //cout << " numProc " <<  numProc << endl;
-
             //printInfo();
-            //cout << " numProc " <<  numProc << endl;
             prepareMatrixPattern();
 
             if(slv == 5)
@@ -119,14 +104,11 @@ void StandardFEM::setSolver(int slv, int *parm, bool cIO)
 
             prepareMatrixPattern();
 
-            //cout << " kkkkkkkkkk " << endl;
             if(solverPetsc->initialise(nNode*ndof, 0, totalDOF) != 0)
               return;
 
             //solverPetsc->setSolverAndParameters();
-            //cout << " kkkkkkkkkk " << endl;
             solverPetsc->printInfo();
-            //cout << " aaaaaaaaa " << endl;
 
         break;
 
@@ -148,7 +130,7 @@ void StandardFEM::setSolver(int slv, int *parm, bool cIO)
     //if( (tis > 0) )
       //setInitialConditions();
 
-    cout << " cIO " << cIO << endl;
+    //cout << " cIO " << cIO << endl;
 
     return;
 }
@@ -167,20 +149,13 @@ int StandardFEM::prepareMatrixPattern()
     int  nRow, nCol, ind1, ind2;
     int  ee, ii, jj, kk, e1, e2;
 
-    MPI_Comm_size(MPI_COMM_WORLD, &n_mpi_procs);
-
-    MPI_Comm_rank(MPI_COMM_WORLD, &this_mpi_proc);
-
-    cout << " this_mpi_proc " << this_mpi_proc << endl;
-    cout << " n_mpi_procs " << n_mpi_procs << endl;
-
     ConditionalOStream  pcout(std::cout,  (this_mpi_proc == 0) );
 
     int n_subdomains = n_mpi_procs, subdomain=0;
 
 
-  if(n_mpi_procs == 1)
-  {
+    if(n_mpi_procs == 1)
+    {
       elem_start = 0;
       elem_end   = nElem-1;
 
@@ -212,31 +187,30 @@ int StandardFEM::prepareMatrixPattern()
           kk++;
         }
       }
-  }
-  else
-  {
-    /////////////////////////////////////////////////////////////////////////////
-    //
-    // Partition the mesh. This can be done using software libraries
-    // Chaco, Jostle, METIS and Scotch.
-    // Here METIS is used.
-    // 
-    /////////////////////////////////////////////////////////////////////////////
+    }
+    else
+    {
+      /////////////////////////////////////////////////////////////////////////////
+      //
+      // Partition the mesh. This can be done using software libraries
+      // Chaco, Jostle, METIS and Scotch.
+      // Here METIS is used.
+      // 
+      /////////////////////////////////////////////////////////////////////////////
 
-    //cout << " 1111111111111111 "  << nElem_local << '\t' << npElem << endl;
+      //cout << " 1111111111111111 "  << nElem_local << '\t' << npElem << endl;
 
-    n2 = ceil(nElem/n_mpi_procs);
+      n2 = ceil(nElem/n_mpi_procs);
 
-    elem_start = n2*this_mpi_proc;
-    elem_end   = n2*(this_mpi_proc+1)-1;
+      elem_start = n2*this_mpi_proc;
+      elem_end   = n2*(this_mpi_proc+1)-1;
 
-    if(this_mpi_proc == (n_mpi_procs-1))
-      elem_end = nElem-1;
+      if(this_mpi_proc == (n_mpi_procs-1))
+        elem_end = nElem-1;
 
-    nElem_local = elem_end - elem_start + 1;
+      nElem_local = elem_end - elem_start + 1;
 
-    //cout << " elem_start = " << elem_start << '\t' << elem_end << '\t' << nElem_local << endl;
-
+      //cout << " elem_start = " << elem_start << '\t' << elem_end << '\t' << nElem_local << endl;
 
       PetscInt  *eptr, *eind;
 
@@ -282,12 +256,11 @@ int StandardFEM::prepareMatrixPattern()
       //eptr[nElem_local] = nElem_local*npElem;
       eptr[nElem] = nElem*npElem;
 
-
       //cout << " \n\n\n\n " << endl;
 
       //PetscInt  nodes_per_side;
       idx_t nodes_per_side;
-      
+
       if(DIM == 2)
         nodes_per_side = 2;
       else
@@ -441,7 +414,6 @@ int StandardFEM::prepareMatrixPattern()
 
 
     pcout << " preparing matrix pattern " << endl;
-
 
     /////////////////////////////////////////////////////////////
     //
@@ -714,7 +686,6 @@ int StandardFEM::prepareMatrixPattern()
       //preallocation of matrix memory is crucial for attaining good
       //performance. See the matrix chapter of the users manual for details.
 
-
       ierr = MatCreate(PETSC_COMM_WORLD, &solverPetsc->mtx);CHKERRQ(ierr);
 
       ierr = MatSetSizes(solverPetsc->mtx, ndofs_local, ndofs_local, totalDOF, totalDOF);CHKERRQ(ierr);
@@ -733,15 +704,12 @@ int StandardFEM::prepareMatrixPattern()
         }
       }
 
-
       VecCreate(PETSC_COMM_WORLD, &solverPetsc->soln);
       VecCreate(PETSC_COMM_WORLD, &solverPetsc->solnPrev);
       VecCreate(PETSC_COMM_WORLD, &solverPetsc->rhsVec);
       VecCreate(PETSC_COMM_WORLD, &solverPetsc->reac);
 
       ierr = VecSetSizes(solverPetsc->soln, ndofs_local, totalDOF); CHKERRQ(ierr);
-      //ierr = VecSetSizes(solnPrev, ndofs_local, totalDOF); CHKERRQ(ierr);
-      //ierr = VecSetSizes(rhsVec, ndofs_local, totalDOF); CHKERRQ(ierr);
       ierr = VecSetSizes(solverPetsc->reac, ndofs_local, totalDOF); CHKERRQ(ierr);
 
       ierr = VecSetFromOptions(solverPetsc->soln);CHKERRQ(ierr);
@@ -773,7 +741,6 @@ int StandardFEM::prepareMatrixPattern()
       {
         for(jj=0;jj<forAssyMat[ii].size();jj++)
         {
-          //cout << ii << '\t' << forAssyMat[ii][jj] << endl;
           solverEigen->mtx.coeffRef(ii, forAssyMat[ii][jj]) = 0.0;
         }
       }
@@ -785,7 +752,7 @@ int StandardFEM::prepareMatrixPattern()
 
     //SolnData.var1 += SolnData.var1applied;
 
-  // remove data objects
+    // remove data objects
 
     nodePosData.clear();
     elemConn.clear();
@@ -806,17 +773,13 @@ int StandardFEM::solveStep(int niter)
 {
     for(int iter=0; iter<niter; iter++)
     {
-      //cout << " aaaaaaaaaaa " << endl;
       calcStiffnessAndResidual();
 
-      //cout << " bbbbbbbbbbb " << endl;
       if( converged() )
         break;
 
-      //cout << " ccccccccccc " << endl;
       factoriseSolveAndUpdate();
 
-      //cout << " ddddddddddd " << endl;
       updateIterStep();
     }
     
@@ -832,106 +795,99 @@ int StandardFEM::solveStep(int niter)
 
 int StandardFEM::calcStiffnessAndResidual(int printRes, bool zeroMtx, bool zeroRes)
 {
-  cout << "     StandardFEM: generating coefficient Matrices ...\n\n";
+    //cout << "     StandardFEM: generating coefficient Matrices ...\n\n";
 
-  char fct[] = "StandardFEM::calcStiffnessAndResidual";
+    char fct[] = "StandardFEM::calcStiffnessAndResidual";
 
-  //computerTime.go(fct);
+    //computerTime.go(fct);
 
-  //if(solver == NULL || solver2 == NULL)
-  //{
-    //COUT << "You need to select a solver first!\n\n";
-    //return 1;
-  //}
+    //if(solver == NULL || solver2 == NULL)
+    //{
+      //COUT << "You need to select a solver first!\n\n";
+      //return 1;
+    //}
   
-  //cout << " firstIter = " << firstIter << endl;
+    //cout << " firstIter = " << firstIter << endl;
 
-  if(firstIter)
-  {
-    rNorm = -1.0;
-  }
+    if(firstIter)
+    {
+      rNorm = -1.0;
+    }
 
-    //PetscInt  this_mpi_proc, n_mpi_procs;
-
-    MPI_Comm_size(MPI_COMM_WORLD, &n_mpi_procs);
-
-    MPI_Comm_rank(MPI_COMM_WORLD, &this_mpi_proc);
-
-  //printVector(SolnData.var1applied);
+    //printVector(SolnData.var1applied);
 
     MatrixXd  Klocal;
     VectorXd  Flocal;
 
+    SolnData.reac.setZero();
 
-  SolnData.reac.setZero();
-
-  if(SOLVER_TYPE == SOLVER_TYPE_PETSC)
-  {
-    //cout << " uuuuuuuuuuuuuu " << endl;
-    solverPetsc->zeroMtx();
-    //cout << " uuuuuuuuuuuuuu " << endl;
-    for(int ee=0;ee<nElem;ee++)  // loop over all the elements
+    if(SOLVER_TYPE == SOLVER_TYPE_PETSC)
     {
-      //cout << "       elem... : " << (ee+1) << endl;
-      if(elems[ee]->getSubdomainId() == this_mpi_proc)
+      //cout << " uuuuuuuuuuuuuu " << endl;
+      solverPetsc->zeroMtx();
+      //cout << " uuuuuuuuuuuuuu " << endl;
+      for(int ee=0;ee<nElem;ee++)  // loop over all the elements
       {
+        //cout << "       elem... : " << (ee+1) << endl;
+        if(elems[ee]->getSubdomainId() == this_mpi_proc)
+        {
+          //elems[ee]->resetMatrixAndVector();
+          //cout << " MMMMMMMMMMM " << endl;
+          elems[ee]->calcStiffnessAndResidual(Klocal, Flocal);
+
+          //elems[ee]->assembleElementMatrix(0, solver2->mtx);
+          //cout << " ooooooooooooooo " << endl;
+          //elems[ee]->assembleElementVector(0, 0, solverPetsc->rhsVec, solver2->reac, 0, 0);
+          //cout << " MMMMMMMMMMM " << endl;
+          solverPetsc->assembleMatrixAndVector(elems[ee]->forAssyVec, elems[ee]->forAssyVec, Klocal, Flocal);
+        }
+      }
+    }
+    else
+    {
+      solverEigen->zeroMtx();
+
+      //printVector(solver->rhsVec);
+
+      for(int ee=0;ee<nElem;ee++)  // loop over all the elements
+      {
+        //cout << "       elem... : " << (ee+1) << endl;
+
         //elems[ee]->resetMatrixAndVector();
         //cout << " MMMMMMMMMMM " << endl;
         elems[ee]->calcStiffnessAndResidual(Klocal, Flocal);
 
-        //elems[ee]->assembleElementMatrix(0, solver2->mtx);
-        //cout << " ooooooooooooooo " << endl;
-        //elems[ee]->assembleElementVector(0, 0, solverPetsc->rhsVec, solver2->reac, 0, 0);
         //cout << " MMMMMMMMMMM " << endl;
-        solverPetsc->assembleMatrixAndVector(elems[ee]->forAssyVec, elems[ee]->forAssyVec, Klocal, Flocal);
+        //elems[ee]->assembleElementMatrixAndVector(0, solver->mtx, &(solver->rhsVec(0)));
+
+        //elems[ee]->assembleElementMatrix(0, solver->mtx);
+        //cout << " aaaaaaaaaaaaa " << endl;
+        //elems[ee]->assembleElementVector(0, 0, &(solverEigen->rhsVec(0)), &(SolnData.reac(0)), 0, 0);
+        //cout << " MMMMMMMMMMM " << endl;
+        solverEigen->assembleMatrixAndVector(0, 0, elems[ee]->forAssyVec, Klocal, Flocal);
       }
     }
-  }
-  else
-  {
-    solverEigen->zeroMtx();
 
-    //printVector(solver->rhsVec);
+    //cout << " MMMMMMMMMMM " << endl;
 
-    for(int ee=0;ee<nElem;ee++)  // loop over all the elements
-    {
-      //cout << "       elem... : " << (ee+1) << endl;
+    //cout << solver->mtx << endl;
 
-      //elems[ee]->resetMatrixAndVector();
-      //cout << " MMMMMMMMMMM " << endl;
-      elems[ee]->calcStiffnessAndResidual(Klocal, Flocal);
+    //cout << " solver->rhsVec " << endl;        printVector(solver->rhsVec);
 
-      //cout << " MMMMMMMMMMM " << endl;
-      //elems[ee]->assembleElementMatrixAndVector(0, solver->mtx, &(solver->rhsVec(0)));
+    //printf("\n solver->rhsVec norm = %12.6E \n", solver->rhsVec.norm());
 
-      //elems[ee]->assembleElementMatrix(0, solver->mtx);
-      //cout << " aaaaaaaaaaaaa " << endl;
-      //elems[ee]->assembleElementVector(0, 0, &(solverEigen->rhsVec(0)), &(SolnData.reac(0)), 0, 0);
-      //cout << " MMMMMMMMMMM " << endl;
-      solverEigen->assembleMatrixAndVector(0, 0, elems[ee]->forAssyVec, Klocal, Flocal);
-    }
+    applyBoundaryConditions();
 
-    //cout << solverEigen->mtx << endl;
-  }
-
-  //cout << " MMMMMMMMMMM " << endl;
-
-   //cout << " solver->rhsVec " << endl;        printVector(solver->rhsVec);
-
-   //printf("\n solver->rhsVec norm = %12.6E \n", solver->rhsVec.norm());
-
-   applyBoundaryConditions();
-
-   applyExternalForces();
+    applyExternalForces();
    
-   //cout << solver->mtx << endl;
+    //cout << solver->mtx << endl;
 
-   // rhs due to external forces
-   //rhsVec += rhsVec2;
+    // rhs due to external forces
+    //rhsVec += rhsVec2;
 
-   //cout << " rhsVec " << endl;        printVector(&(rhsVec[0]), totalDOF);
+    //cout << " rhsVec " << endl;        printVector(&(rhsVec[0]), totalDOF);
 
-   //printf("\n rhsVec norm = %12.6E \n", solver->rhsVec.norm());
+    //printf("\n rhsVec norm = %12.6E \n", solver->rhsVec.norm());
 
 /*
   if(firstIter)
@@ -964,31 +920,31 @@ int StandardFEM::calcStiffnessAndResidual(int printRes, bool zeroMtx, bool zeroR
   }
 */
 
-  firstIter = false;
-  rNormPrev = rNorm;
+    firstIter = false;
+    rNormPrev = rNorm;
 
-  if(SOLVER_TYPE == SOLVER_TYPE_PETSC)
-  {
-    VecAssemblyBegin(solverPetsc->rhsVec);
-    VecAssemblyEnd(solverPetsc->rhsVec);
+    if(SOLVER_TYPE == SOLVER_TYPE_PETSC)
+    {
+      VecAssemblyBegin(solverPetsc->rhsVec);
+      VecAssemblyEnd(solverPetsc->rhsVec);
 
-    VecNorm(solverPetsc->rhsVec, NORM_2, &rNorm);
-    solverPetsc->currentStatus = ASSEMBLY_OK;
-  }
-  else
-  {
-    rNorm = solverEigen->rhsVec.norm();
-    solverEigen->currentStatus = ASSEMBLY_OK;
-  }
+      VecNorm(solverPetsc->rhsVec, NORM_2, &rNorm);
+      solverPetsc->currentStatus = ASSEMBLY_OK;
+    }
+    else
+    {
+      rNorm = solverEigen->rhsVec.norm();
+      solverEigen->currentStatus = ASSEMBLY_OK;
+    }
 
-  //if(printRes > 1)
-     COUT << "StandardFEM"; printf("  %11.4e\n",rNorm);
+    //if(printRes > 1)
+       COUT << "StandardFEM"; printf("  %11.4e\n",rNorm);
 
-  //ctimCalcStiffRes += computerTime.stop(fct);
+    //ctimCalcStiffRes += computerTime.stop(fct);
 
-  //computerTime.stopAndPrint(fct);
+    //computerTime.stopAndPrint(fct);
 
-  return 0;
+    return 0;
 }
 
 
@@ -1005,8 +961,6 @@ int StandardFEM::factoriseSolveAndUpdate()
   if(SOLVER_TYPE == SOLVER_TYPE_PETSC)
   {
     //VecView(solver2->rhsVec, PETSC_VIEWER_STDOUT_WORLD);
-
-    //cout << " PetscSolver " << endl;
 
     tstart = time(0);
 
@@ -1122,153 +1076,152 @@ int StandardFEM::factoriseSolveAndUpdate()
 
 void StandardFEM::applyBoundaryConditions()
 {   
-  cout <<  " applying boundary conditions .... " << endl;
-  cout << " tis = " << tis << endl;
-  if(PHYSICS_TYPE == PHYSICS_TYPE_FLUID)
-    cout << " PHYSICS_TYPE = " << PHYSICS_TYPE_FLUID << endl;
+    cout <<  " applying boundary conditions .... " << endl;
+    cout << " tis = " << tis << endl;
+    if(PHYSICS_TYPE == PHYSICS_TYPE_FLUID)
+      cout << " PHYSICS_TYPE = " << PHYSICS_TYPE_FLUID << endl;
 
-  //printVector(SolnData.td);
+    //printVector(SolnData.td);
 
-  int ii, jj, nn, dof, aa, ind;
-  double specVal, PENALTY=1.0e6, af, val1, val2;
+    int ii, jj, nn, dof, aa, ind;
+    double  specVal, PENALTY=1.0e6, val1, val2;
 
-  af = SolnData.td(2);
+    double  af = SolnData.td(2);
 
-  if(SOLVER_TYPE == SOLVER_TYPE_PETSC)
-  {
-    //int  row_start, row_end;
-    //VecGetOwnershipRange(solver2->rhsVec, &row_start, &row_end);
-    //row_end -= 1;
-
-    cout << " row_start = " <<  row_start << '\t' << row_end << '\t' << af << endl;
-
-    for(aa=0;aa<DirichletBCs.size();aa++)
+    if(SOLVER_TYPE == SOLVER_TYPE_PETSC)
     {
-      nn  = (int) (DirichletBCs[aa][0]);
-      dof = (int) (DirichletBCs[aa][1]);
-      specVal = DirichletBCs[aa][2];
+      //int  row_start, row_end;
+      //VecGetOwnershipRange(solver2->rhsVec, &row_start, &row_end);
+      //row_end -= 1;
 
-      ind = nn*ndof+dof;
-      //specVal = SolnData.var1applied[ind];
+      cout << " row_start = " <<  row_start << '\t' << row_end << '\t' << af << endl;
 
-      //if( ElemProp[elemConn[0][1]].id == 7 )
-        //specVal  -=  SolnData.var1Cur[ind];
-      //else
-        specVal  -=  SolnData.var1Cur[ind];
-
-      //cout << " values " << '\t' << nn << '\t' << ind << '\t' << specVal << '\t' << SolnData.var1Cur[ind] << endl;
-
-      val1 = PENALTY*af;
-      val2 = PENALTY*specVal;
-
-      //ind += start;
-
-      if( (ind >= row_start) && (ind <= row_end) )
+      for(aa=0;aa<DirichletBCs.size();aa++)
       {
-        MatSetValue(solverPetsc->mtx, ind, ind, val1, ADD_VALUES);
-        VecSetValue(solverPetsc->rhsVec, ind, val2, ADD_VALUES);
+        nn  = (int) (DirichletBCs[aa][0]);
+        dof = (int) (DirichletBCs[aa][1]);
+        specVal = DirichletBCs[aa][2];
+
+        ind = nn*ndof+dof;
+        //specVal = SolnData.var1applied[ind];
+
+        //if( ElemProp[elemConn[0][1]].id == 7 )
+          //specVal  -=  SolnData.var1Cur[ind];
+        //else
+          specVal  -=  SolnData.var1Cur[ind];
+
+        //cout << " values " << '\t' << nn << '\t' << ind << '\t' << specVal << '\t' << SolnData.var1Cur[ind] << endl;
+
+        val1 = PENALTY*af;
+        val2 = PENALTY*specVal;
+
+        //ind += start;
+
+        if( (ind >= row_start) && (ind <= row_end) )
+        {
+          MatSetValue(solverPetsc->mtx, ind, ind, val1, ADD_VALUES);
+          VecSetValue(solverPetsc->rhsVec, ind, val2, ADD_VALUES);
+        }
       }
     }
-  }
-  else
-  {
-    for(aa=0;aa<DirichletBCs.size();aa++)
+    else
     {
-      nn  = (int) (DirichletBCs[aa][0]);
-      dof = (int) (DirichletBCs[aa][1]);
-      specVal = DirichletBCs[aa][2];
+      for(aa=0;aa<DirichletBCs.size();aa++)
+      {
+        nn  = (int) (DirichletBCs[aa][0]);
+        dof = (int) (DirichletBCs[aa][1]);
+        specVal = DirichletBCs[aa][2];
 
-      //itint = find(GlobalPointNumbers.begin(), GlobalPointNumbers.end(), nn);
-      //nn   = distance(GlobalPointNumbers.begin(), itint);
+        //itint = find(GlobalPointNumbers.begin(), GlobalPointNumbers.end(), nn);
+        //nn   = distance(GlobalPointNumbers.begin(), itint);
 
-      ind = nn*ndof+dof;
-      //specVal = SolnData.var1applied[ind];
+        ind = nn*ndof+dof;
+        //specVal = SolnData.var1applied[ind];
 
-      //if( ElemProp[elemConn[0][1]].id == 7 )
-        //specVal  -=  SolnData.var1Cur[ind];
-      //else
-        specVal  -=  SolnData.var1Cur[ind];
+        //if( ElemProp[elemConn[0][1]].id == 7 )
+          //specVal  -=  SolnData.var1Cur[ind];
+        //else
+          specVal  -=  SolnData.var1Cur[ind];
 
-      //cout << start << '\t' << nn << '\t' << ind << '\t' << specVal << endl;
+        //cout << start << '\t' << nn << '\t' << ind << '\t' << specVal << endl;
 
-      val1 = PENALTY*af;
-      val2 = PENALTY*specVal;
+        val1 = PENALTY*af;
+        val2 = PENALTY*specVal;
 
-      //ind += start;
+        //ind += start;
 
-      solverEigen->mtx.coeffRef(ind, ind) += val1;
-      solverEigen->rhsVec[ind]   += val2;
+        solverEigen->mtx.coeffRef(ind, ind) += val1;
+        solverEigen->rhsVec[ind]   += val2;
+      }
     }
-  }
 
-  return;
+    return;
 }
 
 
 
 void StandardFEM::applyExternalForces()
 {
-  int  nn, dof, ii, ind;
-  double specVal=0.0, fact=0.0, fact1=0.0;
+    int  nn, dof, ii, ind;
+    double specVal=0.0, fact=0.0, fact1=0.0;
 
-  VectorXd  vecTemp(SolnData.forceCur.rows());
-  vecTemp.setZero();
-  for(ii=0;ii<nodeForcesData.size();ii++)
-  {
-    nn  = (int) (nodeForcesData[ii][0] - 1);
-    dof = (int) (nodeForcesData[ii][1] - 1);
-    specVal = nodeForcesData[ii][2];
-
-    ind = nn*ndof+dof;
-
-    //cout << nn << '\t' << dof << '\t' << ind << '\t' << specVal << endl;
-
-    vecTemp[ind] += specVal;
-  }
-  //printVector(vecTemp);
-
-  if(PHYSICS_TYPE == PHYSICS_TYPE_FLUID)
-  {
-    if(mpapTime.cur <= 5.0e-3)
+    VectorXd  vecTemp(SolnData.forceCur.rows());
+    vecTemp.setZero();
+    for(ii=0;ii<nodeForcesData.size();ii++)
     {
-      //fact = ( 1.0-cos(628.3185*mpapTime.cur));
-      //fact = sin(628.3185*mpapTime.cur);
-      fact = 1.0;
-      //fact = sin(20.0*mpapTime.cur);
+      nn  = (int) (nodeForcesData[ii][0] - 1);
+      dof = (int) (nodeForcesData[ii][1] - 1);
+      specVal = nodeForcesData[ii][2];
+
+      ind = nn*ndof+dof;
+
+      //cout << nn << '\t' << dof << '\t' << ind << '\t' << specVal << endl;
+
+      vecTemp[ind] += specVal;
+    }
+    //printVector(vecTemp);
+
+    if(PHYSICS_TYPE == PHYSICS_TYPE_FLUID)
+    {
+      if(mpapTime.cur <= 5.0e-3)
+      {
+        //fact = ( 1.0-cos(628.3185*mpapTime.cur));
+        //fact = sin(628.3185*mpapTime.cur);
+        fact = 1.0;
+        //fact = sin(20.0*mpapTime.cur);
+      }
+      else
+        fact = 0.0;
+
+      //cout << " fact = " << fact << endl;
+    }
+
+    //fact = 1.0;
+    fact = timeFunction[0].prop;
+    //fact = mpapTime.cur;
+    //fact = sin(20.0*mpapTime.cur);
+    //fact = 0.5*( 1.0-cos(628.3185*mpapTime.cur));
+
+    if(SOLVER_TYPE == SOLVER_TYPE_PETSC)
+    {
+      for(ii=0;ii<totalDOF;ii++)
+      {
+        VecSetValue(solverPetsc->rhsVec, ii, SolnData.forceCur[assy4r[ii]], ADD_VALUES);
+
+        fact1 = fact*vecTemp[assy4r[ii]];
+        VecSetValue(solverPetsc->rhsVec, ii, fact1, ADD_VALUES);
+      }
     }
     else
-      fact = 0.0;
-
-    //cout << " fact = " << fact << endl;
-  }
-
-  //fact = 1.0;
-  fact = timeFunction[0].prop;
-  //fact = mpapTime.cur;
-  //fact = sin(20.0*mpapTime.cur);
-  //fact = 0.5*( 1.0-cos(628.3185*mpapTime.cur));
-
-
-  if(SOLVER_TYPE == SOLVER_TYPE_PETSC)
-  {
-    for(ii=0;ii<totalDOF;ii++)
     {
-      VecSetValue(solverPetsc->rhsVec, ii, SolnData.forceCur[assy4r[ii]], ADD_VALUES);
+      for(ii=0;ii<totalDOF;ii++)
+        solverEigen->rhsVec[ii] += SolnData.forceCur[assy4r[ii]];
 
-      fact1 = fact*vecTemp[assy4r[ii]];
-      VecSetValue(solverPetsc->rhsVec, ii, fact1, ADD_VALUES);
+      for(ii=0;ii<totalDOF;ii++)
+        solverEigen->rhsVec[ii] += (fact*vecTemp[assy4r[ii]]);
     }
-  }
-  else
-  {
-    for(ii=0;ii<totalDOF;ii++)
-      solverEigen->rhsVec[ii] += SolnData.forceCur[assy4r[ii]];
 
-    for(ii=0;ii<totalDOF;ii++)
-      solverEigen->rhsVec[ii] += (fact*vecTemp[assy4r[ii]]);
-  }
-
-  return;
+    return;
 }
 
 
@@ -1286,13 +1239,9 @@ void  StandardFEM::computeElementErrors(int index)
     {
       for(int ee=0;ee<nElem;ee++)  // loop over all the elements
       {
-        //cout << "       elem... : " << (ee+1) << endl;
-
-        //cout << " MMMMMMMMMMM " << endl;
         elems[ee]->calcError(index);
 
         totalError += elems[ee]->getError();
-        //cout << " MMMMMMMMMMM " << endl;
       }
 
       totalError = sqrt(totalError);
@@ -1309,13 +1258,9 @@ void  StandardFEM::computeElementErrors(int index)
 
       for(int ee=0;ee<nElem;ee++)  // loop over all the elements
       {
-        //cout << "       elem... : " << (ee+1) << endl;
-
-        //cout << " MMMMMMMMMMM " << endl;
         elems[ee]->computeEnergy(0, 0, energyElem);
 
         energyGlobal += energyElem;
-        //cout << " MMMMMMMMMMM " << endl;
       }
       energyGlobal[2] = energyGlobal[0] + energyGlobal[1];
 
@@ -1335,13 +1280,9 @@ void  StandardFEM::computeElementErrors(int index)
 
       for(int ee=0;ee<nElem;ee++)  // loop over all the elements
       {
-        //cout << "       elem... : " << (ee+1) << endl;
-
-        //cout << " MMMMMMMMMMM " << endl;
         elems[ee]->computeMomentum(0, 0, momElem);
 
         momGlobal += momElem;
-        //cout << " MMMMMMMMMMM " << endl;
       }
 
       char        tmp[200];
@@ -1360,10 +1301,8 @@ void  StandardFEM::computeElementErrors(int index)
     }
     //printf(" \n\n \t totalError = %12.6E \n\n " , totalError);
     
-
     return;
 }
-
 
 
 

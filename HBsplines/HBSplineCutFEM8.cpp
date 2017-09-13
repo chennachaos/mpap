@@ -10,6 +10,8 @@
 #include "DistFunctions.h"
 #include "AABB.h"
 
+#include "insertuniquepoint.h"
+
 
 extern ComputerTime       computerTime;
 extern MpapTime mpapTime;
@@ -35,8 +37,8 @@ void HBSplineCutFEM::plotGeomAdapIntegration2D(int val1, bool flag2, int col, bo
 
     node *ndTemp;
     myPoint  ptTemp;
-    NodeOrientation  neigbour_map1[] = {EAST, NORTH, WEST, WEST};
-    NodeOrientation  neigbour_map2[] = {RIGHT, LEFT};
+    NodeOrientation  neighbour_map1[] = {EAST, NORTH, WEST, WEST};
+    NodeOrientation  neighbour_map2[] = {RIGHT, LEFT};
 
     AABB  bbTemp;
 
@@ -106,14 +108,13 @@ void HBSplineCutFEM::plotGeomAdapIntegration2D(int val1, bool flag2, int col, bo
 
               cellDataVTK->InsertNextValue( adapNd2->getDomainNumber() );
               cellDataVTK2->InsertNextValue(ndTemp->getSubdomainId());
-              //cellDataVTK2->InsertNextValue( adapNd2->getLevel() );
               uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
             }
 
             if(adapNd2->getOrientation() == -1)
               adapNd3 = NULL;
             else
-              adapNd3 = adapNd2->getNeighbour(neigbour_map1[adapNd2->getOrientation()]);
+              adapNd3 = adapNd2->getNeighbour(neighbour_map1[adapNd2->getOrientation()]);
 
             while( adapNd2->getOrientation() == NW )
             {
@@ -123,7 +124,7 @@ void HBSplineCutFEM::plotGeomAdapIntegration2D(int val1, bool flag2, int col, bo
                 adapNd3 = NULL;
               else
       	      {
-                adapNd3 = adapNd2->getNeighbour(neigbour_map1[adapNd2->getOrientation()]);
+                adapNd3 = adapNd2->getNeighbour(neighbour_map1[adapNd2->getOrientation()]);
 	            }
             }
 
@@ -172,7 +173,7 @@ void HBSplineCutFEM::plotGeomAdapIntegration2D(int val1, bool flag2, int col, bo
             if(adapNd2->getOrientation() == -1)
               adapNd3 = NULL;
             else
-              adapNd3 = adapNd2->getNeighbour(neigbour_map2[adapNd2->getOrientation()]);
+              adapNd3 = adapNd2->getNeighbour(neighbour_map2[adapNd2->getOrientation()]);
 
             while( adapNd2->getOrientation() == RIGHT )
             //while(adapNd3 == NULL)
@@ -183,7 +184,7 @@ void HBSplineCutFEM::plotGeomAdapIntegration2D(int val1, bool flag2, int col, bo
                 adapNd3 = NULL;
               else
       	      {
-                adapNd3 = adapNd2->getNeighbour(neigbour_map2[adapNd2->getOrientation()]);
+                adapNd3 = adapNd2->getNeighbour(neighbour_map2[adapNd2->getOrientation()]);
 	            }
             }
 
@@ -215,214 +216,227 @@ void HBSplineCutFEM::plotGeomAdapIntegration2D(int val1, bool flag2, int col, bo
 }
 
 
-
-
+//
 void HBSplineCutFEM::plotGeomAdapIntegration3D(int val1, bool flag2, int col, bool PLOT_KNOT_LINES, int* resln)
 {
-    //prepareCutElements();
+    auto tstart = Clock::now(); 
 
-    int  ii=0, ee=0, ll=0, kk=0, totalNGP=0;
+    //vtkSmartPointer<vtkMergePoints>   mergePoints  =  vtkSmartPointer<vtkMergePoints>::New();
 
-    vtkIdType  ptIds[8];
+    //int ii = nelem[0]*MAX_LEVEL;
+    //int jj = nelem[1]*MAX_LEVEL;
+    //int kk = nelem[2]*MAX_LEVEL;
+
+    //double  tolTemp = max( max(gridLEN[0], gridLEN[1]), gridLEN[2] )*1.0e-6;
+
+    //mergePoints->SetDivisions(ii, jj, kk);
+    //mergePoints->SetTolerance(tolTemp);
+
+    //pointsVTK->InsertNextPoint(origin[0], origin[1], origin[2]);
+    //mergePoints->InitPointInsertion(pointsVTK, pointsVTK->GetBounds());
+
+
+    int ii=0, jj=0, kk=0;
+    int ee=0, ll=0, totalNGP=0, ind=0;
+
+    vtkIdType  ptIds[8], id;
+    double  vec[]={0.0, 0.0, 0.0};
 
     node* ndTemp;
 
     AABB  bbTemp;
 
-    NodeOrientation  neigbour_map1[] = {EAST, NORTH, FRONT, WEST, WEST, WEST, EAST, SOUTH};
-    NodeOrientation  neigbour_map2[] = {RIGHT, LEFT};
+    NodeOrientation  neighbour_map1[] = {EAST, NORTH, FRONT, WEST, WEST, WEST, EAST, SOUTH};
+    NodeOrientation  neighbour_map2[] = {RIGHT, LEFT};
 
     for(ee=0; ee<activeElements.size(); ee++)
     {
       ndTemp = elems[activeElements[ee]];
 
-      if( ndTemp->domNums.size() == 1 )
+      if( ndTemp->getSubdomainId() == this_mpi_proc )
       {
-        if( ndTemp->domNums[0] == 0 )
+        if( ndTemp->domNums.size() == 1 )
         {
-          bbTemp = ndTemp->getAABB();
-
-          ptIds[0] = pointsVTK->InsertNextPoint(bbTemp.minBB[0], bbTemp.minBB[1], bbTemp.minBB[2]);
-          ptIds[1] = pointsVTK->InsertNextPoint(bbTemp.maxBB[0], bbTemp.minBB[1], bbTemp.minBB[2]);
-          ptIds[2] = pointsVTK->InsertNextPoint(bbTemp.maxBB[0], bbTemp.maxBB[1], bbTemp.minBB[2]);
-          ptIds[3] = pointsVTK->InsertNextPoint(bbTemp.minBB[0], bbTemp.maxBB[1], bbTemp.minBB[2]);
-
-          ptIds[4] = pointsVTK->InsertNextPoint(bbTemp.minBB[0], bbTemp.minBB[1], bbTemp.maxBB[2]);
-          ptIds[5] = pointsVTK->InsertNextPoint(bbTemp.maxBB[0], bbTemp.minBB[1], bbTemp.maxBB[2]);
-          ptIds[6] = pointsVTK->InsertNextPoint(bbTemp.maxBB[0], bbTemp.maxBB[1], bbTemp.maxBB[2]);
-          ptIds[7] = pointsVTK->InsertNextPoint(bbTemp.minBB[0], bbTemp.maxBB[1], bbTemp.maxBB[2]);
-
-          for(ll=0;ll<8;ll++)
-            hexVTK->GetPointIds()->SetId(ll, ptIds[ll]);
-
-          cellDataVTK->InsertNextValue( ndTemp->getDomainNumber() );
-          cellDataVTK2->InsertNextValue(ndTemp->getSubdomainId());
-
-          uGridVTK->InsertNextCell(hexVTK->GetCellType(), hexVTK->GetPointIds());
-        }
-      }
-      else if( ndTemp->domNums.size() > 1) // the element is cutCell
-      {
-        totalNGP += ndTemp->Quadrature.gausspoints.size();
-
-        //
-        /////////////////////////////////////////////////////////////
-        //  method 1 - adaptive octree
-        /////////////////////////////////////////////////////////////
-
-        typedef  typename  node::adapTreePTR  adapTreePTR;
-
-        adapTreePTR  adapNd1, adapNd2, adapNd3;
-
-        adapNd2 = ndTemp->adapIntegNode;
-
-        while( adapNd2 != NULL )
-        {
-          if( adapNd2->isLeaf() )
+          if( ndTemp->domNums[0] == 0 )
           {
-            if( (adapNd2->getDomainNumber() == 0) || (adapNd2->getDomainNumber() == -1) )
+            bbTemp = ndTemp->getAABB();
+
+            //InsertUniquePointsForAABB3D(mergePoints, ndTemp->getAABB(), ptIds);
+
+            ptIds[0] = pointsVTK->InsertNextPoint(bbTemp.minBB[0], bbTemp.minBB[1], bbTemp.minBB[2]);
+            ptIds[1] = pointsVTK->InsertNextPoint(bbTemp.maxBB[0], bbTemp.minBB[1], bbTemp.minBB[2]);
+            ptIds[2] = pointsVTK->InsertNextPoint(bbTemp.maxBB[0], bbTemp.maxBB[1], bbTemp.minBB[2]);
+            ptIds[3] = pointsVTK->InsertNextPoint(bbTemp.minBB[0], bbTemp.maxBB[1], bbTemp.minBB[2]);
+
+            ptIds[4] = pointsVTK->InsertNextPoint(bbTemp.minBB[0], bbTemp.minBB[1], bbTemp.maxBB[2]);
+            ptIds[5] = pointsVTK->InsertNextPoint(bbTemp.maxBB[0], bbTemp.minBB[1], bbTemp.maxBB[2]);
+            ptIds[6] = pointsVTK->InsertNextPoint(bbTemp.maxBB[0], bbTemp.maxBB[1], bbTemp.maxBB[2]);
+            ptIds[7] = pointsVTK->InsertNextPoint(bbTemp.minBB[0], bbTemp.maxBB[1], bbTemp.maxBB[2]);
+
+            pointsVTK->InsertNextPoint(origin[0], origin[1], origin[2]);
+
+            for(ll=0;ll<8;ll++)
+              hexVTK->GetPointIds()->SetId(ll, ptIds[ll]);
+
+            cellDataVTK->InsertNextValue( ndTemp->getDomainNumber() );
+            cellDataVTK2->InsertNextValue(ndTemp->getSubdomainId());
+
+            uGridVTK->InsertNextCell(hexVTK->GetCellType(), hexVTK->GetPointIds());
+          }
+        }
+        else if( ndTemp->domNums.size() > 1) // the element is cutCell
+        {
+          totalNGP += ndTemp->Quadrature.gausspoints.size();
+
+          //
+          /////////////////////////////////////////////////////////////
+          //  method 1 - adaptive octree
+          /////////////////////////////////////////////////////////////
+
+          typedef  typename  node::adapTreePTR  adapTreePTR;
+
+          adapTreePTR  adapNd1, adapNd2, adapNd3;
+
+          adapNd2 = ndTemp->adapIntegNode;
+
+          while( adapNd2 != NULL )
+          {
+            if( adapNd2->isLeaf() )
             {
-              bbTemp = adapNd2->getAABB();
-
-              ptIds[0] = pointsVTK->InsertNextPoint(bbTemp.minBB[0], bbTemp.minBB[1], bbTemp.minBB[2]);
-              ptIds[1] = pointsVTK->InsertNextPoint(bbTemp.maxBB[0], bbTemp.minBB[1], bbTemp.minBB[2]);
-              ptIds[2] = pointsVTK->InsertNextPoint(bbTemp.maxBB[0], bbTemp.maxBB[1], bbTemp.minBB[2]);
-              ptIds[3] = pointsVTK->InsertNextPoint(bbTemp.minBB[0], bbTemp.maxBB[1], bbTemp.minBB[2]);
-
-              ptIds[4] = pointsVTK->InsertNextPoint(bbTemp.minBB[0], bbTemp.minBB[1], bbTemp.maxBB[2]);
-              ptIds[5] = pointsVTK->InsertNextPoint(bbTemp.maxBB[0], bbTemp.minBB[1], bbTemp.maxBB[2]);
-              ptIds[6] = pointsVTK->InsertNextPoint(bbTemp.maxBB[0], bbTemp.maxBB[1], bbTemp.maxBB[2]);
-              ptIds[7] = pointsVTK->InsertNextPoint(bbTemp.minBB[0], bbTemp.maxBB[1], bbTemp.maxBB[2]);
-
-              for(ll=0;ll<8;ll++)
-                hexVTK->GetPointIds()->SetId(ll, ptIds[ll]);
-
-              cellDataVTK->InsertNextValue( adapNd2->getDomainNumber() );
-              cellDataVTK2->InsertNextValue(ndTemp->getSubdomainId());
-
-              uGridVTK->InsertNextCell(hexVTK->GetCellType(), hexVTK->GetPointIds());
-            }
-
-            if(adapNd2->getOrientation() == -1)
-              adapNd3 = NULL;
-            else
-              adapNd3 = adapNd2->getNeighbour(neigbour_map1[adapNd2->getOrientation()]);
-
-            //cout <<  adapNd2->getID() << '\t' << adapNd2->getOrientation() << endl;
-            while( adapNd2->getOrientation() == SW_FRONT )
-            //while(adapNd3 == NULL)
-            {
-              //cout << " inside IF " << endl;
-              adapNd2 = adapNd2->getParent();
-              //cout << " inside IF " << endl;
-
-              if(adapNd2->getOrientation() == -1)
-                adapNd3 = NULL;
-              else
+              if( (adapNd2->getDomainNumber() == 0) || (adapNd2->getDomainNumber() == -1) )
               {
-                //cout <<  adapNd2->getID() << '\t' << adapNd2->getOrientation() << endl;
-                adapNd3 = adapNd2->getNeighbour(neigbour_map1[adapNd2->getOrientation()]);
+                //InsertUniquePointsForAABB3D(mergePoints, adapNd2->getAABB(), ptIds);
+ 
+                bbTemp = adapNd2->getAABB();
+
+                ptIds[0] = pointsVTK->InsertNextPoint(bbTemp.minBB[0], bbTemp.minBB[1], bbTemp.minBB[2]);
+                ptIds[1] = pointsVTK->InsertNextPoint(bbTemp.maxBB[0], bbTemp.minBB[1], bbTemp.minBB[2]);
+                ptIds[2] = pointsVTK->InsertNextPoint(bbTemp.maxBB[0], bbTemp.maxBB[1], bbTemp.minBB[2]);
+                ptIds[3] = pointsVTK->InsertNextPoint(bbTemp.minBB[0], bbTemp.maxBB[1], bbTemp.minBB[2]);
+
+                ptIds[4] = pointsVTK->InsertNextPoint(bbTemp.minBB[0], bbTemp.minBB[1], bbTemp.maxBB[2]);
+                ptIds[5] = pointsVTK->InsertNextPoint(bbTemp.maxBB[0], bbTemp.minBB[1], bbTemp.maxBB[2]);
+                ptIds[6] = pointsVTK->InsertNextPoint(bbTemp.maxBB[0], bbTemp.maxBB[1], bbTemp.maxBB[2]);
+                ptIds[7] = pointsVTK->InsertNextPoint(bbTemp.minBB[0], bbTemp.maxBB[1], bbTemp.maxBB[2]);
+
+                for(ll=0;ll<8;ll++)
+                  hexVTK->GetPointIds()->SetId(ll, ptIds[ll]);
+
+                cellDataVTK->InsertNextValue( adapNd2->getDomainNumber() );
+                cellDataVTK2->InsertNextValue(ndTemp->getSubdomainId());
+
+                uGridVTK->InsertNextCell(hexVTK->GetCellType(), hexVTK->GetPointIds());
               }
-              //cout << adapNd2->getID() << endl;
-            }
-
-            adapNd2 = adapNd3;
-          }
-          else
-          {
-            adapNd2 = adapNd2->getChild(0);
-          }
-        }
-        //
-
-        /*
-        /////////////////////////////////////////////////////////////
-        //  method 2 - adaptive bindarytree
-        /////////////////////////////////////////////////////////////
-        
-        typedef  typename  node::adapTreePTR  adapTreePTR;
-
-        adapTreePTR  adapNd1, adapNd2, adapNd3;
-        
-        adapNd2 = ndTemp->adapIntegNode;
-        
-        //adapNd2 = adapNd1->getChild(0);
-        //cout << adapNd2->getID() << endl;
-
-        while( adapNd2 != NULL )
-        {
-          if( adapNd2->isLeaf() )
-          {
-            //if( (adapNd2->getDomainNumber() == 0) || (adapNd2->getDomainNumber() == -1) )
-            //{
-              bbTemp = adapNd2->getAABB();
-
-              ptIds[0] = pointsVTK->InsertNextPoint(bbTemp.minBB[0], bbTemp.minBB[1], bbTemp.minBB[2]);
-              ptIds[1] = pointsVTK->InsertNextPoint(bbTemp.maxBB[0], bbTemp.minBB[1], bbTemp.minBB[2]);
-              ptIds[2] = pointsVTK->InsertNextPoint(bbTemp.maxBB[0], bbTemp.maxBB[1], bbTemp.minBB[2]);
-              ptIds[3] = pointsVTK->InsertNextPoint(bbTemp.minBB[0], bbTemp.maxBB[1], bbTemp.minBB[2]);
-
-              ptIds[4] = pointsVTK->InsertNextPoint(bbTemp.minBB[0], bbTemp.minBB[1], bbTemp.maxBB[2]);
-              ptIds[5] = pointsVTK->InsertNextPoint(bbTemp.maxBB[0], bbTemp.minBB[1], bbTemp.maxBB[2]);
-              ptIds[6] = pointsVTK->InsertNextPoint(bbTemp.maxBB[0], bbTemp.maxBB[1], bbTemp.maxBB[2]);
-              ptIds[7] = pointsVTK->InsertNextPoint(bbTemp.minBB[0], bbTemp.maxBB[1], bbTemp.maxBB[2]);
-
-              for(ll=0;ll<8;ll++)
-                hexVTK->GetPointIds()->SetId(ll, ptIds[ll]);
-
-              cellDataVTK->InsertNextValue( adapNd2->getDomainNumber() );
-              cellDataVTK2->InsertNextValue(ndTemp->getSubdomainId());
-
-              uGridVTK->InsertNextCell(hexVTK->GetCellType(), hexVTK->GetPointIds());
-            //}
-
-            if(adapNd2->getOrientation() == -1)
-              adapNd3 = NULL;
-            else
-              adapNd3 = adapNd2->getNeighbour(neigbour_map2[adapNd2->getOrientation()]);
-
-            //cout <<  adapNd2->getID() << '\t' << adapNd2->getOrientation() << endl;
-            while( adapNd2->getOrientation() == RIGHT )
-            {
-              //cout << " inside IF " << endl;
-              adapNd2 = adapNd2->getParent();
-              //cout << " inside IF " << endl;
 
               if(adapNd2->getOrientation() == -1)
                 adapNd3 = NULL;
               else
-	      {
-                //cout <<  adapNd2->getID() << '\t' << adapNd2->getOrientation() << endl;
-                adapNd3 = adapNd2->getNeighbour(neigbour_map2[adapNd2->getOrientation()]);
-	      }
+                adapNd3 = adapNd2->getNeighbour(neighbour_map1[adapNd2->getOrientation()]);
 
-              //cout << adapNd2->getID() << endl;
+              while( adapNd2->getOrientation() == SW_FRONT )
+              {
+                adapNd2 = adapNd2->getParent();
+
+                if(adapNd2->getOrientation() == -1)
+                  adapNd3 = NULL;
+                else
+                {
+                  adapNd3 = adapNd2->getNeighbour(neighbour_map1[adapNd2->getOrientation()]);
+                }
+              }
+
+              adapNd2 = adapNd3;
             }
+            else
+            {
+              adapNd2 = adapNd2->getChild(0);
+            }
+          }
+          //
 
-            adapNd2 = adapNd3;
-          }
-          else
+          /*
+          //if(2<1)//////////
+          //{
+          /////////////////////////////////////////////////////////////
+          //  method 2 - adaptive bindarytree
+          /////////////////////////////////////////////////////////////
+        
+          typedef  typename  node::adapTreePTR  adapTreePTR;
+
+          adapTreePTR  adapNd1, adapNd2, adapNd3;
+        
+          adapNd2 = ndTemp->adapIntegNode;
+        
+          while( adapNd2 != NULL )
           {
-            adapNd2 = adapNd2->getChild(0);
+            if( adapNd2->isLeaf() )
+            {
+              if( (adapNd2->getDomainNumber() == 0) || (adapNd2->getDomainNumber() == -1) )
+              {
+                //InsertUniquePointsForAABB3D(mergePoints, adapNd2->getAABB(), ptIds);
+
+                bbTemp = adapNd2->getAABB();
+
+                ptIds[0] = pointsVTK->InsertNextPoint(bbTemp.minBB[0], bbTemp.minBB[1], bbTemp.minBB[2]);
+                ptIds[1] = pointsVTK->InsertNextPoint(bbTemp.maxBB[0], bbTemp.minBB[1], bbTemp.minBB[2]);
+                ptIds[2] = pointsVTK->InsertNextPoint(bbTemp.maxBB[0], bbTemp.maxBB[1], bbTemp.minBB[2]);
+                ptIds[3] = pointsVTK->InsertNextPoint(bbTemp.minBB[0], bbTemp.maxBB[1], bbTemp.minBB[2]);
+
+                ptIds[4] = pointsVTK->InsertNextPoint(bbTemp.minBB[0], bbTemp.minBB[1], bbTemp.maxBB[2]);
+                ptIds[5] = pointsVTK->InsertNextPoint(bbTemp.maxBB[0], bbTemp.minBB[1], bbTemp.maxBB[2]);
+                ptIds[6] = pointsVTK->InsertNextPoint(bbTemp.maxBB[0], bbTemp.maxBB[1], bbTemp.maxBB[2]);
+                ptIds[7] = pointsVTK->InsertNextPoint(bbTemp.minBB[0], bbTemp.maxBB[1], bbTemp.maxBB[2]);
+
+                for(ll=0;ll<8;ll++)
+                  hexVTK->GetPointIds()->SetId(ll, ptIds[ll]);
+
+                cellDataVTK->InsertNextValue( adapNd2->getDomainNumber() );
+                cellDataVTK2->InsertNextValue(ndTemp->getSubdomainId());
+
+                uGridVTK->InsertNextCell(hexVTK->GetCellType(), hexVTK->GetPointIds());
+              }
+
+              if(adapNd2->getOrientation() == -1)
+                adapNd3 = NULL;
+              else
+                adapNd3 = adapNd2->getNeighbour(neighbour_map2[adapNd2->getOrientation()]);
+
+              while( adapNd2->getOrientation() == RIGHT )
+              {
+                adapNd2 = adapNd2->getParent();
+
+                if(adapNd2->getOrientation() == -1)
+                  adapNd3 = NULL;
+                else
+	               {
+                  adapNd3 = adapNd2->getNeighbour(neighbour_map2[adapNd2->getOrientation()]);
+	               }
+              }
+              adapNd2 = adapNd3;
+            }
+            else
+            {
+              adapNd2 = adapNd2->getChild(0);
+            }
           }
-        }
-        */
-      } //else
+          //}/////////////
+          */
+        } //else
+      }
     }
 
     PetscPrintf(MPI_COMM_WORLD, "\n Total number of Gauss points in cut cells = %d \n\n", totalNGP);
 
-    //cellDataVTK->SetName("ElemType");
-
     uGridVTK->SetPoints(pointsVTK);
     uGridVTK->GetCellData()->SetScalars(cellDataVTK);
-    uGridVTK->GetCellData()->AddArray(cellDataVTK2);
+    uGridVTK->GetCellData()->AddArray(cellDataVTK2); 
+
+    auto tend = Clock::now(); 
+    PetscPrintf(MPI_COMM_WORLD, "HBSplineCutFEM::plotGeomAdapIntegration3D() took %d millisecond(s) \n ", std::chrono::duration_cast<std::chrono::milliseconds>(tend - tstart).count());
 
     return;
 }
 //
-
-
 
 
 
@@ -571,8 +585,8 @@ void  HBSplineCutFEM::postProcessAdapIntegration2D(int vartype, int vardir, int 
     myPoint  knotIncr, knotBegin;
 
     double   fact, uleft, uright, *tmp0, *tmp1, incr1, incr2, val1;
-    NodeOrientation  neigbour_map1[] = {EAST, NORTH, WEST, WEST};
-    NodeOrientation  neigbour_map2[] = {RIGHT, LEFT};
+    NodeOrientation  neighbour_map1[] = {EAST, NORTH, WEST, WEST};
+    NodeOrientation  neighbour_map2[] = {RIGHT, LEFT};
     vector<double>  uu, vv;
 
     vtkIdType pt[50], cellId;
@@ -902,7 +916,7 @@ void  HBSplineCutFEM::postProcessAdapIntegration2D(int vartype, int vardir, int 
               if(adapNd2->getOrientation() == -1)
                 adapNd3 = NULL;
               else
-                adapNd3 = adapNd2->getNeighbour(neigbour_map1[adapNd2->getOrientation()]);
+                adapNd3 = adapNd2->getNeighbour(neighbour_map1[adapNd2->getOrientation()]);
 
               //cout <<  adapNd2->getID() << '\t' << adapNd2->getOrientation() << endl;
               while( adapNd2->getOrientation() == NW )
@@ -913,7 +927,7 @@ void  HBSplineCutFEM::postProcessAdapIntegration2D(int vartype, int vardir, int 
                   adapNd3 = NULL;
                 else
                 {
-                  adapNd3 = adapNd2->getNeighbour(neigbour_map1[adapNd2->getOrientation()]);
+                  adapNd3 = adapNd2->getNeighbour(neighbour_map1[adapNd2->getOrientation()]);
                 }
               } //while( adapNd2->getOrientation() == NW )
 
@@ -1010,7 +1024,7 @@ void  HBSplineCutFEM::postProcessAdapIntegration2D(int vartype, int vardir, int 
               if(adapNd2->getOrientation() == -1)
                 adapNd3 = NULL;
               else
-                adapNd3 = adapNd2->getNeighbour(neigbour_map2[adapNd2->getOrientation()]);
+                adapNd3 = adapNd2->getNeighbour(neighbour_map2[adapNd2->getOrientation()]);
 
               //cout <<  adapNd2->getID() << '\t' << adapNd2->getOrientation() << endl;
               while( adapNd2->getOrientation() == RIGHT )
@@ -1021,7 +1035,7 @@ void  HBSplineCutFEM::postProcessAdapIntegration2D(int vartype, int vardir, int 
                   adapNd3 = NULL;
                 else
       	        {
-                  adapNd3 = adapNd2->getNeighbour(neigbour_map2[adapNd2->getOrientation()]);
+                  adapNd3 = adapNd2->getNeighbour(neighbour_map2[adapNd2->getOrientation()]);
 	              }
               } //while( adapNd2->getOrientation() == RIGHT )
 
@@ -1069,122 +1083,129 @@ void  HBSplineCutFEM::postProcessAdapIntegration3D(int vartype, int vardir, int 
 {
     //cout << " jjjjjjjjjjjjjjjjjj " << endl;
 
-    int  dd, ii, jj, kk, ll, count, nlocal, index, ind1, ind2, e, ee, gcount, ind, domTemp;
-    vtkIdType ptIds[50], cellId;
+    //vtkSmartPointer<vtkMergePoints>   mergePoints  =  vtkSmartPointer<vtkMergePoints>::New();
+    //vtkSmartPointer<vtkPoints>        pointsVTK    = vtkSmartPointer<vtkPoints>::New();
+    // using mergePoints algorithm takes 45 seconds for the Level-1 mesh for the 3D cylinder problem
+    // where as without this algorithm, it only takes 0.5 seconds.
 
-    nlocal = (degree[0]+1) * (degree[1] + 1) * (degree[2] + 1);
+    //int ii = nelem[0]*MAX_LEVEL;
+    //int jj = nelem[1]*MAX_LEVEL;
+    //int kk = nelem[2]*MAX_LEVEL;
 
-    VectorXd  NN(nlocal), dNN_dx(nlocal), dNN_dy(nlocal), dNN_dz(nlocal),  tempVec, tempVec2;
+    //double  tolTemp = max( max(gridLEN[0], gridLEN[1]), gridLEN[2] )*1.0e-6;
+
+    //mergePoints->SetDivisions(ii, jj, kk);
+    //mergePoints->SetTolerance(tolTemp);
+
+    //pointsVTK->Reset();
+
+    //pointsVTK->InsertNextPoint(origin[0], origin[1], origin[2]);
+    //mergePoints->InitPointInsertion(pointsVTK, pointsVTK->GetBounds());
+
+    int  ii=0, jj=0, kk=0;
+    int  count=0, ee=0, domTemp=0;
+    vtkIdType ptIds[50], ptExists, id;
+
+    int  nlocal = (degree[0]+1) * (degree[1] + 1) * (degree[2] + 1);
+
+    VectorXd  NN(nlocal), dNN_dx(nlocal), dNN_dy(nlocal), dNN_dz(nlocal);
     VectorXd  N(nlocal), dN_dx(nlocal), dN_dy(nlocal), dN_dz(nlocal);
     VectorXd  vectmp(nlocal), rhsTemp;
-    myPoint   knotIncr, knotBegin;
+    myPoint   knotBegin, knotEnd, knotIncr;
+    myPoint   knotBeginTemp, knotEndTemp, knotIncrTemp;
 
-    double   fact, *tmp0, *tmp1, *tmp2, incr1, incr2, incr3, val1;
+    double   pres, uu[2], vv[2], ww[2];
 
-    NodeOrientation  neigbour_map1[] = {EAST, NORTH, FRONT, WEST, WEST, WEST, EAST, SOUTH};
-    NodeOrientation  neigbour_map2[] = {RIGHT, LEFT};
+    NodeOrientation  neighbour_map1[] = {EAST, NORTH, FRONT, WEST, WEST, WEST, EAST, SOUTH};
+    NodeOrientation  neighbour_map2[] = {RIGHT, LEFT};
 
-    vector<int> bfs;
-    vector<double>  uu, vv, ww;
-
-    time_t tstart, tend;
+    auto tstart = Clock::now();
 
     node* ndTemp;
+
 
   //if(ndf == 1)
   //{
   //}
   //else // for Stokes and Navier-Stokes
   //{
-    double vec[3];
-    vec[0] = vec[1] = vec[2] = 0.0;
+      double vec[]={0.0, 0.0, 0.0};
 
-    vecVTK->SetNumberOfComponents(3);
-    //vecVTK->SetNumberOfTuples(count);
-    vecVTK2->SetNumberOfComponents(3);
-    //vecVTK2->SetNumberOfTuples(count);
-    //scaVTK->SetNumberOfTuples(count);
-    //scaVTK2->SetNumberOfTuples(count);
+      vecVTK->SetName("vel");
+      vecVTK2->SetName("vort");
+      scaVTK->SetName("pres");
 
-    cout << " Node aaaaaaaaaaa " << endl;
-    
-    for(ee=0; ee<activeElements.size(); ee++)
-    {
+      vecVTK->SetNumberOfComponents(3);
+      //vecVTK->SetNumberOfTuples(count);
+      vecVTK2->SetNumberOfComponents(3);
+      //vecVTK2->SetNumberOfTuples(count);
+      //scaVTK->SetNumberOfTuples(count);
+      //scaVTK2->SetNumberOfTuples(count);
+
+      for(ee=0; ee<activeElements.size(); ee++)
+      {
         ndTemp = elems[activeElements[ee]];
-        //cout << " Node # " << nd->getID() << endl;
 
-        knotBegin = ndTemp->getKnotBegin();
-        knotIncr  = ndTemp->getKnotIncrement();
+        if( ndTemp->getSubdomainId() == this_mpi_proc )
+        {
+          knotBegin = ndTemp->getKnotBegin();
+          knotEnd   = ndTemp->getKnotEnd();
+          knotIncr  = ndTemp->getKnotIncrement();
 
           if( (ndTemp->domNums.size() == 1) && (ndTemp->domNums[0] == 0) )
           {
-             tmp0 = ndTemp->getKnots(Dir1);
-             tmp1 = ndTemp->getKnots(Dir2);
-             tmp2 = ndTemp->getKnots(Dir3);
-
-             incr1 = tmp0[2] ;
-             incr2 = tmp1[2] ;
-             incr3 = tmp2[2] ;
-
-             fact = incr1/resln[0];
-             create_vector(tmp0[0], tmp0[1], fact, uu);
-
-             fact = incr2/resln[1];
-             create_vector(tmp1[0], tmp1[1], fact, vv);
-
-             fact = incr3/resln[2];
-             create_vector(tmp2[0], tmp2[1], fact, ww);
-
-             //create the coordinates of the pointsVTK (nodes in FEM)
-             //cout << " ooooooooooooo " << endl;
+            uu[0] = knotBegin[0];  uu[1] = knotEnd[0];
+            vv[0] = knotBegin[1];  vv[1] = knotEnd[1];
+            ww[0] = knotBegin[2];  ww[1] = knotEnd[2];
 
             count = 0;
-            for(kk=0; kk<ww.size(); kk++)
+            for(kk=0; kk<2; kk++)
             {
-              param[2] = ww[kk];
-              geom[2] = computeGeometry(2, ww[kk]);
+                param[2] = ww[kk];
+                geom[2] = computeGeometry(2, ww[kk]);
 
-            for(jj=0;jj<vv.size();jj++)
+            for(jj=0; jj<2; jj++)
             {
-              param[1] = vv[jj];
-              geom[1] = computeGeometry(1, vv[jj]);
+                param[1] = vv[jj];
+                geom[1] = computeGeometry(1, vv[jj]);
 
-              for(ii=0;ii<uu.size();ii++)
-              {
+            for(ii=0; ii<2; ii++)
+            {
                 param[0] = uu[ii];
                 geom[0] = computeGeometry(0, uu[ii]);
 
                 ptIds[count++] = pointsVTK->InsertNextPoint(geom[0], geom[1], geom[2]);
 
-                GeomData.computeBasisFunctions3D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy, dNN_dz);
+                //ptExists = mergePoints->InsertUniquePoint(&geom[0], id);
+                //ptIds[count++] = id;
 
-                if(ndTemp->getParent() == NULL)
-                {
-                  N = NN;
-                  dN_dx = dNN_dx;
-                  dN_dy = dNN_dy;
-                  dN_dz = dNN_dz;
-                }
-                else
-                {
-                  N = ndTemp->SubDivMat*NN;
-                  dN_dx = ndTemp->SubDivMat*dNN_dx;
-                  dN_dy = ndTemp->SubDivMat*dNN_dy;
-                  dN_dz = ndTemp->SubDivMat*dNN_dz;
-                }
+                //if(ptExists == 1)
+                //{
+                  if(ndTemp->getParent() == NULL)
+                  {
+                    GeomData.computeBasisFunctions3D(knotBegin, knotIncr, param, N, dN_dx, dN_dy, dN_dz);
+                  }
+                  else
+                  {
+                    GeomData.computeBasisFunctions3D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy, dNN_dz);
 
-                vec[0] = ndTemp->computeValue(0, N);
-                vec[1] = ndTemp->computeValue(1, N);
-                vec[2] = ndTemp->computeValue(2, N);
+                    N = ndTemp->SubDivMat*NN;
+                    dN_dx = ndTemp->SubDivMat*dNN_dx;
+                    dN_dy = ndTemp->SubDivMat*dNN_dy;
+                    dN_dz = ndTemp->SubDivMat*dNN_dz;
+                  }
 
-                fact   = ndTemp->computeValue(3, N);
+                  vec[0] = ndTemp->computeValue(0, N);
+                  vec[1] = ndTemp->computeValue(1, N);
+                  vec[2] = ndTemp->computeValue(2, N);
 
-                vecVTK->InsertNextTuple(vec);
-                vecVTK2->InsertNextTuple(vec);
-                scaVTK->InsertNextValue(fact);
-                //scaVTK2->InsertNextValue(fact);
+                  pres   = ndTemp->computeValue(3, N);
 
-              } // for(ii=0;ii<uu.size();ii++)
+                  vecVTK->InsertNextTuple(vec);
+                  vecVTK2->InsertNextTuple(vec);
+                  scaVTK->InsertNextValue(pres);
+                //} //if(ptExists == 1)
+            } // for(ii=0;ii<uu.size();ii++)
             } // for(jj=0;jj<vv.size();jj++)
             } // for(kk=0; kk<ww.size(); kk++)
 
@@ -1199,15 +1220,13 @@ void  HBSplineCutFEM::postProcessAdapIntegration3D(int vartype, int vardir, int 
             hexVTK->GetPointIds()->SetId(7, ptIds[6]);
 
             uGridVTK->InsertNextCell(hexVTK->GetCellType(), hexVTK->GetPointIds());
-            //cellDataVTK->InsertNextValue(0);
-            //cellDataVTK2->InsertNextValue(0);
 
             cellDataVTK->InsertNextValue(ndTemp->getDomainNumber() );
             cellDataVTK2->InsertNextValue(ndTemp->getSubdomainId());
 
             //cout << " ooooooooooooo " << endl;
-         } // if( (ndTemp->domNums.size() == 0) && (ndTemp->domNums[0] == 0) )
-         else if( ndTemp->domNums.size() > 1 )
+        } // if( (ndTemp->domNums.size() == 0) && (ndTemp->domNums[0] == 0) )
+        else if( ndTemp->domNums.size() > 1 )
         {
           /////////////////////////////////////////////////////////////
           //  method 2
@@ -1221,74 +1240,66 @@ void  HBSplineCutFEM::postProcessAdapIntegration3D(int vartype, int vardir, int 
 
           while( adapNd2 != NULL )
           {
-            if( adapNd2->isLeaf() )
+            if( adapNd2->isLeaf()  )
             {
+              //if( adapNd2->getDomainNumber() <= 0 && (adapNd2->getLevel() < 3) )
               if( adapNd2->getDomainNumber() <= 0 )
               {
-                //bbTemp = adapNd2->getAABB();
+                knotBeginTemp = adapNd2->getKnotBegin();
+                knotEndTemp   = adapNd2->getKnotEnd();
+                knotIncrTemp  = adapNd2->getKnotIncrement();
 
-                tmp0 = adapNd2->getKnots(Dir1);
-                tmp1 = adapNd2->getKnots(Dir2);
-                tmp2 = adapNd2->getKnots(Dir3);
-
-                incr1 = tmp0[2] ;
-                incr2 = tmp1[2] ;
-                incr3 = tmp2[2] ;
-
-                fact = incr1/resln[0];
-                create_vector(tmp0[0], tmp0[1], fact, uu);
-
-                fact = incr2/resln[1];
-                create_vector(tmp1[0], tmp1[1], fact, vv);
-
-                fact = incr3/resln[2];
-                create_vector(tmp2[0], tmp2[1], fact, ww);
-
-                //cout << " ooooooooooooo " << endl;
+                uu[0] = knotBeginTemp[0];  uu[1] = knotEndTemp[0];
+                vv[0] = knotBeginTemp[1];  vv[1] = knotEndTemp[1];
+                ww[0] = knotBeginTemp[2];  ww[1] = knotEndTemp[2];
 
                 count = 0;
-                for(kk=0; kk<ww.size(); kk++)
+                for(kk=0; kk<2; kk++)
                 {
                   param[2] = ww[kk];
                   geom[2] = computeGeometry(2, ww[kk]);
 
-                for(jj=0;jj<vv.size();jj++)
+                for(jj=0;jj<2;jj++)
                 {
                   param[1] = vv[jj];
                   geom[1] = computeGeometry(1, vv[jj]);
 
-                for(ii=0;ii<uu.size();ii++)
+                for(ii=0;ii<2;ii++)
                 {
                   param[0] = uu[ii];
                   geom[0] = computeGeometry(0, uu[ii]);
 
                   ptIds[count++] = pointsVTK->InsertNextPoint(geom[0], geom[1], geom[2]);
 
-                  GeomData.computeBasisFunctions3D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy, dNN_dz);
+                  //ptExists = mergePoints->InsertUniquePoint(&geom[0], id);
+                  //ptIds[count++] = id;
 
-                  if(ndTemp->getParent() == NULL)
-                  {
-                    N = NN;
-                    dN_dx = dNN_dx;
-                    dN_dy = dNN_dy;
-                    dN_dz = dNN_dz;
-                  }
-                  else
-                  {
-                    N = ndTemp->SubDivMat*NN;
-                    dN_dx = ndTemp->SubDivMat*dNN_dx;
-                    dN_dy = ndTemp->SubDivMat*dNN_dy;
-                    dN_dz = ndTemp->SubDivMat*dNN_dz;
-                  }
+                  //if(ptExists == 1)
+                  //{
+                    if(ndTemp->getParent() == NULL)
+                    {
+                      GeomData.computeBasisFunctions3D(knotBegin, knotIncr, param, N, dN_dx, dN_dy, dN_dz);
+                    }
+                    else
+                    {
+                      GeomData.computeBasisFunctions3D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy, dNN_dz);
 
-                  vec[0] = ndTemp->computeValue(0, N);
-                  vec[1] = ndTemp->computeValue(1, N);
-                  vec[2] = ndTemp->computeValue(2, N);
-                  fact   = ndTemp->computeValue(3, N);
+                      N = ndTemp->SubDivMat*NN;
+                      dN_dx = ndTemp->SubDivMat*dNN_dx;
+                      dN_dy = ndTemp->SubDivMat*dNN_dy;
+                      dN_dz = ndTemp->SubDivMat*dNN_dz;
+                    }
 
-                  vecVTK->InsertNextTuple(vec);
-                  vecVTK2->InsertNextTuple(vec);
-                  scaVTK->InsertNextValue(fact);
+                    vec[0] = ndTemp->computeValue(0, N);
+                    vec[1] = ndTemp->computeValue(1, N);
+                    vec[2] = ndTemp->computeValue(2, N);
+
+                    pres   = ndTemp->computeValue(3, N);
+
+                    vecVTK->InsertNextTuple(vec);
+                    vecVTK2->InsertNextTuple(vec);
+                    scaVTK->InsertNextValue(pres);
+                  //} //if(ptExists == 1)
                 } // for(ii=0;ii<uu.size();ii++)
                 } // for(jj=0;jj<vv.size();jj++)
                 } // for(kk=0; kk<ww.size(); kk++)
@@ -1305,7 +1316,7 @@ void  HBSplineCutFEM::postProcessAdapIntegration3D(int vartype, int vardir, int 
 
                 uGridVTK->InsertNextCell(hexVTK->GetCellType(), hexVTK->GetPointIds());
 
-                cellDataVTK->InsertNextValue(ndTemp->getDomainNumber() );
+                cellDataVTK->InsertNextValue(ndTemp->getDomainNumber());
                 cellDataVTK2->InsertNextValue(ndTemp->getSubdomainId());
 
             } // if( (adapNd2->getDomainNumber() <= 0) )
@@ -1313,11 +1324,9 @@ void  HBSplineCutFEM::postProcessAdapIntegration3D(int vartype, int vardir, int 
             if(adapNd2->getOrientation() == -1)
               adapNd3 = NULL;
             else
-              adapNd3 = adapNd2->getNeighbour(neigbour_map1[adapNd2->getOrientation()]);
-              //adapNd3 = adapNd2->getNeighbour(neigbour_map2[adapNd2->getOrientation()]);
+              adapNd3 = adapNd2->getNeighbour(neighbour_map1[adapNd2->getOrientation()]);
 
             while( adapNd2->getOrientation() == SW_FRONT )
-            //while( adapNd2->getOrientation() == RIGHT )
             {
               adapNd2 = adapNd2->getParent();
 
@@ -1325,8 +1334,7 @@ void  HBSplineCutFEM::postProcessAdapIntegration3D(int vartype, int vardir, int 
                 adapNd3 = NULL;
               else
               {
-                adapNd3 = adapNd2->getNeighbour(neigbour_map1[adapNd2->getOrientation()]);
-                //adapNd3 = adapNd2->getNeighbour(neigbour_map2[adapNd2->getOrientation()]);
+                adapNd3 = adapNd2->getNeighbour(neighbour_map1[adapNd2->getOrientation()]);
               }
             }
             adapNd2 = adapNd3;
@@ -1336,31 +1344,27 @@ void  HBSplineCutFEM::postProcessAdapIntegration3D(int vartype, int vardir, int 
             adapNd2 = adapNd2->getChild(0);
           }
           //cout << " AAAAAAAAAA " << endl;
-	}// else
-      } // for(
+	      }// else
+        }
+      } // for(ee=0; ee<activeElements.size(); ee++)
 
-    //cout << " jjjjjjjjjjjjjjjjjj " << endl;
-    vecVTK->SetName("vel");
-    vecVTK2->SetName("vort");
-    scaVTK->SetName("pres");
+      uGridVTK->SetPoints(pointsVTK);
 
-    //assign nodal coordinates and field data to uGridVTK
-    // no need to create lookup table here. All this stuff can be done in Paraview
+      uGridVTK->GetPointData()->SetScalars(scaVTK);
+      uGridVTK->GetPointData()->SetVectors(vecVTK);
+      //uGridVTK->GetPointData()->AddArray(vecVTK2);
+      //uGridVTK->GetPointData()->AddArray(scaVTK2);
 
-    uGridVTK->SetPoints(pointsVTK);
+      //uGridVTK->GetCellData()->SetScalars(cellDataVTK);
+      //uGridVTK->GetCellData()->AddArray(cellDataVTK2);
 
-    uGridVTK->GetPointData()->SetScalars(scaVTK);
-    uGridVTK->GetPointData()->SetVectors(vecVTK);
-    uGridVTK->GetPointData()->AddArray(vecVTK2);
-    //uGridVTK->GetPointData()->AddArray(scaVTK2);
-
-    uGridVTK->GetCellData()->SetScalars(cellDataVTK);
-    uGridVTK->GetCellData()->AddArray(cellDataVTK2);
-
-    //cout << " jjjjjjjjjjjjjjjjjj " << endl;
+      //cout << " jjjjjjjjjjjjjjjjjj " << endl;
   }
 
-    return;
+  auto tend = Clock::now(); 
+  PetscPrintf(MPI_COMM_WORLD, "HBSplineCutFEM::postProcessAdapIntegration3D() took %d millisecond(s) \n ", std::chrono::duration_cast<std::chrono::milliseconds>(tend - tstart).count());
+
+  return;
 }
 
 

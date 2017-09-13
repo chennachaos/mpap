@@ -3,7 +3,9 @@
 #define MY_STABILISATION_ROUTINES_H
 
 
-
+/* Compute the constants for stabilisation terms
+ * as in Dr Wulf Dettmer's PhD thesis
+ */
 inline  void  get_stabilisation_beta_wulf(double* beta)
 {
     beta[0] = 1.0;     beta[1] = 1.0/3.0;
@@ -39,6 +41,9 @@ c
 c----------------------------------------------------------------------------
 **/
 
+/* Compute the stabilisation constants
+ * as in Dr Wulf Dettmer's PhD thesis
+ */
 inline  void  evaluateStabParams_algo1(double* u, double h, double rho, double mu, double dt,  double* beta, double* tau)
 {
   double  fact, fact2;
@@ -84,7 +89,9 @@ inline  void  evaluateStabParams_algo1(double* u, double h, double rho, double m
 }
 
 
-
+/* Compute the stabilisation parameters
+ * from Tedzuyar's paper
+ */
 inline void  evaluateStabParams_algo2(double* u, double h, double rho, double mu, double dt,  double* beta, double* tau)
 {
   double  uNorm = u[0]*u[0];
@@ -115,7 +122,9 @@ inline void  evaluateStabParams_algo2(double* u, double h, double rho, double mu
 }
 
 
-
+/* Compute stabilisation terms
+ * using VMS stabilisation term
+ */
 inline void  evaluateStabParams_algo3(VectorXd& u, MatrixXd& G, double dt, double rho, double mu, double CI, double* tau)
 {
   //tau[0] = 4.0/dt/dt + u.dot(G*u) + CI*(mu*mu/rho/rho)*G.cwiseAbs2().sum();
@@ -132,6 +141,42 @@ inline void  evaluateStabParams_algo3(VectorXd& u, MatrixXd& G, double dt, doubl
 
   return;
 }
+
+/*
+ * Compute the constant in VMS stabilisation term
+ * for 2D problems
+ */
+inline  double  computeCI2D(double hx, double hy)
+{
+  double lhy = log10(hy/hx);
+  double fact = 0.8460 - 0.0025*lhy + (0.9887 - 0.0008*lhy - 0.2946*lhy*lhy)*lhy*lhy;
+
+  return pow(10.0, fact);
+}
+
+/*
+ * Compute the constant in VMS stabilisation term
+ * for 3D problems
+ */
+inline  double  computeCI3D(double hx, double hy, double hz)
+{
+//p00 + p10*lhy + p01*lhz + p20*lhy*lhy + p11*lhy*lhz + p02*lhz*lhz + p30*lhy*lhy*lhy;
+//+ p21*lhy*lhy*lhz+ p12*lhy*lhz*lhz + p03*lhz*lhz*lhz + p40*lhy*lhy*lhy*lhy;
+//+ p31*lhy*lhy*lhy*lhz + p22*lhy*lhy*lhz*lhz + p13lhy*lhz*lhz*lhz+ p04*lhz*lhz*lhz*lhz;
+//p00 =  1.041;  p10 = 0.0;    p01 =  0.0;    p20 = 0.8056; p11 = −0.7063;
+//p02 =  0.8056; p30 = 0.0;    p21 =  0.0;    p12 = 0.0;    p03 =  0.0;
+//p40 = −0.1455; p31 = 0.1555; p22 = −0.2724; p13 = 0.1555; p04 = −0.1455;
+
+  double lhy = log10(hy/hx);
+  double lhz = log10(hz/hx);
+
+  double fact  = 1.041 + 0.8056*lhy*lhy - 0.7063 *lhy*lhz + 0.8056*lhz*lhz - 0.1455*lhy*lhy*lhy*lhy;
+         fact += 0.1555*lhy*lhy*lhy*lhz - 0.2724*lhy*lhy*lhz*lhz + 0.1555*lhy*lhz*lhz*lhz - 0.1455*lhz*lhz*lhz*lhz;
+
+  return pow(10.0, fact);
+}
+
+
 
 
 

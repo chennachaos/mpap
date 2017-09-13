@@ -3,6 +3,12 @@
 
 #define vtkRenderingCore_AUTOINIT 4(vtkInteractionStyle,vtkRenderingFreeType,vtkRenderingFreeTypeOpenGL,vtkRenderingOpenGL)
 #define vtkRenderingVolume_AUTOINIT 1(vtkRenderingVolumeOpenGL)
+//#define vtkRenderingCore_AUTOINIT 3(vtkInteractionStyle,vtkRenderingFreeType,vtkRenderingOpenGL2)
+
+//#include <vtkAutoInit.h> 
+//VTK_MODULE_INIT(vtkRenderingOpenGL2)
+//VTK_MODULE_INIT(vtkInteractionStyle)
+
 
 #include <vtkCell.h>
 #include <vtkGenericCell.h>

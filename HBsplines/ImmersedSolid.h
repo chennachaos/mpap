@@ -10,13 +10,22 @@
 #include  "SolverEigen.h"
 #include  "SolverPetsc.h"
 
+//#include "myCGALroutines.h"
+
+/*
 #include <list>
+//#include <cfloat>
+//#define DBL_MAX    1.7976931348623157E+308
+
 #include <CGAL/Simple_cartesian.h>
 #include <CGAL/AABB_tree.h>
 #include <CGAL/AABB_traits.h>
 #include <CGAL/AABB_triangle_primitive.h>
+#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 
-typedef CGAL::Simple_cartesian<double> K;
+//typedef CGAL::Simple_cartesian<double> K;
+typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
+
 typedef K::FT CGAL_FT;
 typedef K::Ray_3 CGAL_Ray;
 typedef K::Line_3 CGAL_Line;
@@ -27,7 +36,7 @@ typedef std::list<CGAL_Triangle>::iterator CGAL_Iterator;
 typedef CGAL::AABB_triangle_primitive<K, CGAL_Iterator> CGAL_Primitive;
 typedef CGAL::AABB_traits<K, CGAL_Primitive> CGAL_AABB_triangle_traits;
 typedef CGAL::AABB_tree<CGAL_AABB_triangle_traits> CGAL_Tree;
-
+*/
 
 using namespace myGeom;
 
@@ -83,12 +92,12 @@ class ImmersedSolid
         vtkSmartPointer<vtkSelectEnclosedPoints> selectEnclosedPoints2;
 
         // CGAL related
-
-        vector<CGAL_Point>   pointsCGAL;
-        list<CGAL_Triangle>  trianglesCGAL;
-
-        //Tree tree(triangles.begin(),triangles.end());
-        CGAL_Tree treeCGAL;
+        //vector<CGAL_Point>   pointsCGAL;
+        ////list<CGAL_Triangle>  trianglesCGAL;
+        //vector<int>  facesCGAL;
+        //CGAL_Polyhedron  polyhedronTemp;
+        //CGAL_Tree treeCGAL;
+        //CGAL_Point_inside  *point_inside_tester;
 
         //////////////////////////////////////////////////////
         // member functions

@@ -36,8 +36,8 @@ void HBSplineFEM::setInitialConditions()
        //printf("\n\n");
        //printVector(Flocal);
 
-        nd->assembleElementMatrix2(0, solverEigen->mtx);
-        nd->assembleElementVector(0, 0, &(solverEigen->rhsVec(0)));
+      //nd->assembleElementMatrix2(0, solverEigen->mtx);
+      //nd->assembleElementVector(0, 0, &(solverEigen->rhsVec(0)));
     }
 
     solverEigen->currentStatus = ASSEMBLY_OK;

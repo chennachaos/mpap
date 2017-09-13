@@ -398,7 +398,7 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
               stagParams[i] =  lvdTmp[0][i] ;
 
             STAGGERED = (lvdTmp[0][0] == 0);
-            cout << " STAGGERED " << STAGGERED << endl;
+            //cout << " STAGGERED " << STAGGERED << endl;
 
             break;
 
@@ -886,6 +886,7 @@ void HBSplineCutFEM::prepareInputData()
 
 
   /*
+  ////////////////////////////////////////////////////////////////
   // subroutines using VTK library
   ////////////////////////////////////////////////////////////////
 
@@ -925,7 +926,7 @@ void HBSplineCutFEM::prepareInputData()
 
     mergePoints->InitPointInsertion(pointsVTKfluidgrid, bounds);
     mergePoints->SetDivisions(nelem[0], nelem[1], nelem[2]);
-    mergePoints->setTolerance(1.0e-5);
+    //mergePoints->setTolerance(1.0e-5);
 
     //cout << " AAAAAAAAAAA " << endl;
 
@@ -956,8 +957,6 @@ void HBSplineCutFEM::prepareInputData()
       uGridVTKfluid->InsertNextCell(hexVTK->GetCellType(), hexVTK->GetPointIds());
     }
 
-    //cout << " AAAAAAAAAAA " << endl;
-
     pointsPolydata->SetPoints(pointsVTKfluidgrid);
 
     uGridVTKfluid->SetPoints(pointsVTKfluidgrid);
@@ -967,10 +966,8 @@ void HBSplineCutFEM::prepareInputData()
     //cout << " uGridVTKfluid->GetNumberOfCells()  = " <<  uGridVTKfluid->GetNumberOfCells() << endl;
   }
 
-  ////////////////////////////////////////
   // generate polygons for the immersed boundaries
-  //
-  ////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////
 
   vtkSmartPointer<vtkPolyData> pointsPolydataVTK   =   vtkSmartPointer<vtkPolyData>::New();
   pointsPolydataVTK->SetPoints(pointsVTKfluidgrid);
@@ -986,9 +983,10 @@ void HBSplineCutFEM::prepareInputData()
     //cout << "  HBSplineCutFEM::setImmersedFaces()  " << endl;
     ImmersedBodyObjects[bb]->setImmersedFaces();
   }
-
   */
 
+  //
+  ////////////////////////////////////////////////////////////////
   // subroutines using CGAL library
   ////////////////////////////////////////////////////////////////
 
@@ -997,6 +995,7 @@ void HBSplineCutFEM::prepareInputData()
     //cout << "  HBSplineCutFEM::setImmersedFaces()  " << endl;
     ImmersedBodyObjects[bb]->setImmersedFaces();
   }
+  //
 
   PetscPrintf(MPI_COMM_WORLD, "\n     HBSplineCutFEM::prepareInputData()  .... FINISHED ...\n\n");
 

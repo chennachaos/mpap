@@ -21,19 +21,53 @@ void  HBSplineCutFEM::computeTotalBodyForce(int index)
 //
 void  HBSplineCutFEM::solveSolidProblem()
 {
-  IB_MOVED = false;
-  for(int bb=0;bb<ImmersedBodyObjects.size();bb++)
+  MPI_Status status;
+
+  int bb=0;
+
+  // solve the solids on the 1st processor and 
+  // then broadcast the solution to the other processors
+  // in the communicator
+  if(this_mpi_proc == 0)
   {
-    //computeTotalForce(bb);
-    //ImmersedBodyObjects[bb]->updateForce(&(totalForce(0)));
+    for(bb=0; bb<nImmSolids; bb++)
+    {
+      ImmersedBodyObjects[bb]->solveTimeStep();
 
-    //cout << " kkkkkkkkkkk " << endl;
-    ImmersedBodyObjects[bb]->solveTimeStep();
-
-    //IB_MOVED = (IB_MOVED || ImmersedBodyObjects[bb]->updatePointPositions() );
+      //cout << " kkkkkkkkkkk " << count << endl;
+      //printVector(ImmersedBodyObjects[bb]->SolnData.var1);
+    }
   }
-  
-  updateImmersedPointPositions();
+
+  PetscPrintf(MPI_COMM_WORLD,"aaaaaaaaaa \n");
+
+  //MPI_Barrier(MPI_COMM_WORLD);
+
+  int  rootProc=0, count;
+  for(bb=0; bb<nImmSolids; bb++)
+  {
+    count = ImmersedBodyObjects[bb]->SolnData.var1.rows();
+    MPI_Bcast(&(ImmersedBodyObjects[bb]->SolnData.var1[0]), count, MPI_DOUBLE, rootProc, MPI_COMM_WORLD);
+  }
+
+  PetscPrintf(MPI_COMM_WORLD,"bbbbbbbbbb \n");
+
+  IB_MOVED = false;
+  //if(this_mpi_proc != 0)
+  //{
+    for(bb=0; bb<nImmSolids; bb++)
+    {
+      //cout << " lllllllllllllllllll " << this_mpi_proc << endl;
+      //printVector(ImmersedBodyObjects[bb]->SolnData.var1);
+
+      ImmersedBodyObjects[bb]->updateIterStep();
+
+      IB_MOVED = (IB_MOVED || ImmersedBodyObjects[bb]->updatePointPositions() );
+    }
+  //}
+
+  // don't use this
+  //updateImmersedPointPositions();
 
   return;
 }
@@ -1538,17 +1572,17 @@ void  HBSplineCutFEM::computeTotalForce3D(int bb)
       return;
     }
 
-    int  aa=0, ii=0, jj=0, nlb=0, nlocal=0, gp=0, nGauss=0;
+    int  aa=0, ii=0, jj=0, gp=0;
     int  nlf = (degree[0]+1)*(degree[1]+1)*(degree[2]+1);
 
     double  dvol=0.0, PENALTY=0.0, detJ=0.0;
+    double  rho = GeomData.FluidProps[3];
+    double  mu  = GeomData.FluidProps[4];
+
 
     VectorXd  Nb;
     myPoint   vel, velSpec, trac, ptTemp, centroid, FluidAcce;
     MatrixXd  stress(DIM, DIM);
-
-    double  rho = GeomData.FluidProps[3];
-    double  mu  = GeomData.FluidProps[4];
 
     vector<double>  gausspoints1, gausspoints2, gaussweights;
 
@@ -1563,11 +1597,11 @@ void  HBSplineCutFEM::computeTotalForce3D(int bb)
 
     PENALTY = ImmersedBodyObjects[bb]->getPenaltyParameter();
 
-    nlb = ImmersedBodyObjects[bb]->ImmIntgElems[0]->pointNums.size();
+    int nlb = ImmersedBodyObjects[bb]->ImmIntgElems[0]->pointNums.size();
 
     Nb.resize(nlb);
 
-    nGauss = (int) cutFEMparams[1];
+    int nGauss = (int) cutFEMparams[1];
 
     if(nlb == 3)
       getGaussPointsTriangle(nGauss, gausspoints1, gausspoints2, gaussweights);
@@ -1590,7 +1624,7 @@ void  HBSplineCutFEM::computeTotalForce3D(int bb)
     totalForce.setZero();
 
     centroid.setZero();
-    //centroid = ImmersedBodyObjects[bb]->getCentroid(2);
+    centroid = ImmersedBodyObjects[bb]->getCentroid(2);
 
     //cout << " ImmersedBodyObjects[bb]->ImmIntgElems.size() = " << ImmersedBodyObjects[bb]->ImmIntgElems.size() << endl;
 
@@ -1687,13 +1721,6 @@ void  HBSplineCutFEM::computeTotalForce3D(int bb)
 
   return;
 }
-
-
-
-
-
-
-
 
 
 

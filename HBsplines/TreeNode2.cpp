@@ -615,11 +615,11 @@ void TreeNode<1>::setInitialProfile()
     
     ii = forAssyVec.size();
 
-    Klocal.resize(ii, ii);
-    Flocal.resize(ii);
+    //Klocal.resize(ii, ii);
+    //Flocal.resize(ii);
 
-    Klocal.setZero();
-    Flocal.setZero();
+    //Klocal.setZero();
+    //Flocal.setZero();
 
     for(gp=0; gp<GeomData->gausspoints.size(); gp++)
     {
@@ -644,8 +644,8 @@ void TreeNode<1>::setInitialProfile()
         res = analy.computeValue(0, 0.0, xx);
         //cout << " res = " << res << endl;
 
-        Klocal += ( (N*dvol)*N.transpose() );
-        Flocal += ( (res*dvol) * N);
+        //Klocal += ( (N*dvol)*N.transpose() );
+        //Flocal += ( (res*dvol) * N);
     }
 
     //printMatrix(Klocal);
@@ -1983,7 +1983,7 @@ int TreeNode<1>::calcLoadVector(int ind1, int ind2, double inp1, double inp2)
     //JacMult = GeomData->getJacobianFull() * val1 ;
 
     //Mlocal.setZero();
-    Flocal.setZero();
+    //Flocal.setZero();
 
     double  *gausspoints  = &(GeomData->gausspoints1[0]);
     double  *gaussweights = &(GeomData->gaussweights1[0]);
@@ -2042,12 +2042,12 @@ int TreeNode<1>::calcLoadVector(int ind1, int ind2, double inp1, double inp2)
        //printf(" Wt ... %14.8f \t \t %14.8f \n", computed, Wt);
 
        //Mlocal += (N * N.transpose())*dvol;
-       Flocal += (val*dvol) * N ;
+       //Flocal += (val*dvol) * N ;
     }
     //printf("\n\n");
     //cout << " CCCCCCCCCCCC " << endl;
     
-    counter++;
+    //counter++;
 
   return 0;
 }

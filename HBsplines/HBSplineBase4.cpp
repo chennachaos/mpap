@@ -32,8 +32,6 @@ void  HBSplineBase::computeTotalBodyForce(int index)
 
 
 
-
-
 void  HBSplineBase::updateImmersedPointPositions()
 {
   IB_MOVED = false;
@@ -67,8 +65,11 @@ void  HBSplineBase::writeFluidOutput()
 
 void  HBSplineBase::writeImmersedSolidOutput()
 {
-  for(int bb=0; bb<nImmSolids; bb++)
-    ImmersedBodyObjects[bb]->writeOutput();
+  if(this_mpi_proc == 0)
+  {
+    for(int bb=0; bb<nImmSolids; bb++)
+      ImmersedBodyObjects[bb]->writeOutput();
+  }
 
   return;
 }

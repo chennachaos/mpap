@@ -7,7 +7,6 @@
 #include <vector>
 #include "SolverEigen.h"
 #include "SolverPetsc.h"
-#include <Eigen/Dense>
 
 
 using std::vector;

@@ -2850,16 +2850,16 @@ void TreeNode<2>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
               }
             }
              */
-              /*
+              //
               if(side == 0 )
               {
                 if(dir == 0)
                 {
-                   // vertical beam - Wall
-                  y0 = 0.0;    y1 = 0.6;
-                  specVal = DirichletData[aa][2]*(6.0/y1/y1)*(y1-geom[1])*(geom[1]-y0);
+                  // vertical beam - Wall
+                  //y0 = 0.0;    y1 = 0.6;
+                  //specVal = DirichletData[aa][2]*(6.0/y1/y1)*(y1-geom[1])*(geom[1]-y0);
 
-                   // Turek beam
+                  // Turek beam
                   //y0 = 0.0;    y1 = 0.41;
                   //specVal = DirichletData[aa][2]*(6.0/y1/y1)*(y1-geom[1])*(geom[1]-y0);
 
@@ -2870,8 +2870,8 @@ void TreeNode<2>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
                   //if(geom[1] >= y0 && geom[1] <= y1)
 
                   // heart-valve benchmark
-                  //y0 = 0.0;    y1 = 1.61;
-                  //specVal = DirichletData[aa][2]*(y1-geom[1])*(geom[1]-y0);
+                  y0 = 0.0;    y1 = 1.61;
+                  specVal = DirichletData[aa][2]*(y1-geom[1])*(geom[1]-y0);
 
                   // single-leaf benchmark
                   //y0 = 0.0;    y1 = 2.0;
@@ -2886,7 +2886,7 @@ void TreeNode<2>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
                     //specVal = DirichletData[aa][2]*(1.0-geom[1]*geom[1]);
                 }
               }
-              */
+              //
 
               /*
               if(side == 3)

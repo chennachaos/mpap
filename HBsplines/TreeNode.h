@@ -3,7 +3,6 @@
 #define incl_TreeNode_h
 
 #include "headersEigen.h"
-
 #include "AdaptiveOctree.h"
 #include "AdaptiveBinarytree.h"
 #include "GeomDataHBSplines.h"
@@ -32,8 +31,7 @@ class TreeNode
         static int  nodecount, MAX_LEVEL;
 
         int  level, id, subdomId, NUM_CHILDREN, NUM_NEIGHBOURS, nlbf[DIM], nlbf2[DIM], degree[DIM];
-
-        int  totnlbf, totnlbf2, nsize, nsize2, ndof, counter;
+        int  totnlbf, totnlbf2, nsize, nsize2, ndof;
         NodeOrientation  orientation;
 
         double  *elmDat, *matDat, JacMultElem, elemError, volume;
@@ -41,7 +39,6 @@ class TreeNode
         
         AABB  bbox;
         
-        //eigenPoint_type  knotBegin, knotEnd;
         myPoint  knotBegin, knotEnd, knotIncr;
 
         bool FuncFlag, GHOST_FLAG, ACTIVE_FLAG, PROCESSED;
@@ -53,18 +50,14 @@ class TreeNode
     public:
 
         vector<int>  domNums, QuadratureDomNums;
-
+        vector<int>  GlobalBasisFuncs, LocalBasisFuncs, LocalBasisFuncsPrev, forAssyVec;
         vector<vector<double> > DirichletData, NeumannData, DerivativeBCData;
-
-        vector<int>  GlobalBasisFuncs, LocalBasisFuncs, LocalBasisFuncsPrev, forAssyVec, forAssyVec2;
 
         SolutionData  *SolnData;
         GeomDataHBSplines  *GeomData;
 
-        MatrixXd  SubDivMat, Klocal;
+        MatrixXd  SubDivMat;
 
-        VectorXd  Flocal;
-        
         GaussQuadrature  Quadrature;
         vector<GaussQuadrature>  BoundaryQuadrature;
 
@@ -123,9 +116,6 @@ class TreeNode
         double  getVolume();
         
         double  getVolumeGaussPoints(int domTemp);
-
-        int getNsize2()
-        { return nsize2; }
 
         void  setSubdomainId(int sid)
         {  subdomId = sid;  return;  }
@@ -251,6 +241,40 @@ class TreeNode
         bool isCutElement()
         {  return (domNums.size() > 1); }
 
+        int getNsize2()
+        { return nsize2; }
+
+        int getNumberOfBasisFunctions()
+        { return GlobalBasisFuncs.size(); }
+
+        int getNumberOfQuadraturePoints()
+        {
+          if(domNums.size() > 1) // cut-cell
+          {
+            return  Quadrature.gausspoints.size();
+          }
+          else
+          {
+            return  GeomData->gausspoints.size();
+          }
+        }
+
+        /*
+        * Computational effort for each cell.
+        * To be used as weight for partitioning the mesh to achieve efficient load-balancing
+        */
+        int getComputationalEffort()
+        {
+          if(domNums.size() > 1) // cut-cell
+          {
+            return  (GlobalBasisFuncs.size() * Quadrature.gausspoints.size());
+          }
+          else
+          {
+            return  (GlobalBasisFuncs.size() * GeomData->gausspoints.size());
+          }
+        }
+
         bool  pointLiesInside(const myPoint& pt);
         
         void  subDivide();
@@ -356,12 +380,6 @@ class TreeNode
         void  applyGhostPenaltyCutFEM(myDataIntegrateCutFEM&);
 
         void  computeAndReturnJacobian(int, double*, double*, double*, double, double*, MatrixXd&, VectorXd&, VectorXd&);
-
-        void  assembleElementVector(int ind, bool flag, double* rhs);
-        
-        //void  assembleMatrixAndVector(int, Mat, double*);
-
-        void  assembleElementMatrix2(int, SparseMatrixXd& globalK);
 
         void  MatrixToMapResult(int, int, SparseMatrixXd& globalK);
 
@@ -660,42 +678,12 @@ void TreeNode<DIM>::initialiseDOFvalues()
         for(jj=0;jj<ndof;jj++)
           forAssyVec[ind1+jj] = ind2 + jj;
       }
-      forAssyVec2 = GlobalBasisFuncs;
+      //forAssyVec2 = GlobalBasisFuncs;
     }
     else
       forAssyVec = GlobalBasisFuncs;
 
-    counter = 0;
-
     return;
-}
-
-
-
-template<int DIM>
-void TreeNode<DIM>::assembleElementMatrix2(int index, SparseMatrixXd& globalMat)
-{
-  int ii, jj, row, col;
-
-  for(ii=0;ii<nsize;ii++)
-  {
-    row = forAssyVec[ii];
-    for(jj=0;jj<nsize;jj++)
-      globalMat.coeffRef(row, forAssyVec[jj]) += Klocal(ii,jj);
-  }
-
-  return;
-}
-
-
-
-template<int DIM>
-void TreeNode<DIM>::assembleElementVector(int ind, bool flag, double* rhs)
-{
-   for(int ii=0;ii<nsize;ii++)
-     rhs[forAssyVec[ii]] += Flocal(ii);
-
-   return;
 }
 
 

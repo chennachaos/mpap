@@ -36,24 +36,29 @@ struct RunControl
 
   // functions to control the status
 
-  void reset(void) { act = -1; 
-	             macCnt = 0; 
-		     batch.free(); 
-		     cmd.free(); 
-		     quit = false; 
-	             fixedStatus = UNDEF; 
-		     return; }
+  void reset()
+  {
+    act = -1; 
+	  macCnt = 0; 
+		batch.free(); 
+		cmd.free(); 
+		quit = false; 
+	  fixedStatus = UNDEF; 
+	  return;
+  }
   
   void newMode(RunMode rm)
   {
     mode = rm;
-    if (mode == BATCH) 
-       cout <<  " BATCH mode " << endl;
-        //plot.suppressCopyPixmap = true;
+    if (mode == BATCH)
+    {
+      //cout <<  " BATCH mode " << endl;
+      //plot.suppressCopyPixmap = true;
+    }
     else 
     { 
-        //plot.suppressCopyPixmap = false;
-        //essGrpCopyPixmap();
+      //plot.suppressCopyPixmap = false;
+      //essGrpCopyPixmap();
     }
     //essGrpSetMacroSens();
     //if (rm == PRE)

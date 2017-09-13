@@ -11,19 +11,12 @@
 template<>
 int TreeNode<1>::prepareCutCell(vector<double>& cutFEMparams)
 {
-  double  x0, x1, xif=0.5;
-  
-  x0 = GeomData->computeCoord(0, knots[0][0]);
-  x1 = GeomData->computeCoord(0, knots[0][1]);
-  
-  cout << x0 << '\t' << x1 << endl;
-  
-  bool f0, f1;
-  
-  f0 = ( x0 <= xif );
-  f1 = ( x1 <= xif );
-  
-  cout << f0 << '\t' << f1 << endl;
+  double  x0 = GeomData->computeCoord(0, knots[0][0]);
+  double  x1 = GeomData->computeCoord(0, knots[0][1]);
+  double  xif=0.5;
+
+  bool f0 = ( x0 <= xif );
+  bool f1 = ( x1 <= xif );
   
   if( f0 == f1 )
   {
@@ -37,8 +30,6 @@ int TreeNode<1>::prepareCutCell(vector<double>& cutFEMparams)
     domNums[0] = -1;
   }
   
-  //cout << " domainNum " << domainNums << endl;
-
   return 1;
 }
 
@@ -49,7 +40,7 @@ int TreeNode<1>::prepareCutCell(vector<double>& cutFEMparams)
 template<>
 int TreeNode<2>::prepareCutCell(vector<double>& cutFEMparams)
 {
-  int  ee, bb, ii, jj, domTemp;
+  int  ee=0, bb=0, ii=0, jj=0, domTemp=0;
 
   vector<myPoint>  ptOut;
   vector<int>  cornerInOut(4);
@@ -183,29 +174,19 @@ int TreeNode<2>::prepareCutCell(vector<double>& cutFEMparams)
 template<>
 int TreeNode<3>::prepareCutCell(vector<double>& cutFEMparams)
 {
-  int  ee, bb, ii, jj, domTemp;
-
   vector<myPoint>  ptOut;
   vector<int>  cornerInOut(8);
   
   if( (int) cutFEMparams[0] == 2 ) // adaptive integration
   {
     return GeomData->doIntersect3D(bbox, false, cornerInOut, ptOut, domNums) ;
-
-    //if( isRightBoundary() && isTopBoundary() && isBackBoundary() )
-    //{
-      //bbox.printSelf();
-      //printVector(cornerInOut);
-      //printVector(domNums);
-    //}
   }
   else // subtriangulation
   {
     cerr << " TreeNode<3>::prepareCutCell() ... Subtriangulation is not implemented for 3D problems ... " << endl;
-    //GeomData->doIntersect3D(bbox, true, cornerInOut, ptOut, domNums) ;
   }
 
-  return 1;
+  return 0;
 }
 
 
@@ -231,12 +212,11 @@ int TreeNode<2>::computeGaussPointsSubTrias(int nGP, int inclFlag, int flag1, in
     return -1;
   }
 
-  int  ii, nc, gp, domTemp;
-  double area11, area12, area21, area22, area, area1, area2, temp;
-  area11 = area12 = area21 = area22 = 0.0;
+  int  ii=0, nc=0, gp=0, domTemp=0;
+  double  area11=0.0, area12=0.0, area21=0.0, area22=0.0, area1=0.0, area2=0.0, temp=0.0;
   myPoint  param, geom, ptTemp;
 
-  area = (bbox.maxBB[0]-bbox.minBB[0])*(bbox.maxBB[1]-bbox.minBB[1]);
+  double  area = (bbox.maxBB[0]-bbox.minBB[0])*(bbox.maxBB[1]-bbox.minBB[1]);
 
   vector<myPoint>  gpsLoc;
   vector<double>  gwsLoc;
@@ -275,13 +255,6 @@ int TreeNode<2>::computeGaussPointsSubTrias(int nGP, int inclFlag, int flag1, in
           Quadrature.gausspoints.push_back(ptTemp);
           Quadrature.gaussweights.push_back(gwsLoc[gp]);
 
-          //param[0]  = 0.5*(knots[0][2] * Quadrature.gausspoints[gp][0] + knots[0][3]);
-          //param[1]  = 0.5*(knots[1][2] * Quadrature.gausspoints[gp][1] + knots[1][3]);
-
-          //geom[0] = GeomData->computeCoord(0, param[0]);
-          //geom[1] = GeomData->computeCoord(1, param[1]);
-
-          //QuadratureDomNums.push_back( GeomData->within(geom) ) ;
           QuadratureDomNums.push_back( domTemp ) ;
         }
     }
@@ -313,8 +286,6 @@ int TreeNode<2>::computeGaussPointsSubTrias(int nGP, int inclFlag, int flag1, in
             // parametric domain to integration master-quadrilateral domain
             ptTemp[ii] = (2.0*param[ii] - knots[ii][3])/knots[ii][2];
           }
-
-          //cout << " gp = " << gp << endl;
 
           Quadrature.gausspoints.push_back(ptTemp);
           Quadrature.gaussweights.push_back(gwsLoc[gp]);
@@ -370,6 +341,10 @@ int TreeNode<2>::computeGaussPointsSubTrias(int nGP, int inclFlag, int flag1, in
 template<>
 int TreeNode<3>::computeGaussPointsSubTrias(int nGP, int refLev2, int inclFlag, int flag2)
 {
+  cerr << " TreeNode<3>::computeGaussPointsSubTrias ... is not implemented " << endl;
+  return 0;
+
+
   if(domNums.size() == 1)
     return 1;
   
@@ -381,20 +356,17 @@ int TreeNode<3>::computeGaussPointsSubTrias(int nGP, int refLev2, int inclFlag, 
 
   //cout << " AAAAAAAAAA " << endl;
   
-  int  ii, nc, gp;
-  double area11, area12, area21, area22, area, area1, area2, temp;
+  int  ii=0, nc=0, gp=0;
+  double area11=0.0, area12=0.0, area21=0.0, area22=0.0, area1=0.0, area2=0.0, temp=0.0;
   myPoint  ptTemp, param;
 
-  area = (bbox.maxBB[0]-bbox.minBB[0])*(bbox.maxBB[1]-bbox.minBB[1])*(bbox.maxBB[2]-bbox.minBB[2]);
+  double  area = (bbox.maxBB[0]-bbox.minBB[0])*(bbox.maxBB[1]-bbox.minBB[1])*(bbox.maxBB[2]-bbox.minBB[2]);
 
   vector<myPoint>  gpsLoc;
   vector<double>  gwsLoc;
 
-  //myPoly *poly;
-
   Quadrature.reset();
 
-  area11 = area12 = area21 = area22 = 0.0;
   for(vector<myPoly*>::iterator poly = subTrias.begin() ; poly != subTrias.end(); ++poly)
   {
     if( (*poly)->getDomainNumber() == 0 )
@@ -620,7 +592,7 @@ int TreeNode<3>::computeGaussPointsAdapIntegration(int refLev1, int refLev2, int
 
 
   // parametric domain to integration master-quadrilateral domain
-  int  ii, gp;
+  int  ii=0, gp=0;
   for(gp=0; gp<Quadrature.gausspoints.size(); gp++)
   {
     for(ii=0; ii<3; ii++)
@@ -649,7 +621,7 @@ int TreeNode<3>::computeGaussPointsAdapIntegration(int refLev1, int refLev2, int
   if( isBoundary() )
   {
     BoundaryQuadrature.resize(6);
-    int aa, side;
+    int aa=0, side=0;
 
     for(side=0; side<6; side++)
       BoundaryQuadrature[side].reset();
@@ -674,16 +646,11 @@ int TreeNode<3>::computeGaussPointsAdapIntegration(int refLev1, int refLev2, int
         side  = (int) (NeumannData[aa][0] - 1);
 
         //cout << " NeumannData ... " << aa << '\t' << side << endl;
-
         if( BoundaryQuadrature[side].gausspoints.size() == 0 )
           TreeNode<3>::computeGaussPointsAdapIntegrationBoundary(side, refLev1, refLev2, inclFlag, flag2);
       }
     }
   }
-
-  //cout << id << '\t' << Quadrature.gausspoints.size() << endl;
-
-  //cout << " AAAAAAAAAA " << endl;
 
   return 1;
 }

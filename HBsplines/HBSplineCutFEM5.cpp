@@ -128,123 +128,123 @@ void  HBSplineCutFEM::applyInterfaceTerms2D()
 
               if( nd2->getSubdomainId() == this_mpi_proc )
               {
-              bbTemp = nd2->getAABB();
-              hx = bbTemp.maxBB[0]-bbTemp.minBB[0];
-              hy = bbTemp.maxBB[1]-bbTemp.minBB[1];
+                bbTemp = nd2->getAABB();
+                hx = bbTemp.maxBB[0]-bbTemp.minBB[0];
+                hy = bbTemp.maxBB[1]-bbTemp.minBB[1];
 
-              //bbTemp.printSelf();
+                //bbTemp.printSelf();
 
-              //
-              if( (nd2->domNums.size() == 1) && (nd2->domNums[0] != 0) )
-              {
-                //cout << " elnum = " << elnum << endl;
-                //printVector(nd2->domNums);
+                //
+                if( (nd2->domNums.size() == 1) && (nd2->domNums[0] != 0) )
+                {
+                  //cout << " elnum = " << elnum << endl;
+                  //printVector(nd2->domNums);
                 
-                if( abs(geom[1]-bbTemp.minBB[1]) < 1.0e-8 ) // bottom edge
-                {
-                  nd3 = nd2->getNeighbour(EAST);
-                  
-                  if( (nd3->domNums.size() == 1) && (nd3->domNums[0] != 0) )
+                  if( abs(geom[1]-bbTemp.minBB[1]) < 1.0e-8 ) // bottom edge
                   {
-                    nd4 = nd2->getNeighbour(SOUTH);
-                    if( (nd4->domNums.size() == 1) && (nd4->domNums[0] != 0) )
-                      nd = nd2->getNeighbour(WEST);
+                    nd3 = nd2->getNeighbour(EAST);
+                  
+                    if( (nd3->domNums.size() == 1) && (nd3->domNums[0] != 0) )
+                    {
+                      nd4 = nd2->getNeighbour(SOUTH);
+                      if( (nd4->domNums.size() == 1) && (nd4->domNums[0] != 0) )
+                        nd = nd2->getNeighbour(WEST);
+                      else
+                        nd = nd4;
+                    }
                     else
-                      nd = nd4;
+                      nd = nd2->getNeighbour(SOUTH);
+                  }
+                  else if( abs(geom[1]-bbTemp.maxBB[1]) < 1.0e-8 ) // top edge
+                  {
+                    nd3 = nd2->getNeighbour(EAST);
+                  
+                    if( (nd3->domNums.size() == 1) && (nd3->domNums[0] != 0) )
+                    {
+                      nd4 = nd2->getNeighbour(NORTH);
+                      if( (nd4->domNums.size() == 1) && (nd4->domNums[0] != 0) )
+                        nd = nd2->getNeighbour(WEST);
+                      else
+                        nd = nd4;
+                    }
+                    else
+                      nd = nd2->getNeighbour(NORTH);
                   }
                   else
-                    nd = nd2->getNeighbour(SOUTH);
+                  {
+                    if( abs(geom[0]-bbTemp.minBB[0]) < 1.0e-8 ) // left edge
+                      nd = nd2->getNeighbour(WEST);
+                    else if( abs(geom[0]-bbTemp.maxBB[0]) < 1.0e-8 ) // right edge
+                      nd = nd2->getNeighbour(EAST);
+                    else
+                    {
+                      cerr << " Boundary integration point lies in absurd element \n\n " << endl;
+                    }
+                  }
                 }
-                else if( abs(geom[1]-bbTemp.maxBB[1]) < 1.0e-8 ) // top edge
+                else
+                  nd = nd2;
+                //
+
+                geometryToParametric(geom, param);
+
+                nr = nd->forAssyVec.size();
+
+                K1 = MatrixXd::Zero(nr, nr);
+                F1 = VectorXd::Zero(nr);
+
+                //printf("param = %12.6f, yy = %12.6f, zz = %12.6f, dvol = %12.6f, \n", param[0], param[1], param[2], dvol);
+                //printf("vx = %12.6f, vy = %12.6f, vz = %12.6f \n", velSpec[0], velSpec[1], velSpec[2]);
+
+                // stiffness and residual terms due to Nitsche method
+
+                knotBegin = nd->getKnotBegin();
+                knotIncr  = nd->getKnotIncrement();
+
+                GeomData.computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy);
+
+                if(nd->getParent() == NULL)
                 {
-                  nd3 = nd2->getNeighbour(EAST);
-                  
-                  if( (nd3->domNums.size() == 1) && (nd3->domNums[0] != 0) )
-                  {
-                    nd4 = nd2->getNeighbour(NORTH);
-                    if( (nd4->domNums.size() == 1) && (nd4->domNums[0] != 0) )
-                      nd = nd2->getNeighbour(WEST);
-                    else
-                      nd = nd4;
-                  }
-                  else
-                    nd = nd2->getNeighbour(NORTH);
+                  N = NN;
+                  dN_dx = dNN_dx;
+                  dN_dy = dNN_dy;
                 }
                 else
                 {
-                  if( abs(geom[0]-bbTemp.minBB[0]) < 1.0e-8 ) // left edge
-                    nd = nd2->getNeighbour(WEST);
-                  else if( abs(geom[0]-bbTemp.maxBB[0]) < 1.0e-8 ) // right edge
-                    nd = nd2->getNeighbour(EAST);
-                  else
-                  {
-                    cerr << " Boundary integration point lies in absurd element \n\n " << endl;
-                  }
+                  N = nd->SubDivMat*NN;
+                  dN_dx = nd->SubDivMat*dNN_dx;
+                  dN_dy = nd->SubDivMat*dNN_dy;
                 }
-              }
-              else
-                nd = nd2;
-              //
 
-              geometryToParametric(geom, param);
+                vel[0] = velSpec[0] - nd->computeValueCur(0, N);
+                vel[1] = velSpec[1] - nd->computeValueCur(1, N);
 
-              nr = nd->forAssyVec.size();
+                //printf("vel        ... %12.6f \t %12.6f \t %12.6f \n", vel[0], vel[1], vel[2]);
 
-              K1 = MatrixXd::Zero(nr, nr);
-              F1 = VectorXd::Zero(nr);
+                /////////////////////////////////////////
+                // compute the stresses and tractions
+                /////////////////////////////////////////
 
-              //printf("param = %12.6f, yy = %12.6f, zz = %12.6f, dvol = %12.6f, \n", param[0], param[1], param[2], dvol);
-              //printf("vx = %12.6f, vy = %12.6f, vz = %12.6f \n", velSpec[0], velSpec[1], velSpec[2]);
+                grad(0,0) = nd->computeValueCur(0, dN_dx);
+                grad(0,1) = nd->computeValueCur(0, dN_dy);
+                grad(1,0) = nd->computeValueCur(1, dN_dx);
+                grad(1,1) = nd->computeValueCur(1, dN_dy);
+                pres      = nd->computeValue(2, N);
+                presPrev  = nd->computeValuePrev(2, N);
 
-              // stiffness and residual terms due to Nitsche method
+                //stress = mu*(grad+grad.transpose());
+                stress = mu*grad;
 
-              knotBegin = nd->getKnotBegin();
-              knotIncr  = nd->getKnotIncrement();
+                stress(0,0) -= pres;
+                stress(1,1) -= pres;
 
-              GeomData.computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy);
+                trac[0] = stress(0,0)*normal[0] + stress(0,1)*normal[1] ;
+                trac[1] = stress(1,0)*normal[0] + stress(1,1)*normal[1] ;
 
-              if(nd->getParent() == NULL)
-              {
-                N = NN;
-                dN_dx = dNN_dx;
-                dN_dy = dNN_dy;
-              }
-              else
-              {
-                N = nd->SubDivMat*NN;
-                dN_dx = nd->SubDivMat*dNN_dx;
-                dN_dy = nd->SubDivMat*dNN_dy;
-              }
+                totnlbf2 = nr/ndof;
 
-              vel[0] = velSpec[0] - nd->computeValueCur(0, N);
-              vel[1] = velSpec[1] - nd->computeValueCur(1, N);
-
-              //printf("vel        ... %12.6f \t %12.6f \t %12.6f \n", vel[0], vel[1], vel[2]);
-
-              /////////////////////////////////////////
-              // compute the stresses and tractions
-              /////////////////////////////////////////
-
-              grad(0,0) = nd->computeValueCur(0, dN_dx);
-              grad(0,1) = nd->computeValueCur(0, dN_dy);
-              grad(1,0) = nd->computeValueCur(1, dN_dx);
-              grad(1,1) = nd->computeValueCur(1, dN_dy);
-              pres      = nd->computeValue(2, N);
-              presPrev  = nd->computeValuePrev(2, N);
-
-              //stress = mu*(grad+grad.transpose());
-              stress = mu*grad;
-
-              stress(0,0) -= pres;
-              stress(1,1) -= pres;
-
-              trac[0] = stress(0,0)*normal[0] + stress(0,1)*normal[1] ;
-              trac[1] = stress(1,0)*normal[0] + stress(1,1)*normal[1] ;
-
-              totnlbf2 = nr/ndof;
-
-              for(ii=0;ii<totnlbf2;ii++)
-              {
+                for(ii=0;ii<totnlbf2;ii++)
+                {
                   TI   = 3*ii;
                   TIp1 = TI+1;
                   TIp2 = TI+2;
@@ -320,11 +320,10 @@ void  HBSplineCutFEM::applyInterfaceTerms2D()
                   F1(TIp1) -= (Ta[4]*vel[1]);
                   F1(TIp2) -= (Ta[5]*vel[1]);
 
-              } // for(ii=0;ii<totnlbf2;ii++)
+                } // for(ii=0;ii<totnlbf2;ii++)
 
-              solverPetsc->assembleMatrixAndVectorCutFEM(0, 0, nd->forAssyVec, grid_to_proc_DOF, K1, F1);
+                solverPetsc->assembleMatrixAndVectorCutFEM(0, 0, nd->forAssyVec, grid_to_proc_DOF, K1, F1);
               } //if( nd2->getSubdomainId() == this_mpi_proc )
-            
             }//for(gp=0...
           } // if( lme->isActive() )
         }//for(aa=0...
@@ -1108,7 +1107,7 @@ void  HBSplineCutFEM::applyGhostPenalty2D()
 
 void  HBSplineCutFEM::applyGhostPenalty3D()
 {
-    cout << " need to modify HBSplineCutFEM::applyGhostPenalty3D() ... " << endl;
+    //cout << " need to modify HBSplineCutFEM::applyGhostPenalty3D() ... " << endl;
 
     ////////////////////////////////////////////////////////
     //
@@ -1177,53 +1176,55 @@ void  HBSplineCutFEM::applyGhostPenalty3D()
     {
       nd1 = elems[cutCellIds[ee]];
 
-      if( nd1->isCutElement() )
+      if( nd1->getSubdomainId() == this_mpi_proc )
       {
-        //cout << " nd1->getID() " <<  nd1->getID() << '\t' <<  nd1->getLevel() << endl;
-
-        knots1[0] = nd1->getKnots(Dir1);
-        knots1[1] = nd1->getKnots(Dir2);
-        knots1[2] = nd1->getKnots(Dir3);
-
-        knotBegin1 = nd1->getKnotBegin();
-        knotIncr1  = nd1->getKnotIncrement();
-
-        //
-        //if( nd1->isLeftBoundary() || nd1->isRightBoundary() )
-        if( nd1->isBoundary() )
+        if( nd1->isCutElement() )
         {
-          gammGP[0]  = cutFEMparams[6] * mu*h1;
-          gammGP[1]  = gammGP[0];
-          gammGP[2]  = gammGP[0];
-          gammGP[3]  = cutFEMparams[7] * h1*h1*h1/mu;
-        }
-        else
-        {
-          gammGP[0]  = cutFEMparams[6] * mu*h1;
-          gammGP[1]  = gammGP[0];
-          gammGP[2]  = gammGP[0];
-          gammGP[3]  = cutFEMparams[7] * h1*h1*h1/mu;
-        }
+          //cout << " nd1->getID() " <<  nd1->getID() << '\t' <<  nd1->getLevel() << endl;
 
-        bb1 = 1.0;
-        for(ii=1; ii<degree[0]; ii++)
-        {
-          bb1 *= h1*h1;
-        }
-        gammGP[0] *= bb1;
-        gammGP[1] *= bb1;
-        gammGP[2] *= bb1;
-        gammGP[3] *= bb1;
-        //
+          knots1[0] = nd1->getKnots(Dir1);
+          knots1[1] = nd1->getKnots(Dir2);
+          knots1[2] = nd1->getKnots(Dir3);
 
-        for(side=0; side<NUM_NEIGHBOURS; side++)
-        {
-          //cout << " side = " << side << endl;
-          nd2 = nd1->getNeighbour(side);
+          knotBegin1 = nd1->getKnotBegin();
+          knotIncr1  = nd1->getKnotIncrement();
 
-          //if( nd2 != NULL && !(nd2->isGhost()) )
-          if( (nd2 != NULL) && !(nd2->isGhost()) && nd2->isLeaf() && (nd2->isCutElement() || nd2->domNums[0] == 0) )
+          //
+          //if( nd1->isLeftBoundary() || nd1->isRightBoundary() )
+          if( nd1->isBoundary() )
           {
+            gammGP[0]  = cutFEMparams[6] * mu*h1;
+            gammGP[1]  = gammGP[0];
+            gammGP[2]  = gammGP[0];
+            gammGP[3]  = cutFEMparams[7] * h1*h1*h1/mu;
+          }
+          else
+          {
+            gammGP[0]  = cutFEMparams[6] * mu*h1;
+            gammGP[1]  = gammGP[0];
+            gammGP[2]  = gammGP[0];
+            gammGP[3]  = cutFEMparams[7] * h1*h1*h1/mu;
+          }
+
+          bb1 = 1.0;
+          for(ii=1; ii<degree[0]; ii++)
+          {
+            bb1 *= h1*h1;
+          }
+          gammGP[0] *= bb1;
+          gammGP[1] *= bb1;
+          gammGP[2] *= bb1;
+          gammGP[3] *= bb1;
+          //
+
+          for(side=0; side<NUM_NEIGHBOURS; side++)
+          {
+            //cout << " side = " << side << endl;
+            nd2 = nd1->getNeighbour(side);
+
+            //if( nd2 != NULL && !(nd2->isGhost()) )
+            if( (nd2 != NULL) && !(nd2->isGhost()) && nd2->isLeaf() && (nd2->isCutElement() || nd2->domNums[0] == 0) )
+            {
               nr1 = nd1->forAssyVec.size();
               nr2 = nd2->forAssyVec.size();
 
@@ -1430,9 +1431,10 @@ void  HBSplineCutFEM::applyGhostPenalty3D()
                 }
               }
               //cout << " lllllllllllllll " << endl;
-          }//  if( neighbours[side] != NULL && !neighbours[side]->isGhost() )
-        } // for(side=0; side<NUM_NEIGHBOURS
-      } //if( nd1->isCutElement() )
+            }//  if( neighbours[side] != NULL && !neighbours[side]->isGhost() )
+          } // for(side=0; side<NUM_NEIGHBOURS
+        } //if( nd1->isCutElement() )
+      } //if( nd1->getSubdomainId() == this_mpi_proc )
     } //for(ee=0; ee<activeElements.size(); ee++)
 
   return;

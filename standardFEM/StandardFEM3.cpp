@@ -1,5 +1,4 @@
 
-
 #include "StandardFEM.h"
 #include "MpapTime.h"
 #include "Functions.h"
@@ -7,7 +6,6 @@
 #include "MyString.h"
 #include "KimMoinFlow.h"
 #include "LagrangeElement.h"
-
 
 extern MpapTime mpapTime;
 extern Files files;
@@ -30,7 +28,6 @@ void StandardFEM::plotGeom(int a1, bool b1, int c1, bool d1, int* ffff)
 
     count = GeomData.NodePosOrig.size();
 
-    //cout << " AAAAAAAAAAA " << endl;
     if(DIM == 2)
     {
       for(ii=0;ii<GeomData.NodePosOrig.size();ii++)
@@ -40,7 +37,6 @@ void StandardFEM::plotGeom(int a1, bool b1, int c1, bool d1, int* ffff)
 
         pt[0] = pointsVTK->InsertNextPoint(xx, yy, 0.0);
       }
-
 
       if(elems[0]->nodeNums.size() == 3) // tria
       {
@@ -118,8 +114,6 @@ void StandardFEM::plotGeom(int a1, bool b1, int c1, bool d1, int* ffff)
 
     // create a write object and write uGridVTK to it
 
-    //cout << " AAAAAAAAAAA " << endl;
-
     char fname[200];
 
     //VTKfilename = files.Ofile.asCharArray();
@@ -139,9 +133,7 @@ void StandardFEM::plotGeom(int a1, bool b1, int c1, bool d1, int* ffff)
 
     writerUGridVTK->Write();
 
-    //cout << " AAAAAAAAAAA " << endl;
-
-  return;
+    return;
 }
 
 
@@ -151,13 +143,8 @@ void  StandardFEM::postProcess(int vartype, int vardir, int nCol, bool umnxflag,
 {
     //cout << " StandardFEM::postProcess " << endl;
 
-    PetscMPIInt  this_mpi_proc;
-
-    MPI_Comm_rank(MPI_COMM_WORLD, &this_mpi_proc);
-
     if(this_mpi_proc != 0)
       return;
-
 
     int  dd, ii, jj, kk, ll, nlocal, index, ind1, ind2, e, ee, count, gcount, ind;
     double vec[3], vec2[3], xx, yy, zz;
@@ -569,9 +556,7 @@ else
 
     writerUGridVTK->Write();
 
-    //cout << " AAAAAAAAAAA " << endl;
-
-  return;
+    return;
 }
 
 

@@ -1,6 +1,4 @@
 
-
-#include "LagrangeElement.h"
 #include "StandardFEM.h"
 #include "DataBlockTemplate.h"
 #include "ComputerTime.h"
@@ -25,12 +23,15 @@ using namespace std;
 
 StandardFEM::StandardFEM()
 {
+    MPI_Comm_size(MPI_COMM_WORLD, &n_mpi_procs);
+    MPI_Comm_rank(MPI_COMM_WORLD, &this_mpi_proc);
+
+    //cout << " this_mpi_proc " << this_mpi_proc << endl;
+    //cout << " n_mpi_procs " << n_mpi_procs << endl;
+
     //PetscErrorCode ierr;
-
     //PetscInitialize(NULL,NULL,(char *)0,NULL);
-
     //PetscInitialize(NULL, NULL, "petsc_options.dat", NULL);
-
 
     geom.resize(3);
     param.resize(3);

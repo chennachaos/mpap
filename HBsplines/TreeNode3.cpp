@@ -704,8 +704,8 @@ void TreeNode<2>::setInitialProfile()
     MatrixXd  D(nsize,3); D.setZero();
     myPoint  param;
 
-    Klocal.setZero();
-    Flocal.setZero();
+    //Klocal.setZero();
+    //Flocal.setZero();
 
     for(gp=0; gp<GeomData->gausspoints.size(); gp++)
     {
@@ -744,8 +744,8 @@ void TreeNode<2>::setInitialProfile()
              D(TI+2,2) = N[ii];
           }
 
-          Klocal += ((D*dvol) * D.transpose());
-          Flocal += (D*(dvol*res));
+          //Klocal += ((D*dvol) * D.transpose());
+          //Flocal += (D*(dvol*res));
     } //gp
 
     //printf("\n\n");

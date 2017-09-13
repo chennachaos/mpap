@@ -100,12 +100,6 @@ class AdaptiveOctree
         double  getVolume()
         {  return volume; }
 
-        void setKnots(double* knots_)
-        {  knots = knots_; }
-        
-        double* getKnots(int ind)
-        {  return knots[ind]; }
-        
         void setParent(AdaptiveOctree_PTR  parent1)
         {  parent = parent1; }
         
@@ -136,6 +130,9 @@ class AdaptiveOctree
         static int  getCount()
         { return nodecount; }
 
+        void setKnots(double* knots_)
+        {  knots = knots_; }
+        
         void setKnots(int index, double val0, double val1)
         {
            knots[index][0] = val0;
@@ -160,26 +157,29 @@ class AdaptiveOctree
            knots[2][1] = w1;
         }
 
-        AABB& getAABB()
-        {  return  bbox; }
+        double* getKnots(int ind)
+        {  return knots[ind]; }
 
         double  getKnotspan(int dir)
-        {  return (knots[dir][1] - knots[dir][0]);  }
+        {  return  knots[dir][2];  }
 
         double  getKnotAt(int dir, int loc)
         {  return  knots[dir][loc];  }
 
-        //void SetDomainNumber(int  dd)
-        //{ domainNum = dd;  } 
+        myPoint& getKnotBegin()
+        {  return knotBegin; }
 
-        //int getDomainNumber()
-        //{  return domainNum; }
+        myPoint& getKnotEnd()
+        {  return knotEnd; }
+
+        myPoint& getKnotIncrement()
+        {  return knotIncr; }
+
+        AABB& getAABB()
+        {  return  bbox; }
 
         int getDomainNumber()
         {  return ( (domNums.size() == 1) ? domNums[0] : -1); }
-
-        //bool isCutElement()
-        //{  return (domainNum == -1); }
 
         bool isCutElement()
         {  return (domNums.size() > 1); }
@@ -295,26 +295,19 @@ AdaptiveOctree<DIM>::~AdaptiveOctree()
 template<int DIM>
 void AdaptiveOctree<DIM>::prepareData()
 {
-    //cout << knots[0][0] << '\t' << knots[0][1] << '\t' << knots[0][2] << '\t' << knots[0][3] << endl;
-    //cout << knots[1][0] << '\t' << knots[1][1] << '\t' << knots[1][2] << '\t' << knots[1][3] << endl;
-
     JacMultElem = GeomData->getJacobianFull();
 
     for(int ii=0;ii<DIM;ii++)
     {
-      //cout << " ii = " << ii << endl;
       knots[ii][2] = knots[ii][1] - knots[ii][0];
       knots[ii][3] = knots[ii][1] + knots[ii][0];
 
       knotBegin[ii] = knots[ii][0];
       knotEnd[ii]   = knots[ii][1];
       knotIncr[ii]  = knots[ii][2];
-      //bbox.printSelf();
-      //cout << " ii = " << ii << endl;
 
       bbox.minBB[ii] = GeomData->computeCoord(ii, knots[ii][0]);
       bbox.maxBB[ii] = GeomData->computeCoord(ii, knots[ii][1]);
-      //cout << bbox.minBB[ii] << '\t' << bbox.maxBB[ii] << endl;
 
       JacMultElem *= (0.5*knots[ii][2]);
     }

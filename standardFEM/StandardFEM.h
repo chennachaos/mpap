@@ -12,9 +12,6 @@
 
 #include "LagrangeElement.h"
 
-#include "SolverEigen.h"
-#include "SolverPetsc.h"
-
 
 class PropertyItem;
 

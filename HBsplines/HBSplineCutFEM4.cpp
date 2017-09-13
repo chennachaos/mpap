@@ -6,8 +6,6 @@
 #include "myDataIntegrateCutFEM.h"
 #include "ImmersedIntegrationElement.h"
 
-#include <chrono>
-typedef std::chrono::high_resolution_clock Clock;
 
 extern ComputerTime       computerTime;
 extern MpapTime mpapTime;
@@ -258,7 +256,6 @@ int HBSplineCutFEM::factoriseSolveAndUpdate()
   auto tstart = Clock::now();
 
   //VecView(solverPetsc->rhsVec, PETSC_VIEWER_STDOUT_WORLD);
-  //MatView(solverPetsc->mtx, PETSC_VIEWER_STDOUT_WORLD);
 
   solverPetsc->factoriseAndSolve();
 

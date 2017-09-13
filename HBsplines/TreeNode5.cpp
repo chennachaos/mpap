@@ -1358,7 +1358,7 @@ void TreeNode<2>::mapBoundaryPointDataToGlobalBodyForceVector(double* position, 
           //val1 = LevelSetFunc[0][7]*normal[0]*fact;
           //val2 = LevelSetFunc[0][7]*normal[1]*fact;
 
-          Flocal += (dvol*(D*res));
+          //Flocal += (dvol*(D*res));
 
     }//gp1
     }//gp2

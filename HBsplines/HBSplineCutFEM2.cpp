@@ -25,183 +25,182 @@ using namespace myGeom;
 
 void  HBSplineCutFEM::prepareCutElements()
 {
-  //PetscPrintf(MPI_COMM_WORLD, "  HBSplineCutFEM::prepareCutElements() \n");
+    //PetscPrintf(MPI_COMM_WORLD, "  HBSplineCutFEM::prepareCutElements() \n");
 
-  int  bb, dd, ee, ii, kk, domTemp, ind1, ind2, count;
-  bool  flag;
+    int  bb=0, dd=0, ee=0, ii=0, kk=0, domTemp=0, ind1=0, ind2=0, count=0;
+    bool  flag=false;
 
-  node  *nd1;
+    node  *nd1;
 
-  nElem = activeElements.size();
-  nNode = gridBF1;
+    nElem = activeElements.size();
+    nNode = gridBF1;
 
-  totalDOF = nNode*ndof;
+    totalDOF = nNode*ndof;
 
-  grid_to_cutfem_BFprev  = grid_to_cutfem_BF;
-  grid_to_cutfem_DOFprev = grid_to_cutfem_DOF;
+    grid_to_cutfem_BFprev  = grid_to_cutfem_BF;
+    grid_to_cutfem_DOFprev = grid_to_cutfem_DOF;
 
-  grid_to_cutfem_BF.assign(gridBF1, -1);
-  grid_to_cutfem_DOF.assign(totalDOF, -1);
+    grid_to_cutfem_BF.assign(gridBF1, -1);
+    grid_to_cutfem_DOF.assign(totalDOF, -1);
 
-  cutfem_to_grid_BF.clear();
-  cutfem_to_grid_DOF.clear();
+    cutfem_to_grid_BF.clear();
+    cutfem_to_grid_DOF.clear();
 
-
-  if( ImmersedBodyObjects.size() == 0 )
-  {
-    fluidElementIds = activeElements;
-
-    cutfem_to_grid_BF.resize(gridBF1);
-    cutfem_to_grid_DOF.resize(totalDOF);
-
-    kk=0;
-    for(ii=0; ii<gridBF1; ii++)
+    if( ImmersedBodyObjects.size() == 0 )
     {
-      cutfem_to_grid_BF[ii] = ii;
-      grid_to_cutfem_BF[ii] = ii;
+      fluidElementIds = activeElements;
 
-      for(dd=0; dd<ndof; dd++)
+      cutfem_to_grid_BF.resize(gridBF1);
+      cutfem_to_grid_DOF.resize(totalDOF);
+
+      kk=0;
+      for(ii=0; ii<gridBF1; ii++)
       {
-        cutfem_to_grid_DOF[kk] = kk;
-        grid_to_cutfem_DOF[kk] = kk;
-        kk++;
+        cutfem_to_grid_BF[ii] = ii;
+        grid_to_cutfem_BF[ii] = ii;
+
+        for(dd=0; dd<ndof; dd++)
+        {
+          cutfem_to_grid_DOF[kk] = kk;
+          grid_to_cutfem_DOF[kk] = kk;
+          kk++;
+        }
       }
+
+      for(ee=0; ee<activeElements.size(); ee++)
+      {
+        nd1 = elems[activeElements[ee]];
+        nd1->domNums.clear();
+        nd1->domNums.push_back(0);
+      }
+      return;
+    }
+  
+    cutCellIds.clear();
+    fluidElementIds.clear();
+
+    for(bb=0; bb<ImmersedBodyObjects.size(); bb++)
+    {
+      //cout << " jjjjjjjjjjjjjjjj " << endl;
+      ImmersedBodyObjects[bb]->updateImmersedFaces();
+      //cout << " jjjjjjjjjjjjjjjj " << endl;
+      ImmersedBodyObjects[bb]->computeAABB(2);
     }
 
-    for(ee=0; ee<activeElements.size(); ee++)
+     //cout << " immersed objects updated " << endl;
+  
+    //GeomData.domainFixedYesNo[0] = 0;
+    //GeomData.domainFixedYesNo[1] = 0;
+
+    for(ee=0; ee<nElem; ee++)
     {
       nd1 = elems[activeElements[ee]];
-      nd1->domNums.clear();
-      nd1->domNums.push_back(0);
-    }
-    return;
-  }
-  
-  cutCellIds.clear();
-  fluidElementIds.clear();
+      //cout << ee << '\t' << nd1->getID() << endl;
 
-  for(int bb=0; bb<ImmersedBodyObjects.size(); bb++)
-  {
-    //cout << " jjjjjjjjjjjjjjjj " << endl;
-    ImmersedBodyObjects[bb]->updateImmersedFaces();
-    //cout << " jjjjjjjjjjjjjjjj " << endl;
-    ImmersedBodyObjects[bb]->computeAABB(2);
-  }
+      flag = false;
 
-  cout << " immersed objected updated " << endl;
-  
-  //GeomData.domainFixedYesNo[0] = 0;
-  //GeomData.domainFixedYesNo[1] = 0;
-
-  for(ee=0; ee<nElem; ee++)
-  {
-    nd1 = elems[activeElements[ee]];
-    //cout << ee << '\t' << nd1->getID() << endl;
-
-    flag = false;
-
-    /*
-    if( nd1->domNums.size() == 0 )
-    {
-      flag = true;
-    }
-    else if( nd1->domNums.size() == 1 )
-    {
-      domTemp = nd1->domNums[0] ;
-
-      if( domTemp == 0 )
+      /*
+      if( nd1->domNums.size() == 0 )
       {
         flag = true;
+      }
+      else if( nd1->domNums.size() == 1 )
+      {
+        domTemp = nd1->domNums[0] ;
+
+        if( domTemp == 0 )
+        {
+          flag = true;
+        }
+        else
+        {
+          if( !GeomData.domainFixedYesNo[domTemp-1] )
+            flag = true;
+        }
       }
       else
       {
-        if( !GeomData.domainFixedYesNo[domTemp-1] )
+        domTemp = *std::max_element(nd1->domNums.begin(), nd1->domNums.end() ) - 1;
+
+        if( !GeomData.domainFixedYesNo[domTemp] )
           flag = true;
       }
-    }
-    else
-    {
-      domTemp = *std::max_element(nd1->domNums.begin(), nd1->domNums.end() ) - 1;
+      */
 
-      if( !GeomData.domainFixedYesNo[domTemp] )
-        flag = true;
-    }
-    */
+      flag = true;
 
-    flag = true;
-
-    if( flag )
-    {
-      kk = nd1->prepareCutCell(cutFEMparams);
-
-      if( kk != 1)
+      if( flag )
       {
-        cerr << " Error in prepareCutCell() for TreeNode<>::prepareCutCell() " << kk << endl;
-        exit(kk);
-      }
+        kk = nd1->prepareCutCell(cutFEMparams);
 
-      if( nd1->isCutElement() )
+        if( kk != 1)
+        {
+          cerr << " Error in prepareCutCell() for TreeNode<>::prepareCutCell() " << kk << endl;
+          exit(kk);
+        }
+
+        if( nd1->isCutElement() )
+        {
+          cutCellIds.push_back(activeElements[ee]);
+
+          //if(cutFEMparams[0] == 1)
+            //nd1->computeGaussPointsSubTrias(cutFEMparams[2], false);
+          //else
+            //nd1->computeGaussPointsAdapIntegration(cutFEMparams[3], cutFEMparams[4], false, true);
+        }
+      }
+      //cout << " iiiiiii " << endl;
+
+      if( nd1->getDomainNumber() <= 0 )
       {
-        cutCellIds.push_back(activeElements[ee]);
+        fluidElementIds.push_back( nd1->getID() );
 
-        if(cutFEMparams[0] == 1)
-          nd1->computeGaussPointsSubTrias(cutFEMparams[2], false);
-        else
-          nd1->computeGaussPointsAdapIntegration(cutFEMparams[3], cutFEMparams[4], false, true);
+        //printVector(nd1->GlobalBasisFuncs);
+
+        for(ii=0; ii<nd1->GlobalBasisFuncs.size(); ii++)
+          grid_to_cutfem_BF[nd1->GlobalBasisFuncs[ii]] = 1;
       }
     }
-    //cout << " iiiiiii " << endl;
 
-    if( nd1->getDomainNumber() <= 0 )
+    nNode = 0;
+    for(ee=0; ee<gridBF1; ee++)
     {
-      fluidElementIds.push_back( nd1->getID() );
-
-      //printVector(nd1->GlobalBasisFuncs);
-
-      for(ii=0; ii<nd1->GlobalBasisFuncs.size(); ii++)
-        grid_to_cutfem_BF[nd1->GlobalBasisFuncs[ii]] = 1;
-    }
-  }
-
-  nNode = 0;
-  for(ee=0; ee<gridBF1; ee++)
-  {
-    if(grid_to_cutfem_BF[ee] == 1)
-    {
-      grid_to_cutfem_BF[ee] = nNode;
-      cutfem_to_grid_BF.push_back(ee);
-
-      ind1 = ndof*ee;
-      ind2 = ndof*nNode;
-      for(dd=0; dd<ndof; dd++)
+      if(grid_to_cutfem_BF[ee] == 1)
       {
-        grid_to_cutfem_DOF[ind1+dd] = ind2+dd;
-        cutfem_to_grid_DOF.push_back(ind1+dd);
+        grid_to_cutfem_BF[ee] = nNode;
+        cutfem_to_grid_BF.push_back(ee);
+
+        ind1 = ndof*ee;
+        ind2 = ndof*nNode;
+        for(dd=0; dd<ndof; dd++)
+        {
+          grid_to_cutfem_DOF[ind1+dd] = ind2+dd;
+          cutfem_to_grid_DOF.push_back(ind1+dd);
+        }
+        nNode++;
       }
-      nNode++;
     }
-  }
 
-  //for(ee=0; ee<gridBF1; ee++)
-    //cout << ee << '\t' << grid_to_cutfem_DOF[ee] << endl;
-  //printVector(grid_to_cutfem_DOF);
+    //for(ee=0; ee<gridBF1; ee++)
+      //cout << ee << '\t' << grid_to_cutfem_DOF[ee] << endl;
+    //printVector(grid_to_cutfem_DOF);
 
-  nElem     =  fluidElementIds.size();
-  fluidDOF  =  nNode*ndof;
+    nElem     =  fluidElementIds.size();
+    fluidDOF  =  nNode*ndof;
 
-  //PetscPrintf(MPI_COMM_WORLD, "  nNode    = %d \n", nNode);
-  //PetscPrintf(MPI_COMM_WORLD, "  fluidDOF = %d \n", fluidDOF);
-  //PetscPrintf(MPI_COMM_WORLD, "  HBSplineCutFEM::prepareCutElements() \n\n");
+    //PetscPrintf(MPI_COMM_WORLD, "  nNode    = %d \n", nNode);
+    //PetscPrintf(MPI_COMM_WORLD, "  fluidDOF = %d \n", fluidDOF);
+    //PetscPrintf(MPI_COMM_WORLD, "  HBSplineCutFEM::prepareCutElements() \n\n");
 
-  //if(this_mpi_proc==0)
-  //{
-    //for(ii=0; ii<grid_to_cutfem_BF.size(); ii++)
-      //cout << ii << '\t' << grid_to_cutfem_BF[ii] << endl;
-  //}
+    //if(this_mpi_proc==0)
+    //{
+      //for(ii=0; ii<grid_to_cutfem_BF.size(); ii++)
+        //cout << ii << '\t' << grid_to_cutfem_BF[ii] << endl;
+    //}
 
-  //MPI_Barrier(MPI_COMM_WORLD);
+    //MPI_Barrier(MPI_COMM_WORLD);
 
-  return;
+    return;
 }
 
 

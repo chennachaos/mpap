@@ -52,14 +52,14 @@ void HBSplineCutFEM::timeUpdate()
   filecount++;
 
   for(int bb=0;bb<ImmersedBodyObjects.size();bb++)
-  {
     ImmersedBodyObjects[bb]->timeUpdate();
-  }
 
   SolnData.timeUpdate();
 
   if(STAGGERED)
     solveSolidProblem();
+
+  //MPI_Barrier(MPI_COMM_WORLD);
 
   updateIterStep();
 
@@ -78,12 +78,9 @@ void HBSplineCutFEM::updateIterStep()
 
   SolnData.updateIterStep();
 
-  //cout << " kkkkkkkkkkk " << endl;
-
   for(bb=0;bb<ImmersedBodyObjects.size();bb++)
   {
     computeTotalForce(bb);
-    //cout << " bbbbbbbbbbbbbbbb " << endl;
     ImmersedBodyObjects[bb]->updateForce(&(totalForce(0)));
   }
 
@@ -102,7 +99,6 @@ void HBSplineCutFEM::updateIterStep()
 
   //cout << " IB_MOVED = " << IB_MOVED << endl;
   //cout << " kkkkkkkkkkk " << endl;
-  //cout << " PPPPPPPPPPPPPPPPP " << firstIter << '\t' << SOLVER_TYPE << '\t' << GRID_CHANGED << '\t' << IB_MOVED << endl;
   if(GRID_CHANGED || IB_MOVED)
   {
       if(SOLVER_TYPE == SOLVER_TYPE_PETSC)
@@ -148,9 +144,7 @@ void HBSplineCutFEM::updateIterStep()
               return;
 
             solverPetsc->setSolverAndParameters();
-            //cout << " kkkkkkkkkk " << endl;
             //solverPetsc->printInfo();
-            //cout << " aaaaaaaaa " << endl;
 
         break;
 
@@ -380,22 +374,31 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
     node  *nd1, *nd2;
 
-    //cout << " this_mpi_proc " << this_mpi_proc << endl;
-    //cout << " n_mpi_procs " << n_mpi_procs << endl;
-
     int n_subdomains = n_mpi_procs, subdomain=0;
+
+    PetscPrintf(MPI_COMM_WORLD, " preparing cut elements \n");
 
     auto tstart = Clock::now();
 
-    PetscPrintf(MPI_COMM_WORLD, " preparing cut elements \n");
+    //
+    // Find cut cells, without computng their quadrature points.
+    // Because quadrature points information is not required to decompose the mesh
+    // and prepare the matrix pattern.
+    // Quadrature points can be computed can be computed "parallely" after
+    // preparing the matrix pattern.
+    // It has to be done this way because we don't know which elements belong
+    // to which processor.
+    ///////////////////////////////////////////////////////////////////////////
 
     prepareCutElements();
 
     auto tend = Clock::now();
 
-    PetscPrintf(MPI_COMM_WORLD, " preparing cut elements took %12.6f  milliseconds \n", std::chrono::duration_cast<std::chrono::milliseconds>(tend - tstart).count());
+    PetscPrintf(MPI_COMM_WORLD, " preparing cut elements took %d  milliseconds \n", std::chrono::duration_cast<std::chrono::milliseconds>(tend - tstart).count());
 
     setCoveringUncovering();
+
+    tstart = Clock::now();
 
     //cout << " activeElements.size () = "  << activeElements.size() << endl;
     //cout << " fluidElementIds.size () = "  << fluidElementIds.size() << endl;
@@ -423,7 +426,6 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
     proc_to_grid_BF.resize(nNode);
     proc_to_grid_DOF.resize(totalDOF);
-
 
     if(n_mpi_procs == 1)
     {
@@ -477,13 +479,14 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
       nElem_local = elem_end - elem_start + 1;
 
-      cout << " elem_start = " << elem_start << '\t' << elem_end << '\t' << nElem_local << endl;
+      //cout << " elem_start = " << elem_start << '\t' << elem_end << '\t' << nElem_local << endl;
 
-      PetscInt  *eptr, *eind, *epart, *npart;
+      PetscInt  *eptr, *eind, *epart, *npart, *vwgtElem;
 
       ierr  = PetscMalloc1(nElem+1,  &eptr);  CHKERRQ(ierr);
       ierr  = PetscMalloc1(nElem,    &epart); CHKERRQ(ierr);
       ierr  = PetscMalloc1(nNode,    &npart); CHKERRQ(ierr);
+      ierr  = PetscMalloc1(nElem,    &vwgtElem); CHKERRQ(ierr);
 
       //ierr  = PetscMalloc1(nElem_local+1,  &eptr);CHKERRQ(ierr);
 
@@ -495,13 +498,14 @@ int  HBSplineCutFEM::prepareMatrixPattern()
         npElem_total += elems[fluidElementIds[ee]]->GlobalBasisFuncs.size();
 
         eptr[ee+1] = npElem_total;
+
+        //vwgtElem[ee] = elems[fluidElementIds[ee]]->getComputationalEffort();
+        vwgtElem[ee] = elems[fluidElementIds[ee]]->getNumberOfQuadraturePoints();
       }
 
-      cout << " npElem_total = " << npElem_total << endl;
+      //cout << " npElem_total = " << npElem_total << endl;
 
       ierr  = PetscMalloc1(npElem_total,  &eind); CHKERRQ(ierr);
-      //ierr  = PetscMalloc1(nElem_local*npElem,  &eind);CHKERRQ(ierr);
-      //ierr  = PetscMalloc1(nElem+1,  &eptr);CHKERRQ(ierr);
 
       //PetscSynchronizedPrintf(PETSC_COMM_WORLD,"%d \n", elem_start);
 
@@ -535,21 +539,17 @@ int  HBSplineCutFEM::prepareMatrixPattern()
         //cout << endl;
       //}
 
-      idx_t nodes_per_side;
-      
+      int  nodes_per_side=2;
+
       if(DIM == 2)
         nodes_per_side = 2;
       else
         nodes_per_side = 4;
 
 
-      idx_t  nWeights  = 1;
-      idx_t  nParts = n_mpi_procs;
-      idx_t  objval;
-      idx_t  *xadj, *adjncy;
-      idx_t  numflag=0;
-
-      idx_t options[METIS_NOPTIONS];
+      int  nWeights  = 1, numflag=0, nParts = n_mpi_procs, objval;
+      int  *xadj, *adjncy;
+      int  options[METIS_NOPTIONS];
 
       METIS_SetDefaultOptions(options);
 
@@ -559,15 +559,18 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
       //options[METIS_OPTION_NSEPS] = 10;
 
-      options[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_CUT;   // Edge-cut minimization
-      //options[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_VOL; // Total communication volume minimization
+      //options[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_CUT;   // Edge-cut minimization
+      options[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_VOL; // Total communication volume minimization
 
       options[METIS_OPTION_NUMBERING] = 0;  // C-style numbering is assumed that starts from 0.
 
 
-      // METIS partition routine
+      // METIS partition routine - based on the nodal graph of the mesh
       //int ret = METIS_PartMeshNodal(&nElem, &nNode, eptr, eind, NULL, NULL, &nParts, NULL, options, &objval, epart, npart);
+
+      // METIS partition routine - based on the dual graph of the mesh
       int ret = METIS_PartMeshDual(&nElem, &nNode, eptr, eind, NULL, NULL, &nodes_per_side, &n_mpi_procs, NULL, options, &objval, epart, npart);
+      //int ret = METIS_PartMeshDual(&nElem, &nNode, eptr, eind, vwgtElem, NULL, &nodes_per_side, &n_mpi_procs, NULL, options, &objval, epart, npart);
 
       //idx_t  wgtflag=0, numflag=0, ncon=0, ncommonnodes=2, nparts=n_mpi_procs;
       //idx_t  *elmdist;
@@ -597,6 +600,7 @@ int  HBSplineCutFEM::prepareMatrixPattern()
       for(e1=0; e1<nElem; e1++)
         elems[fluidElementIds[e1]]->setSubdomainId(epart[e1]);
 
+      // find nodes local to each processor
 
       std::vector<std::vector<int> >  locally_owned_nodes_total;
       std::vector<int>  locally_owned_nodes;
@@ -612,7 +616,7 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
       nNode_local = locally_owned_nodes.size();
 
-      cout << " nNode_local = " << nNode_local << '\t' << this_mpi_proc << endl;
+      //cout << " nNode_local = " << nNode_local << '\t' << this_mpi_proc << endl;
 
       node_map_new_to_old.resize(nNode, 0);
       node_map_old_to_new.resize(nNode, 0);
@@ -663,6 +667,12 @@ int  HBSplineCutFEM::prepareMatrixPattern()
       ierr  = PetscFree(eind);  CHKERRQ(ierr);
       ierr  = PetscFree(epart); CHKERRQ(ierr);
       ierr  = PetscFree(npart); CHKERRQ(ierr);
+      ierr  = PetscFree(vwgtElem); CHKERRQ(ierr);
+
+      locally_owned_nodes.clear();
+      locally_owned_nodes_total.clear();
+      for(ii=0; ii<locally_owned_nodes_total.size(); ii++)
+        locally_owned_nodes_total[ii].clear();
 
 
       /////////////////////////////////////////////////////////////
@@ -697,15 +707,15 @@ int  HBSplineCutFEM::prepareMatrixPattern()
     // mesh partitioning and node reordering is done
     /////////////////////////////////////////////////////
 
+    MPI_Barrier(MPI_COMM_WORLD);
+
     for(ee=0; ee<activeElements.size(); ee++)
     {
       elems[activeElements[ee]]->initialiseDOFvalues();
     }
 
-    PetscSynchronizedPrintf(MPI_COMM_WORLD, "\n    preparing matrix pattern    \n");
     //printf("\n element DOF values initialised \n\n");
     //printf("\n Finding Global positions \n\n");
-
 
     for(ii=0; ii<gridBF1; ii++)
       grid_to_proc_BF[ii]   =  node_map_old_to_new[grid_to_cutfem_BF[ii]];
@@ -720,18 +730,27 @@ int  HBSplineCutFEM::prepareMatrixPattern()
     for(ii=0; ii<totalDOF; ii++)
       proc_to_grid_DOF[ii]  =  cutfem_to_grid_DOF[dof_map_new_to_old[ii]];
 
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    PetscSynchronizedPrintf(MPI_COMM_WORLD, "\n    preparing matrix pattern    \n");
 
     vector<vector<int> > DDconn;
     DDconn.resize(totalDOF);
 
+    //PetscPrintf(MPI_COMM_WORLD, " aaaaaaaaaaaaa \n");
+    vector<int>  vecIntTemp;
+
     for(ee=0; ee<nElem; ee++)
     {
-        nd1 = elems[fluidElementIds[ee]];
+      nd1 = elems[fluidElementIds[ee]];
 
+      //if( nd1->getSubdomainId() == this_mpi_proc )
+      //{
         //PetscPrintf(MPI_COMM_WORLD, " %d \t %d \t %d \n", ee, fluidElementIds[ee], nd1->getID());
 
         val1 =  nd1->getNsize2();
-        tt1  =  &(nd1->forAssyVec[0]);
+        //tt1  =  &(nd1->forAssyVec[0]);
+        vecIntTemp  =  nd1->forAssyVec;
 
         //if(this_mpi_proc == 0)
           //printVector(nd1->forAssyVec);
@@ -740,24 +759,32 @@ int  HBSplineCutFEM::prepareMatrixPattern()
         {
           for(ii=0; ii<val1; ii++)
           {
-            r = grid_to_proc_DOF[tt1[ii]];
+            //r = grid_to_proc_DOF[tt1[ii]];
+            r = grid_to_proc_DOF[vecIntTemp[ii]];
 
-            for(jj=0; jj<val1; jj++)
-              DDconn[r].push_back(grid_to_proc_DOF[tt1[jj]]);
+            // this saves a lot of memory
+            // and prevents crashing due to SIGNAL 9
+            if( r >= row_start && r <= row_end )
+            {
+              for(jj=0; jj<val1; jj++)
+                DDconn[r].push_back(grid_to_proc_DOF[vecIntTemp[jj]]);
+            }
+            //DDconn[r].push_back(grid_to_proc_DOF[tt1[jj]]);
           }
         }
 
         //PetscPrintf(MPI_COMM_WORLD, " aaaaaaaaaaaaa \n");
 
-      // connectivity for ghost-penalty terms
-      if( nd1->isCutElement() )
-      {
-        for(side=0; side<NUM_NEIGHBOURS; side++)
+        //
+        // connectivity for ghost-penalty terms
+        if( nd1->isCutElement() )
         {
-          nd2 = nd1->getNeighbour(side);
-
-          if( (nd2 != NULL) && !(nd2->isGhost()) && nd2->isLeaf() && (nd2->isCutElement() || nd2->domNums[0] == 0) )
+          for(side=0; side<NUM_NEIGHBOURS; side++)
           {
+            nd2 = nd1->getNeighbour(side);
+
+            if( (nd2 != NULL) && !(nd2->isGhost()) && nd2->isLeaf() && (nd2->isCutElement() || nd2->domNums[0] == 0) )
+            {
               nr1 = nd1->forAssyVec.size();
               nr2 = nd2->forAssyVec.size();
 
@@ -773,12 +800,14 @@ int  HBSplineCutFEM::prepareMatrixPattern()
                   DDconn[c].push_back(r);
                 } // for(jj=0; jj<nr2; jj++)
               } // for(ii=0; ii<nr1; ii++)
-          }
-        } //for(side=0; side<NUM_NEIGHBOURS; side++)
-      } //if( nd1->isCutElement() )
-      //PetscPrintf(MPI_COMM_WORLD, " aaaaaaaaaaaaa \n");
+            }
+          } //for(side=0; side<NUM_NEIGHBOURS; side++)
+        } //if( nd1->isCutElement() )
+        //
+      //} //if( nd1->getSubdomainId() == this_mpi_proc )
     } // for(e=0;e<fluidElementIds.size();e++)
 
+    MPI_Barrier(MPI_COMM_WORLD);
 
     PetscSynchronizedPrintf(MPI_COMM_WORLD, "\n   Finding global positions DONE \n\n");
 
@@ -791,10 +820,11 @@ int  HBSplineCutFEM::prepareMatrixPattern()
     GeomData.node_map_new_to_old = node_map_new_to_old;
     GeomData.node_map_old_to_new = node_map_old_to_new;
 
-
     ////////////////////////////////////////////////////////////////////////////////////////////
     // find the number of nonzeroes in the diagonal and off-diagonal portions of each processor
     ////////////////////////////////////////////////////////////////////////////////////////////
+
+    MPI_Barrier(MPI_COMM_WORLD);
 
     cout << " local sizes " << row_start << '\t' << row_end << '\t' << ndofs_local << endl;
 
@@ -834,7 +864,11 @@ int  HBSplineCutFEM::prepareMatrixPattern()
       kk++;
     }
 
-    //cout << " iiiiiiiiiiiii " << count_diag << '\t' << count_offdiag << endl;
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    cout << " iiiiiiiiiiiii " << count_diag << '\t' << count_offdiag << endl;
+    cout << " totalDOF " << this_mpi_proc << '\t' << totalDOF << endl;
+
 
     //Create parallel matrix, specifying only its global dimensions.
     //When using MatCreate(), the matrix format can be specified at
@@ -853,10 +887,17 @@ int  HBSplineCutFEM::prepareMatrixPattern()
     ierr = MatMPIAIJSetPreallocation(solverPetsc->mtx, 20, d_nnz, 20, o_nnz);CHKERRQ(ierr);
     ierr = MatSeqAIJSetPreallocation(solverPetsc->mtx, 20, d_nnz);CHKERRQ(ierr);
 
-    //cout << " jjjjjjjjjjjjjjjj " << endl;
+    MPI_Barrier(MPI_COMM_WORLD);
 
-    PetscInt  colTemp[nnz_max_row];
-    PetscScalar  arrayD[nnz_max_row];
+    cout << " jjjjjjjjjjjjjjjj " << this_mpi_proc << endl;
+
+    PetscInt  *colTemp;
+    ierr  = PetscMalloc1(nnz_max_row,  &colTemp);CHKERRQ(ierr);
+    PetscScalar  *arrayD;
+    ierr  = PetscMalloc1(nnz_max_row,  &arrayD);CHKERRQ(ierr);
+
+    //PetscInt  colTemp[nnz_max_row];
+    //PetscScalar  arrayD[nnz_max_row];
 
     for(jj=0; jj<nnz_max_row; jj++)
       arrayD[jj] = 0.0;
@@ -871,12 +912,15 @@ int  HBSplineCutFEM::prepareMatrixPattern()
       ierr = MatSetValues(solverPetsc->mtx, 1, &ii, size1, colTemp, arrayD, INSERT_VALUES);
     }
 
-    //cout << " iiiiiiiiiiiii " << endl;
+    MPI_Barrier(MPI_COMM_WORLD);
+    cout << " iiiiiiiiiiiii " << this_mpi_proc << endl;
 
     VecCreate(PETSC_COMM_WORLD, &solverPetsc->soln);
     VecCreate(PETSC_COMM_WORLD, &solverPetsc->solnPrev);
     VecCreate(PETSC_COMM_WORLD, &solverPetsc->rhsVec);
     VecCreate(PETSC_COMM_WORLD, &solverPetsc->reac);
+
+    cout << " bbbbbbbb " << this_mpi_proc << endl;
 
     ierr = VecSetSizes(solverPetsc->soln, ndofs_local, totalDOF); CHKERRQ(ierr);
 
@@ -884,6 +928,8 @@ int  HBSplineCutFEM::prepareMatrixPattern()
     ierr = VecDuplicate(solverPetsc->soln, &solverPetsc->rhsVec);CHKERRQ(ierr);
     ierr = VecDuplicate(solverPetsc->soln, &solverPetsc->solnPrev);CHKERRQ(ierr);
     ierr = VecDuplicate(solverPetsc->soln, &solverPetsc->reac);CHKERRQ(ierr);
+
+    cout << " aaaaaaaa " << this_mpi_proc << endl;
 
     solverPetsc->currentStatus = PATTERN_OK;
 
@@ -895,21 +941,48 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
     ierr  = PetscFree(d_nnz); CHKERRQ(ierr);
     ierr  = PetscFree(o_nnz); CHKERRQ(ierr);
+    ierr  = PetscFree(colTemp); CHKERRQ(ierr);
+    ierr  = PetscFree(arrayD); CHKERRQ(ierr);
 
-    //printf("\n     HBSplineCutFEM::prepareMatrixPattern()  .... FINISHED ...\n\n");
+    tend = Clock::now();
 
-  return 1;
+    PetscPrintf(MPI_COMM_WORLD, " HBSplineCutFEM::prepareMatrixPattern()  .... FINISHED. Took %d  milliseconds \n", std::chrono::duration_cast<std::chrono::milliseconds>(tend - tstart).count());
+
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    // compute quadrature points for cut cells
+    //
+    //////////////////////////////////////////////
+    tstart = Clock::now();
+    
+    for(ee=0; ee<cutCellIds.size(); ee++)
+    {
+      nd1 = elems[cutCellIds[ee]];
+
+      if( nd1->getSubdomainId() == this_mpi_proc )
+      {
+        if( nd1->isCutElement() )
+        {
+          if(cutFEMparams[0] == 1)
+            nd1->computeGaussPointsSubTrias(cutFEMparams[2], false);
+          else
+            nd1->computeGaussPointsAdapIntegration(cutFEMparams[3], cutFEMparams[4], false, true);
+        }
+      }
+    }
+
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    tend = Clock::now();
+
+    PetscPrintf(MPI_COMM_WORLD, " computing cutcell gps took %d  milliseconds \n", std::chrono::duration_cast<std::chrono::milliseconds>(tend - tstart).count());
+
+    return 1;
 }
 
 
 
-
-
-
-
 /*
-
-
     if(!STAGGERED)
     {
       start1 = fluidDOF;

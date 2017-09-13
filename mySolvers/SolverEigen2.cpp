@@ -59,6 +59,7 @@ void SolverEigen::computeConditionNumber()
       }
     }
 
+
     VectorXd sing_vals = globalK.jacobiSvd().singularValues();
 
     //printf("\n Matrix condition number = %12.6E \n", sing_vals(0)/sing_vals(sing_vals.size()-1) );
@@ -68,6 +69,7 @@ void SolverEigen::computeConditionNumber()
     printf("\n Matrix condition number = %12.6E \n", sing_vals.maxCoeff() / sing_vals.minCoeff() );
     printf("\n\n\n\n");
 */
+
     //myMatrix::OneNormEst estimator(mtx.rows(), 4);
     //double norm_a;
     
@@ -85,15 +87,6 @@ void SolverEigen::computeConditionNumber()
   //printf("\n Matrix condition number = %12.6E \n", cond);
 
   //myCondNumMatlab(mtx);
-
-  GeneralizedSelfAdjointEigenSolver<MatrixXd> es(matA, matB);
-  cout << "The eigenvalues of the pencil (A,B) are:" << endl << es.eigenvalues() << endl;
-  //cout << "The matrix of eigenvectors, V, is:" << endl << es.eigenvectors() << endl << endl;
-
-  //printf("\n Matrix condition number = %12.6E \n", sing_vals(0)/sing_vals(sing_vals.size()-1) );
-  //printf("\n Minimum eigenvalue = %12.6f \n", sing_vals.minCoeff() );
-  //printf("\n Minimum eigenvalue = %12.6f \n", sing_vals.maxCoeff() );
-  //printf("\n\n\n\n");
 
   return;
 }
