@@ -557,7 +557,7 @@ void  HBSplineCutFEM::applyInterfaceTerms3D()
 
               ndTemp = elems[findCellNumber(geom)];
 
-              if( ndTemp->getSubdomainId() == this_mpi_proc )
+              if( (ndTemp->getSubdomainId() == this_mpi_proc) && ndTemp->isCutElement() )
               {
                 geometryToParametric(geom, param);
 
@@ -1257,7 +1257,24 @@ void  HBSplineCutFEM::applyGhostPenalty3D()
 
               JacTemp = GeomData.boundaryJacobians[side][nd2->getLevel()];
 
-              //h1 = abs(hElem.dot(normal1));
+              /*
+              h1 = abs(hElem.dot(normal1));
+
+              //if( nd1->IsBoundary() )
+              //{
+                //gammGP[0]  = cutFEMparams[6] * mu*h1;
+                //gammGP[1]  = gammGP[0];
+                //gammGP[2]  = gammGP[0];
+                //gammGP[3]  = cutFEMparams[7] * h1/mu;
+              //}
+              //else
+              //{
+                gammGP[0]  = cutFEMparams[6] * mu*h1;
+                gammGP[1]  = gammGP[0];
+                gammGP[2]  = gammGP[0];
+                gammGP[3]  = cutFEMparams[7] * h1*h1*h1/mu;
+              //}
+              */
 
               for(gp=0; gp<nGauss; gp++)
               {

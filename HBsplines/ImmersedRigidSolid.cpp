@@ -1234,17 +1234,25 @@ void ImmersedRigidSolid::updateForce()
 {
   computeTotalForce();
 
-  SolnData.forceTemp.setZero();
+  /*
+  if(DIM == 2)
+  {
+    totalForce[0]  = -data[0];  // Fx
+    totalForce[1]  = -data[1];  // Fy
+    totalForce[2]  = -data[5];  // Fz
+  }
+  else if(DIM == 3)
+  {
+    totalForce[0]  = -data[0];  // Fx
+    totalForce[1]  = -data[1];  // Fy
+    totalForce[2]  = -data[2];  // Fz
+    totalForce[3]  = -data[3];  // Mx
+    totalForce[4]  = -data[4];  // My
+    totalForce[5]  = -data[5];  // Mz
+  }
+  */
 
-  //cout << totalForce[0] << '\t' << totalForce[1] << endl;
-
-  //SolnData.forceTemp[0] = totalForce[0];  // Fx
-  //SolnData.forceTemp[1] = totalForce[1];  // Fy
-  //SolnData.forceTemp[2] = totalMoment[2]; // Mz
-
-  SolnData.forceTemp[0] = totalForce[1];  // Fy
-  SolnData.forceTemp[1] = 0.0;  // lamba - contact
-  SolnData.forceTemp[2] = 0.0;
+  SolnData.forceTemp = totalForce;
 
   SolnData.interpolateForce();
 
@@ -1264,28 +1272,26 @@ void ImmersedRigidSolid::updateForce(double* data)
 
   if(DIM == 2)
   {
-    totalForce[0]  = -data[0];
-    totalForce[1]  = -data[1];
-    totalForce[2]  = -data[5];
+    totalForce[0]  = -data[0];  // Fx
+    totalForce[1]  = -data[1];  // Fy
+    totalForce[2]  = -data[5];  // Fz
   }
   else if(DIM == 3)
   {
-    totalForce[0]  = -data[0];
-    totalForce[1]  = -data[1];
-    totalForce[2]  = -data[2];
-    totalForce[3]  = -data[3];
-    totalForce[4]  = -data[4];
-    totalForce[5]  = -data[5];
+    totalForce[0]  = -data[0];  // Fx
+    totalForce[1]  = -data[1];  // Fy
+    totalForce[2]  = -data[2];  // Fz
+    totalForce[3]  = -data[3];  // Mx
+    totalForce[4]  = -data[4];  // My
+    totalForce[5]  = -data[5];  // Mz
   }
 
-  //SolnData.forceTemp[0] = totalForce[0];  // Fx
-  //SolnData.forceTemp[1] = totalForce[1];  // Fy
-  //SolnData.forceTemp[2] = totalMoment[2]; // Mz
+  SolnData.forceTemp.setZero();
 
-  SolnData.forceTemp[0] = totalForce[1];  // Fy
+  SolnData.forceTemp = totalForce;
+
+  //SolnData.forceTemp[0] = totalForce[1];  // Fy
   //SolnData.forceTemp[0] = totalForce[2];  // Mz
-  SolnData.forceTemp[1] = 0.0;  // lamba - contact
-  SolnData.forceTemp[2] = 0.0;
 
   SolnData.interpolateForce();
 
@@ -1377,116 +1383,163 @@ int ImmersedRigidSolid::calcStiffnessAndResidual(int solver_type, bool zeroMtx, 
     rNorm = -1.0;
 
   int ii, jj, ind;
-  double  y1, y2, fact, tol=1.e-12, lamn, gn, af, cn, g0, disp, beta=1.0;
-  
-  Kglobal.setZero();
-  rhsVec.setZero();
-  
+  double  tol=1.e-12;
+  double  af = SolnData.td[2];
+
   //cout << " force = " << SolnData.forceCur(0) << '\t' << SolnData.forceCur(1) << endl;
   //cout << " values = " << SolnData.var1Cur(0) << '\t' << SolnData.forceCur(1) << endl;
-
   //cout << SolnData.td[5] << '\t' << SolnData.td[6] << '\t' << SolnData.td[7] << endl;
   
-  //printMatrix(M);  printMatrix(C);  printMatrix(K);
+  //printMatrix(matM);  printMatrix(matC);  printMatrix(matK);
 
-  Kglobal(0,0) = SolnData.td[5]*matM(1,1) + SolnData.td[6]*matC(1,1) + SolnData.td[7]*matK(1,1);
-  rhsVec(0)    = SolnData.forceCur(0) - matM(1,1)*SolnData.var1DotDotCur[0] - matC(1,1)*SolnData.var1DotCur[0] - matK(1,1)*SolnData.var1Cur[0];
+  Klocal.setZero();
+  Flocal.setZero();
 
-  //Kglobal(0,0) = SolnData.td[5]*matM(2,2) + SolnData.td[6]*matC(2,2) + SolnData.td[7]*matK(2,2);
-  //rhsVec(0)    = SolnData.forceCur(0) - matM(2,2)*SolnData.var1DotDotCur[0] - matC(2,2)*SolnData.var1DotCur[0] - matK(2,2)*SolnData.var1Cur[0];
+  // contribution from the mass, damping and stiffness
 
-  rhsVec(0)   += preLoad[1] ;
+  MatrixXd  Ktemp = SolnData.td[5]*matM + SolnData.td[6]*matC + SolnData.td[7]*matK;
 
-  //cout << " contact force = " << veloCur(1) << '\t' << velo(1) << '\t' << veloPrev(1) << endl;
+  for(ii=0; jj<ndofRigidbody; jj++)
+  {
+    Flocal(ii)  = SolnData.forceCur(ii);
 
-  //Kglobal(0,0) /= SolnData.td[10];
+    for(jj=0; jj<ndofRigidbody; jj++)
+    {
+      Klocal(ii,jj) = Ktemp(ii,jj);
+
+      Flocal(ii)  -=  (matM(ii,jj)*SolnData.var1DotDotCur[jj] + matC(ii,jj)*SolnData.var1DotCur[jj] + matK(ii,jj)*SolnData.var1Cur[jj]);
+    }
+  }
+
+  // add preload (input from the user)
+
+  for(ii=0; jj<ndofRigidbody; jj++)
+    Flocal(ii) += preLoad[ii] ;
+
+  // when the velocity is used as the primary variable for the solid
+  //Klocal(0,0) /= SolnData.td[10];
   
-  //cout << Kglobal(0,0) << '\t' << rhsVec(0) << endl;
-
   //////////////////////////////////////////
   // terms related to contact
   //////////////////////////////////////////
+  // rigidBodyMotionLimits - modified while reading the input
+  // dof(1/2/3)  direction (-1/+1)  bool (1/0)  specified value
+  // for 2D
+  // 1   -1   0/1   a.b
+  // 1    1   0/1   a.b
+  // 2   -1   0/1   a.b
+  // 2    1   0/1   a.b
+  // 3   -1   0/1   a.b
+  // 3    1   0/1   a.b
 
-  disp = SolnData.var1Cur[0];
 
-  y1 = 21.1; // top-most point on the lower block
-  g0 = 0.05; // initial gap
-  y2 = y1 + g0 + disp;
-  cn = 1000.0;
+  double  disp, lamn, cn=10.0;
+  double  gn; // gn is penetration variable
+  //double  fact = 1.0/SolnData.td[10]; // when the velocity is used as the primary variable for the solid
+  double  fact = 1.0;// when the displacement is used as the primary variable for the solid
+  double  fact2 = 0.0;
 
-  //gn = y2 - y1 - g0;
-  gn = - disp; // gn is penetration variable
-
-  //cout << " displacement = " << disp << '\t' << lamn << endl;
-
-  //cout << " penetration = " << gn << '\t' << lamn << endl;
-
-  af   = SolnData.td[2];
-  fact = 1.0/SolnData.td[10];
-  fact = 1.0;
-
-if(totalDOF > 1)
-{
-  lamn = SolnData.var1Cur[1] ;
-  //lamn = 0.0;
-  //lamn = SolnData.var1DotCur[1];
-
-  //cout << " penetration = " << gn << '\t' << lamn << endl;
-
-  if( (lamn + cn*gn) > tol)
+  // contact in the negative Y direction
+  if(rigidBodyMotionLimits[2][2] == 1)
   {
-    //cout << " Contact 1 is active " << endl;
+    disp = SolnData.var1Cur[1];
+    gn   = rigidBodyMotionLimits[2][3] - disp;
+    lamn = SolnData.var1Cur[ndofRigidbody] ;
 
-    Kglobal(0,1) -= af*beta;
-    Kglobal(1,0) -= af*beta*fact;
+    //cout << " penetration = " << gn << '\t' << lamn << endl;
 
-    //Kglobal(0,0) += 2.0*cn*af;
+    if( (lamn + cn*gn) > tol)
+    {
+      //cout << " Contact 1 is active " << endl;
 
-    rhsVec(0)   += lamn;
-    //rhsVec(0)   += 2.0*cn*gn;
-    rhsVec(1)   -= gn;  // residual: contact force
-  }
-  else
-  {
-    //cout << " Contact 1 is inactive " << endl;
+      Klocal(ndofRigidbody,ndofRigidbody+1)  -= af;
+      Klocal(ndofRigidbody+1, ndofRigidbody) -= af*fact;
+
+      Flocal(ndofRigidbody)   += lamn;
+      Flocal(ndofRigidbody+1)   -= gn;
+    }
+    else
+    {
+      //cout << " Contact 1 is inactive " << endl;
     
-    Kglobal(1,1) += af;
-    rhsVec(1)    -= lamn;
+      Klocal(ndofRigidbody+1,ndofRigidbody+1) += af;
+      Flocal(ndofRigidbody+1)    -= lamn;
+    }
   }
 
-  disp = SolnData.var1Cur[0];
-
-  //gn = disp-5.0;
-  //gn = disp-1.55;
-  gn = disp-20.4;
-  //gn = disp-80.0*PI/180.0;
-
-  double lamn2 = SolnData.var1Cur[2];
-  //lamn2 = 0.0;
-
-  //cout << " penetration = " << gn << '\t' << lamn2 << endl;
-
-  if( (lamn2 + cn*gn) > tol)
+  // contact in the positive Y direction
+  if(rigidBodyMotionLimits[3][2] == 1)
   {
-    //cout << " Contact 2 is active " << endl;
+    disp = SolnData.var1Cur[1];
+    gn   = disp - rigidBodyMotionLimits[3][3];
+    lamn = SolnData.var1Cur[ndofRigidbody+1] ;
 
-    Kglobal(0,2) += af*beta;
-    Kglobal(2,0) += af*beta*fact;
+    //cout << " penetration = " << gn << '\t' << lamn << endl;
 
-    //Kglobal(0,0) += 2.0*cn*af;
+    if( (lamn + cn*gn) > tol)
+    {
+      //cout << " Contact 2 is active " << endl;
 
-    rhsVec(0)   -= lamn2 ;
-    //rhsVec(0)   -= 2.0*cn*gn;
-    rhsVec(2)   -= gn;  // residual: contact force
+      Klocal(ndofRigidbody,ndofRigidbody+2) += af;
+      Klocal(ndofRigidbody+2,ndofRigidbody) += af*fact;
+
+      Flocal(ndofRigidbody)     -= lamn ;
+      Flocal(ndofRigidbody+2)   -= gn;
+    }
+    else
+    {
+      //cout << " Contact 2 is inactive " << endl;
+
+      Klocal(ndofRigidbody+2, ndofRigidbody+2) += af;
+      Flocal(ndofRigidbody+2)    -= lamn;
+    }
   }
-  else
+
+  int  index=0;
+  for(ii=0; ii<ndofRigidbody; ii++)
   {
-    //cout << " Contact 2 is inactive " << endl;
+    for(jj=0; jj<2; jj++)
+    {
+      index = 2*ii+jj;
 
-    Kglobal(2,2) += af;
-    rhsVec(2)    -= lamn2;
+      if((int) rigidBodyMotionLimits[index][2])
+      {
+        if(jj==0)
+          fact2 = 1.0;
+        else
+          fact2 = -1.0;
+
+        disp = SolnData.var1Cur[ii];
+        gn   = (rigidBodyMotionLimits[2][3] - disp)*fact2;
+        lamn = SolnData.var1Cur[ndofRigidbody+index] ;
+
+        //cout << " penetration = " << gn << '\t' << lamn << endl;
+
+        if( (lamn + cn*gn) > tol)
+        {
+          //cout << " Contact is active " << endl;
+
+          Klocal(ii,ndofRigidbody+index)  -= af*fact2;
+          Klocal(ndofRigidbody+index, ii) -= af*fact*fact2;
+
+          Flocal(ii)   += lamn*fact2;
+          Flocal(ndofRigidbody+index)   -= gn*fact2;
+        }
+        else
+        {
+          //cout << " Contact is inactive " << endl;
+    
+          Klocal(ndofRigidbody+index, ndofRigidbody+index) += af;
+          Flocal(ndofRigidbody+index)    -= lamn;
+        }
+      }
+    }
   }
-}
+
+
+  Kglobal.setZero();
+  rhsVec.setZero();
+
   //printMatrix(Kglobal);
   //printf("\n\n");
   //printVector(rhsVec);

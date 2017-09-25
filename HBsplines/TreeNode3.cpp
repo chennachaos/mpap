@@ -892,7 +892,7 @@ void TreeNode<2>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, doub
 */
 
 
-//
+/*
 template<>
 void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
 {
@@ -971,6 +971,56 @@ void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
 
   //printMatrix(Klocal);
   //printVector(Flocal);
+
+  return;
+}
+*/
+
+
+
+template<>
+void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
+{
+    // Stiffness for computing penalty parameter
+    ///////////////////////////////////////
+
+    int ii, jj, gp1, gp2, TI, TIp1, TIp2, count, TJ, TJp1, TJp2;
+   
+    double  Jac, dvol, force, bb1;
+
+    VectorXd  NN(totnlbf), dNN_dx(totnlbf), dNN_dy(totnlbf);
+    VectorXd  N, dN_dx, dN_dy;
+
+    myPoint  param, geom;
+
+    for(gp2=0;gp2<GeomData->getNGP(1);gp2++)
+    {
+      param[1]  = 0.5*(knots[1][2] * GeomData->gausspoints2[gp2] + knots[1][3]);
+      Jac = GeomData->gaussweights2[gp2] * JacMultElem;
+
+      for(gp1=0;gp1<GeomData->getNGP(0);gp1++)
+      {
+          param[0]   = 0.5*(knots[0][2] * GeomData->gausspoints1[gp1] + knots[0][3]);
+          dvol = GeomData->gaussweights1[gp1] * Jac;
+
+          GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy);
+
+          if(parent == NULL)
+          {
+            N = NN;
+            dN_dx = dNN_dx;
+            dN_dy = dNN_dy;
+          }
+          else
+          {
+            N = SubDivMat*NN;
+            dN_dx = SubDivMat*dNN_dx;
+            dN_dy = SubDivMat*dNN_dy;
+          }
+
+          Klocal += ((dvol)*(dN_dx*dN_dx.transpose()+dN_dy*dN_dy.transpose()));
+    }//gp1
+    }//gp2
 
   return;
 }
@@ -1075,11 +1125,6 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
 
     vector<double>  boundaryGPs1, boundaryGWs1, boundaryGPs2, boundaryGWs2;
 
-    bool   axsy = ((int)elmDat[2] == 1);
-
-    double  rho = elmDat[3];
-    double  mu  = elmDat[4];
-
     double  hx = bbox.maxBB[0]-bbox.minBB[0];
     double  hy = bbox.maxBB[1]-bbox.minBB[1];
 
@@ -1109,8 +1154,6 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
  
             dvol = JacMultLoc * boundaryGWs2[gp2] * boundaryGWs1[gp1] ;
             
-            //printf(" %4d \t %4d \t %12.6f \t %12.6f \n", side, dir, vv, uu);
-
             GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy );
 
             if(parent == NULL)
@@ -1125,13 +1168,6 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
               dN_dx = SubDivMat*dNN_dx;
               dN_dy = SubDivMat*dNN_dy;
             }
-
-            //for(ii=0;ii<totnlbf;ii++)
-            //printf(" \t %14.8f \n", NN[ii]);
-
-            //printf("\n\n tracX and tracY ... %12.6f \t %12.6f  \t %12.6f  \t %12.6f  \t %12.6f  \t %12.6f  \t %12.6f \n\n\n", xx, yy, val, val, Jac, JacMult, dvol);
-            //if(pout) printf(" knotsAtGPs = %12.6f \t xx = %12.6f \t yy = %12.6f \n", knotsAtGPs, xx, yy);
-            //printf(" uu = %12.6f \t vv = %12.6f \t dvol = %12.6f \t volume = %12.6f \n", uu, vv, dvol, volume);
 
             for(ii=0;ii<totnlbf2;ii++)
             {
