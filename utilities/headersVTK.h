@@ -1,13 +1,21 @@
 #ifndef incl_headersVTK_h
 #define incl_headersVTK_h
 
+
+//
+// for desktop and laptop
 #define vtkRenderingCore_AUTOINIT 4(vtkInteractionStyle,vtkRenderingFreeType,vtkRenderingFreeTypeOpenGL,vtkRenderingOpenGL)
 #define vtkRenderingVolume_AUTOINIT 1(vtkRenderingVolumeOpenGL)
 //#define vtkRenderingCore_AUTOINIT 3(vtkInteractionStyle,vtkRenderingFreeType,vtkRenderingOpenGL2)
 
-//#include <vtkAutoInit.h> 
-//VTK_MODULE_INIT(vtkRenderingOpenGL2)
-//VTK_MODULE_INIT(vtkInteractionStyle)
+
+/*
+//for enhpc
+#define vtkRenderingCore_AUTOINIT 2(vtkInteractionStyle,vtkRenderingFreeType)
+
+#include <vtkAutoInit.h> 
+VTK_MODULE_INIT(vtkRenderingOpenGL2)
+*/
 
 
 #include <vtkCell.h>

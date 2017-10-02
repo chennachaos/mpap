@@ -13,9 +13,8 @@
 #include "mpi.h"
 #include "metis.h"
 
-#include <chrono>
-typedef std::chrono::high_resolution_clock Clock;
-
+//#include <chrono>
+//typedef std::chrono::high_resolution_clock Clock;
 
 
 extern ComputerTime       computerTime;
@@ -365,8 +364,6 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
     assert(SOLVER_TYPE == SOLVER_TYPE_PETSC);
 
-    //time_t tstart, tend;
-
     int  tempDOF, domTemp, npElem, ind, size1;
     int  r, c, r1, c1, count=0, count1=0, count2=0, ii, jj, ee, dd, ind1, ind2;
     int  *tt1, *tt2, val1, val2, nnz, nnz_max_row, n1, n2, kk, e1, e2, ll, pp, aa, bb;
@@ -378,7 +375,7 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
     PetscPrintf(MPI_COMM_WORLD, " preparing cut elements \n");
 
-    auto tstart = Clock::now();
+    double  tstart = MPI_Wtime();
 
     //
     // Find cut cells, without computng their quadrature points.
@@ -392,13 +389,15 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
     prepareCutElements();
 
-    auto tend = Clock::now();
+    double  tend = MPI_Wtime();
 
-    PetscPrintf(MPI_COMM_WORLD, " preparing cut elements took %d  milliseconds \n", std::chrono::duration_cast<std::chrono::milliseconds>(tend - tstart).count());
+    //PetscPrintf(MPI_COMM_WORLD, " preparing cut elements took %d  milliseconds \n", std::chrono::duration_cast<std::chrono::milliseconds>(tend - tstart).count());
+    PetscPrintf(MPI_COMM_WORLD, " preparing cut elements took %f  milliseconds \n", (tend-tstart)*1000);
+
 
     setCoveringUncovering();
 
-    tstart = Clock::now();
+    tstart = MPI_Wtime();
 
     //cout << " activeElements.size () = "  << activeElements.size() << endl;
     //cout << " fluidElementIds.size () = "  << fluidElementIds.size() << endl;
@@ -826,12 +825,12 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
     MPI_Barrier(MPI_COMM_WORLD);
 
-    cout << " local sizes " << row_start << '\t' << row_end << '\t' << ndofs_local << endl;
+    //cout << " local sizes " << row_start << '\t' << row_end << '\t' << ndofs_local << endl;
 
     PetscInt  count_diag=0, count_offdiag=0, tempInt;
 
     //PetscInt  d_nnz[ndofs_local], o_nnz[ndofs_local];
-    // this leads to segmentation fault errors. So, allocate using Malloc functions
+    // this leads to segmentation fault errors. So, allocate using Malloc functions. And, don't forget to free this memory.
 
     PetscInt  *d_nnz, *o_nnz;
 
@@ -866,8 +865,8 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
     MPI_Barrier(MPI_COMM_WORLD);
 
-    cout << " iiiiiiiiiiiii " << count_diag << '\t' << count_offdiag << endl;
-    cout << " totalDOF " << this_mpi_proc << '\t' << totalDOF << endl;
+    //cout << " iiiiiiiiiiiii " << count_diag << '\t' << count_offdiag << endl;
+    //cout << " totalDOF " << this_mpi_proc << '\t' << totalDOF << endl;
 
 
     //Create parallel matrix, specifying only its global dimensions.
@@ -889,15 +888,12 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
     MPI_Barrier(MPI_COMM_WORLD);
 
-    cout << " jjjjjjjjjjjjjjjj " << this_mpi_proc << endl;
+    //cout << " jjjjjjjjjjjjjjjj " << this_mpi_proc << endl;
 
     PetscInt  *colTemp;
     ierr  = PetscMalloc1(nnz_max_row,  &colTemp);CHKERRQ(ierr);
     PetscScalar  *arrayD;
     ierr  = PetscMalloc1(nnz_max_row,  &arrayD);CHKERRQ(ierr);
-
-    //PetscInt  colTemp[nnz_max_row];
-    //PetscScalar  arrayD[nnz_max_row];
 
     for(jj=0; jj<nnz_max_row; jj++)
       arrayD[jj] = 0.0;
@@ -913,14 +909,14 @@ int  HBSplineCutFEM::prepareMatrixPattern()
     }
 
     MPI_Barrier(MPI_COMM_WORLD);
-    cout << " iiiiiiiiiiiii " << this_mpi_proc << endl;
+    //cout << " iiiiiiiiiiiii " << this_mpi_proc << endl;
 
     VecCreate(PETSC_COMM_WORLD, &solverPetsc->soln);
     VecCreate(PETSC_COMM_WORLD, &solverPetsc->solnPrev);
     VecCreate(PETSC_COMM_WORLD, &solverPetsc->rhsVec);
     VecCreate(PETSC_COMM_WORLD, &solverPetsc->reac);
 
-    cout << " bbbbbbbb " << this_mpi_proc << endl;
+    //cout << " bbbbbbbb " << this_mpi_proc << endl;
 
     ierr = VecSetSizes(solverPetsc->soln, ndofs_local, totalDOF); CHKERRQ(ierr);
 
@@ -929,7 +925,7 @@ int  HBSplineCutFEM::prepareMatrixPattern()
     ierr = VecDuplicate(solverPetsc->soln, &solverPetsc->solnPrev);CHKERRQ(ierr);
     ierr = VecDuplicate(solverPetsc->soln, &solverPetsc->reac);CHKERRQ(ierr);
 
-    cout << " aaaaaaaa " << this_mpi_proc << endl;
+    //cout << " aaaaaaaa " << this_mpi_proc << endl;
 
     solverPetsc->currentStatus = PATTERN_OK;
 
@@ -944,16 +940,16 @@ int  HBSplineCutFEM::prepareMatrixPattern()
     ierr  = PetscFree(colTemp); CHKERRQ(ierr);
     ierr  = PetscFree(arrayD); CHKERRQ(ierr);
 
-    tend = Clock::now();
+    tend = MPI_Wtime();
 
-    PetscPrintf(MPI_COMM_WORLD, " HBSplineCutFEM::prepareMatrixPattern()  .... FINISHED. Took %d  milliseconds \n", std::chrono::duration_cast<std::chrono::milliseconds>(tend - tstart).count());
+    PetscPrintf(MPI_COMM_WORLD, " HBSplineCutFEM::prepareMatrixPattern()  .... FINISHED. Took %f  milliseconds \n", (tend-tstart)*1000);
 
     MPI_Barrier(MPI_COMM_WORLD);
 
     // compute quadrature points for cut cells
     //
     //////////////////////////////////////////////
-    tstart = Clock::now();
+    tstart = MPI_Wtime();
     
     for(ee=0; ee<cutCellIds.size(); ee++)
     {
@@ -973,9 +969,9 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
     MPI_Barrier(MPI_COMM_WORLD);
 
-    tend = Clock::now();
+    tend = MPI_Wtime();
 
-    PetscPrintf(MPI_COMM_WORLD, " computing cutcell gps took %d  milliseconds \n", std::chrono::duration_cast<std::chrono::milliseconds>(tend - tstart).count());
+    PetscPrintf(MPI_COMM_WORLD, " computing cutcell gps took %f  milliseconds \n", (tend-tstart)*1000);
 
     return 1;
 }

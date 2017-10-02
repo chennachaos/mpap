@@ -219,7 +219,7 @@ void HBSplineCutFEM::plotGeomAdapIntegration2D(int val1, bool flag2, int col, bo
 //
 void HBSplineCutFEM::plotGeomAdapIntegration3D(int val1, bool flag2, int col, bool PLOT_KNOT_LINES, int* resln)
 {
-    auto tstart = Clock::now(); 
+    double tstart = MPI_Wtime();
 
     //vtkSmartPointer<vtkMergePoints>   mergePoints  =  vtkSmartPointer<vtkMergePoints>::New();
 
@@ -431,8 +431,8 @@ void HBSplineCutFEM::plotGeomAdapIntegration3D(int val1, bool flag2, int col, bo
     uGridVTK->GetCellData()->SetScalars(cellDataVTK);
     uGridVTK->GetCellData()->AddArray(cellDataVTK2); 
 
-    auto tend = Clock::now(); 
-    PetscPrintf(MPI_COMM_WORLD, "HBSplineCutFEM::plotGeomAdapIntegration3D() took %d millisecond(s) \n ", std::chrono::duration_cast<std::chrono::milliseconds>(tend - tstart).count());
+    double tend = MPI_Wtime(); 
+    PetscPrintf(MPI_COMM_WORLD, "HBSplineCutFEM::plotGeomAdapIntegration3D() took %f millisecond(s) \n ", (tend-tstart)*1000);
 
     return;
 }
@@ -450,7 +450,7 @@ void  HBSplineCutFEM::postProcessAdapIntegration1D(int vartype, int vardir, int 
     VectorXd  NN(nlocal), dNN_dx(nlocal), d2NN_dx2(nlocal);
     myPoint  knotIncr, knotBegin, knotEnd;
 
-    double   fact=0, incr1=0, *tmp1, xx[2], val[3], xIntf=0.5;
+    double   fact=0, xx[2], val[3], xIntf=0.5;
 
     vector<double>  uu, uu1, uu2;
 
@@ -465,20 +465,18 @@ void  HBSplineCutFEM::postProcessAdapIntegration1D(int vartype, int vardir, int 
     {
         nd1 = elems[activeElements[ee]];
 
-        tmp1 = nd1->getKnots(0);
         knotBegin = nd1->getKnotBegin();
+        knotEnd   = nd1->getKnotEnd();
         knotIncr  = nd1->getKnotIncrement();
-
-        //printf("\t tmp[0] and tmp[1]  ... : %12.8f\t%12.8f\n", tmp[0], tmp[1] );
 
         if( nd1->isCutElement() )
         {
-          fact = (xIntf - tmp1[0])/resln[0];
-          create_vector(tmp1[0], xIntf, fact, uu1);
+          fact = (xIntf - knotBegin[0])/resln[0];
+          create_vector(knotBegin[0], xIntf, fact, uu1);
 
-          fact = (tmp1[1] - xIntf)/resln[0];
-          create_vector(xIntf, tmp1[1], fact, uu2);
-          
+          fact = (knotEnd[0] - xIntf)/resln[0];
+          create_vector(xIntf, knotEnd[0], fact, uu2);
+
           kk = uu1.size();
           ii = uu1.size() + uu2.size();
           uu.resize(ii);
@@ -490,12 +488,10 @@ void  HBSplineCutFEM::postProcessAdapIntegration1D(int vartype, int vardir, int 
         }
         else
         {
-          fact = (tmp1[1] - tmp1[0])/resln[0];
-          create_vector(tmp1[0], tmp1[1], fact, uu);
+          fact = (knotEnd[0] - knotBegin[0])/resln[0];
+          create_vector(knotBegin[0], knotEnd[0], fact, uu);
         }
           //cout << uu << endl;
-
-          incr1 = tmp1[1] - tmp1[0];
 
           //create the coordinates of the pointsVTK (nodes in FEM)
 
@@ -539,12 +535,7 @@ void  HBSplineCutFEM::postProcessAdapIntegration1D(int vartype, int vardir, int 
                 scaVTK2->InsertNextTuple(val);
               }
 
-              //outp.push_back(nd1->computeValue(0, N));
-              //outp2.push_back(nd1->computeForce(0, N));
-              //outp2.push_back(nd1->computeValue(0, dN_dx));
-              //outp3.push_back(nd1->computeValue(0, d2N_dx2));
-              //outp3.push_back(analy.computeValue(0, uu[kk], 0.0));
-           } //for(ii=0;ii<uu.n;ii++)
+          } //for(ii=0;ii<uu.n;ii++)
 
           for(ii=0;ii<uu.size()-1;ii++)
           {
@@ -582,9 +573,9 @@ void  HBSplineCutFEM::postProcessAdapIntegration2D(int vartype, int vardir, int 
 
     VectorXd  NN(nlocal), N(nlocal), dN_dx(nlocal), dN_dy(nlocal), dNN_dx(nlocal), dNN_dy(nlocal), tempVec, tempVec2, d2N_dx2(nlocal), d2N_dy2(nlocal);
     VectorXd  vectmp(nlocal), rhsTemp;
-    myPoint  knotIncr, knotBegin;
+    myPoint  knotIncr, knotBegin, knotEnd;
 
-    double   fact, uleft, uright, *tmp0, *tmp1, incr1, incr2, val1;
+    double   fact, uleft, uright, val1;
     NodeOrientation  neighbour_map1[] = {EAST, NORTH, WEST, WEST};
     NodeOrientation  neighbour_map2[] = {RIGHT, LEFT};
     vector<double>  uu, vv;
@@ -601,28 +592,20 @@ void  HBSplineCutFEM::postProcessAdapIntegration2D(int vartype, int vardir, int 
       for(ee=0; ee<activeElements.size(); ee++)
       {
         ndTemp = elems[activeElements[ee]];
-        //cout << " Node # " << nd->getID() << endl;
-
-        tmp0 = ndTemp->getKnots(Dir1);
-        tmp1 = ndTemp->getKnots(Dir2);
 
         knotBegin = ndTemp->getKnotBegin();
+        knotEnd   = ndTemp->getKnotEnd();
         knotIncr  = ndTemp->getKnotIncrement();
-
-        //printf("\t tmp[0] and tmp[1]  ... : %12.8f\t%12.8f\n", tmp[0], tmp[1] );
-
-        incr1 = tmp0[2] ;
-        incr2 = tmp1[2] ;
 
         if( !ndTemp->isCutElement() )
         {
           if( ndTemp->getDomainNumber() == 0 )
           {
-            fact = incr1/resln[0];
-            create_vector(tmp0[0], tmp0[1], fact, uu);
+            fact = knotIncr[0]/resln[0];
+            create_vector(knotBegin[0], knotEnd[0], fact, uu);
 
-            fact = incr2/resln[1];
-            create_vector(tmp1[0], tmp1[1], fact, vv);
+            fact = knotIncr[1]/resln[1];
+            create_vector(knotBegin[1], knotEnd[1], fact, vv);
 
             //create the coordinates of the pointsVTK (nodes in FEM)
 
@@ -752,27 +735,19 @@ void  HBSplineCutFEM::postProcessAdapIntegration2D(int vartype, int vardir, int 
         //cout << " Node # " << nd->getID() << endl;
 
         knotBegin = ndTemp->getKnotBegin();
+        knotEnd   = ndTemp->getKnotEnd();
         knotIncr  = ndTemp->getKnotIncrement();
-
-        //printf("\t tmp[0] and tmp[1]  ... : %12.8f\t%12.8f\n", tmp[0], tmp[1] );
 
         //if( !nd->isCutElement() )
         if( ndTemp->getDomainNumber() == 0 )
         {
-            tmp0 = ndTemp->getKnots(Dir1);
-            tmp1 = ndTemp->getKnots(Dir2);
+            fact = knotIncr[0]/resln[0];
+            create_vector(knotBegin[0], knotEnd[0], fact, uu);
 
-            incr1 = tmp0[2] ;
-            incr2 = tmp1[2] ;
-
-            fact = incr1/resln[0];
-            create_vector(tmp0[0], tmp0[1], fact, uu);
-
-            fact = incr2/resln[1];
-            create_vector(tmp1[0], tmp1[1], fact, vv);
+            fact = knotIncr[1]/resln[1];
+            create_vector(knotBegin[1], knotEnd[1], fact, vv);
 
             //create the coordinates of the pointsVTK (nodes in FEM)
-            //cout << " ooooooooooooo " << endl;
 
             count = 0;
             for(jj=0;jj<vv.size();jj++)
@@ -866,17 +841,15 @@ void  HBSplineCutFEM::postProcessAdapIntegration2D(int vartype, int vardir, int 
 
                 uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
 
-                tmp0 = adapNd2->getKnots(Dir1);
-                tmp1 = adapNd2->getKnots(Dir2);
+                knotBegin = ndTemp->getKnotBegin();
+                knotEnd   = ndTemp->getKnotEnd();
+                knotIncr  = ndTemp->getKnotIncrement();
 
-                incr1 = tmp0[2] ;
-                incr2 = tmp1[2] ;
+                fact = knotIncr[0]/resln[0];
+                create_vector(knotBegin[0], knotEnd[0], fact, uu);
 
-                fact = incr1/resln[0];
-                create_vector(tmp0[0], tmp0[1], fact, uu);
-
-                fact = incr2/resln[1];
-                create_vector(tmp1[0], tmp1[1], fact, vv);
+                fact = knotIncr[1]/resln[1];
+                create_vector(knotBegin[1], knotEnd[1], fact, vv);
 
                 for(jj=0;jj<vv.size();jj++)
                 {
@@ -974,17 +947,15 @@ void  HBSplineCutFEM::postProcessAdapIntegration2D(int vartype, int vardir, int 
 
                 uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
 
-                tmp0 = adapNd2->getKnots(Dir1);
-                tmp1 = adapNd2->getKnots(Dir2);
+                knotBegin = ndTemp->getKnotBegin();
+                knotEnd   = ndTemp->getKnotEnd();
+                knotIncr  = ndTemp->getKnotIncrement();
 
-                incr1 = tmp0[2] ;
-                incr2 = tmp1[2] ;
+                fact = knotIncr[0]/resln[0];
+                create_vector(knotBegin[0], knotEnd[0], fact, uu);
 
-                fact = incr1/resln[0];
-                create_vector(tmp0[0], tmp0[1], fact, uu);
-
-                fact = incr2/resln[1];
-                create_vector(tmp1[0], tmp1[1], fact, vv);
+                fact = knotIncr[1]/resln[1];
+                create_vector(knotBegin[1], knotEnd[1], fact, vv);
 
                 for(jj=0;jj<vv.size();jj++)
                 {
@@ -1119,7 +1090,7 @@ void  HBSplineCutFEM::postProcessAdapIntegration3D(int vartype, int vardir, int 
     NodeOrientation  neighbour_map1[] = {EAST, NORTH, FRONT, WEST, WEST, WEST, EAST, SOUTH};
     NodeOrientation  neighbour_map2[] = {RIGHT, LEFT};
 
-    auto tstart = Clock::now();
+    double tstart = MPI_Wtime();
 
     node* ndTemp;
 
@@ -1242,8 +1213,7 @@ void  HBSplineCutFEM::postProcessAdapIntegration3D(int vartype, int vardir, int 
           {
             if( adapNd2->isLeaf()  )
             {
-              //if( adapNd2->getDomainNumber() <= 0 && (adapNd2->getLevel() < 3) )
-              if( adapNd2->getDomainNumber() <= 0 )
+              if( adapNd2->getDomainNumber() <= 0 && (adapNd2->getLevel() < 3) )
               {
                 knotBeginTemp = adapNd2->getKnotBegin();
                 knotEndTemp   = adapNd2->getKnotEnd();
@@ -1361,8 +1331,8 @@ void  HBSplineCutFEM::postProcessAdapIntegration3D(int vartype, int vardir, int 
       //cout << " jjjjjjjjjjjjjjjjjj " << endl;
   }
 
-  auto tend = Clock::now(); 
-  PetscPrintf(MPI_COMM_WORLD, "HBSplineCutFEM::postProcessAdapIntegration3D() took %d millisecond(s) \n ", std::chrono::duration_cast<std::chrono::milliseconds>(tend - tstart).count());
+  double tend = MPI_Wtime(); 
+  PetscPrintf(MPI_COMM_WORLD, "HBSplineCutFEM::postProcessAdapIntegration3D() took %f millisecond(s) \n ", (tend-tstart)*1000);
 
   return;
 }

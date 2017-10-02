@@ -248,6 +248,10 @@ void  SolutionData::timeUpdate()
       //var1DotDotPrev.setZero();
     //}
 
+    double  beta = stagParams[2];
+    //double  z = (1.0+beta+beta*rho-2.0*sqrt(beta+beta*rho))/(1.0-beta);
+    double  z=0.5;
+    //cout << "z = " << z << endl;
 
     switch(predType)
     {
@@ -257,13 +261,15 @@ void  SolutionData::timeUpdate()
         
       case 2:
         //q1 =  2.0;  q2 = -1.0;  q3 =  0.0;  q4 =  0.0;
-        q1 =  1.5;  q2 = -0.5;  q3 =  0.0;  q4 =  0.0;
+        //q1 =  1.5;  q2 = -0.5;  q3 =  0.0;  q4 =  0.0;
         //q1 =  4.0/3.0;  q2 = -1.0/3.0;  q3 =  0.0;  q4 =  0.0;
         //q1 = 1.0+knp1; q2 = -knp1;  q3 =  0.0;  q4 =  0.0;
+        q1 = 1.0+z; q2 = -z;  q3 =  0.0;  q4 =  0.0;
         break;
       
       case 3:
-        q1 =  3.0;  q2 = -3.0;  q3 =  1.0;  q4 =  0.0;
+        //q1 =  3.0;  q2 = -3.0;  q3 =  1.0;  q4 =  0.0;
+        q1 =  2.0+z;  q2 = -1.0-2.0*z;  q3 =  z;  q4 =  0.0;
         //q1 =  2.5;  q2 = -2.0;  q3 =  0.5;  q4 =  0.0;
         break;
       

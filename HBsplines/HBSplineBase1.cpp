@@ -51,10 +51,20 @@ int node2D::MAX_LEVEL = 0;
 template<>
 int node3D::MAX_LEVEL = 0;
 
+
+template<>
+int node1D::ndof = 1;
+
+template<>
+int node2D::ndof = 3;
+
+template<>
+int node3D::ndof = 4;
+
+
 int ImmersedSolid::count = 0;
 
-
-int ImmersedIntegrationElement::pointcount = 0;
+int ImmersedIntegrationElement::itemcount = 0;
 
 
 
@@ -266,17 +276,6 @@ void HBSplineBase::prepareInputData()
     gridBF1 = 0;
     algorithm3(0);
 
-    /*
-    for(ee=0;ee<elems.size();ee++)
-    {
-      if( !(elems[ee]->isGhost()) )
-      {
-        //cout << " uuuuuuuuuuuuu " << endl;
-        elems[ee]->calcSubdivisionMatrix();
-        //cout << " uuuuuuuuuuuuu " << endl;
-      }
-    }
-    */
 
     //printf("\n \t  Creating immersed boundary points \n ");
 
@@ -435,7 +434,7 @@ void HBSplineBase::prepareInputData()
     
     time_t tstart, tend;
 
-    //printf("\n HBSplineBase : Preparing element data ...... STARTED \n \n ");
+    PetscSynchronizedPrintf(MPI_COMM_WORLD, "\n   HBSplineBase : Preparing element data ...... STARTED \n\n");
 
     tstart = time(0);
     for(ee=0;ee<elems.size();ee++)
@@ -670,9 +669,10 @@ void HBSplineBase::refinementforAdvDiff2D()
 
 void HBSplineBase::limitBasedRefinement(int kk)
 {
-    node *nd, *nd1, *nd2;
+    node *nd;
     int  ii, ee, mm;
-    double *tmp1, *tmp2, *tmp3, val[6];
+    double  val[6];
+    myPoint  knotBegin, knotIncr;
 
     assert(refinementData[1] <= refineLimitVals.size());
 
@@ -684,12 +684,10 @@ void HBSplineBase::limitBasedRefinement(int kk)
         {
           nd = elems[NodeNumsAtLevel[kk][ee]];
 
-          tmp1 = nd->getKnots(Dir1);
+          param = nd->getKnotBegin();
 
-          param[0] = tmp1[0];
           computeGeometry(param, geom);
 
-          //cout << " ee " << ee << endl;
           for(mm=0;mm<refineLimitVals.size();mm++)
           {
             if(refineLimitVals[mm][0] == (kk+1))
@@ -706,10 +704,8 @@ void HBSplineBase::limitBasedRefinement(int kk)
         {
           nd = elems[NodeNumsAtLevel[kk][ee]];
 
-          tmp1 = nd->getKnots(Dir1);
-          tmp2 = nd->getKnots(Dir2);
+          param = nd->getKnotBegin();
 
-          param[0] = tmp1[0];  param[1] = tmp2[0];
           computeGeometry(param, geom);
 
           for(mm=0;mm<refineLimitVals.size();mm++)
@@ -733,11 +729,10 @@ void HBSplineBase::limitBasedRefinement(int kk)
 
           if(!nd->isGhost())
           {
-            tmp1 = nd->getKnots(Dir1);
-            tmp2 = nd->getKnots(Dir2);
-            tmp3 = nd->getKnots(Dir3);
+            param = nd->getKnotSum();
+            param *= 0.5;
 
-            param[0] = 0.5*(tmp1[0]+tmp1[1]);  param[1] = 0.5*(tmp2[0]+tmp2[1]);  param[2] = 0.5*(tmp3[0]+tmp3[1]);
+            //printf("%12.6f \t %12.6f \t %12.6f \n", param[0], param[1], param[2]);
             computeGeometry(param, geom);
             //val[0] = computeGeometry(0, tmp1[0]);
             //val[1] = computeGeometry(0, tmp1[1]);
@@ -746,13 +741,16 @@ void HBSplineBase::limitBasedRefinement(int kk)
             //val[4] = computeGeometry(2, tmp3[0]);
             //val[5] = computeGeometry(2, tmp3[1]);
 
+            //printf("%12.6f \t %12.6f \t %12.6f \t %12.6f \t %12.6f \t %12.6f \n", param[0], param[1], param[2], geom[0], geom[1], geom[2]);
             //printf("%12.6f \t %12.6f \t %12.6f \t %12.6f \t %12.6f \t %12.6f \n", val[0], val[1], val[2], val[3], val[4], val[5]);
             for(mm=0;mm<refineLimitVals.size();mm++)
             {
               //printVector(refineLimitVals[mm]);
               if(refineLimitVals[mm][0] == (kk+1))
               {
-                if( (geom[0] >= refineLimitVals[mm][1] && geom[0] <= refineLimitVals[mm][2]) && (geom[1] >= refineLimitVals[mm][3] && geom[1] < refineLimitVals[mm][4])  && (geom[2] >= refineLimitVals[mm][5] && geom[2] < refineLimitVals[mm][6]) )
+                if( (geom[0] >= refineLimitVals[mm][1] && geom[0] <= refineLimitVals[mm][2]) &&
+                    (geom[1] >= refineLimitVals[mm][3] && geom[1] <  refineLimitVals[mm][4]) &&
+                    (geom[2] >= refineLimitVals[mm][5] && geom[2] <  refineLimitVals[mm][6]) )
                 {
                   //printf("%12.6f \t %12.6f \t %12.6f \t %12.6f \t %12.6f \t %12.6f \n", tmp1[0], tmp1[1], tmp2[0], tmp2[1], tmp3[0], tmp3[1]);
                   //printf("%12.6f \t %12.6f \t %12.6f \t %12.6f \t %12.6f \t %12.6f \n", val[0], val[1], val[2], val[3], val[4], val[5]);
@@ -1033,6 +1031,7 @@ void  HBSplineBase::refine(int kk)
     double  *tmp1, *tmp2, val[2];
     bool  f1, f2, f3, f4, ff;
     node *nd, *nd1, *nd2, *nd3, *nd4;
+    myPoint  knotBegin;
 
     //for(kk=LevelSetFunc[0][2];kk<(2*LevelSetFunc[0][2]+2);kk++)
     //for(kk=CURRENT_LEVEL;kk<=LevelSetFunc[0][2];kk++)
@@ -1046,9 +1045,9 @@ void  HBSplineBase::refine(int kk)
 
           if(!nd->isGhost())
           {
-
-          tmp1 = nd->getKnots(Dir1);
-          tmp2 = nd->getKnots(Dir2);
+          //tmp1 = nd->getKnots(Dir1);
+          //tmp2 = nd->getKnots(Dir2);
+          knotBegin = nd->getKnotBegin();
           
           //cout << tmp1[0] << '\t' << tmp1[1] << '\t' << tmp2[0] << '\t' << tmp2[1] << endl;
 

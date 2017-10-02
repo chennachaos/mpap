@@ -6,7 +6,6 @@
 #include "util.h"
 #include "GeomDataHBSplines.h"
 #include "GaussQuadrature.h"
-
 #include "AABB.h"
 #include "AdaptiveOctree.h"
 
@@ -25,9 +24,9 @@ class AdaptiveBinarytree
         int  level, id, NUM_CHILDREN, NUM_NEIGHBOURS;
         NodeOrientation  orientation;
 
-        double  knots[3][4], volume, JacMultElem, coord3, param3;
+        double   volume, JacMultElem, coord3, param3;
 
-        myPoint  knotBegin, knotEnd, knotIncr;
+        myPoint  knotBegin, knotEnd, knotIncr, knotSum;
 
         AdaptiveBinarytree_PTR  *child, parent, *neighbours;
 
@@ -115,41 +114,42 @@ class AdaptiveBinarytree
         static int  getCount()
         { return nodecount; }
 
-        void setKnots(double* knots_)
-        {  knots = knots_; }
-        
-        void setKnots(int index, double val0, double val1)
+        void setKnots(int index, double u0, double u1)
         {
-           knots[index][0] = val0;
-           knots[index][1] = val1;
+          knotBegin[index] = u0;          knotEnd[index]   = u1;
+
+          knotIncr[index] = u1-u0;
+          knotSum[index]  = u1+u0;
         }
 
         void setKnots(double u0, double u1, double v0, double v1)
         {
-           knots[0][0] = u0;
-           knots[0][1] = u1;
-           knots[1][0] = v0;
-           knots[1][1] = v1;
+          knotBegin[0] = u0;          knotEnd[0]   = u1;
+          knotIncr[0] = u1-u0;
+          knotSum[0]  = u1+u0;
+
+          knotBegin[1] = v0;          knotEnd[1]   = v1;
+          knotIncr[1] = v1-v0;
+          knotSum[1]  = v1+v0;
         }
 
         void setKnots(double u0, double u1, double v0, double v1, double w0, double w1)
         {
-           knots[0][0] = u0;
-           knots[0][1] = u1;
-           knots[1][0] = v0;
-           knots[1][1] = v1;
-           knots[2][0] = w0;
-           knots[2][1] = w1;
+          knotBegin[0] = u0;          knotEnd[0]   = u1;
+          knotIncr[0] = u1-u0;
+          knotSum[0]  = u1+u0;
+
+          knotBegin[1] = v0;          knotEnd[1]   = v1;
+          knotIncr[1] = v1-v0;
+          knotSum[1]  = v1+v0;
+
+          knotBegin[2] = w0;          knotEnd[2]   = w1;
+          knotIncr[2] = w1-w0;
+          knotSum[2]  = w1+w0;
         }
 
-        double* getKnots(int ind)
-        {  return knots[ind]; }
-
         double  getKnotspan(int dir)
-        {  return  knots[dir][2];  }
-
-        double  getKnotAt(int dir, int loc)
-        {  return  knots[dir][loc];  }
+        {  return  knotIncr[dir];  }
 
         myPoint& getKnotBegin()
         {  return knotBegin; }
@@ -159,6 +159,9 @@ class AdaptiveBinarytree
 
         myPoint& getKnotIncrement()
         {  return knotIncr; }
+
+        myPoint& getKnotSum()
+        {  return knotSum; }
 
         AABB& getAABB()
         {  return  bbox; }
@@ -295,17 +298,10 @@ void AdaptiveBinarytree<DIM>::prepareData()
 
     for(int ii=0;ii<DIM;ii++)
     {
-      knots[ii][2] = knots[ii][1] - knots[ii][0];
-      knots[ii][3] = knots[ii][1] + knots[ii][0];
+      bbox.minBB[ii] = GeomData->computeCoord(ii, knotBegin[ii]);
+      bbox.maxBB[ii] = GeomData->computeCoord(ii, knotEnd[ii]);
 
-      knotBegin[ii] = knots[ii][0];
-      knotEnd[ii]   = knots[ii][1];
-      knotIncr[ii]  = knots[ii][2];
-
-      bbox.minBB[ii] = GeomData->computeCoord(ii, knots[ii][0]);
-      bbox.maxBB[ii] = GeomData->computeCoord(ii, knots[ii][1]);
-
-      JacMultElem *= (0.5*knots[ii][2]);
+      JacMultElem *= (0.5*knotIncr[ii]);
     }
 
 
@@ -317,12 +313,12 @@ void AdaptiveBinarytree<DIM>::prepareData()
          case 1:
 
                 bbox.minBB[0] = coord3 ;
-                bbox.minBB[1] = GeomData->computeCoord(1, knots[0][0]) ;
-                bbox.minBB[2] = GeomData->computeCoord(2, knots[1][0]) ;
+                bbox.minBB[1] = GeomData->computeCoord(1, knotBegin[0]) ;
+                bbox.minBB[2] = GeomData->computeCoord(2, knotBegin[1]) ;
 
                 bbox.maxBB[0] = coord3 ;
-                bbox.maxBB[1] = GeomData->computeCoord(1, knots[0][1]) ;
-                bbox.maxBB[2] = GeomData->computeCoord(2, knots[1][1]) ;
+                bbox.maxBB[1] = GeomData->computeCoord(1, knotEnd[0]) ;
+                bbox.maxBB[2] = GeomData->computeCoord(2, knotEnd[1]) ;
                 
                 JacMultElem /= GeomData->getJacobian(0);
 
@@ -331,13 +327,13 @@ void AdaptiveBinarytree<DIM>::prepareData()
         case 2:
         case 3:
 
-                bbox.minBB[0] = GeomData->computeCoord(0, knots[0][0]) ;
+                bbox.minBB[0] = GeomData->computeCoord(0, knotBegin[0]) ;
                 bbox.minBB[1] = coord3 ;
-                bbox.minBB[2] = GeomData->computeCoord(2, knots[1][0]) ;
+                bbox.minBB[2] = GeomData->computeCoord(2, knotBegin[1]) ;
 
-                bbox.maxBB[0] = GeomData->computeCoord(0, knots[0][1]) ;
+                bbox.maxBB[0] = GeomData->computeCoord(0, knotEnd[0]) ;
                 bbox.maxBB[1] = coord3 ;
-                bbox.maxBB[2] = GeomData->computeCoord(2, knots[1][1]) ;
+                bbox.maxBB[2] = GeomData->computeCoord(2, knotEnd[1]) ;
                 
                 JacMultElem /= GeomData->getJacobian(1);
 
@@ -346,12 +342,12 @@ void AdaptiveBinarytree<DIM>::prepareData()
         case 4:
         case 5:
 
-                bbox.minBB[0] = GeomData->computeCoord(0, knots[0][0]) ;
-                bbox.minBB[1] = GeomData->computeCoord(1, knots[1][0]) ;
+                bbox.minBB[0] = GeomData->computeCoord(0, knotBegin[0]) ;
+                bbox.minBB[1] = GeomData->computeCoord(1, knotBegin[1]) ;
                 bbox.minBB[2] = coord3 ;
 
-                bbox.maxBB[0] = GeomData->computeCoord(0, knots[0][1]) ;
-                bbox.maxBB[1] = GeomData->computeCoord(1, knots[1][1]) ;
+                bbox.maxBB[0] = GeomData->computeCoord(0, knotEnd[0]) ;
+                bbox.maxBB[1] = GeomData->computeCoord(1, knotEnd[1]) ;
                 bbox.maxBB[2] = coord3 ;
                 
                 JacMultElem /= GeomData->getJacobian(2);

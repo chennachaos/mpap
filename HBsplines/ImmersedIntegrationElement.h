@@ -5,7 +5,6 @@
 #include "util.h"
 #include "TreeNode.h"
 
-
 using namespace std;
 using namespace Eigen;
 
@@ -19,7 +18,7 @@ class ImmersedIntegrationElement
 {
     private:
     
-        static  int  pointcount;
+        static  int  itemcount;
 
         int DIM, id, nGP;
         
@@ -30,7 +29,7 @@ class ImmersedIntegrationElement
         vector<int>  pointNums, posIndices, elemNums;
         vector<double>  gausspoints, gaussweights;
 
-        myPoint  U, dU, ddU, iU, Un, dUn, ddUn, iUn, force, param;
+        myPoint param;
 
         VectorXd  Flocal, Flocal2;
 
@@ -50,7 +49,7 @@ class ImmersedIntegrationElement
         {  return id; }
 
         static int  getCount()
-        { return pointcount; }
+        { return itemcount; }
 
         void setDimension(int dd)
         {  DIM = dd; return;  }
@@ -95,11 +94,7 @@ class ImmersedIntegrationElement
 
         void  prepareElemData();
 
-        void  computeBodyForce(bool, double*);
-
         void  getDataFromGlobalSolutionVector(bool flag);
-
-        void  mapDataToGlobalBodyForceVector(bool flag, double* useThisData);
 
         void  reset();
 

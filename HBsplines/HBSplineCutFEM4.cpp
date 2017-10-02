@@ -24,7 +24,7 @@ void HBSplineCutFEM::setInitialConditions()
        {
            //cout << " elems[ee]->getID() " <<  elems[ee]->getID() << '\t' <<  elems[ee]->getLevel() << endl;
 
-           elems[ee]->resetMatrixAndVector();
+           //elems[ee]->resetMatrixAndVector();
            elems[ee]->setInitialProfile();
            //elems[ee]->assembleMatrixAndVector(1, solver->mtx, &(rhsVec(0)));
        }
@@ -86,7 +86,7 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
     // stiffness and residual for the background fluid grid
     ////////////////////////////////////////////////////////
 
-    auto tstart = Clock::now();
+    double tstart = MPI_Wtime();
 
     solverPetsc->zeroMtx();
 
@@ -230,8 +230,16 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
 
     PetscPrintf(MPI_COMM_WORLD, "  %5d \t %11.4e\n", iterCount, rNorm);
 
-    auto tend = Clock::now();
-    PetscPrintf(MPI_COMM_WORLD, "HBSplineCutFEM::calcStiffnessAndResidual() took %d millisecond(s) \n\n ", std::chrono::duration_cast<std::chrono::milliseconds>(tend - tstart).count());
+    if(IB_MOVED)
+    {
+      for(ee=0; ee<cutCellIds.size(); ee++)
+      {
+        elems[cutCellIds[ee]]->Quadrature.reset();
+      }
+    }
+
+    double tend = MPI_Wtime();
+    PetscPrintf(MPI_COMM_WORLD, " HBSplineCutFEM::calcStiffnessAndResidual() took %f  milliseconds \n", (tend-tstart)*1000);
 
     iterCount++;
 
@@ -253,7 +261,7 @@ int HBSplineCutFEM::factoriseSolveAndUpdate()
 
   //cout << " rhsVec " << endl;        printVector(&(solver->rhsVec(0)), totalDOF);
 
-  auto tstart = Clock::now();
+  double tstart = MPI_Wtime();
 
   //VecView(solverPetsc->rhsVec, PETSC_VIEWER_STDOUT_WORLD);
 
@@ -272,6 +280,7 @@ int HBSplineCutFEM::factoriseSolveAndUpdate()
   VecScatterCreateToAll(solverPetsc->soln, &ctx, &vec_SEQ);
   VecScatterBegin(ctx, solverPetsc->soln, vec_SEQ, INSERT_VALUES, SCATTER_FORWARD);
   VecScatterEnd(ctx, solverPetsc->soln, vec_SEQ, INSERT_VALUES, SCATTER_FORWARD);
+  VecScatterDestroy(&ctx);
 
   VecGetArray(vec_SEQ, &arrayTemp);
 
@@ -307,13 +316,13 @@ int HBSplineCutFEM::factoriseSolveAndUpdate()
     }
 
   VecRestoreArray(vec_SEQ, &arrayTemp);
-  VecScatterDestroy(&ctx);
 
   //printVector(SolnData.var1);
   //printf("\n\n\n");
 
-  auto tend = Clock::now();
-  PetscPrintf(MPI_COMM_WORLD, "HBSplineCutFEM::factoriseSolveAndUpdate() took %d millisecond(s) \n ", std::chrono::duration_cast<std::chrono::milliseconds>(tend - tstart).count());
+  double tend = MPI_Wtime();
+  PetscPrintf(MPI_COMM_WORLD, " HBSplineCutFEM::factoriseSolveAndUpdate() took %f  milliseconds \n", (tend-tstart)*1000);
+
 
   return 0;
 }
@@ -346,10 +355,9 @@ void HBSplineCutFEM::computeElementErrors(int index)
             domTemp = nd->getDomainNumber() ;
             //if(domTemp == 1)
             //{
-              nd->calcError(index, domTemp);
-            
+              
               //cout << ee << '\t' << elems[ee]->getError() << endl;
-              totalError +=  nd->getError();
+              totalError +=  nd->calcError(index, domTemp);
             //}
           //}
        }
@@ -361,9 +369,7 @@ void HBSplineCutFEM::computeElementErrors(int index)
        {
           nd = elems[activeElements[ii]];
 
-          nd->calcError(index);
-            
-          totalError += nd->getError();
+          totalError += nd->calcError(index);
 
           count++;
        }

@@ -1140,7 +1140,7 @@ void HBSplineBase::performAdaptiveRefinement(double eTol)
        
        if( !(nd->isGhost()) &&  nd->isLeaf() ) //&& (elems[ii]->getLevel() == MAX_LEVEL) )
        {
-          if( nd->getError() > totalError )
+          //if( nd->getError() > totalError )
           {
             //cout << " nd->isProcessed() " << '\t' << nd->getID() << '\t' << nd->isProcessed() << endl;
 
@@ -1167,7 +1167,7 @@ void HBSplineBase::performAdaptiveRefinement(double eTol)
        
        if( !(nd->isGhost()) &&  nd->isLeaf() && (nd->getLevel() == CURRENT_LEVEL) )
        {
-          if( nd->getError() > totalError )
+          //if( nd->getError() > totalError )
           {
             //cout << " nd->isProcessed() " << '\t' << nd->getID() << '\t' << nd->isProcessed() << endl;
 

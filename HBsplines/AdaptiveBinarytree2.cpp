@@ -21,8 +21,8 @@ void AdaptiveBinarytree<2>::computeGaussPoints(int flag, GaussQuadrature&  quadT
     //if(domNums.size() > 1)
     //{
       //cout << " gps " << GeomData->gausspoints.size() << endl;
-      //cout << knots[0][0] << '\t' << knots[0][1] << '\t' << knots[0][2] << '\t' << knots[0][3] << endl;
-      //cout << knots[1][0] << '\t' << knots[1][1] << '\t' << knots[1][2] << '\t' << knots[1][3] << endl;
+      //cout << knotBegin[0] << '\t' << knotEnd[0] << '\t' << knotIncr[0] << '\t' << knotSum[0] << endl;
+      //cout << knotBegin[1] << '\t' << knotEnd[1] << '\t' << knotIncr[1] << '\t' << knotSum[1] << endl;
 
       if( (level < 5) || (level == MAX_LEVEL) )
       {
@@ -31,7 +31,7 @@ void AdaptiveBinarytree<2>::computeGaussPoints(int flag, GaussQuadrature&  quadT
           // parametric domain to integration master-quadrilateral domain
 
           for(ii=0; ii<2; ii++)
-            param[ii] = 0.5*(knots[ii][2] * GeomData->gausspoints[gp][ii] + knots[ii][3]);
+            param[ii] = 0.5*(knotIncr[ii] * GeomData->gausspoints[gp][ii] + knotSum[ii]);
 
           //cout << gp << '\t' << GeomData->gausspoints[gp][0] << '\t' << GeomData->gausspoints[gp][1] << endl;
           //cout << gp << '\t' << param(0) << '\t' << param(1) << endl;
@@ -58,7 +58,7 @@ void AdaptiveBinarytree<2>::computeGaussPoints(int flag, GaussQuadrature&  quadT
         // add only one Gauss point for the cells which are below level 5
 
           for(ii=0; ii<2; ii++)
-            param[ii] = 0.5*(knots[ii][2] * 0.0 + knots[ii][3]);
+            param[ii] = 0.5*(knotIncr[ii] * 0.0 + knotSum[ii]);
 
           GeomData->computeCoord(param, geom);
 
@@ -115,7 +115,7 @@ void AdaptiveBinarytree<2>::computeGaussPoints(int refLev2, int inclDom, int chk
           // parametric domain to integration master-quadrilateral domain
 
           for(ii=0; ii<2; ii++)
-            param[ii] = 0.5*(knots[ii][2] * GeomData->gausspoints[gp][ii] + knots[ii][3]);
+            param[ii] = 0.5*(knotIncr[ii] * GeomData->gausspoints[gp][ii] + knotSum[ii]);
 
           GeomData->computeCoord(param, geom);
 
@@ -140,7 +140,7 @@ void AdaptiveBinarytree<2>::computeGaussPoints(int refLev2, int inclDom, int chk
             // parametric domain to integration master-quadrilateral domain
 
             for(ii=0; ii<2; ii++)
-              param[ii] = 0.5*(knots[ii][2] * GeomData->gausspoints[gp][ii] + knots[ii][3]);
+              param[ii] = 0.5*(knotIncr[ii] * GeomData->gausspoints[gp][ii] + knotSum[ii]);
 
             //cout << gp << '\t' << GeomData->gausspoints[gp][0] << '\t' << GeomData->gausspoints[gp][1] << endl;
             //cout << gp << '\t' << param(0) << '\t' << param(1) << endl;
@@ -236,7 +236,7 @@ void AdaptiveBinarytree<2>::computeGaussPoints2Dfor3D(int refLev2, int inclDom, 
           // parametric domain to integration master-quadrilateral domain
 
           for(ii=0; ii<2; ii++)
-            param[ii] = 0.5*(knots[ii][2] * GeomData->gausspoints2D[gp][ii] + knots[ii][3]);
+            param[ii] = 0.5*(knotIncr[ii] * GeomData->gausspoints2D[gp][ii] + knotSum[ii]);
           
           map2DPointTo3DPoint(sideTemp, param, param3);
 
@@ -264,7 +264,7 @@ void AdaptiveBinarytree<2>::computeGaussPoints2Dfor3D(int refLev2, int inclDom, 
             // parametric domain to integration master-quadrilateral domain
 
             for(ii=0; ii<2; ii++)
-              param[ii] = 0.5*(knots[ii][2] * GeomData->gausspoints2D[gp][ii] + knots[ii][3]);
+              param[ii] = 0.5*(knotIncr[ii] * GeomData->gausspoints2D[gp][ii] + knotSum[ii]);
 
             //cout << gp << '\t' << GeomData->gausspoints[gp][0] << '\t' << GeomData->gausspoints[gp][1] << endl;
             //cout << gp << '\t' << param(0) << '\t' << param(1) << endl;
@@ -345,7 +345,7 @@ void AdaptiveBinarytree<2>::computeGaussPointsForMerging(int refLev2, int inclDo
           // parametric domain to integration master-quadrilateral domain
 
           for(ii=0; ii<2; ii++)
-            param[ii] = 0.5*(knots[ii][2] * GeomData->gausspoints[gp][ii] + knots[ii][3]);
+            param[ii] = 0.5*(knotIncr[ii] * GeomData->gausspoints[gp][ii] + knotSum[ii]);
 
           GeomData->computeCoord(param, geom);
 
@@ -361,7 +361,7 @@ void AdaptiveBinarytree<2>::computeGaussPointsForMerging(int refLev2, int inclDo
           // parametric domain to integration master-quadrilateral domain
 
           for(ii=0; ii<2; ii++)
-            param[ii] = 0.5*(knots[ii][2] * 0.0 + knots[ii][3]);
+            param[ii] = 0.5*(knotIncr[ii] * 0.0 + knotSum[ii]);
 
           GeomData->computeCoord(param, geom);
 
@@ -401,7 +401,7 @@ void AdaptiveBinarytree<2>::computeGaussPointsForMerging2Dfor3D(int refLev2, int
           // parametric domain to integration master-quadrilateral domain
 
           for(ii=0; ii<2; ii++)
-            param[ii] = 0.5*(knots[ii][2] * GeomData->gausspoints2D[gp][ii] + knots[ii][3]);
+            param[ii] = 0.5*(knotIncr[ii] * GeomData->gausspoints2D[gp][ii] + knotSum[ii]);
 
           map2DPointTo3DPoint(sideTemp, param, param3);
 
@@ -419,7 +419,7 @@ void AdaptiveBinarytree<2>::computeGaussPointsForMerging2Dfor3D(int refLev2, int
           // parametric domain to integration master-quadrilateral domain
 
           for(ii=0; ii<2; ii++)
-            param[ii] = 0.5*(knots[ii][2] * 0.0 + knots[ii][3]);
+            param[ii] = 0.5*(knotIncr[ii] * 0.0 + knotSum[ii]);
 
           map2DPointTo3DPoint(sideTemp, param, param3);
 
@@ -468,7 +468,7 @@ void AdaptiveBinarytree<3>::computeGaussPoints(int refLev2, int inclDom, int chk
             // parametric domain to integration master-quadrilateral domain
 
             for(ii=0; ii<3; ii++)
-              param[ii] = 0.5*(knots[ii][2] * GeomData->gausspoints[gp][ii] + knots[ii][3]);
+              param[ii] = 0.5*(knotIncr[ii] * GeomData->gausspoints[gp][ii] + knotSum[ii]);
 
             GeomData->computeCoord(param, geom);
 
@@ -493,7 +493,7 @@ void AdaptiveBinarytree<3>::computeGaussPoints(int refLev2, int inclDom, int chk
             // parametric domain to integration master-quadrilateral domain
 
             for(ii=0; ii<3; ii++)
-              param[ii] = 0.5*(knots[ii][2] * GeomData->gausspoints[gp][ii] + knots[ii][3]);
+              param[ii] = 0.5*(knotIncr[ii] * GeomData->gausspoints[gp][ii] + knotSum[ii]);
 
             //cout << gp << '\t' << GeomData->gausspoints[gp][0] << '\t' << GeomData->gausspoints[gp][1] << endl;
             //cout << gp << '\t' << param(0) << '\t' << param(1) << endl;
@@ -571,7 +571,7 @@ void AdaptiveBinarytree<3>::computeGaussPointsForMerging(int refLev2, int inclDo
         for(gp=0; gp<GeomData->gausspoints.size(); gp++)
         {
           for(ii=0; ii<3; ii++)
-            param[ii] = 0.5*(knots[ii][2] * GeomData->gausspoints[gp][ii] + knots[ii][3]);
+            param[ii] = 0.5*(knotIncr[ii] * GeomData->gausspoints[gp][ii] + knotSum[ii]);
 
           GeomData->computeCoord(param, geom);
 
@@ -585,7 +585,7 @@ void AdaptiveBinarytree<3>::computeGaussPointsForMerging(int refLev2, int inclDo
 
         /*
           for(ii=0; ii<3; ii++)
-            param[ii] = 0.5*(knots[ii][2] * 0.0 + knots[ii][3]);
+            param[ii] = 0.5*(knotIncr[ii] * 0.0 + knotSum[ii]);
 
           GeomData->computeCoord(param, geom);
 

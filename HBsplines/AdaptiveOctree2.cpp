@@ -39,7 +39,7 @@ void AdaptiveOctree<2>::computeGaussPoints(int refLev2, int inclDom, int chkFlag
           // parametric domain to integration master-quadrilateral domain
 
           for(ii=0; ii<2; ii++)
-            param[ii] = 0.5*(knots[ii][2] * GeomData->gausspoints[gp][ii] + knots[ii][3]);
+            param[ii] = 0.5*(knotIncr[ii] * GeomData->gausspoints[gp][ii] + knotSum[ii]);
 
           GeomData->computeCoord(param, geom);
 
@@ -64,7 +64,7 @@ void AdaptiveOctree<2>::computeGaussPoints(int refLev2, int inclDom, int chkFlag
             // parametric domain to integration master-quadrilateral domain
 
             for(ii=0; ii<2; ii++)
-              param[ii] = 0.5*(knots[ii][2] * GeomData->gausspoints[gp][ii] + knots[ii][3]);
+              param[ii] = 0.5*(knotIncr[ii] * GeomData->gausspoints[gp][ii] + knotSum[ii]);
 
             //cout << gp << '\t' << GeomData->gausspoints[gp][0] << '\t' << GeomData->gausspoints[gp][1] << endl;
             //cout << gp << '\t' << param(0) << '\t' << param(1) << endl;
@@ -163,7 +163,7 @@ void AdaptiveOctree<2>::computeGaussPoints2Dfor3D(int refLev2, int inclDom, int 
           // parametric domain to integration master-quadrilateral domain
 
           for(ii=0; ii<2; ii++)
-            param[ii] = 0.5*(knots[ii][2] * GeomData->gausspoints2D[gp][ii] + knots[ii][3]);
+            param[ii] = 0.5*(knotIncr[ii] * GeomData->gausspoints2D[gp][ii] + knotSum[ii]);
           
           map2DPointTo3DPoint(sideTemp, param, param3);
 
@@ -191,7 +191,7 @@ void AdaptiveOctree<2>::computeGaussPoints2Dfor3D(int refLev2, int inclDom, int 
             // parametric domain to integration master-quadrilateral domain
 
             for(ii=0; ii<2; ii++)
-              param[ii] = 0.5*(knots[ii][2] * GeomData->gausspoints2D[gp][ii] + knots[ii][3]);
+              param[ii] = 0.5*(knotIncr[ii] * GeomData->gausspoints2D[gp][ii] + knotSum[ii]);
 
             //cout << gp << '\t' << GeomData->gausspoints[gp][0] << '\t' << GeomData->gausspoints[gp][1] << endl;
             //cout << gp << '\t' << param(0) << '\t' << param(1) << endl;
@@ -273,7 +273,7 @@ void AdaptiveOctree<2>::computeGaussPointsForMerging(int refLev2, int inclDom, i
           // parametric domain to integration master-quadrilateral domain
 
           for(ii=0; ii<2; ii++)
-            param[ii] = 0.5*(knots[ii][2] * GeomData->gausspoints[gp][ii] + knots[ii][3]);
+            param[ii] = 0.5*(knotIncr[ii] * GeomData->gausspoints[gp][ii] + knotSum[ii]);
 
           GeomData->computeCoord(param, geom);
 
@@ -289,7 +289,7 @@ void AdaptiveOctree<2>::computeGaussPointsForMerging(int refLev2, int inclDom, i
           // parametric domain to integration master-quadrilateral domain
 
           for(ii=0; ii<2; ii++)
-            param[ii] = 0.5*(knots[ii][2] * 0.0 + knots[ii][3]);
+            param[ii] = 0.5*(knotIncr[ii] * 0.0 + knotSum[ii]);
 
           GeomData->computeCoord(param, geom);
 
@@ -329,7 +329,7 @@ void AdaptiveOctree<2>::computeGaussPointsForMerging2Dfor3D(int refLev2, int inc
           // parametric domain to integration master-quadrilateral domain
 
           for(ii=0; ii<2; ii++)
-            param[ii] = 0.5*(knots[ii][2] * GeomData->gausspoints2D[gp][ii] + knots[ii][3]);
+            param[ii] = 0.5*(knotIncr[ii] * GeomData->gausspoints2D[gp][ii] + knotSum[ii]);
 
           map2DPointTo3DPoint(sideTemp, param, param3);
 
@@ -347,7 +347,7 @@ void AdaptiveOctree<2>::computeGaussPointsForMerging2Dfor3D(int refLev2, int inc
           // parametric domain to integration master-quadrilateral domain
 
           for(ii=0; ii<2; ii++)
-            param[ii] = 0.5*(knots[ii][2] * 0.0 + knots[ii][3]);
+            param[ii] = 0.5*(knotIncr[ii] * 0.0 + knotSum[ii]);
 
           map2DPointTo3DPoint(sideTemp, param, param3);
 
@@ -395,7 +395,7 @@ void AdaptiveOctree<3>::computeGaussPoints(int refLev2, int inclDom, int chkFlag
           // parametric domain to integration master-quadrilateral domain
 
           for(ii=0; ii<3; ii++)
-            param[ii] = 0.5*(knots[ii][2] * GeomData->gausspoints[gp][ii] + knots[ii][3]);
+            param[ii] = 0.5*(knotIncr[ii] * GeomData->gausspoints[gp][ii] + knotSum[ii]);
 
           GeomData->computeCoord(param, geom);
 
@@ -420,7 +420,7 @@ void AdaptiveOctree<3>::computeGaussPoints(int refLev2, int inclDom, int chkFlag
             // parametric domain to integration master-quadrilateral domain
 
             for(ii=0; ii<3; ii++)
-              param[ii] = 0.5*(knots[ii][2] * GeomData->gausspoints[gp][ii] + knots[ii][3]);
+              param[ii] = 0.5*(knotIncr[ii] * GeomData->gausspoints[gp][ii] + knotSum[ii]);
 
             //cout << gp << '\t' << GeomData->gausspoints[gp][0] << '\t' << GeomData->gausspoints[gp][1] << endl;
             //cout << gp << '\t' << param(0) << '\t' << param(1) << endl;
@@ -499,7 +499,7 @@ void AdaptiveOctree<3>::computeGaussPointsForMerging(int refLev2, int inclDom, i
         for(gp=0; gp<GeomData->gausspoints.size(); gp++)
         {
           for(ii=0; ii<3; ii++)
-            param[ii] = 0.5*(knots[ii][2] * GeomData->gausspoints[gp][ii] + knots[ii][3]);
+            param[ii] = 0.5*(knotIncr[ii] * GeomData->gausspoints[gp][ii] + knotSum[ii]);
 
           GeomData->computeCoord(param, geom);
 
@@ -513,7 +513,7 @@ void AdaptiveOctree<3>::computeGaussPointsForMerging(int refLev2, int inclDom, i
 
         /*
           for(ii=0; ii<3; ii++)
-            param[ii] = 0.5*(knots[ii][2] * 0.0 + knots[ii][3]);
+            param[ii] = 0.5*(knotIncr[ii] * 0.0 + knotSum[ii]);
 
           GeomData->computeCoord(param, geom);
 

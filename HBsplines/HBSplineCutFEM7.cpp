@@ -148,21 +148,21 @@ void HBSplineCutFEM::plotGeomSubTrias1D(int val1, bool flag2, int col, bool PLOT
     int  ii=0, jj=0, n1=0, n2=0, ind1=0, ind2=0, ll=0;
 
     vtkIdType pt0, pt1, pt2;
-    double  *tmp;
+    myPoint   knotBegin, knotEnd;
 
     for(ii=0;ii<elems.size();ii++)
     {
       //if( elems[ii]->isLeaf() && !(elems[ii]->isGhost()) &&  elems[ii]->isActive())
       if( elems[ii]->isActive() )
       {
-          //cout << " Node # " << elems[ii]->getID() << '\t' << elems[ii]->isLeaf() << '\t' << elems[ii]->isGhost() << endl;
-          tmp = elems[ii]->getKnots(0);
+          knotBegin = elems[ii]->getKnotBegin();
+          knotEnd   = elems[ii]->getKnotEnd();
 
-          param[0] = tmp[0];
+          param[0] = knotBegin[0];
           computeGeometry(param, geom);
           pt0 = pointsVTK->InsertNextPoint(geom[0], 0.0, 0.0);
 
-          param[0] = tmp[1];
+          param[0] = knotEnd[0];
           computeGeometry(param, geom);
           pt1 = pointsVTK->InsertNextPoint(geom[0], 0.0, 0.0);
           
@@ -450,9 +450,9 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
 
     VectorXd  NN(nlocal), N(nlocal), dN_dx(nlocal), dN_dy(nlocal), dNN_dx(nlocal), dNN_dy(nlocal), tempVec, tempVec2, d2N_dx2(nlocal), d2N_dy2(nlocal);
     VectorXd  vectmp(nlocal), rhsTemp;
-    myPoint  knotIncr, knotBegin;
+    myPoint  knotIncr, knotBegin, knotEnd;
 
-    double   fact=0.0, incr1=0.0, incr2=0.0, val1=0.0, *tmp0, *tmp1;
+    double   fact=0.0, incr1=0.0, incr2=0.0, val1=0.0;
 
     vector<double>  uu, vv;
 
@@ -465,30 +465,22 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
       index = 0;
       for(ee=0; ee<activeElements.size(); ee++)
       {
-        ndTemp = elems[activeElements[ee]];
-        //cout << " Node # " << nd->getID() << endl;
-
-          tmp0 = ndTemp->getKnots(Dir1);
-          tmp1 = ndTemp->getKnots(Dir2);
+          ndTemp = elems[activeElements[ee]];
 
           knotBegin = ndTemp->getKnotBegin();
+          knotEnd   = ndTemp->getKnotEnd();
           knotIncr  = ndTemp->getKnotIncrement();
-
-          //printf("\t tmp[0] and tmp[1]  ... : %12.8f\t%12.8f\n", tmp[0], tmp[1] );
-
-          incr1 = tmp0[2] ;
-          incr2 = tmp1[2] ;
 
           //if( !(ndTemp->isCutElement()) )
           if( ndTemp->getDomainNumber() < 10 )
           {
             //if( ndTemp->getDomainNumber() == 0 )
             //{
-              fact = incr1/resln[0];
-              create_vector(tmp0[0], tmp0[1], fact, uu);
+              fact = knotIncr[0]/resln[0];
+              create_vector(knotBegin[0], knotEnd[0], fact, uu);
 
-              fact = incr2/resln[1];
-              create_vector(tmp1[0], tmp1[1], fact, vv);
+              fact = knotIncr[1]/resln[1];
+              create_vector(knotBegin[1], knotEnd[1], fact, vv);
 
               //create the coordinates of the pointsVTK (nodes in FEM)
 
@@ -612,30 +604,21 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
       for(ee=0; ee<activeElements.size(); ee++)
       {
         ndTemp = elems[activeElements[ee]];
-        //cout << " Node # " << nd->getID() << endl;
-
-        tmp0 = ndTemp->getKnots(Dir1);
-        tmp1 = ndTemp->getKnots(Dir2);
 
         knotBegin = ndTemp->getKnotBegin();
+        knotEnd   = ndTemp->getKnotEnd();
         knotIncr  = ndTemp->getKnotIncrement();
-
-        //printf("\t tmp[0] and tmp[1]  ... : %12.8f\t%12.8f\n", tmp[0], tmp[1] );
-
-        incr1 = tmp0[2] ;
-        incr2 = tmp1[2] ;
 
         if( ndTemp->getDomainNumber() == 0 )
         //if( ndTemp->getDomainNumber() <= 10 )
         {
-            fact = incr1/resln[0];
-            create_vector(tmp0[0], tmp0[1], fact, uu);
+            fact = knotIncr[0]/resln[0];
+            create_vector(knotBegin[0], knotEnd[0], fact, uu);
 
-            fact = incr2/resln[1];
-            create_vector(tmp1[0], tmp1[1], fact, vv);
+            fact = knotIncr[1]/resln[1];
+            create_vector(knotBegin[1], knotEnd[1], fact, vv);
 
             //create the coordinates of the pointsVTK (nodes in FEM)
-            //cout << " ooooooooooooo " << endl;
 
             count = 0;
             for(jj=0;jj<vv.size();jj++)
@@ -791,9 +774,9 @@ void  HBSplineCutFEM::postProcessSubTrias3D(int vartype, int vardir, int nCol, b
     VectorXd  NN(nlocal), dNN_dx(nlocal), dNN_dy(nlocal), dNN_dz(nlocal),  tempVec, tempVec2;
     VectorXd  N(nlocal), dN_dx(nlocal), dN_dy(nlocal), dN_dz(nlocal);
     VectorXd  vectmp(nlocal), rhsTemp;
-    myPoint  knotIncr, knotBegin;
+    myPoint  knotIncr, knotBegin, knotEnd;
 
-    double   fact=0.0, incr1=0.0, incr2=0.0, incr3=0.0, val1=0.0, *tmp0, *tmp1, *tmp2;
+    double   fact=0.0, val1=0.0;
 
     vector<double>  uu, vv, ww;
 
@@ -801,7 +784,7 @@ void  HBSplineCutFEM::postProcessSubTrias3D(int vartype, int vardir, int nCol, b
 
     vtkIdType pt[50], cellId;
 
-    auto tstart = Clock::now();
+    double tstart = MPI_Wtime();
 
     if(ndf == 1)
     {
@@ -809,31 +792,21 @@ void  HBSplineCutFEM::postProcessSubTrias3D(int vartype, int vardir, int nCol, b
       for(ee=0; ee<activeElements.size(); ee++)
       {
         ndTemp = elems[activeElements[ee]];
-        //cout << " Node # " << nd->getID() << endl;
-
-        tmp0 = ndTemp->getKnots(Dir1);
-        tmp1 = ndTemp->getKnots(Dir2);
-        tmp2 = ndTemp->getKnots(Dir3);
 
         knotBegin = ndTemp->getKnotBegin();
+        knotEnd   = ndTemp->getKnotEnd();
         knotIncr  = ndTemp->getKnotIncrement();
-
-        //printf("\t tmp[0] and tmp[1]  ... : %12.8f\t%12.8f\n", tmp[0], tmp[1] );
-
-        incr1 = tmp0[2] ;
-        incr2 = tmp1[2] ;
-        incr3 = tmp2[2] ;
 
         if( !ndTemp->isCutElement() )
         {
-          fact = incr1/resln[0];
-          create_vector(tmp0[0], tmp0[1], fact, uu);
+          fact = knotIncr[0]/resln[0];
+          create_vector(knotBegin[0], knotEnd[0], fact, uu);
 
-          fact = incr2/resln[1];
-          create_vector(tmp1[0], tmp1[1], fact, vv);
+          fact = knotIncr[1]/resln[1];
+          create_vector(knotBegin[1], knotEnd[1], fact, vv);
 
-          fact = incr3/resln[2];
-          create_vector(tmp2[0], tmp2[1], fact, ww);
+          fact = knotIncr[2]/resln[2];
+          create_vector(knotBegin[2], knotEnd[2], fact, ww);
 
           //create the coordinates of the pointsVTK (nodes in FEM)
 
@@ -955,34 +928,23 @@ void  HBSplineCutFEM::postProcessSubTrias3D(int vartype, int vardir, int nCol, b
       for(ee=0; ee<activeElements.size(); ee++)
       {
         ndTemp = elems[activeElements[ee]];
-        //cout << " Node # " << nd->getID() << endl;
-
-        tmp0 = ndTemp->getKnots(Dir1);
-        tmp1 = ndTemp->getKnots(Dir2);
-        tmp2 = ndTemp->getKnots(Dir3);
 
         knotBegin = ndTemp->getKnotBegin();
+        knotEnd   = ndTemp->getKnotEnd();
         knotIncr  = ndTemp->getKnotIncrement();
-
-        //printf("\t tmp[0] and tmp[1]  ... : %12.8f\t%12.8f\n", tmp[0], tmp[1] );
-
-        incr1 = tmp0[2] ;
-        incr2 = tmp1[2] ;
-        incr3 = tmp2[2] ;
 
         if( !(ndTemp->isCutElement()) )
         {
-            fact = incr1/resln[0];
-            create_vector(tmp0[0], tmp0[1], fact, uu);
+            fact = knotIncr[0]/resln[0];
+            create_vector(knotBegin[0], knotEnd[0], fact, uu);
 
-            fact = incr2/resln[1];
-            create_vector(tmp1[0], tmp1[1], fact, vv);
+            fact = knotIncr[1]/resln[1];
+            create_vector(knotBegin[1], knotEnd[1], fact, vv);
 
-            fact = incr3/resln[2];
-            create_vector(tmp2[0], tmp2[1], fact, ww);
+            fact = knotIncr[2]/resln[2];
+            create_vector(knotBegin[2], knotEnd[2], fact, ww);
 
             //create the coordinates of the pointsVTK (nodes in FEM)
-            //cout << " ooooooooooooo " << endl;
 
             count = 0;
             for(kk=0; kk<ww.size(); kk++)
@@ -1127,8 +1089,8 @@ void  HBSplineCutFEM::postProcessSubTrias3D(int vartype, int vardir, int nCol, b
       uGridVTK->GetCellData()->SetScalars(cellDataVTK2);
     }
 
-  auto tend = Clock::now(); 
-  PetscPrintf(MPI_COMM_WORLD, "\n HBSplineCutFEM::postProcessAdapIntegration3D() took %d millisecond(s) \n ", std::chrono::duration_cast<std::chrono::milliseconds>(tend - tstart).count());
+  double tend = MPI_Wtime(); 
+  PetscPrintf(MPI_COMM_WORLD, "\n HBSplineCutFEM::postProcessAdapIntegration3D() took %f millisecond(s) \n ", (tend-tstart)*1000);
 
   return;
 }
@@ -1144,9 +1106,11 @@ void HBSplineCutFEM::plotGaussPointsElement()
     int  ee=0, ll=0, ii=0, gp=0, nGauss=0;
 
     vtkIdType  ptId;
-    double  volume=0.0, *tmp[3], *gws;
+    double  volume=0.0, *gws;
     myPoint *gps;
     node*  nd1;
+
+    myPoint   knotIncr, knotBegin, knotSum;
 
     param.setZero();
 
@@ -1154,10 +1118,9 @@ void HBSplineCutFEM::plotGaussPointsElement()
     {
         nd1 = elems[activeElements[ee]];
 
-        for(ii=0; ii<DIM; ii++)
-          tmp[ii] = nd1->getKnots(ii);
-
-        //cout << tmp[0][0] << '\t' << tmp[0][1] << '\t' << tmp1[0] << '\t' << tmp1[1] << endl;
+        knotBegin = nd1->getKnotBegin();
+        knotIncr  = nd1->getKnotIncrement();
+        knotSum   = nd1->getKnotSum();
 
         nGauss=0;
         if( nd1->getDomainNumber() == -1 )
@@ -1183,7 +1146,7 @@ void HBSplineCutFEM::plotGaussPointsElement()
           for(gp=0; gp<nGauss; gp++)
           {
               for(ii=0; ii<DIM; ii++)
-                param[ii]  = 0.5*(tmp[ii][2] * gps[gp][ii] + tmp[ii][3]);
+                param[ii]  = 0.5*(knotIncr[ii] * gps[gp][ii] + knotSum[ii]);
 
               if( nd1->getDomainNumber() == -1 )
                 volume += gws[gp];
@@ -1240,9 +1203,10 @@ void HBSplineCutFEM::plotGaussPointsDirichletBoundary()
     int  aa=0, ee=0, ll=0, ii=0, gp=0, side=0, nGauss=0, levTemp=0;
 
     vtkIdType  ptId;
-    double  volume=0.0, *tmp[3], *gws, JacTemp;
+    double  volume=0.0, *gws, JacTemp;
     myPoint *gps;
     node*  nd1;
+    myPoint   knotIncr, knotBegin, knotSum;
 
     param.setZero();
 
@@ -1252,11 +1216,11 @@ void HBSplineCutFEM::plotGaussPointsDirichletBoundary()
         
       if( nd1->isBoundary() && ( (nd1->domNums.size()>1) || (nd1->domNums[0] == 0)) )
       {
-        for(ii=0; ii<DIM; ii++)
-          tmp[ii] = nd1->getKnots(ii);
+        knotBegin = nd1->getKnotBegin();
+        knotIncr  = nd1->getKnotIncrement();
+        knotSum   = nd1->getKnotSum();
 
         levTemp = nd1->getLevel();
-        //cout << tmp[0][0] << '\t' << tmp[0][1] << '\t' << tmp1[0] << '\t' << tmp1[1] << endl;
 
         if( nd1->DirichletData.size() > 0)
         {
@@ -1286,7 +1250,7 @@ void HBSplineCutFEM::plotGaussPointsDirichletBoundary()
               for(gp=0; gp<nGauss; gp++)
               {
                   for(ii=0; ii<DIM; ii++)
-                    param[ii]  = 0.5*(tmp[ii][2] * gps[gp][ii] + tmp[ii][3]);
+                    param[ii]  = 0.5*(knotIncr[ii] * gps[gp][ii] + knotSum[ii]);
 
                   //if( nd1->getDomainNumber() == -1 )
                     volume += gws[gp] * JacTemp;
@@ -1339,9 +1303,11 @@ void HBSplineCutFEM::plotGaussPointsNeumannBoundary()
     int  aa=0, ee=0, ll=0, ii=0, gp=0, side=0, nGauss=0, levTemp=0;
 
     vtkIdType  ptId;
-    double  volume=0.0, *tmp[3], *gws, JacTemp=0.0;
+    double  volume=0.0, *gws, JacTemp=0.0;
     myPoint *gps;
     node*  nd1;
+
+    myPoint   knotIncr, knotBegin, knotSum;
 
     param.setZero();
 
@@ -1351,11 +1317,11 @@ void HBSplineCutFEM::plotGaussPointsNeumannBoundary()
         
       if( nd1->isBoundary() && ( (nd1->domNums.size()>1) || (nd1->domNums[0] == 0)) )
       {
-        for(ii=0; ii<DIM; ii++)
-          tmp[ii] = nd1->getKnots(ii);
+        knotBegin = nd1->getKnotBegin();
+        knotIncr  = nd1->getKnotIncrement();
+        knotSum   = nd1->getKnotSum();
 
         levTemp = nd1->getLevel();
-        //cout << tmp[0][0] << '\t' << tmp[0][1] << '\t' << tmp1[0] << '\t' << tmp1[1] << endl;
 
         if( nd1->NeumannData.size() > 0)
         {
@@ -1385,7 +1351,7 @@ void HBSplineCutFEM::plotGaussPointsNeumannBoundary()
               for(gp=0; gp<nGauss; gp++)
               {
                   for(ii=0; ii<DIM; ii++)
-                    param[ii]  = 0.5*(tmp[ii][2] * gps[gp][ii] + tmp[ii][3]);
+                    param[ii]  = 0.5*(knotIncr[ii] * gps[gp][ii] + knotSum[ii]);
 
                   //if( nd1->getDomainNumber() == -1 )
                     volume += gws[gp] * JacTemp;

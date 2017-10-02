@@ -368,6 +368,9 @@ void matDiffTangentTest(double ddd, char *fname, int dig, int dig2, bool gfrmt)
  
   // compare the matrices
 
+  cout << " matDiffTangentTest() is not complete. Check it. " << endl;
+  /*
+  // this is commented because I have removed this subroutine. -Chenna
   prgCompareTwoSimpleMatrices(cdiff,                         // matrix 1
 		              c,                             // matrix 2
 		              "numerical differentiation",   // title matrix 1 
@@ -378,6 +381,7 @@ void matDiffTangentTest(double ddd, char *fname, int dig, int dig2, bool gfrmt)
 			      10,                            // indentation
 			      false,                         // interactive
 			      false);                        // row/column numbers
+  */
   delete [] F;
   delete [] iv1;
   delete [] iv2;

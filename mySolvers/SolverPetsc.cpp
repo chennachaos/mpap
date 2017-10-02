@@ -55,7 +55,7 @@ int SolverPetsc::setSolverAndParameters()
 
     KSPSetType(ksp, KSPCG);
 
-    //KSPSetInitialGuessNonzero(ksp,PETSC_TRUE);
+    //KSPSetInitialGuessNonzero(ksp, PETSC_TRUE);
     //KSPSetInitialGuessNonzero(ksp, PETSC_FALSE);
 
     ierr = KSPSetFromOptions(ksp);CHKERRQ(ierr);
@@ -70,11 +70,8 @@ int SolverPetsc::setSolverAndParameters()
     ierr = KSPSetReusePreconditioner(ksp, PETSC_FALSE);
 
     PCSetType(pc, PCILU);
-    //PCSetType(pc, PCBJACOBI);
 
     ierr = PCSetFromOptions(pc);CHKERRQ(ierr);
-
-    //PetscPrintf(MPI_COMM_WORLD, " qqqqqqqqqq \n");
 
     return 0;
 }
@@ -84,12 +81,10 @@ int SolverPetsc::setSolverAndParameters()
 
 int SolverPetsc::zeroMtx()
 {
-  //cout << " SolverPetsc::zeroMtx() " << endl;
   ierr = MatAssemblyBegin(mtx,MAT_FINAL_ASSEMBLY);//CHKERRQ(ierr);
   ierr = MatAssemblyEnd(mtx,MAT_FINAL_ASSEMBLY);//CHKERRQ(ierr);
-  //cout << " SolverPetsc::zeroMtx() " << endl;
+
   MatZeroEntries(mtx);
-  //cout << " SolverPetsc::zeroMtx() " << endl;
 
   VecAssemblyBegin(rhsVec);
   VecAssemblyEnd(rhsVec);
@@ -108,7 +103,7 @@ int SolverPetsc::zeroMtx()
 
 int SolverPetsc::free()
 {
-  PetscPrintf(MPI_COMM_WORLD, "SolverPetsc::free() \n");
+  //PetscPrintf(MPI_COMM_WORLD, "SolverPetsc::free() \n");
 
   //ierr = KSPReset(ksp);CHKERRQ(ierr);
   //cout << " ierr = " << ierr << endl;
@@ -132,7 +127,7 @@ int SolverPetsc::free()
   ierr = KSPReset(ksp);CHKERRQ(ierr);
   //cout << " ierr = " << ierr << endl;
 
-  PetscPrintf(MPI_COMM_WORLD, "SolverPetsc::free() \n");
+  //PetscPrintf(MPI_COMM_WORLD, "SolverPetsc::free() \n");
   
   return 1;
 }
@@ -205,17 +200,14 @@ int SolverPetsc::solve()
 {
   char fct[] = "SolverPetsc::solve";
 
-  time_t tstart, tend; 
-
-  PetscInt its;
-  KSPConvergedReason reason;
+  //time_t tstart, tend; 
 
   if (currentStatus != FACTORISE_OK) { prgWarning(1,fct,"factorise matrix first!"); return -1; }
 
   ierr = MatAssemblyBegin(mtx,MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
   ierr = MatAssemblyEnd(mtx,MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
 
-  PetscPrintf(MPI_COMM_WORLD, "  SolverPetsc::solve() ... Matrix Assembly ...  \n\n");
+  //PetscPrintf(MPI_COMM_WORLD, "  SolverPetsc::solve() ... Matrix Assembly ...  \n\n");
 
   //PetscViewerCreate(PETSC_COMM_WORLD, &viewer_matx);
   //PetscViewerDrawOpen();
@@ -226,30 +218,29 @@ int SolverPetsc::solve()
   ierr = VecAssemblyBegin(rhsVec); CHKERRQ(ierr);
   ierr = VecAssemblyEnd(rhsVec); CHKERRQ(ierr);
 
-  PetscPrintf(MPI_COMM_WORLD, "  SolverPetsc::solve() ... rhsVec Assembly ...  \n\n");
+  //PetscPrintf(MPI_COMM_WORLD, "  SolverPetsc::solve() ... rhsVec Assembly ...  \n\n");
 
   ierr = VecAssemblyBegin(soln); CHKERRQ(ierr);
   ierr = VecAssemblyEnd(soln); CHKERRQ(ierr);
 
-  PetscPrintf(MPI_COMM_WORLD, "  SolverPetsc::solve() ... soln Assembly ...  \n\n");
+  //PetscPrintf(MPI_COMM_WORLD, "  SolverPetsc::solve() ... soln Assembly ...  \n\n");
 
   VecZeroEntries(soln);
 
-  PetscPrintf(MPI_COMM_WORLD, "  SolverPetsc::solve() ... vec zero ...  \n\n");
+  //PetscPrintf(MPI_COMM_WORLD, "  SolverPetsc::solve() ... vec zero ...  \n\n");
 
   computerTime.go(fct);
 
   //VecView(rhsVec, PETSC_VIEWER_STDOUT_WORLD);
 
-  tstart = time(0);
+  //tstart = time(0);
 
   ierr = KSPSolve(ksp,rhsVec,soln); CHKERRQ(ierr);
 
-  PetscPrintf(MPI_COMM_WORLD, "  SolverPetsc::solve() ... KSP solve ...  \n\n");
+  //PetscPrintf(MPI_COMM_WORLD, "  SolverPetsc::solve() ... KSP solve ...  \n\n");
 
-  ierr = KSPGetIterationNumber(ksp,&its); CHKERRQ(ierr);
-
-  KSPGetConvergedReason(ksp,&reason);
+  KSPConvergedReason reason;
+  KSPGetConvergedReason(ksp, &reason);
 
   if(reason<0)
   {
@@ -257,14 +248,15 @@ int SolverPetsc::solve()
   }
   else
   {
-    KSPGetIterationNumber(ksp,&its);
-    PetscPrintf(MPI_COMM_WORLD, "Convergence in %d iterations.\n", its);
+    PetscInt its;
+    ierr = KSPGetIterationNumber(ksp, &its); CHKERRQ(ierr);
+    PetscPrintf(MPI_COMM_WORLD, "\n Convergence in %d iterations.\n\n", its);
   }
 
   //ierr = KSPView(ksp,PETSC_VIEWER_STDOUT_WORLD);//CHKERRQ(ierr);
   //VecView(soln, PETSC_VIEWER_STDOUT_WORLD);
 
-  tend = time(0); 
+  //tend = time(0); 
   
   //cout << "SolverPetsc::solve()  took "<< difftime(tend, tstart) <<" second(s)."<< endl;
 

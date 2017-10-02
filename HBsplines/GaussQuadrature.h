@@ -23,13 +23,22 @@ class GaussQuadrature
       vector<myPoint>  gausspoints;
       vector<double>  gaussweights;
 
-      GaussQuadrature();
+      GaussQuadrature() {}
 
-      ~GaussQuadrature();
+      ~GaussQuadrature() {}
 
       void SetGaussPoints(int nn);
       
-      void reset();
+      void reset()
+      {
+        gausspoints.erase(gausspoints.begin(), gausspoints.begin()+gausspoints.size() );
+        gaussweights.erase(gaussweights.begin(), gaussweights.begin()+gaussweights.size() );
+
+        gausspoints.clear();
+        gaussweights.clear();
+
+        return;
+      }
 };
 
 

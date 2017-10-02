@@ -4,16 +4,13 @@
 #include "MacroList.h"
 #include "MathBasic.h"
 #include "RunControl.h"
-//#include "FunctionsEssGrp.h"
 #include "FunctionsProgram.h"
-////#include "Plot.h"
 #include "Files.h"
 
 
 extern bool       noGUI;
 extern MacroList  macro;
 extern RunControl runCtrl;
-////extern Plot       plot;
 extern Files      files;
 
 
@@ -180,25 +177,32 @@ void MacroQueue::append(MacroCommand &mC)
   {
     //cout << "end\n";
 
-    if (openLoops>0 || openIfs>0) cout << "\n WARNING! open loop or if statements ignored!\n\n";
+    if(openLoops>0 || openIfs>0)
+      cout << "\n WARNING! open loop or if statements ignored!\n\n";
 	    	  
-    if (!!mC.p[0].fctName)        cout << "\n WARNING! parameter function ignored!\n\n";
-    
+    if(!!mC.p[0].fctName)
+      cout << "\n WARNING! parameter function ignored!\n\n";
+
     reset();
    
-    if (roundToInt(mC.p[0].x) == 1) runCtrl.quit = true;
+    if(roundToInt(mC.p[0].x) == 1)
+      runCtrl.quit = true;
     
     else if (!noGUI && runCtrl.act > runCtrl.cmd.n - 2) 
-      {    
-        std::cout << "\n          Input file run control finished.";
-        std::cout << "\n          To close the project, select 'project' -> 'close'";
-        std::cout << "\n          To quit Mpap2, select 'project' -> 'exit'\n\n";
+    {
+        //std::cout << "\n          Input file run control finished.";
+        //std::cout << "\n          To close the project, select 'project' -> 'close'";
+        //std::cout << "\n          To quit Mpap2, select 'project' -> 'exit'\n\n";
 
-        if (runCtrl.mode == PRE) runCtrl.newStatus(INTERACTIVE);
-
-        else { runCtrl.newMode(INTER); runCtrl.newStatus(INTERACTIVE); }
-      }
-      else  prgExecNextRunCtrlCmd();
+        if(runCtrl.mode == PRE)
+          runCtrl.newStatus(INTERACTIVE);
+        else
+        {
+          runCtrl.newMode(INTER); runCtrl.newStatus(INTERACTIVE);
+        }
+    }
+    else
+      prgExecNextRunCtrlCmd();
 
     return;
   }
@@ -211,9 +215,11 @@ void MacroQueue::append(MacroCommand &mC)
  
   macCmd[i].ii   = mC.ii;
   macCmd[i].strg = mC.strg;
-  for (int j=0; j<mC.p.n; j++) macCmd[i].p[j] = mC.p[j];
+  for(int j=0; j<mC.p.n; j++)
+    macCmd[i].p[j] = mC.p[j];
   
-  if (openLoops > 0 || openIfs > 0) return;
+  if(openLoops > 0 || openIfs > 0)
+    return;
 
   // execute
       
@@ -228,7 +234,8 @@ void MacroQueue::append(MacroCommand &mC)
     
     macro[ii].strg = macCmd[act].strg;
    
-    for(i=0; i<macCmd[act].p.n; i++) macro[ii].p[i] = macCmd[act].p[i].evaluate(act);
+    for(i=0; i<macCmd[act].p.n; i++)
+      macro[ii].p[i] = macCmd[act].p[i].evaluate(act);
    
     //essGrpUpdateDisplay();
 

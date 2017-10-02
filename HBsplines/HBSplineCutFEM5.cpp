@@ -557,7 +557,7 @@ void  HBSplineCutFEM::applyInterfaceTerms3D()
 
               ndTemp = elems[findCellNumber(geom)];
 
-              if( (ndTemp->getSubdomainId() == this_mpi_proc) && ndTemp->isCutElement() )
+              if( ndTemp->getSubdomainId() == this_mpi_proc )
               {
                 geometryToParametric(geom, param);
 
@@ -787,7 +787,6 @@ void  HBSplineCutFEM::applyGhostPenalty2D()
 
     double  Ta1=0.0, Ta2=0.0, Tb1=0.0, Tb2=0.0, JacMultLoc=0.0, rad=0.0, dvol=0.0, fact=0.0;
     double  bb1=0.0, bb2=0.0, PENALTY=0.0, h1=0.0, h2=0.0;
-    double  *knots1[2], *knots2[2];
     vector<double>  boundaryGPs1, boundaryGWs1, boundaryGPs2, boundaryGWs2;
     vector<double>  gammGP(ndof+1), temp(ndof+1);
 
@@ -798,7 +797,7 @@ void  HBSplineCutFEM::applyGhostPenalty2D()
     VectorXd   NN1(nlf), dNN1_dx(nlf), dNN1_dy(nlf), N1, dN1_dx, dN1_dy;
     VectorXd   NN2(nlf), dNN2_dx(nlf), dNN2_dy(nlf), N2, dN2_dx, dN2_dy;
     myPoint   normal1, normal2, hElem;
-    myPoint   knotIncr1, knotBegin1, knotIncr2, knotBegin2;
+    myPoint   knotIncr1, knotBegin1, knotEnd1, knotSum1, knotIncr2, knotBegin2, knotEnd2, knotSum2;
 
     node *nd1, *nd2;
 
@@ -847,11 +846,10 @@ void  HBSplineCutFEM::applyGhostPenalty2D()
         {
           //cout << " nd1->getID() " <<  nd1->getID() << '\t' <<  nd1->getLevel() << endl;
 
-          knots1[0] = nd1->getKnots(Dir1);
-          knots1[1] = nd1->getKnots(Dir2);
-
           knotBegin1 = nd1->getKnotBegin();
+          knotEnd1   = nd1->getKnotEnd();
           knotIncr1  = nd1->getKnotIncrement();
+          knotSum1   = nd1->getKnotSum();
 
           //cout << " nd1->isRightBoundary() = " << nd1->isRightBoundary() << endl;
 
@@ -905,11 +903,10 @@ void  HBSplineCutFEM::applyGhostPenalty2D()
               F1 = VectorXd::Zero(nr1);
               F2 = VectorXd::Zero(nr2);
 
-              knots2[0] = nd2->getKnots(Dir1);
-              knots2[1] = nd2->getKnots(Dir2);
-
               knotBegin2 = nd2->getKnotBegin();
+              knotEnd2   = nd2->getKnotEnd();
               knotIncr2  = nd2->getKnotIncrement();
+              knotSum2   = nd2->getKnotSum();
 
               GeomData.getBoundaryNormal2D(side, normal1);
               GeomData.setBoundaryGPs2D(side, boundaryGPs1, boundaryGWs1, boundaryGPs2, boundaryGWs2);
@@ -920,10 +917,10 @@ void  HBSplineCutFEM::applyGhostPenalty2D()
         
               for(gp2=0;gp2<boundaryGPs2.size();gp2++)
               {
-                  param[1] = 0.5 * (knots1[1][2] * boundaryGPs2[gp2] + knots1[1][3]);
+                  param[1] = 0.5 * (knotIncr1[1] * boundaryGPs2[gp2] + knotSum1[1]);
               for(gp1=0;gp1<boundaryGPs1.size();gp1++)
               {
-                  param[0] = 0.5 * (knots1[0][2] * boundaryGPs1[gp1] + knots1[0][3]);
+                  param[0] = 0.5 * (knotIncr1[0] * boundaryGPs1[gp1] + knotSum1[0]);
  
                   dvol = JacMultLoc * boundaryGWs2[gp2] * boundaryGWs1[gp1] ;
 
@@ -1121,7 +1118,6 @@ void  HBSplineCutFEM::applyGhostPenalty3D()
 
     double  Ta1=0.0, Ta2=0.0, Tb1=0.0, Tb2=0.0, JacTemp=0.0, dvol=0.0, fact=0.0;
     double  bb1=0.0, bb2=0.0, PENALTY=0.0, h1=0.0, h2=0.0, h3=0.0;
-    double  *knots1[3], *knots2[3];
     vector<double>  gammGP(ndof+1), temp(ndof+1);
     vector<double>  boundaryGPs1, boundaryGWs1, boundaryGPs2, boundaryGWs2, boundaryGPs3, boundaryGWs3;
 
@@ -1132,7 +1128,7 @@ void  HBSplineCutFEM::applyGhostPenalty3D()
     VectorXd   NN1(nlf), dNN1_dx(nlf), dNN1_dy(nlf), dNN1_dz(nlf), N1, dN1_dx, dN1_dy, dN1_dz;
     VectorXd   NN2(nlf), dNN2_dx(nlf), dNN2_dy(nlf), dNN2_dz(nlf), N2, dN2_dx, dN2_dy, dN2_dz;
     myPoint   normal1, normal2, hElem;
-    myPoint  knotIncr1, knotBegin1, knotIncr2, knotBegin2;
+    myPoint   knotIncr1, knotBegin1, knotEnd1, knotSum1, knotIncr2, knotBegin2, knotEnd2, knotSum2;
     double *gws;
     myPoint *gps;
 
@@ -1180,14 +1176,10 @@ void  HBSplineCutFEM::applyGhostPenalty3D()
       {
         if( nd1->isCutElement() )
         {
-          //cout << " nd1->getID() " <<  nd1->getID() << '\t' <<  nd1->getLevel() << endl;
-
-          knots1[0] = nd1->getKnots(Dir1);
-          knots1[1] = nd1->getKnots(Dir2);
-          knots1[2] = nd1->getKnots(Dir3);
-
           knotBegin1 = nd1->getKnotBegin();
+          knotEnd1   = nd1->getKnotEnd();
           knotIncr1  = nd1->getKnotIncrement();
+          knotSum1   = nd1->getKnotSum();
 
           //
           //if( nd1->isLeftBoundary() || nd1->isRightBoundary() )
@@ -1240,12 +1232,11 @@ void  HBSplineCutFEM::applyGhostPenalty3D()
               F1 = VectorXd::Zero(nr1);
               F2 = VectorXd::Zero(nr2);
 
-              knots2[0] = nd2->getKnots(Dir1);
-              knots2[1] = nd2->getKnots(Dir2);
-              knots2[2] = nd2->getKnots(Dir3);
-
               knotBegin2 = nd2->getKnotBegin();
+              knotEnd2   = nd2->getKnotEnd();
               knotIncr2  = nd2->getKnotIncrement();
+              knotSum2   = nd2->getKnotSum();
+
 
               normal1 = GeomData.boundaryNormals[side];
               normal2 = -normal1;
@@ -1278,9 +1269,9 @@ void  HBSplineCutFEM::applyGhostPenalty3D()
 
               for(gp=0; gp<nGauss; gp++)
               {
-                  param[2] = 0.5 * (knots1[2][2] * gps[gp][2] + knots1[2][3]);
-                  param[1] = 0.5 * (knots1[1][2] * gps[gp][1] + knots1[1][3]);
-                  param[0] = 0.5 * (knots1[0][2] * gps[gp][0] + knots1[0][3]);
+                  param[2] = 0.5 * (knotIncr1[2] * gps[gp][2] + knotSum1[2]);
+                  param[1] = 0.5 * (knotIncr1[1] * gps[gp][1] + knotSum1[1]);
+                  param[0] = 0.5 * (knotIncr1[0] * gps[gp][0] + knotSum1[0]);
 
                   dvol = JacTemp * gws[gp] ;
 

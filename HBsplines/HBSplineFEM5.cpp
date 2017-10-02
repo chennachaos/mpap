@@ -682,11 +682,9 @@ void HBSplineFEM::computeElementErrors(int index)
        {
           ee = activeElements[ii];
 
-          elems[ee]->calcError(index);
-            
           //cout << ee << '\t' << elems[ee]->getError() << endl;
           //totalError += ( elems[ee]->getError() * elems[ee]->getError() );
-          totalError +=  elems[ee]->getError();
+          totalError +=  elems[ee]->calcError(index);
        }
        totalError = sqrt(totalError);
     }
@@ -696,9 +694,7 @@ void HBSplineFEM::computeElementErrors(int index)
        {
           nd = elems[activeElements[ii]];
 
-          nd->calcError(index);
-            
-          totalError += nd->getError();
+          totalError += nd->calcError(index);
 
           count++;
        }

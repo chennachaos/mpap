@@ -29,7 +29,7 @@ void  HBSplineFEM::ImmersedBoundaryBodyForce1D()
 
     int  aa, bb, ii, jj, nlocal, ind, nodenum, size, ee, dir, numPoints;
 
-    double   fact, val, xx, yy, incr1, incr2, *knots[2];
+    double   fact, val, xx, yy, incr1, incr2;
     double   t0, tf, tdiff, funcVal[2], temp, val1, val2, ds, h, C;
     myPoint  knotIncr, knotBegin;
 
@@ -49,21 +49,14 @@ void  HBSplineFEM::ImmersedBoundaryBodyForce1D()
             xx = geom[0];
             ee = findCellNumber(geom);
 
-            //printf("xx = %12.6f,  cell = %5d, \n", geom[0], ee);
-
             ndtmp = elems[ee];
-
-            knots[0] = ndtmp->getKnots(0);
 
             knotBegin = ndtmp->getKnotBegin();
             knotIncr  = ndtmp->getKnotIncrement();
 
-
             bfs = ndtmp->GlobalBasisFuncs;
 
             geometryToParametric(geom, param);
-
-            //printf("param ... = %12.6f \t %12.6f \t %12.6f, \n \n ", param, knots[0][0], knots[0][2]);
 
             GeomData.computeBasisFunctions1D(knotBegin, knotIncr, param, N, dN_dx, d2N_dx2);
 
@@ -83,7 +76,7 @@ void  HBSplineFEM::ImmersedBoundaryBodyForce1D()
             //val1 = ndtmp->computeValueOld(0, d2N_dx2);
             //printf("\t val1  %12.8f \t   %12.8f \n", val1, ndtmp->computeValueOld(0, dN_dx));
 
-            h = knots[0][2];
+            h = knotIncr[0];
             //val1 = C/h;
             val1 = - GeomData.FluidProps[2]/h;
             val1 = 1.0/h;
@@ -171,7 +164,7 @@ void  HBSplineFEM::ImmersedBoundaryBodyForceLSFEM()
           //cout << bb << '\t' << aa << endl;
           lme = ImmersedBodyObjects[bb]->ImmIntgElems[aa];
 
-          lme->computeBodyForce(1, VelSolid);
+          //lme->computeBodyForce(1, VelSolid);
           //lme->mapDataToGlobalBodyForceVector(0, temp);
         }
       }
@@ -361,7 +354,7 @@ void  HBSplineFEM::ImmersedBoundaryBodyForce2D()
 
     int  aa, bb, ii, jj, nlocal, ind, nodenum, size, ee, dir, numPoints;
 
-    double   fact, val, xx, yy, incr1, incr2, *knots[2], param[2], normal[2];
+    double   fact, val, xx, yy, param[2], normal[2];
     double   t0, tf, tdiff, funcVal[2], temp, val1, val2, ds, h1, h2;
 
     vector<int>  bfs;
@@ -393,26 +386,23 @@ void  HBSplineFEM::ImmersedBoundaryBodyForce2D()
 
             ndtmp = elems[ee];
 
-            knots[0] = ndtmp->getKnots(0);
-            knots[1] = ndtmp->getKnots(1);
+            knotBegin = nd1->getKnotBegin();
+            knotEnd   = nd1->getKnotEnd();
+            knotIncr  = nd1->getKnotIncrement();
 
             bfs = ndtmp->GlobalBasisFuncs;
 
             //geometryToParametric(param[0], param[1], param);
 
-            //printf("param ... = %12.6f \t %12.6f, \n \n ", param[0], param[1]);
-            //printf("param ... = %12.6f \t %12.6f, \n \n ", knots[0][0], knots[0][1]);
-            //printf("param ... = %12.6f \t %12.6f, \n \n ", knots[1][0], knots[1][1]);
-
-            FluidSolnData.computeBasisFunctions2D(knots[0][0], knots[1][0], knots[0][2], knots[1][2], param[0], param[1], &N(0));
+            FluidSolnData.computeBasisFunctions2D(knotBegin, knotIncr, param, N);
 
             if(ndtmp->getParent() == NULL )
               NN = N;
             else
               NN = ndtmp->SubDivMat * N;
 
-            h1 = gridLEN[0]*knots[0][2];
-            h2 = gridLEN[1]*knots[1][2];
+            h1 = gridLEN[0]*knotIncr[0];
+            h2 = gridLEN[1]*knotIncr[1];
             fact = 1.0*IBpoints[bb]->GetArcLength()/h1/h2;
 
             //val1 = - FluidSolnData.ElemProp.data[4]*fact;
@@ -485,9 +475,9 @@ void  HBSplineFEM::applyInterfaceTerms2D()
       VectorXd  NN(nlf), dNN_dx(nlf), dNN_dy(nlf), dN_dx, dN_dy, Nf;
       VectorXd  Flocal2, vel(DIM), vel2(DIM), lagmults(DIM), Nb, dNb, xx, yy,  specValx, specValy, res(DIM);
       MatrixXd  Khorz;
-      myPoint  knotIncr, knotBegin;
+      myPoint  knotIncr, knotBegin, knotEnd;
 
-      double  detJ, *knots[2], af, dvol, fact, fact1, fact2;
+      double  detJ, af, dvol, fact, fact1, fact2;
 
       af = SolnData.td(2);
       
@@ -569,10 +559,8 @@ void  HBSplineFEM::applyInterfaceTerms2D()
 
               geometryToParametric(geom, param);
 
-              knots[0] = nd->getKnots(0);
-              knots[1] = nd->getKnots(1);
-
               knotBegin = nd->getKnotBegin();
+              knotEnd   = nd->getKnotEnd();
               knotIncr  = nd->getKnotIncrement();
 
               GeomData.computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy);
@@ -791,7 +779,7 @@ void  HBSplineFEM::applyInterfaceTerms3D()
       MatrixXd  Khorz;
       myPoint  knotIncr, knotBegin;
 
-      double  detJ, *knots[3], af, dvol, fact, fact1, fact2;
+      double  detJ, af, dvol, fact, fact1, fact2;
 
       af = SolnData.td(2);
       double  rho = GeomData.FluidProps[3];
@@ -871,10 +859,6 @@ void  HBSplineFEM::applyInterfaceTerms3D()
               nd = elems[findCellNumber(geom)];
 
               geometryToParametric(geom, param);
-
-              knots[0] = nd->getKnots(0);
-              knots[1] = nd->getKnots(1);
-              knots[2] = nd->getKnots(2);
 
               knotBegin = nd->getKnotBegin();
               knotIncr  = nd->getKnotIncrement();

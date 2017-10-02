@@ -21,7 +21,7 @@ void ImmersedSolid::adjustBoundaryPoints(double* minVal, double* maxVal)
     //cout << " ImmersedSolid::adjustBoundaryPoints .... needs to be modified " << endl;
 
     int ii=0, jj=0;
-    double  tol1=1.0e-8, tol2=1.0e-6;
+    double  tol1=1.0e-8, tol2=1.0e-4;
 
     myPoint  pt1, pt2;
 

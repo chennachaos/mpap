@@ -15,7 +15,7 @@ class  DistanceFunction;
 class  GeomDataHBSplines
 {
   private:
-    int  DIM, degree[3], nelem[3], nlbf, ngbf[3], nGP[3], totalNGP, ndof, tis;
+    int  DIM, degree[3], nelem[3], ngbf[3], nGP[3], totalNGP, ndof, tis, totnlbf;
     double  origin[3], dX[3], gridLEN[3], Jacobian[3], Jfull, rho;
 
   public:
@@ -109,8 +109,14 @@ class  GeomDataHBSplines
     int  getNdof()
     {       return  ndof;     }
 
+    int* getDegree()
+    {      return  degree;    }
+
     int getDegree(int ind)
     {       return degree[ind];     }
+
+    int  getLocalBFsSize()
+    {    return  totnlbf;     }
 
     int getNGP(int ind)
     {       return  nGP[ind];     }

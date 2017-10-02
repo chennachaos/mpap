@@ -10,7 +10,7 @@ namespace myGeom
 
 bool AABB::doIntersect(AABB&  bb)
 {
-//
+/*
   if( (bb.minBB[0] > maxBB[0] ) || ( bb.maxBB[0] < minBB[0] ) || 
       ( bb.minBB[1] > maxBB[1] ) || ( bb.maxBB[1] < minBB[1] ) )
   {

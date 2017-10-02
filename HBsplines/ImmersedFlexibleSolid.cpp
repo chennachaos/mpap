@@ -218,7 +218,7 @@ void  ImmersedFlexibleSolid::setSolidElements(vector<vector<int> >& elemConn)
     //
     ///////////////////////////////////////////////////////////////////
 
-    cout << " nElem_Constraint =  " << nElem_Constraint << endl;
+    //cout << " nElem_Constraint =  " << nElem_Constraint << endl;
 
     totalDOF = nNode*ndof;
     totalDOF += nElem_Constraint;
@@ -693,7 +693,7 @@ void ImmersedFlexibleSolid::updatePointPositions3D()
 {
     int  ii=0, ind=0, bb=0;
 
-    cout << " nNode = " << nNode << '\t' << ndof << endl;
+    //cout << " nNode = " << nNode << '\t' << ndof << endl;
 
     for(bb=0; bb<nNode; bb++)
     {

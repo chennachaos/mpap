@@ -54,22 +54,21 @@ void HBSplineFEM::plotGeom1D(int val1, bool flag2, int col, bool PLOT_KNOT_LINES
     int ii, jj, n1, n2, ind1, ind2, ll;
 
     vtkIdType pt0, pt1, pt2;
-    double  *tmp;
+    myPoint  knotBegin, knotEnd;
 
     for(ii=0;ii<elems.size();ii++)
     {
        //if( elems[ii]->isLeaf() && !(elems[ii]->isGhost()) &&  elems[ii]->isActive())
        if( elems[ii]->isActive() )
        {
-          //cout << " Node # " << elems[ii]->getID() << '\t' << elems[ii]->isLeaf() << '\t' << elems[ii]->isGhost() << endl;
+          knotBegin = elems[ii]->getKnotBegin();
+          knotEnd   = elems[ii]->getKnotEnd();
 
-          tmp = elems[ii]->getKnots(0);
-
-          param[0] = tmp[0];
+          param[0] = knotBegin[0];
           computeGeometry(param, geom);
           pt0 = pointsVTK->InsertNextPoint(geom[0], 0.0, 0.0);
 
-          param[0] = tmp[1];
+          param[0] = knotEnd[0];
           computeGeometry(param, geom);
           pt1 = pointsVTK->InsertNextPoint(geom[0], 0.0, 0.0);
           
@@ -98,27 +97,22 @@ void HBSplineFEM::plotGeom2D(int val1, bool flag2, int col, bool PLOT_KNOT_LINES
     int ee, ll;
 
     vtkIdType pt[4];
-    double  *tmp1, *tmp2, dist;
-
-    double  x1, y1, x2, y2;
+    myPoint  knotBegin, knotEnd;
+    double  x1, y1, x2, y2, dist;
 
     for(ee=0;ee<elems.size();ee++)
     {
-       //cout << " Node # " << elems[ee]->getID() << '\t' << elems[ee]->isLeaf() << endl;
        if( elems[ee]->isLeaf() && !(elems[ee]->isGhost()) )
        //if( elems[ee]->isLeaf() )
        {
-          tmp1 = elems[ee]->getKnots(Dir1);
-          tmp2 = elems[ee]->getKnots(Dir2);
-          
-          //cout << tmp1[0] << '\t' << tmp1[1] << '\t' << tmp2[0] << '\t' << tmp2[1] << endl;
+          knotBegin = elems[ee]->getKnotBegin();
+          knotEnd   = elems[ee]->getKnotEnd();
 
-          x1 = computeGeometry(0, tmp1[0]);
-          x2 = computeGeometry(0, tmp1[1]);
+          x1 = computeGeometry(0, knotBegin[0]);
+          x2 = computeGeometry(0, knotEnd[0]);
 
-          y1 = computeGeometry(1, tmp2[0]);
-          y2 = computeGeometry(1, tmp2[1]);
-
+          y1 = computeGeometry(1, knotBegin[1]);
+          y2 = computeGeometry(1, knotEnd[1]);
 
           pt[0] = pointsVTK->InsertNextPoint(x1, y1, 0.0);
           pt[1] = pointsVTK->InsertNextPoint(x2, y1, 0.0);
@@ -146,7 +140,8 @@ void HBSplineFEM::plotGeom3D(int val1, bool flag2, int col, bool PLOT_KNOT_LINES
     int ee, ll;
 
     vtkIdType pt[8];
-    double  *tmp1, *tmp2, *tmp3, xx[2], yy[2], zz[2];
+    double   xx[2], yy[2], zz[2];
+    myPoint  knotBegin, knotEnd;
 
     time_t tstart, tend;
     tstart = time(0);
@@ -156,19 +151,15 @@ void HBSplineFEM::plotGeom3D(int val1, bool flag2, int col, bool PLOT_KNOT_LINES
        //cout << " Node # " << elems[ee]->getID() << '\t' << elems[ee]->isLeaf() << endl;
        if( elems[ee]->isLeaf() && !(elems[ee]->isGhost()) )
        {
-          //elems[ee]->printSelf();
-          tmp1 = elems[ee]->getKnots(Dir1);
-          tmp2 = elems[ee]->getKnots(Dir2);
-          tmp3 = elems[ee]->getKnots(Dir3);
-          
-          //cout << tmp1[0] << '\t' << tmp1[1] << '\t' << tmp2[0] << '\t' << tmp2[1] << '\t' << tmp3[0] << '\t' << tmp3[1]<< endl;
+          knotBegin = elems[ee]->getKnotBegin();
+          knotEnd   = elems[ee]->getKnotEnd();
 
-          xx[0] = computeGeometry(0, tmp1[0]);
-          xx[1] = computeGeometry(0, tmp1[1]);
-          yy[0] = computeGeometry(1, tmp2[0]);
-          yy[1] = computeGeometry(1, tmp2[1]);
-          zz[0] = computeGeometry(2, tmp3[0]);
-          zz[1] = computeGeometry(2, tmp3[1]);
+          xx[0] = computeGeometry(0, knotBegin[0]);
+          xx[1] = computeGeometry(0, knotEnd[1]);
+          yy[0] = computeGeometry(1, knotBegin[1]);
+          yy[1] = computeGeometry(1, knotEnd[1]);
+          zz[0] = computeGeometry(2, knotBegin[2]);
+          zz[1] = computeGeometry(2, knotEnd[1]);
 
           pt[0] = pointsVTK->InsertNextPoint(xx[0], yy[0], zz[0]);
           pt[1] = pointsVTK->InsertNextPoint(xx[1], yy[0], zz[0]);
@@ -261,8 +252,9 @@ void  HBSplineFEM::createPostProcessGrid2D(int vartype, int vardir, int nCol, bo
 
     nlocal = (degree[0]+1) * (degree[1] + 1);
 
-    double   fact, uleft, uright, *tmp1, *tmp2, incr1, incr2;
+    double   fact, uleft, uright, incr1, incr2;
     vector<double>  xx, yy, uu, vv;
+    myPoint  knotBegin, knotEnd;
 
     node* nd1;
 
@@ -294,26 +286,22 @@ void  HBSplineFEM::createPostProcessGrid2D(int vartype, int vardir, int nCol, bo
     {
        ee = activeElements[e];
 
-           nd1 = elems[ee];
-           //cout << " Node # " << nd1->getID() << endl;
+          nd1 = elems[ee];
+          //cout << " Node # " << nd1->getID() << endl;
 
-           tmp1 = nd1->getKnots(0);
-           tmp2 = nd1->getKnots(1);
+          knotBegin = elems[ee]->getKnotBegin();
+          knotEnd   = elems[ee]->getKnotEnd();
 
-           //printf("\t tmp[0] and tmp[1]  ... : %12.8f\t%12.8f\n", tmp[0], tmp[1] );
-               
-           fact = (tmp1[1] - tmp1[0])/resln[0];
-           create_vector(tmp1[0], tmp1[1], fact, uu);
+          fact = (knotEnd[0] - knotBegin[0])/resln[0];
+          create_vector(knotBegin[0], knotEnd[0], fact, uu);
 
-           fact = (tmp2[1] - tmp2[0])/resln[1];
-           create_vector(tmp2[0], tmp2[1], fact, vv);
+          fact = (knotEnd[1] - knotBegin[1])/resln[1];
+          create_vector(knotBegin[1], knotEnd[1], fact, vv);
            
-           //cout << uu << endl;           cout << vv << endl;
+          //cellDataVTK->InsertNextValue(0);
 
-           //cellDataVTK->InsertNextValue(0);
-
-           for(jj=0;jj<vv.size();jj++)
-           {
+          for(jj=0;jj<vv.size();jj++)
+          {
               for(ii=0;ii<uu.size();ii++)
               {
                  param[0] = uu[ii]; param[1] = vv[jj];
@@ -439,9 +427,9 @@ void  HBSplineFEM::postProcess1D(int vartype, int vardir, int nCol, bool umnxfla
 
     VectorXd  N(nlocal), dN_dx(nlocal), d2N_dx2(nlocal), tempVec;
     VectorXd  NN(nlocal), dNN_dx(nlocal), d2NN_dx2(nlocal);
-    myPoint  knotIncr, knotBegin;
+    myPoint  knotIncr, knotBegin, knotEnd;
 
-    double   fact, uleft, uright, *tmp;
+    double   fact, uleft, uright;
 
     vector<double>  outp, u1, u2, outp2, outp3, uu;
     vector<int> bfs;
@@ -457,19 +445,17 @@ void  HBSplineFEM::postProcess1D(int vartype, int vardir, int nCol, bool umnxfla
        //cout << " Node # " << nd1->getID() << '\t' << nd1->isGhost() << '\t' << nd1->isLeaf() << endl;
        if( !(nd1->isGhost()) &&  nd1->isLeaf() )
        {
-           tmp = nd1->getKnots(0);
-
            knotBegin = nd1->getKnotBegin();
+           knotEnd = nd1->getKnotEnd();
            knotIncr  = nd1->getKnotIncrement();
-           //printf("\t tmp[0] and tmp[1]  ... : %12.8f\t%12.8f\n", tmp[0], tmp[1] );
                
-           fact = (tmp[1] - tmp[0])/resln[0];
-           //fact = tmp[1] - tmp[0];
+           fact = (knotEnd[0] - knotBegin[0])/resln[0];
+
            //
-           if( CompareDoubles(tmp[1], 1.0) )
-             create_vector(tmp[0], tmp[1], fact, uu);
+           if( CompareDoubles(knotEnd[1], 1.0) )
+             create_vector(knotBegin[0], knotEnd[0], fact, uu);
            else
-             create_vector(tmp[0], tmp[1] - fact, fact, uu);
+             create_vector(knotBegin[0], knotEnd[0]-fact, fact, uu);
            //
            /*
            if( CompareDoubles(tmp[1], 0.0) )
@@ -589,9 +575,9 @@ void  HBSplineFEM::postProcess2D(int vartype, int vardir, int nCol, bool umnxfla
     VectorXd  NN(nlocal), N(nlocal), dN_dx(nlocal), dN_dy(nlocal), dNN_dx(nlocal), dNN_dy(nlocal), tempVec, tempVec2, d2N_dx2(nlocal), d2N_dy2(nlocal);
     VectorXd  Du(2), dp(2), vectmp(nlocal), R(2), vel(2), rhsTemp;
     MatrixXd  F(2,2);
-    myPoint  knotIncr, knotBegin;
+    myPoint  knotIncr, knotBegin, knotEnd;
 
-    double   fact, uleft, uright, *tmp1, *tmp2, geom[3], incr1, incr2, val1;
+    double   fact, uleft, uright, geom[3], incr1, incr2, val1;
 
     vector<int> bfs;
     vector<double>  xx, yy, uu, vv;
@@ -637,26 +623,17 @@ void  HBSplineFEM::postProcess2D(int vartype, int vardir, int nCol, bool umnxfla
     for(e=0;e<activeElements.size();e++)
     {
            nd1 = elems[activeElements[e]];
-           //cout << " Node # " << nd1->getID() << endl;
-
-           tmp1 = nd1->getKnots(0);
-           tmp2 = nd1->getKnots(1);
 
            knotBegin = nd1->getKnotBegin();
+           knotEnd   = nd1->getKnotEnd();
            knotIncr  = nd1->getKnotIncrement();
-           //printf("\t tmp[0] and tmp[1]  ... : %12.8f\t%12.8f\n", tmp[0], tmp[1] );
                
-           fact = (tmp1[1] - tmp1[0])/resln[0];
-           create_vector(tmp1[0], tmp1[1], fact, uu);
+           fact = (knotEnd[0] - knotBegin[0])/resln[0];
+           create_vector(knotBegin[0], knotEnd[0], fact, uu);
 
-           fact = (tmp2[1] - tmp2[0])/resln[1];
-           create_vector(tmp2[0], tmp2[1], fact, vv);
-           
-           //cout << uu << endl;           cout << vv << endl;
+           fact = (knotEnd[1] - knotBegin[1])/resln[1];
+           create_vector(knotBegin[1], knotEnd[1], fact, vv);
 
-           incr1 = tmp1[1] - tmp1[0];
-           incr2 = tmp2[1] - tmp2[0];
-           
            //create the coordinates of the pointsVTK (nodes in FEM)
 
            count = 0;
@@ -707,26 +684,18 @@ void  HBSplineFEM::postProcess2D(int vartype, int vardir, int nCol, bool umnxfla
     for(e=0;e<activeElements.size();e++)
     {
            nd1 = elems[activeElements[e]];
-           //cout << " Node # " << nd1->getID() << endl;
-
-           tmp1 = nd1->getKnots(0);
-           tmp2 = nd1->getKnots(1);
 
            knotBegin = nd1->getKnotBegin();
+           knotEnd   = nd1->getKnotEnd();
            knotIncr  = nd1->getKnotIncrement();
-           //printf("\t tmp[0] and tmp[1]  ... : %12.8f\t%12.8f\n", tmp1[0], tmp1[1] );
                
-           fact = (tmp1[1] - tmp1[0])/resln[0];
-           create_vector(tmp1[0], tmp1[1], fact, uu);
+           fact = (knotEnd[0] - knotBegin[0])/resln[0];
+           create_vector(knotBegin[0], knotEnd[0], fact, uu);
 
-           fact = (tmp2[1] - tmp2[0])/resln[1];
-           create_vector(tmp2[0], tmp2[1], fact, vv);
-           
-           incr1 = tmp1[1] - tmp1[0];
-           incr2 = tmp2[1] - tmp2[0];
-           
+           fact = (knotEnd[1] - knotBegin[1])/resln[1];
+           create_vector(knotBegin[1], knotEnd[1], fact, vv);
+
            //create the coordinates of the pointsVTK (nodes in FEM)
-           //cout << " ooooooooooooo " << endl;
 
            for(jj=0;jj<vv.size();jj++)
            {
@@ -862,7 +831,9 @@ void  HBSplineFEM::createPostProcessGrid3D(int vartype, int vardir, int nCol, bo
 
     nlocal = (degree[0]+1) * (degree[1] + 1) * (degree[2] + 1);
 
-    double   fact, uleft, uright, *tmp1, *tmp2, *tmp3, incr1, incr2, incr3;
+    myPoint  knotBegin, knotEnd, knotIncr;
+
+    double   fact, uleft, uright;
 
     vector<double>  xx, yy, zz, uu, vv, ww;
 
@@ -875,22 +846,18 @@ void  HBSplineFEM::createPostProcessGrid3D(int vartype, int vardir, int nCol, bo
     {
            nd1 = elems[activeElements[e]];
 
-           tmp1 = nd1->getKnots(0);
-           tmp2 = nd1->getKnots(1);
-           tmp3 = nd1->getKnots(2);
-
-           //printf("\t tmp[0] and tmp[1]  ... : %12.8f\t%12.8f\n", tmp[0], tmp[1] );
+           knotBegin = nd1->getKnotBegin();
+           knotEnd   = nd1->getKnotEnd();
+           knotIncr  = nd1->getKnotIncrement();
                
-           fact = (tmp1[1] - tmp1[0])/resln[0];
-           create_vector(tmp1[0], tmp1[1], fact, uu);
+           fact = (knotEnd[0] - knotBegin[0])/resln[0];
+           create_vector(knotBegin[0], knotEnd[0], fact, uu);
 
-           fact = (tmp2[1] - tmp2[0])/resln[1];
-           create_vector(tmp2[0], tmp2[1], fact, vv);
+           fact = (knotEnd[1] - knotBegin[1])/resln[1];
+           create_vector(knotBegin[1], knotEnd[1], fact, vv);
 
-           fact = (tmp3[1] - tmp3[0])/resln[2];
-           create_vector(tmp3[0], tmp3[1], fact, ww);
-
-           //cout << uu << endl;           cout << vv << endl;
+           fact = (knotEnd[2] - knotBegin[2])/resln[2];
+           create_vector(knotBegin[2], knotEnd[2], fact, ww);
 
            for(kk=0;kk<ww.size();kk++)
            {
@@ -1040,9 +1007,9 @@ void  HBSplineFEM::postProcess3D(int vartype, int vardir, int nCol, bool umnxfla
 
     VectorXd  NN(nlocal), dNN_dx(nlocal), dNN_dy(nlocal), dNN_dz(nlocal), d2NN_dx2(nlocal), d2NN_dy2(nlocal);
     VectorXd  N(nlocal), dN_dx(nlocal), dN_dy(nlocal), dN_dz(nlocal), d2N_dx2(nlocal), d2N_dy2(nlocal);
-    myPoint  knotIncr, knotBegin;
+    myPoint  knotIncr, knotBegin, knotEnd;
 
-    double   fact, uleft, uright, *tmp1, *tmp2, *tmp3, geom[3], incr1, incr2, incr3, val1;
+    double   fact, uleft, uright, geom[3], val1;
 
     vector<double>  uu, vv, ww;
     vector<vector<double> >  outp2, outp3;
@@ -1059,33 +1026,23 @@ void  HBSplineFEM::postProcess3D(int vartype, int vardir, int nCol, bool umnxfla
     {
            nd1 = elems[activeElements[e]];
 
-           //cout << " Node # " << nd1->getID() << endl;
-
-           tmp1 = nd1->getKnots(0);
-           tmp2 = nd1->getKnots(1);
-           tmp3 = nd1->getKnots(2);
-
            knotBegin = nd1->getKnotBegin();
+           knotEnd   = nd1->getKnotEnd();
            knotIncr  = nd1->getKnotIncrement();
-           //printf("\t tmp[0] and tmp[1]  ... : %12.8f\t%12.8f\n", tmp[0], tmp[1] );
                
-           fact = (tmp1[1] - tmp1[0])/resln[0];
-           create_vector(tmp1[0], tmp1[1], fact, uu);
+           fact = (knotEnd[0] - knotBegin[0])/resln[0];
+           create_vector(knotBegin[0], knotEnd[0], fact, uu);
 
-           fact = (tmp2[1] - tmp2[0])/resln[1];
-           create_vector(tmp2[0], tmp2[1], fact, vv);
+           fact = (knotEnd[1] - knotBegin[1])/resln[1];
+           create_vector(knotBegin[1], knotEnd[1], fact, vv);
 
-           fact = (tmp3[1] - tmp3[0])/resln[2];
-           create_vector(tmp3[0], tmp3[1], fact, ww);
-
+           fact = (knotEnd[2] - knotBegin[2])/resln[2];
+           create_vector(knotBegin[2], knotEnd[2], fact, ww);
+              
            //cout << uu << endl;
            //cout << vv << endl;
            //cout << ww << endl;
-
-           incr1 = tmp1[1] - tmp1[0];
-           incr2 = tmp2[1] - tmp2[0];
-           incr3 = tmp3[1] - tmp3[0];
-           
+          
            //create the coordinates of the pointsVTK (nodes in FEM)
 
            for(kk=0;kk<ww.size();kk++)
@@ -1139,32 +1096,22 @@ void  HBSplineFEM::postProcess3D(int vartype, int vardir, int nCol, bool umnxfla
     {
            nd1 = elems[activeElements[e]];
 
-           //cout << " Node # " << nd1->getID() << endl;
-
-           tmp1 = nd1->getKnots(0);
-           tmp2 = nd1->getKnots(1);
-           tmp3 = nd1->getKnots(2);
-
            knotBegin = nd1->getKnotBegin();
+           knotEnd   = nd1->getKnotEnd();
            knotIncr  = nd1->getKnotIncrement();
-           //printf("\t tmp[0] and tmp[1]  ... : %12.8f\t%12.8f\n", tmp[0], tmp[1] );
                
-           fact = (tmp1[1] - tmp1[0])/resln[0];
-           create_vector(tmp1[0], tmp1[1], fact, uu);
+           fact = (knotEnd[0] - knotBegin[0])/resln[0];
+           create_vector(knotBegin[0], knotEnd[0], fact, uu);
 
-           fact = (tmp2[1] - tmp2[0])/resln[1];
-           create_vector(tmp2[0], tmp2[1], fact, vv);
+           fact = (knotEnd[1] - knotBegin[1])/resln[1];
+           create_vector(knotBegin[1], knotEnd[1], fact, vv);
 
-           fact = (tmp3[1] - tmp3[0])/resln[2];
-           create_vector(tmp3[0], tmp3[1], fact, ww);
+           fact = (knotEnd[2] - knotBegin[2])/resln[2];
+           create_vector(knotBegin[2], knotEnd[2], fact, ww);
 
            //cout << uu << endl;
            //cout << vv << endl;
            //cout << ww << endl;
-
-           incr1 = tmp1[1] - tmp1[0];
-           incr2 = tmp2[1] - tmp2[0];
-           incr3 = tmp3[1] - tmp3[0];
            //create the coordinates of the pointsVTK (nodes in FEM)
 
            for(kk=0;kk<ww.size();kk++)
@@ -1289,8 +1236,9 @@ void HBSplineFEM::plotGaussPoints()
     int ee, ll, gp;
 
     vtkIdType  ptId;
-    double  *tmp0, *tmp1, *tmp2;
     node*  nd1;
+
+    myPoint  knotIncr, knotSum;
 
     param.setZero();
 
@@ -1298,10 +1246,9 @@ void HBSplineFEM::plotGaussPoints()
     {
       nd1 = elems[activeElements[ee]];
 
-          tmp0 = nd1->getKnots(Dir1);
-          tmp1 = nd1->getKnots(Dir2);
-          tmp2 = nd1->getKnots(Dir3);
-
+           knotIncr  = nd1->getKnotIncrement();
+           knotSum   = nd1->getKnotSum();
+               
           //getGaussPoints1D(nGP, gausspoints1, gaussweights1);
           //getGaussPoints1D(nGP, gausspoints2, gaussweights2);
 
@@ -1309,8 +1256,8 @@ void HBSplineFEM::plotGaussPoints()
 
           for(gp=0; gp<GeomData.gausspoints.size(); gp++)
           {
-              param[0]  = 0.5*(tmp0[2] * GeomData.gausspoints[gp][0] + tmp0[3]);
-              param[1]  = 0.5*(tmp1[2] * GeomData.gausspoints[gp][1] + tmp1[3]);
+              param[0]  = 0.5*(knotIncr[0] * GeomData.gausspoints[gp][0] + knotSum[0]);
+              param[1]  = 0.5*(knotIncr[1] * GeomData.gausspoints[gp][1] + knotSum[1]);
 
               computeGeometry(param, geom);
 

@@ -72,24 +72,24 @@ void AdaptiveBinarytree<2>::subDivide(int refLev)
     child[SECOND]->orientation = SECOND;
 
 
-    double  mid = 0.5*(knots[splitDirTemp][1] + knots[splitDirTemp][0]);
+    double  mid = 0.5*(knotEnd[splitDirTemp] + knotBegin[splitDirTemp]);
 
     if(splitDirTemp == 0)
     {
-      child[FIRST]->setKnots(Dir1, knots[0][0], mid);
-      child[FIRST]->setKnots(Dir2, knots[1][0], knots[1][1]);
+      child[FIRST]->setKnots(Dir1, knotBegin[0], mid);
+      child[FIRST]->setKnots(Dir2, knotBegin[1], knotEnd[1]);
 
-      child[SECOND]->setKnots(Dir1, mid,        knots[0][1]);
-      child[SECOND]->setKnots(Dir2, knots[1][0], knots[1][1]);
+      child[SECOND]->setKnots(Dir1, mid,        knotEnd[0]);
+      child[SECOND]->setKnots(Dir2, knotBegin[1], knotEnd[1]);
     }
 
     if(splitDirTemp == 1)
     {
-      child[FIRST]->setKnots(Dir1, knots[0][0], knots[0][1]);
-      child[FIRST]->setKnots(Dir2, knots[1][0], mid);
+      child[FIRST]->setKnots(Dir1, knotBegin[0], knotEnd[0]);
+      child[FIRST]->setKnots(Dir2, knotBegin[1], mid);
 
-      child[SECOND]->setKnots(Dir1, knots[0][0], knots[0][1]);
-      child[SECOND]->setKnots(Dir2, mid,         knots[1][1]);
+      child[SECOND]->setKnots(Dir1, knotBegin[0], knotEnd[0]);
+      child[SECOND]->setKnots(Dir2, mid,          knotEnd[1]);
     }
 
 
@@ -206,39 +206,39 @@ void AdaptiveBinarytree<3>::subDivide(int refLev)
     child[SECOND]->orientation = SECOND;
 
 
-    double  mid = 0.5*(knots[splitDirTemp][1] + knots[splitDirTemp][0]);
+    double  mid = 0.5*(knotEnd[splitDirTemp] + knotBegin[splitDirTemp]);
 
     if(splitDirTemp == 0)
     {
-      child[FIRST]->setKnots(Dir1, knots[0][0], mid);
-      child[FIRST]->setKnots(Dir2, knots[1][0], knots[1][1]);
-      child[FIRST]->setKnots(Dir3, knots[2][0], knots[2][1]);
+      child[FIRST]->setKnots(Dir1, knotBegin[0], mid);
+      child[FIRST]->setKnots(Dir2, knotBegin[1], knotEnd[1]);
+      child[FIRST]->setKnots(Dir3, knotBegin[2], knotEnd[2]);
 
-      child[SECOND]->setKnots(Dir1, mid,        knots[0][1]);
-      child[SECOND]->setKnots(Dir2, knots[1][0], knots[1][1]);
-      child[SECOND]->setKnots(Dir3, knots[2][0], knots[2][1]);
+      child[SECOND]->setKnots(Dir1, mid,          knotEnd[0]);
+      child[SECOND]->setKnots(Dir2, knotBegin[1], knotEnd[1]);
+      child[SECOND]->setKnots(Dir3, knotBegin[2], knotEnd[2]);
     }
 
     if(splitDirTemp == 1)
     {
-      child[FIRST]->setKnots(Dir1, knots[0][0], knots[0][1]);
-      child[FIRST]->setKnots(Dir2, knots[1][0], mid);
-      child[FIRST]->setKnots(Dir3, knots[2][0], knots[2][1]);
+      child[FIRST]->setKnots(Dir1, knotBegin[0], knotEnd[0]);
+      child[FIRST]->setKnots(Dir2, knotBegin[1], mid);
+      child[FIRST]->setKnots(Dir3, knotBegin[2], knotEnd[2]);
 
-      child[SECOND]->setKnots(Dir1, knots[0][0], knots[0][1]);
-      child[SECOND]->setKnots(Dir2, mid,         knots[1][1]);
-      child[SECOND]->setKnots(Dir3, knots[2][0], knots[2][1]);
+      child[SECOND]->setKnots(Dir1, knotBegin[0], knotEnd[0]);
+      child[SECOND]->setKnots(Dir2, mid,          knotEnd[1]);
+      child[SECOND]->setKnots(Dir3, knotBegin[2], knotEnd[2]);
     }
 
     if(splitDirTemp == 2)
     {
-      child[FIRST]->setKnots(Dir1, knots[0][0], knots[0][1]);
-      child[FIRST]->setKnots(Dir2, knots[1][0], knots[1][1]);
-      child[FIRST]->setKnots(Dir3, knots[2][0], mid);
+      child[FIRST]->setKnots(Dir1, knotBegin[0], knotEnd[0]);
+      child[FIRST]->setKnots(Dir2, knotBegin[1], knotEnd[1]);
+      child[FIRST]->setKnots(Dir3, knotBegin[2], mid);
 
-      child[SECOND]->setKnots(Dir1, knots[0][0], knots[0][1]);
-      child[SECOND]->setKnots(Dir2, knots[1][0], knots[1][1]);
-      child[SECOND]->setKnots(Dir3, mid,         knots[2][1]);
+      child[SECOND]->setKnots(Dir1, knotBegin[0], knotEnd[0]);
+      child[SECOND]->setKnots(Dir2, knotBegin[1], knotEnd[1]);
+      child[SECOND]->setKnots(Dir3, mid,          knotEnd[2]);
     }
 
 
@@ -306,7 +306,7 @@ void AdaptiveBinarytree<2>::printSelf()
     printf("\t   Parameters ... \n");
     for(int ii=0;ii<2;ii++)
     {
-      printf("\t\t direction #%5d ---> \t%12.6f \t %12.6f\n", (ii+1), knots[ii][0], knots[ii][1]);
+      printf("\t\t direction #%5d ---> \t%12.6f \t %12.6f\n", (ii+1), knotBegin[ii], knotEnd[ii]);
     }
 
     printf("\n\t   Neighbours ... \n");
@@ -356,7 +356,7 @@ void AdaptiveBinarytree<3>::printSelf()
     printf("\t   Parameters ... \n");
     for(int ii=0;ii<3;ii++)
     {
-      printf("\t\t direction #%5d ---> \t%12.6f \t %12.6f\n", (ii+1), knots[ii][0], knots[ii][1]);
+      printf("\t\t direction #%5d ---> \t%12.6f \t %12.6f\n", (ii+1), knotBegin[ii], knotEnd[ii]);
     }
 
     printf("\n\t   Neighbours ... \n");
@@ -396,7 +396,7 @@ void AdaptiveBinarytree<2>::mergeGaussPoints(int refLev2, int inclDom, int dummy
 {
     AdaptiveBinarytree<2>  *adapIntegNodeLocal = new AdaptiveBinarytree<2>(0);
 
-    adapIntegNodeLocal->setKnots(knots[0][0], knots[0][1], knots[1][0], knots[1][1]);
+    adapIntegNodeLocal->setKnots(knotBegin[0], knotEnd[0], knotBegin[1], knotEnd[1]);
 
     adapIntegNodeLocal->GeomData = GeomData;
     adapIntegNodeLocal->domNums = domNums;
@@ -454,7 +454,7 @@ void AdaptiveBinarytree<3>::mergeGaussPoints(int refLev2, int inclDom, int dummy
 {
     AdaptiveBinarytree<3>  *adapIntegNodeLocal = new AdaptiveBinarytree<3>(0);
 
-    adapIntegNodeLocal->setKnots(knots[0][0], knots[0][1], knots[1][0], knots[1][1], knots[2][0], knots[2][1]);
+    adapIntegNodeLocal->setKnots(knotBegin[0], knotEnd[0], knotBegin[1], knotEnd[1], knotBegin[2], knotEnd[2]);
 
     adapIntegNodeLocal->GeomData = GeomData;
     adapIntegNodeLocal->domNums = domNums;

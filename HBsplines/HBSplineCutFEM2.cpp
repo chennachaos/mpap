@@ -81,13 +81,11 @@ void  HBSplineCutFEM::prepareCutElements()
 
     for(bb=0; bb<ImmersedBodyObjects.size(); bb++)
     {
-      //cout << " jjjjjjjjjjjjjjjj " << endl;
       ImmersedBodyObjects[bb]->updateImmersedFaces();
-      //cout << " jjjjjjjjjjjjjjjj " << endl;
       ImmersedBodyObjects[bb]->computeAABB(2);
     }
 
-     //cout << " immersed objects updated " << endl;
+    //cout << " immersed objects updated " << endl;
   
     //GeomData.domainFixedYesNo[0] = 0;
     //GeomData.domainFixedYesNo[1] = 0;
@@ -95,7 +93,6 @@ void  HBSplineCutFEM::prepareCutElements()
     for(ee=0; ee<nElem; ee++)
     {
       nd1 = elems[activeElements[ee]];
-      //cout << ee << '\t' << nd1->getID() << endl;
 
       flag = false;
 
@@ -181,22 +178,12 @@ void  HBSplineCutFEM::prepareCutElements()
       }
     }
 
-    //for(ee=0; ee<gridBF1; ee++)
-      //cout << ee << '\t' << grid_to_cutfem_DOF[ee] << endl;
-    //printVector(grid_to_cutfem_DOF);
-
     nElem     =  fluidElementIds.size();
     fluidDOF  =  nNode*ndof;
 
     //PetscPrintf(MPI_COMM_WORLD, "  nNode    = %d \n", nNode);
     //PetscPrintf(MPI_COMM_WORLD, "  fluidDOF = %d \n", fluidDOF);
     //PetscPrintf(MPI_COMM_WORLD, "  HBSplineCutFEM::prepareCutElements() \n\n");
-
-    //if(this_mpi_proc==0)
-    //{
-      //for(ii=0; ii<grid_to_cutfem_BF.size(); ii++)
-        //cout << ii << '\t' << grid_to_cutfem_BF[ii] << endl;
-    //}
 
     //MPI_Barrier(MPI_COMM_WORLD);
 

@@ -9,27 +9,16 @@
 
 ImmersedIntegrationElement::ImmersedIntegrationElement()
 {
-  id = pointcount++;
+  id = itemcount++;
   DIM = 2;
   
   IS_ACTIVE = true;
-
-  U.setZero();
-  dU = U;
-  ddU = U;
-  iU  = U;
-  Un  = U;
-  dUn = U;
-  ddUn = U;
-  iUn = U;
-  param = U;
-  force = U;
 }
 
 
 ImmersedIntegrationElement::~ImmersedIntegrationElement()
 {
-  pointcount--;
+  itemcount--;
 }
 
 void ImmersedIntegrationElement::prepareElemData()

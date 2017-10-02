@@ -28,18 +28,18 @@ class TreeNode
 
     private:
 
-        static int  nodecount, MAX_LEVEL;
+        static int  nodecount, MAX_LEVEL, ndof;
 
-        int  level, id, subdomId, NUM_CHILDREN, NUM_NEIGHBOURS, nlbf[DIM], nlbf2[DIM], degree[DIM];
-        int  totnlbf, totnlbf2, nsize, nsize2, ndof;
+        int  subdomId, level, totnlbf, totnlbf2;
+        int  NUM_CHILDREN, NUM_NEIGHBOURS;
+        int  id;
         NodeOrientation  orientation;
 
-        double  *elmDat, *matDat, JacMultElem, elemError, volume;
-        double  knots[3][4];
+        double  *elmDat, JacMultElem;
         
         AABB  bbox;
         
-        myPoint  knotBegin, knotEnd, knotIncr;
+        myPoint  knotBegin, knotEnd, knotIncr, knotSum;
 
         bool FuncFlag, GHOST_FLAG, ACTIVE_FLAG, PROCESSED;
     
@@ -49,8 +49,7 @@ class TreeNode
 
     public:
 
-        vector<int>  domNums, QuadratureDomNums;
-        vector<int>  GlobalBasisFuncs, LocalBasisFuncs, LocalBasisFuncsPrev, forAssyVec;
+        vector<int>  domNums, GlobalBasisFuncs, LocalBasisFuncs, LocalBasisFuncsPrev, forAssyVec;
         vector<vector<double> > DirichletData, NeumannData, DerivativeBCData;
 
         SolutionData  *SolnData;
@@ -104,12 +103,6 @@ class TreeNode
         int  getNdof()
         { return ndof; }
 
-        int* getDegree()
-        {  return  degree; }
-
-        double  getError()
-        {  return  elemError; }
-
         double  getJacMultElement()
 	      { return JacMultElem; }
 
@@ -123,43 +116,17 @@ class TreeNode
         int getSubdomainId()
         {  return  subdomId;  }
 
-        void setDegree(int* deg)
+        int  getLocalBFsSize()
+        {  return  totnlbf; }
+
+        void setLocalBFsSize(int dd)
         {
-          totnlbf = 1;
-          for(int ii=0;ii<DIM;ii++)
-          {
-            degree[ii] = deg[ii];
-            nlbf[ii]   = degree[ii]+1;
-            totnlbf   *= nlbf[ii];
-          }
+          totnlbf = dd;
+
           LocalBasisFuncs.resize(totnlbf);
           LocalBasisFuncs.assign(totnlbf, -1);
         }
         
-        bool getFuncFlag()
-        {  return FuncFlag; }
-        
-        void setFuncFlag(bool flag1)
-        {  FuncFlag = flag1; }
-        
-        void setKnots(double* knots_)
-        {  knots = knots_; }
-        
-        double* getKnots(int ind)
-        {  return knots[ind]; }
-
-        AABB& getAABB()
-        {  return  bbox; }
-
-        myPoint& getKnotBegin()
-        {  return knotBegin; }
-
-        myPoint& getKnotEnd()
-        {  return knotEnd; }
-
-        myPoint& getKnotIncrement()
-        {  return knotIncr; }
-
         void setParent(TreeNode_PTR  parent1)
         {  parent = parent1; }
         
@@ -187,36 +154,58 @@ class TreeNode
         static int  getCount()
         { return nodecount; }
 
-        void setKnots(int index, double val0, double val1)
+        AABB& getAABB()
+        {  return  bbox; }
+
+        myPoint& getKnotBegin()
+        {  return knotBegin; }
+
+        myPoint& getKnotEnd()
+        {  return knotEnd; }
+
+        myPoint& getKnotIncrement()
+        {  return knotIncr; }
+
+        myPoint& getKnotSum()
+        {  return knotSum; }
+
+        void setKnots(int index, double u0, double u1)
         {
-          knots[index][0] = val0;
-          knots[index][1] = val1;
+          knotBegin[index] = u0;          knotEnd[index]   = u1;
+
+          knotIncr[index] = u1-u0;
+          knotSum[index]  = u1+u0;
         }
 
         void setKnots(double u0, double u1, double v0, double v1)
         {
-          knots[0][0] = u0;
-          knots[0][1] = u1;
-          knots[1][0] = v0;
-          knots[1][1] = v1;
+          knotBegin[0] = u0;          knotEnd[0]   = u1;
+          knotIncr[0] = u1-u0;
+          knotSum[0]  = u1+u0;
+
+          knotBegin[1] = v0;          knotEnd[1]   = v1;
+          knotIncr[1] = v1-v0;
+          knotSum[1]  = v1+v0;
         }
 
         void setKnots(double u0, double u1, double v0, double v1, double w0, double w1)
         {
-          knots[0][0] = u0;
-          knots[0][1] = u1;
-          knots[1][0] = v0;
-          knots[1][1] = v1;
-          knots[2][0] = w0;
-          knots[2][1] = w1;
+          knotBegin[0] = u0;          knotEnd[0]   = u1;
+          knotIncr[0] = u1-u0;
+          knotSum[0]  = u1+u0;
+
+          knotBegin[1] = v0;          knotEnd[1]   = v1;
+          knotIncr[1] = v1-v0;
+          knotSum[1]  = v1+v0;
+
+          knotBegin[2] = w0;          knotEnd[2]   = w1;
+          knotIncr[2] = w1-w0;
+          knotSum[2]  = w1+w0;
         }
 
         double  getKnotspan(int dir)
-        {  return (knots[dir][1] - knots[dir][0]);  }
+        {  return  knotIncr[dir];  }
 
-        double  getKnotAt(int dir, int loc)
-        {  return  knots[dir][loc];  }
-        
         bool isGhost()
         {  return GHOST_FLAG; }
         
@@ -242,7 +231,7 @@ class TreeNode
         {  return (domNums.size() > 1); }
 
         int getNsize2()
-        { return nsize2; }
+        { return forAssyVec.size(); }
 
         int getNumberOfBasisFunctions()
         { return GlobalBasisFuncs.size(); }
@@ -318,8 +307,6 @@ class TreeNode
 
         void  setInitialProfile();
 
-        void  resetMatrixAndVector();
-
         double  getJacBoundary(int side);
 
         // for fictitioud domain method
@@ -328,6 +315,8 @@ class TreeNode
         void  applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int domainCur=0);
 
         void  applyNeumannBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int domainCur=0);
+
+        void  applyBoundaryConditionsAtApoint(myDataIntegrateCutFEM&);
 
         // for CutFEM for fluid flow 
         void  calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal, int domainCur=0);
@@ -340,46 +329,7 @@ class TreeNode
 
         void  applyBoundaryConditionsAtApointCutFEMFluid2(myDataIntegrateCutFEM&);
 
-        //void  setBoundaryGPsCutFEM(int side, vector<double>& boundaryGPs1, vector<double>& boundaryGWs1, double& Jac);
-        //void  setBoundaryGPsCutFEM(int side, vector<double>& boundaryGPs1, vector<double>& boundaryGWs1, vector<double>& boundaryGPs2, vector<double>& boundaryGWs2, double& Jac);
-        //void  setBoundaryGPsCutFEM(int side, vector<double>& boundaryGPs1, vector<double>& boundaryGWs1, vector<double>& boundaryGPs2, vector<double>& boundaryGWs2, vector<double>& boundaryGPs3, vector<double>& boundaryGWs3, double& Jac);
-
-        // for CutFEM Poisson equation
-        void  calcStiffnessAndResidualCutFEMPoisson(MatrixXd& Klocal, VectorXd& Flocal, int domainCur=0);
-
-        void  applyDirichletBCsCutFEMPoisson(MatrixXd& Klocal, VectorXd& Flocal, int domainCur=0);
-
-        void  applyNeumannBCsCutFEMPoisson(MatrixXd& Klocal, VectorXd& Flocal, int domainCur=0);
-
-        void  applyBoundaryConditionsAtApointCutFEMPoisson(myDataIntegrateCutFEM&);
-
-        void  applyBoundaryConditionsAtApointCutFEMPoisson2(myDataIntegrateCutFEM&);
-
-        // for CutFEM ELASTICITY
-        void  calcStiffnessAndResidualCutFEMelasticity(MatrixXd& Klocal, VectorXd& Flocal, int domainCur=0);
-
-        void  applyDirichletBCsCutFEMelasticity(MatrixXd& Klocal, VectorXd& Flocal, int domainCur=0);
-
-        void  applyNeumannBCsCutFEMelasticity(MatrixXd& Klocal, VectorXd& Flocal, int domainCur=0);
-
-        void  applyBoundaryConditionsAtApointCutFEMElasticity(myDataIntegrateCutFEM&);
-
-        void  applyBoundaryConditionsAtApointCutFEMElasticity2(myDataIntegrateCutFEM&);
-
-        // for Least-Squares formulation
-        void  calcStiffnessAndResidualLSFEM(bool flag, MatrixXd& Klocal, VectorXd& Flocal);
-
-        void  calcResidualLSFEM(VectorXd& Flocal);
-
-        void  applyDirichletBCsLSFEM(bool flag, MatrixXd& Klocal, VectorXd& Flocal);
-
-        void  applyNeumannBCsLSFEM(bool flag, MatrixXd& Klocal, VectorXd& Flocal);
-
-        void  applyBoundaryConditionsAtApoint(myDataIntegrateCutFEM&);
-
         void  applyGhostPenaltyCutFEM(myDataIntegrateCutFEM&);
-
-        void  computeAndReturnJacobian(int, double*, double*, double*, double, double*, MatrixXd&, VectorXd&, VectorXd&);
 
         void  MatrixToMapResult(int, int, SparseMatrixXd& globalK);
 
@@ -387,12 +337,8 @@ class TreeNode
 
         int  calcLoadVector(int ind1=0, int ind2=0, double inp1=0.0, double inp2=0.0);
 
-        int  calcError(int, int domainCur=0);
+        double  calcError(int, int domainCur=0);
         
-        int  calcErrorPoisson(int, int domainCur=0);
-
-        int  calcErrorElasticity(int, int domainCur=0);
-
         double  computeTotalBodyForce(int, int);
         double  computeValue(int dir, VectorXd& NN);
         double  computeValuePrev(int dir, VectorXd& NN);
@@ -432,23 +378,16 @@ class TreeNode
 
 
 template <int DIM>
-TreeNode<DIM>::TreeNode():FuncFlag(false), level(0), NUM_CHILDREN(0), GHOST_FLAG(false), ACTIVE_FLAG(true), PROCESSED(false)
+TreeNode<DIM>::TreeNode():level(0), NUM_CHILDREN(0), GHOST_FLAG(false), ACTIVE_FLAG(true), PROCESSED(false)
 {
     id = nodecount++;
 
     child = NULL;
-    //neighbours = NULL;
     parent = NULL;
     adapIntegNode = NULL;
     
     orientation = ENUM_PARENT;
     
-    for(int ii=0;ii<DIM;ii++)
-    {
-      degree[ii] = 0;
-      nlbf[ii] = 0;
-    }
-
     NUM_NEIGHBOURS = 2*DIM;
 
     //neighbours = new TreeNode_PTR[NUM_NEIGHBOURS];
@@ -463,22 +402,15 @@ TreeNode<DIM>::TreeNode():FuncFlag(false), level(0), NUM_CHILDREN(0), GHOST_FLAG
 
 
 template <int DIM>
-TreeNode<DIM>::TreeNode(int lev):level(lev), NUM_CHILDREN(0), FuncFlag(false), GHOST_FLAG(false), ACTIVE_FLAG(true), PROCESSED(false)
+TreeNode<DIM>::TreeNode(int lev):level(lev), NUM_CHILDREN(0), GHOST_FLAG(false), ACTIVE_FLAG(true), PROCESSED(false)
 {
     id = nodecount++;
 
     child = NULL;
-    //neighbours = NULL;
     parent = NULL;
     adapIntegNode = NULL;
 
     orientation = ENUM_PARENT;
-
-    for(int ii=0;ii<DIM;ii++)
-    {
-      degree[ii] = 0;
-      nlbf[ii] = 0;
-    }
 
     if(level > MAX_LEVEL)
       MAX_LEVEL = level;
@@ -606,39 +538,14 @@ bool  TreeNode<DIM>::isBackBoundary()
 }
 
 
-template <int DIM>
-void TreeNode<DIM>::resetMatrixAndVector()
-{
-  //Klocal.setZero();
-  //Flocal.setZero();
-
-  return;
-}
-
-
 template<int DIM>
 void TreeNode<DIM>::prepareElemData()
 {
     int ii;
-    totnlbf = 1;
-    for(ii=0;ii<DIM;ii++)
-    {
-      knots[ii][2] = knots[ii][1] - knots[ii][0];
-      knots[ii][3] = knots[ii][1] + knots[ii][0];
-      
-      knotBegin[ii] = knots[ii][0];
-      knotEnd[ii]   = knots[ii][1];
-      knotIncr[ii]  = knots[ii][2];
-
-      totnlbf *= nlbf[0];
-    }
-
-    ndof = GeomData->getNdof();
-    nsize =  totnlbf * ndof;
 
     elmDat = &(GeomData->FluidProps[0]);
 
-    //JacMultElem = SolnData->getJacobianFull() * (0.5*knots[0][2]) * (0.5*knots[1][2]) * (0.5*knots[2][2]);
+    //JacMultElem = SolnData->getJacobianFull() * (0.5*knotIncr[0]) * (0.5*knotIncr[1]) * (0.5*knotIncr[2]);
     //
     // because determinant of the Jacobian is constant for uniform rectangular grids.
 
@@ -646,12 +553,11 @@ void TreeNode<DIM>::prepareElemData()
 
     for(ii=0;ii<DIM;ii++)
     {
-      JacMultElem *= (0.5*knots[ii][2]);
+      JacMultElem *= (0.5*knotIncr[ii]);
 
-      bbox.minBB[ii] = GeomData->computeCoord(ii, knots[ii][0]);
-      bbox.maxBB[ii] = GeomData->computeCoord(ii, knots[ii][1]);
+      bbox.minBB[ii] = GeomData->computeCoord(ii, knotBegin[ii]);
+      bbox.maxBB[ii] = GeomData->computeCoord(ii, knotEnd[ii]);
     }
-    //cout << JacMultElem << '\t' << SolnData->getJacobianFull() << '\t' << (0.5*knots[0][2]) << '\t' << (0.5*knots[1][2]) << '\t' << (0.5*knots[2][2]) << endl;
 
     return;
 }
@@ -661,14 +567,11 @@ void TreeNode<DIM>::prepareElemData()
 template<int DIM>
 void TreeNode<DIM>::initialiseDOFvalues()
 {
-    int  ii, jj, ind1, ind2;
-
-    //cout << totnlbf << '\t' << nsize << endl;
-    nsize2 = GlobalBasisFuncs.size() * ndof;
-    //cout << totnlbf2 << '\t' << nsize2 << endl;
-
     if(ndof > 1)
     {
+      int  ii, jj, ind1, ind2;
+      int  nsize2 = GlobalBasisFuncs.size() * ndof;
+
       forAssyVec.resize(nsize2);
       for(ii=0;ii<totnlbf2;ii++)
       {
@@ -678,7 +581,6 @@ void TreeNode<DIM>::initialiseDOFvalues()
         for(jj=0;jj<ndof;jj++)
           forAssyVec[ind1+jj] = ind2 + jj;
       }
-      //forAssyVec2 = GlobalBasisFuncs;
     }
     else
       forAssyVec = GlobalBasisFuncs;

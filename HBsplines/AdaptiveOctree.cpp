@@ -43,7 +43,7 @@ void AdaptiveOctree<1>::subDivide(int lev)
       child[ii]->setParent(this);
     }
 
-    double  mid = 0.5*(knots[0][0] + knots[0][1]);
+    double  mid = 0.5*(knotBegin[0] + knotEnd[0]);
 
     AdaptiveOctree_PTR  tmpnode;
     
@@ -52,8 +52,8 @@ void AdaptiveOctree<1>::subDivide(int lev)
     
     //cout << " AAAAAAAAAAAAAA " << endl;
 
-    child[LEFT]->setKnots(Dir1, knots[0][0], mid);
-    child[RIGHT]->setKnots(Dir1, mid, knots[0][1]);
+    child[LEFT]->setKnots(Dir1,  knotBegin[0], mid);
+    child[RIGHT]->setKnots(Dir1, mid, knotEnd[0]);
 
     // link the children
 
@@ -147,20 +147,20 @@ void AdaptiveOctree<2>::subDivide(int refLev)
 
     double  midu=0.0, midv=0.0;
     
-    midu = 0.5*(knots[0][1] + knots[0][0]);
-    midv = 0.5*(knots[1][1] + knots[1][0]);
+    midu = 0.5*(knotEnd[0] + knotBegin[0]);
+    midv = 0.5*(knotEnd[1] + knotBegin[1]);
 
-    child[SW]->setKnots(Dir1, knots[0][0], midu);
-    child[SW]->setKnots(Dir2, knots[1][0], midv);
+    child[SW]->setKnots(Dir1, knotBegin[0], midu);
+    child[SW]->setKnots(Dir2, knotBegin[1], midv);
 
-    child[SE]->setKnots(Dir1, midu,        knots[0][1]);
-    child[SE]->setKnots(Dir2, knots[1][0], midv);
+    child[SE]->setKnots(Dir1, midu,        knotEnd[0]);
+    child[SE]->setKnots(Dir2, knotBegin[1], midv);
 
-    child[NW]->setKnots(Dir1, knots[0][0], midu);
-    child[NW]->setKnots(Dir2, midv,        knots[1][1]);
+    child[NW]->setKnots(Dir1, knotBegin[0], midu);
+    child[NW]->setKnots(Dir2, midv,        knotEnd[1]);
 
-    child[NE]->setKnots(Dir1, midu,        knots[0][1]);
-    child[NE]->setKnots(Dir2, midv,        knots[1][1]);
+    child[NE]->setKnots(Dir1, midu,        knotEnd[0]);
+    child[NE]->setKnots(Dir2, midv,        knotEnd[1]);
 
 
     child[SW]->setNeighbour(EAST,  child[SE]);
@@ -325,41 +325,41 @@ void AdaptiveOctree<3>::subDivide(int refLev)
     
     ///////////////////////////////////////////////
     //
-    // set the knots
+    // set the knot values
 
-    double  midu = 0.5*(knots[0][0] + knots[0][1]);
-    double  midv = 0.5*(knots[1][0] + knots[1][1]);
-    double  midw = 0.5*(knots[2][0] + knots[2][1]);
+    double  midu = 0.5*(knotBegin[0] + knotEnd[0]);
+    double  midv = 0.5*(knotBegin[1] + knotEnd[1]);
+    double  midw = 0.5*(knotBegin[2] + knotEnd[2]);
 
-    child[SW_BACK ]->setKnots(Dir1, knots[0][0], midu);
-    child[SW_FRONT]->setKnots(Dir1, knots[0][0], midu);
-    child[NW_BACK ]->setKnots(Dir1, knots[0][0], midu);
-    child[NW_FRONT]->setKnots(Dir1, knots[0][0], midu);
+    child[SW_BACK ]->setKnots(Dir1, knotBegin[0], midu);
+    child[SW_FRONT]->setKnots(Dir1, knotBegin[0], midu);
+    child[NW_BACK ]->setKnots(Dir1, knotBegin[0], midu);
+    child[NW_FRONT]->setKnots(Dir1, knotBegin[0], midu);
 
-    child[SE_BACK ]->setKnots(Dir1, midu,        knots[0][1]);
-    child[SE_FRONT]->setKnots(Dir1, midu,        knots[0][1]);
-    child[NE_BACK ]->setKnots(Dir1, midu,        knots[0][1]);
-    child[NE_FRONT]->setKnots(Dir1, midu,        knots[0][1]);
+    child[SE_BACK ]->setKnots(Dir1, midu,        knotEnd[0]);
+    child[SE_FRONT]->setKnots(Dir1, midu,        knotEnd[0]);
+    child[NE_BACK ]->setKnots(Dir1, midu,        knotEnd[0]);
+    child[NE_FRONT]->setKnots(Dir1, midu,        knotEnd[0]);
 
-    child[SW_BACK ]->setKnots(Dir2, knots[1][0], midv);
-    child[SW_FRONT]->setKnots(Dir2, knots[1][0], midv);
-    child[SE_BACK ]->setKnots(Dir2, knots[1][0], midv);
-    child[SE_FRONT]->setKnots(Dir2, knots[1][0], midv);
+    child[SW_BACK ]->setKnots(Dir2, knotBegin[1], midv);
+    child[SW_FRONT]->setKnots(Dir2, knotBegin[1], midv);
+    child[SE_BACK ]->setKnots(Dir2, knotBegin[1], midv);
+    child[SE_FRONT]->setKnots(Dir2, knotBegin[1], midv);
 
-    child[NW_BACK ]->setKnots(Dir2, midv,        knots[1][1]);
-    child[NW_FRONT]->setKnots(Dir2, midv,        knots[1][1]);
-    child[NE_BACK ]->setKnots(Dir2, midv,        knots[1][1]);
-    child[NE_FRONT]->setKnots(Dir2, midv,        knots[1][1]);
+    child[NW_BACK ]->setKnots(Dir2, midv,        knotEnd[1]);
+    child[NW_FRONT]->setKnots(Dir2, midv,        knotEnd[1]);
+    child[NE_BACK ]->setKnots(Dir2, midv,        knotEnd[1]);
+    child[NE_FRONT]->setKnots(Dir2, midv,        knotEnd[1]);
 
-    child[SW_BACK ]->setKnots(Dir3, knots[2][0], midw);
-    child[SE_BACK ]->setKnots(Dir3, knots[2][0], midw);
-    child[NW_BACK ]->setKnots(Dir3, knots[2][0], midw);
-    child[NE_BACK ]->setKnots(Dir3, knots[2][0], midw);
+    child[SW_BACK ]->setKnots(Dir3, knotBegin[2], midw);
+    child[SE_BACK ]->setKnots(Dir3, knotBegin[2], midw);
+    child[NW_BACK ]->setKnots(Dir3, knotBegin[2], midw);
+    child[NE_BACK ]->setKnots(Dir3, knotBegin[2], midw);
 
-    child[SW_FRONT]->setKnots(Dir3, midw,        knots[2][1]);
-    child[SE_FRONT]->setKnots(Dir3, midw,        knots[2][1]);
-    child[NW_FRONT]->setKnots(Dir3, midw,        knots[2][1]);
-    child[NE_FRONT]->setKnots(Dir3, midw,        knots[2][1]);
+    child[SW_FRONT]->setKnots(Dir3, midw,        knotEnd[2]);
+    child[SE_FRONT]->setKnots(Dir3, midw,        knotEnd[2]);
+    child[NW_FRONT]->setKnots(Dir3, midw,        knotEnd[2]);
+    child[NE_FRONT]->setKnots(Dir3, midw,        knotEnd[2]);
 
 
     ///////////////////////////////////////////////
@@ -638,7 +638,7 @@ void AdaptiveOctree<1>::printSelf()
     printf("\t   children    = %5d\n", NUM_CHILDREN);
 
     printf("\t   Parameters ... \n");
-    printf("\t\t direction #%5d ---> \t%12.6f \t %12.6f\n", 1, knots[0][0], knots[0][1]);
+    printf("\t\t direction #%5d ---> \t%12.6f \t %12.6f\n", 1, knotBegin[0], knotEnd[0]);
 
     printf("\n\t   Neighbours ... \n");
     if(neighbours != NULL)
@@ -685,7 +685,7 @@ void AdaptiveOctree<2>::printSelf()
     printf("\t   Parameters ... \n");
     for(int ii=0;ii<2;ii++)
     {
-      printf("\t\t direction #%5d ---> \t%12.6f \t %12.6f\n", (ii+1), knots[ii][0], knots[ii][1]);
+      printf("\t\t direction #%5d ---> \t%12.6f \t %12.6f\n", (ii+1), knotBegin[ii], knotEnd[ii]);
     }
 
     printf("\n\t   Neighbours ... \n");
@@ -751,7 +751,7 @@ void AdaptiveOctree<3>::printSelf()
     printf("\t   Parameters ... \n");
     for(int ii=0;ii<3;ii++)
     {
-      printf("\t\t direction #%5d ---> \t%12.6f \t %12.6f\n", (ii+1), knots[ii][0], knots[ii][1]);
+      printf("\t\t direction #%5d ---> \t%12.6f \t %12.6f\n", (ii+1), knotBegin[ii], knotEnd[ii]);
     }
 
     printf("\n\t   Neighbours ... \n");
@@ -824,10 +824,7 @@ void AdaptiveOctree<2>::mergeGaussPoints(int refLev2, int inclDom, int dummy1, i
 {
     AdaptiveOctree<2>  *adapIntegNodeLocal = new AdaptiveOctree<2>(0);
 
-    //  cout << knots[0][0] << '\t' << knots[0][1] << '\t' << knots[0][2] << '\t' << knots[0][3] << endl;
-    //  cout << knots[1][0] << '\t' << knots[1][1] << '\t' << knots[1][2] << '\t' << knots[1][3] << endl;
-
-    adapIntegNodeLocal->setKnots(knots[0][0], knots[0][1], knots[1][0], knots[1][1]);
+    adapIntegNodeLocal->setKnots(knotBegin[0], knotEnd[0], knotBegin[1], knotEnd[1]);
 
     //cout << " AAAAAAAAAA " << endl;
 
@@ -892,10 +889,7 @@ void AdaptiveOctree<3>::mergeGaussPoints(int refLev2, int inclDom, int dummy1, i
 {
     AdaptiveOctree<3>  *adapIntegNodeLocal = new AdaptiveOctree<3>(0);
 
-    //cout << knots[0][0] << '\t' << knots[0][1] << '\t' << knots[0][2] << '\t' << knots[0][3] << endl;
-    //cout << knots[1][0] << '\t' << knots[1][1] << '\t' << knots[1][2] << '\t' << knots[1][3] << endl;
-
-    adapIntegNodeLocal->setKnots(knots[0][0], knots[0][1], knots[1][0], knots[1][1], knots[2][0], knots[2][1]);
+    adapIntegNodeLocal->setKnots(knotBegin[0], knotEnd[0], knotBegin[1], knotEnd[1], knotBegin[2], knotEnd[2]);
 
     adapIntegNodeLocal->GeomData = GeomData;
     adapIntegNodeLocal->domNums = domNums;

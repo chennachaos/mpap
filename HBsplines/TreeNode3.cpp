@@ -26,8 +26,8 @@ void TreeNode<2>::MatrixToMapResult(int ind1, int ind2, SparseMatrixXd& globalK)
 
     for(gp=0; gp<GeomData->gausspoints.size(); gp++)
     {
-        param[0] = 0.5*(knots[0][2] * GeomData->gausspoints[gp][0] + knots[0][3]);
-        param[1] = 0.5*(knots[1][2] * GeomData->gausspoints[gp][1] + knots[1][3]);
+        param[0] = 0.5*(knotIncr[0] * GeomData->gausspoints[gp][0] + knotSum[0]);
+        param[1] = 0.5*(knotIncr[1] * GeomData->gausspoints[gp][1] + knotSum[1]);
 
         dvol = GeomData->gaussweights[gp] * JacMultElem;
 
@@ -70,8 +70,9 @@ void TreeNode<2>::RhsToMapResult(int ind1, int ind2, double* rhs)
 
     for(gp=0; gp<GeomData->gausspoints.size(); gp++)
     {
-        param[0]  = 0.5*(knots[0][2] * GeomData->gausspoints[gp][0] + knots[0][3]);
-        param[1]  = 0.5*(knots[1][2] * GeomData->gausspoints[gp][1] + knots[1][3]);
+        param[0] = 0.5*(knotIncr[0] * GeomData->gausspoints[gp][0] + knotSum[0]);
+        param[1] = 0.5*(knotIncr[1] * GeomData->gausspoints[gp][1] + knotSum[1]);
+
 
         dvol = GeomData->gaussweights[gp] * JacMultElem;
 
@@ -132,12 +133,12 @@ int TreeNode<2>::calcError(int index, int domainCur)
   {
     for(gp2=0;gp2<GeomData->getNGP(1);gp2++)
     {
-       param[1]  = 0.5*(knots[1][2] * GeomData->gausspoints2[gp2] + knots[1][3]);
+       param[1]  = 0.5*(knotIncr[1] * GeomData->gausspoints2[gp2] + knotSum[1]);
        Jac = GeomData->gaussweights2[gp2] * JacMultElem;
        
        for(gp1=0;gp1<GeomData->getNGP(0);gp1++)
        {
-          param[0]   = 0.5*(knots[0][2] * GeomData->gausspoints1[gp1] + knots[0][3]);
+          param[0]   = 0.5*(knotIncr[0] * GeomData->gausspoints1[gp1] + knotSum[0]);
           dvol = GeomData->gaussweights1[gp1] * Jac;
 
           GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy);
@@ -173,12 +174,12 @@ int TreeNode<2>::calcError(int index, int domainCur)
  {
     for(gp2=0;gp2<GeomData->getNGP(1);gp2++)
     {
-       param[1]  = 0.5*(knots[1][2] * GeomData->gausspoints2[gp2] + knots[1][3]);
+       param[1]  = 0.5*(knotIncr[1] * GeomData->gausspoints2[gp2] + knotSum[1]);
        Jac = GeomData->gaussweights2[gp2] * JacMultElem;
        
        for(gp1=0;gp1<GeomData->getNGP(0);gp1++)
        {
-          param[0]   = 0.5*(knots[0][2] * GeomData->gausspoints1[gp1] + knots[0][3]);
+          param[0]   = 0.5*(knotIncr[0] * GeomData->gausspoints1[gp1] + knotSum[0]);
           dvol = GeomData->gaussweights1[gp1] * Jac;
 
           GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy);
@@ -224,17 +225,15 @@ int TreeNode<2>::calcError(int index, int domainCur)
 
     for(gp2=0;gp2<GeomData->getNGP(1);gp2++)
     {
-       param[1]  = 0.5*(knots[1][2] * GeomData->gausspoints2[gp2] + knots[1][3]);
+       param[1]  = 0.5*(knotIncr[1] * GeomData->gausspoints2[gp2] + knotSum[1]);
        Jac = GeomData->gaussweights2[gp2] * JacMultElem;
        
        for(gp1=0;gp1<GeomData->getNGP(0);gp1++)
        {
-          param[0]   = 0.5*(knots[0][2] * GeomData->gausspoints1[gp1] + knots[0][3]);
+          param[0]   = 0.5*(knotIncr[0] * GeomData->gausspoints1[gp1] + knotSum[0]);
           dvol = GeomData->gaussweights1[gp1] * Jac;
 
           GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy);
-
-          //GeomData->computeBasisFunctions2D(knots[0][0], knots[1][0], knots[0][2], knots[1][2], uu, vv, &NN(0), &dNN_dx(0), &dNN_dy(0), &d2NN_dx2(0), &d2NN_dy2(0));
 
           if(parent == NULL)
           {
@@ -308,12 +307,12 @@ int TreeNode<2>::calcError(int index)
  {
     for(gp=0; gp<GeomData->gausspoints.size(); gp++)
     {
-        uu   = 0.5*(knots[0][2] * GeomData->gausspoints[gp][0] + knots[0][3]);
-        vv   = 0.5*(knots[1][2] * GeomData->gausspoints[gp][1] + knots[1][3]);
+        uu   = 0.5*(knotIncr[0] * GeomData->gausspoints[gp][0] + knotSum[0]);
+        vv   = 0.5*(knotIncr[1] * GeomData->gausspoints[gp][1] + knotSum[1]);
 
         dvol = GeomData->gaussweights[gp] * JacMult;
 
-          GeomData->computeBasisFunctions2D(knots[0][0], knots[1][0], knots[0][2], knots[1][2], uu, vv, &NN(0));
+        GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, NN);
 
             if(parent == NULL)
             {
@@ -352,12 +351,13 @@ int TreeNode<2>::calcError(int index)
  {
     for(gp=0; gp<GeomData->gausspoints.size(); gp++)
     {
-        uu   = 0.5*(knots[0][2] * GeomData->gausspoints[gp][0] + knots[0][3]);
-        vv   = 0.5*(knots[1][2] * GeomData->gausspoints[gp][1] + knots[1][3]);
+        uu   = 0.5*(knotIncr[0] * GeomData->gausspoints[gp][0] + knotSum[0]);
+        vv   = 0.5*(knotIncr[1] * GeomData->gausspoints[gp][1] + knotSum[1]);
 
         dvol = GeomData->gaussweights[gp] * JacMult;
 
-          GeomData->computeBasisFunctions2D(knots[0][0], knots[1][0], knots[0][2], knots[1][2], uu, vv, &NN(0), &dNN_dx(0), &dNN_dy(0));
+          GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy);
+
 
             if(parent == NULL)
             {
@@ -399,12 +399,12 @@ int TreeNode<2>::calcError(int index)
 
     for(gp=0; gp<GeomData->gausspoints.size(); gp++)
     {
-        uu   = 0.5*(knots[0][2] * GeomData->gausspoints[gp][0] + knots[0][3]);
-        vv   = 0.5*(knots[1][2] * GeomData->gausspoints[gp][1] + knots[1][3]);
+        uu   = 0.5*(knotIncr[0] * GeomData->gausspoints[gp][0] + knotSum[0]);
+        vv   = 0.5*(knotIncr[1] * GeomData->gausspoints[gp][1] + knotSum[1]);
 
         dvol = GeomData->gaussweights[gp] * JacMult;
 
-          GeomData->computeBasisFunctions2D(knots[0][0], knots[1][0], knots[0][2], knots[1][2], uu, vv, &NN(0), &dNN_dx(0), &dNN_dy(0), &d2NN_dx2(0), &d2NN_dy2(0));
+          GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy, d2NN_dx2, d2NN_dy2);
 
           if(parent == NULL)
           {
@@ -469,8 +469,8 @@ double TreeNode<2>::computeTotalBodyForce(int index, int dir)
     {
        for(gp=0; gp<GeomData->gausspoints.size(); gp++)
        {
-         param[0] = 0.5*(knots[0][2] * GeomData->gausspoints[gp][0] + knots[0][3]);
-         param[1] = 0.5*(knots[1][2] * GeomData->gausspoints[gp][1] + knots[1][3]);
+         param[0] = 0.5*(knotIncr[0] * GeomData->gausspoints[gp][0] + knotSum[0]);
+         param[1] = 0.5*(knotIncr[1] * GeomData->gausspoints[gp][1] + knotSum[1]);
 
          dvol = GeomData->gaussweights[gp] * JacMultElem;
 
@@ -492,8 +492,8 @@ double TreeNode<2>::computeTotalBodyForce(int index, int dir)
     {
        for(gp=0; gp<GeomData->gausspoints.size(); gp++)
        {
-         param[0]  = 0.5*(knots[0][2] * GeomData->gausspoints[gp][0] + knots[0][3]);
-         param[1]  = 0.5*(knots[1][2] * GeomData->gausspoints[gp][1] + knots[1][3]);
+         param[0] = 0.5*(knotIncr[0] * GeomData->gausspoints[gp][0] + knotSum[0]);
+         param[1] = 0.5*(knotIncr[1] * GeomData->gausspoints[gp][1] + knotSum[1]);
 
          dvol = GeomData->gaussweights[gp] * JacMultElem;
 
@@ -513,8 +513,8 @@ double TreeNode<2>::computeTotalBodyForce(int index, int dir)
     {
        for(gp=0; gp<GeomData->gausspoints.size(); gp++)
        {
-         param[0]  = 0.5*(knots[0][2] * GeomData->gausspoints[gp][0] + knots[0][3]);
-         param[1]  = 0.5*(knots[1][2] * GeomData->gausspoints[gp][1] + knots[1][3]);
+         param[0] = 0.5*(knotIncr[0] * GeomData->gausspoints[gp][0] + knotSum[0]);
+         param[1] = 0.5*(knotIncr[1] * GeomData->gausspoints[gp][1] + knotSum[1]);
 
          dvol = GeomData->gaussweights[gp] * JacMultElem;
 
@@ -538,7 +538,7 @@ double TreeNode<2>::computeTotalBodyForce(int index, int dir)
 
 //
 template<>
-int TreeNode<2>::calcError(int index, int domainCur)
+double  TreeNode<2>::calcError(int index, int domainCur)
 {
     // computing error for Navier-Stokes
     ///////////////////////////////////////////////////////////
@@ -564,18 +564,18 @@ int TreeNode<2>::calcError(int index, int domainCur)
     VectorXd  N, dN_dx, dN_dy;
     myPoint  param, geom;
     
-    elemError = 0.0;
+    double  elemError = 0.0;
 
  if(index < 3) // L2 norm in x-velocity (index=0), y-velocity (index=1) and pressure (index=2)
  {
     for(gp2=0;gp2<GeomData->getNGP(1);gp2++)
     {
-       param[1]  = 0.5*(knots[1][2] * GeomData->gausspoints2[gp2] + knots[1][3]);
+       param[1]  = 0.5*(knotIncr[1] * GeomData->gausspoints2[gp2] + knotSum[1]);
        Jac = GeomData->gaussweights2[gp2] * JacMultElem;
        
        for(gp1=0;gp1<GeomData->getNGP(0);gp1++)
        {
-          param[0]   = 0.5*(knots[0][2] * GeomData->gausspoints1[gp1] + knots[0][3]);
+          param[0]   = 0.5*(knotIncr[0] * GeomData->gausspoints1[gp1] + knotSum[0]);
           dvol = GeomData->gaussweights1[gp1] * Jac;
 
           GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy);
@@ -613,12 +613,12 @@ int TreeNode<2>::calcError(int index, int domainCur)
 
     for(gp2=0;gp2<GeomData->getNGP(1);gp2++)
     {
-       param[1]  = 0.5*(knots[1][2] * GeomData->gausspoints2[gp2] + knots[1][3]);
+       param[1]  = 0.5*(knotIncr[1] * GeomData->gausspoints2[gp2] + knotSum[1]);
        Jac = GeomData->gaussweights2[gp2] * JacMultElem;
        
        for(gp1=0;gp1<GeomData->getNGP(0);gp1++)
        {
-          param[0]   = 0.5*(knots[0][2] * GeomData->gausspoints1[gp1] + knots[0][3]);
+          param[0]   = 0.5*(knotIncr[0] * GeomData->gausspoints1[gp1] + knotSum[0]);
           dvol = GeomData->gaussweights1[gp1] * Jac;
 
           GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy);
@@ -664,7 +664,7 @@ int TreeNode<2>::calcError(int index, int domainCur)
   //if(index == 2)
     //printf(" \t element = %5d ... \t ... error   =   %12.6E \n " , id, elemError);
 
-    return 0;
+    return elemError;
 }
 //
 
@@ -701,7 +701,7 @@ void TreeNode<2>::setInitialProfile()
     //y2 = 6.0;
 
     VectorXd  res(3);
-    MatrixXd  D(nsize,3); D.setZero();
+    MatrixXd  D(forAssyVec.size(),3); D.setZero();
     myPoint  param;
 
     //Klocal.setZero();
@@ -709,8 +709,8 @@ void TreeNode<2>::setInitialProfile()
 
     for(gp=0; gp<GeomData->gausspoints.size(); gp++)
     {
-        param[0] = 0.5*(knots[0][2] * GeomData->gausspoints[gp][0] + knots[0][3]);
-        param[1] = 0.5*(knots[1][2] * GeomData->gausspoints[gp][1] + knots[1][3]);
+        param[0] = 0.5*(knotIncr[0] * GeomData->gausspoints[gp][0] + knotSum[0]);
+        param[1] = 0.5*(knotIncr[1] * GeomData->gausspoints[gp][1] + knotSum[1]);
 
         dvol = GeomData->gaussweights[gp] * JacMultElem;
 
@@ -755,144 +755,7 @@ void TreeNode<2>::setInitialProfile()
 }
 
 
-/*
-template<>
-void TreeNode<2>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, double inp2)
-{
-    // LSFEM for Advection-Diffusion
-    //
-    //////////////////////////////////////////////////
-  
-    int ii, jj, gp1, gp2;
-
-    double  uu, vv, Jac, dvol, fact, res;
-
-    VectorXd  N(totnlbf), dN_dx(totnlbf), d2N_dx2(totnlbf), dN_dy(totnlbf), d2N_dy2(totnlbf), D(totnlbf), NN;
-
-    Klocal.setZero();
-    Flocal.setZero();
-    
-    for(gp2=0;gp2<GeomData->getNGP(1);gp2++)
-    {
-       vv  = 0.5*(knots[1][2] * GeomData->gausspoints2[gp2] + knots[1][3]);
-       Jac = GeomData->gaussweights2[gp2] * JacMult;
-       
-       for(gp1=0;gp1<GeomData->getNGP(0);gp1++)
-       {
-          uu   = 0.5*(knots[0][2] * GeomData->gausspoints1[gp1] + knots[0][3]);
-          dvol = GeomData->gaussweights1[gp1] * Jac;
-
-          //computeBasisFunctions2D(knots[0][0], knots[1][0], knots[0][2], knots[1][2], uu, vv, &N(0), &dN_dx(0), &dN_dy(0), &d2N_dx2(0), &d2N_dy2(0));
-          computeBasisFunctions2D(knots[0][0], knots[1][0], knots[0][2], knots[1][2], uu, vv, &N(0), &dN_dx(0), &dN_dy(0));
-
-          //printf(" uu and vv \t\t %12.8f \t\t %12.8f \t\t %12.8f \n ", uu, vv, dvol);
-
-          //for(ii=0;ii<nsize;ii++)
-            //printf(" \t %14.8f\t %14.8f\t%14.8f\t %14.8f\t%14.8f\n", N[ii], dN_dx[ii], dN_dy[ii], d2N_dx2[ii], d2N_dy2[ii]);
-
-          D = dN_dx + dN_dy;
-
-          //res = sin(uu + vv)*dvol;
-          res = 0.0;
-          res -= computeValue(0, D);
-
-          Klocal += ( (D*dvol) * D.transpose());
-          Flocal += ( (res*dvol) * D );
-       }
-    }
-    //printMatrix(Klocal);
-    //printf("\n\n");
-    //printVector(Flocal);
-    //printf("\n\n");
-
-    return;
-}
-*/
-
-
-
-/*
-template<>
-void TreeNode<2>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, double inp2)
-{
-    // LSFEM for Poisson's (or Laplace) problem
-    ///////////////////////////////////////
-
-    int      ii, jj, gp1, gp2;
-    double   uu, vv, Jac, dvol, fact, res, xx, yy, r, beta, betax, betay, b;
-    //double   N[totnlbf], dN_dx[totnlbf], d2N_dx2[totnlbf], dN_dy[totnlbf], d2N_dy2[totnlbf];
-    VectorXd  N(totnlbf), dN_dx(totnlbf), d2N_dx2(totnlbf), dN_dy(totnlbf), d2N_dy2(totnlbf), D(totnlbf), NN;
-
-    a = elmDat[3];
-
-    Klocal.setZero();
-    Flocal.setZero();
-    
-    b = -3.0;
-    //b = 10.0;
-
-    for(gp2=0;gp2<GeomData->getNGP(1);gp2++)
-    {
-       vv  = 0.5*(knots[1][2] * GeomData->gausspoints2[gp2] + knots[1][3]);
-       Jac = GeomData->gaussweights2[gp2] * JacMult;
-       
-       for(gp1=0;gp1<GeomData->getNGP(0);gp1++)
-       {
-          uu   = 0.5*(knots[0][2] * GeomData->gausspoints1[gp1] + knots[0][3]);
-          dvol = GeomData->gaussweights1[gp1] * Jac;
-
-          computeBasisFunctions2D(knots[0][0], knots[1][0], knots[0][2], knots[1][2], uu, vv, &N(0), &dN_dx(0), &dN_dy(0), &d2N_dx2(0), &d2N_dy2(0));
-
-          //printf(" \t %14.8f \t %14.8f \t %14.8f \t %14.8f\n", uu, vv, fact, dvol0);
-          //printf("BasisFuns \n");
-          //for(ii=0;ii<totnlbf;ii++)
-            //printf(" \t %12.6f  \t %12.6f  \t %12.6f \n ", N(ii), dN_dx(ii), dN_dy(ii));
-
-          xx = GeomData->computeCoord(0, uu);
-          yy = GeomData->computeCoord(1, vv);
-          r  = sqrt(xx*xx+yy*yy);
-
-          if(r <= 0.5)
-          {
-            beta = r*r + 1.0;
-            betax = 2.0*xx;
-            betay = 2.0*yy;
-            //res = 8.0*r*r + 4.0;
-          }
-          else
-          {
-            beta = b;
-            betax = 0.0;
-            betay = 0.0;
-            //res = 0.0;
-          }
-          //res = 8.0*r*r + 4.0;
-
-          beta = 1.0;
-          betax = betay = res = 0.0;
-
-          D = betax*dN_dx + betay*dN_dy + beta*(d2N_dx2 + d2N_dy2);
-
-          res += computeForce(0, N);
-          //cout << " res " << res << endl;
-          res -= computeValue(0, D);
-          //res += 8.0*r*r + 4.0;
-
-          Flocal += ((dvol*res)*D);
-          Klocal += ((dvol*D)*D.transpose());
-    }//gp1
-    }//gp2
-
-    //printMatrix(Klocal);
-    //printf("\n\n");
-    //printVector(Flocal);
-    
-   return;
-}
-*/
-
-
-/*
+//
 template<>
 void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
 {
@@ -921,15 +784,13 @@ void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
     //printVector(GeomData->gaussweights2);
     for(gp2=0;gp2<GeomData->getNGP(1);gp2++)
     {
-      param[1]  = 0.5*(knots[1][2] * GeomData->gausspoints2[gp2] + knots[1][3]);
-      Jac = GeomData->gaussweights2[gp2] * JacMultElem;
-
-      for(gp1=0;gp1<GeomData->getNGP(0);gp1++)
-      {
-          param[0]   = 0.5*(knots[0][2] * GeomData->gausspoints1[gp1] + knots[0][3]);
+       param[1]  = 0.5*(knotIncr[1] * GeomData->gausspoints2[gp2] + knotSum[1]);
+       Jac = GeomData->gaussweights2[gp2] * JacMultElem;
+       
+       for(gp1=0;gp1<GeomData->getNGP(0);gp1++)
+       {
+          param[0]   = 0.5*(knotIncr[0] * GeomData->gausspoints1[gp1] + knotSum[0]);
           dvol = GeomData->gaussweights1[gp1] * Jac;
-
-          //cout << " uuuuuuuuuuuuuuu " << gp2 << '\t' << gp1 << endl;
 
           GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy);
 
@@ -974,56 +835,6 @@ void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
 
   return;
 }
-*/
-
-
-
-template<>
-void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
-{
-    // Stiffness for computing penalty parameter
-    ///////////////////////////////////////
-
-    int ii, jj, gp1, gp2, TI, TIp1, TIp2, count, TJ, TJp1, TJp2;
-   
-    double  Jac, dvol, force, bb1;
-
-    VectorXd  NN(totnlbf), dNN_dx(totnlbf), dNN_dy(totnlbf);
-    VectorXd  N, dN_dx, dN_dy;
-
-    myPoint  param, geom;
-
-    for(gp2=0;gp2<GeomData->getNGP(1);gp2++)
-    {
-      param[1]  = 0.5*(knots[1][2] * GeomData->gausspoints2[gp2] + knots[1][3]);
-      Jac = GeomData->gaussweights2[gp2] * JacMultElem;
-
-      for(gp1=0;gp1<GeomData->getNGP(0);gp1++)
-      {
-          param[0]   = 0.5*(knots[0][2] * GeomData->gausspoints1[gp1] + knots[0][3]);
-          dvol = GeomData->gaussweights1[gp1] * Jac;
-
-          GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy);
-
-          if(parent == NULL)
-          {
-            N = NN;
-            dN_dx = dNN_dx;
-            dN_dy = dNN_dy;
-          }
-          else
-          {
-            N = SubDivMat*NN;
-            dN_dx = SubDivMat*dNN_dx;
-            dN_dy = SubDivMat*dNN_dy;
-          }
-
-          Klocal += ((dvol)*(dN_dx*dN_dx.transpose()+dN_dy*dN_dy.transpose()));
-    }//gp1
-    }//gp2
-
-  return;
-}
 //
 
 
@@ -1054,12 +865,12 @@ void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
 
     for(gp2=0;gp2<GeomData->getNGP(1);gp2++)
     {
-       param[1]  = 0.5*(knots[1][2] * GeomData->gausspoints2[gp2] + knots[1][3]);
+       param[1]  = 0.5*(knotIncr[1] * GeomData->gausspoints2[gp2] + knotSum[1]);
        Jac = GeomData->gaussweights2[gp2] * JacMultElem;
        
        for(gp1=0;gp1<GeomData->getNGP(0);gp1++)
        {
-          param[0]   = 0.5*(knots[0][2] * GeomData->gausspoints1[gp1] + knots[0][3]);
+          param[0]   = 0.5*(knotIncr[0] * GeomData->gausspoints1[gp1] + knotSum[0]);
           dvol = GeomData->gaussweights1[gp1] * Jac;
 
           GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy);
@@ -1125,6 +936,11 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
 
     vector<double>  boundaryGPs1, boundaryGWs1, boundaryGPs2, boundaryGWs2;
 
+    bool   axsy = ((int)elmDat[2] == 1);
+
+    double  rho = elmDat[3];
+    double  mu  = elmDat[4];
+
     double  hx = bbox.maxBB[0]-bbox.minBB[0];
     double  hy = bbox.maxBB[1]-bbox.minBB[1];
 
@@ -1147,13 +963,15 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
         
         for(gp2=0;gp2<boundaryGPs2.size();gp2++)
         {
-            param[1] = 0.5 * (knots[1][2] * boundaryGPs2[gp2] + knots[1][3]);
+            param[1] = 0.5 * (knotIncr[1] * boundaryGPs2[gp2] + knotSum[1]);
         for(gp1=0;gp1<boundaryGPs1.size();gp1++)
         {
-            param[0] = 0.5 * (knots[0][2] * boundaryGPs1[gp1] + knots[0][3]);
+            param[0] = 0.5 * (knotIncr[0] * boundaryGPs1[gp1] + knotSum[0]);
  
             dvol = JacMultLoc * boundaryGWs2[gp2] * boundaryGWs1[gp1] ;
             
+            //printf(" %4d \t %4d \t %12.6f \t %12.6f \n", side, dir, vv, uu);
+
             GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy );
 
             if(parent == NULL)
@@ -1168,6 +986,9 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
               dN_dx = SubDivMat*dNN_dx;
               dN_dy = SubDivMat*dNN_dy;
             }
+
+            //for(ii=0;ii<totnlbf;ii++)
+            //printf(" \t %14.8f \n", NN[ii]);
 
             for(ii=0;ii<totnlbf2;ii++)
             {
@@ -1248,10 +1069,10 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
         
         for(gp2=0;gp2<boundaryGPs2.size();gp2++)
         {
-            param[1] = 0.5 * (knots[1][2] * boundaryGPs2[gp2] + knots[1][3]);
+            param[1] = 0.5 * (knotIncr[1] * boundaryGPs2[gp2] + knotSum[1]);
         for(gp1=0;gp1<boundaryGPs1.size();gp1++)
         {
-            param[0] = 0.5 * (knots[0][2] * boundaryGPs1[gp1] + knots[0][3]);
+            param[0] = 0.5 * (knotIncr[0] * boundaryGPs1[gp1] + knotSum[0]);
  
             dvol = JacMultLoc * boundaryGWs2[gp2] * boundaryGWs1[gp1] ;
             
@@ -1274,10 +1095,6 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
 
             //for(ii=0;ii<totnlbf;ii++)
             //printf(" \t %14.8f \n", NN[ii]);
-
-            //printf("\n\n tracX and tracY ... %12.6f \t %12.6f  \t %12.6f  \t %12.6f  \t %12.6f  \t %12.6f  \t %12.6f \n\n\n", xx, yy, val, val, Jac, JacMult, dvol);
-            //if(pout) printf(" knotsAtGPs = %12.6f \t xx = %12.6f \t yy = %12.6f \n", knotsAtGPs, xx, yy);
-            //printf(" uu = %12.6f \t vv = %12.6f \t dvol = %12.6f \t volume = %12.6f \n", uu, vv, dvol, volume);
 
             geom[0] = GeomData->computeCoord(0, param[0]);
             geom[1] = GeomData->computeCoord(1, param[1]);
@@ -1367,12 +1184,12 @@ void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
 
     for(gp=0; gp<GeomData->gausspoints.size(); gp++)
     {
-        uu   = 0.5*(knots[0][2] * GeomData->gausspoints[gp][0] + knots[0][3]);
-        vv   = 0.5*(knots[1][2] * GeomData->gausspoints[gp][1] + knots[1][3]);
+        param[0] = 0.5*(knotIncr[0] * GeomData->gausspoints[gp][0] + knotSum[0]);
+        param[1] = 0.5*(knotIncr[1] * GeomData->gausspoints[gp][1] + knotSum[1]);
 
         dvol = GeomData->gausspoints[gp] * JacMult;
 
-          GeomData->computeBasisFunctions2D(knots[0][0], knots[1][0], knots[0][2], knots[1][2], uu, vv, &NN(0), &dNN_dx(0), &dNN_dy(0), &d2NN_dx2(0), &d2NN_dy2(0));
+          GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy, d2NN_dx2, d2NN_dy2 );
 
           if(parent == NULL)
           {
@@ -1474,19 +1291,17 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
         
         for(gp2=0;gp2<boundaryGPs2.size();gp2++)
         {
-            param[1] = 0.5 * (knots[1][2] * boundaryGPs2[gp2] + knots[1][3]);
+            param[1] = 0.5 * (knotIncr[1] * boundaryGPs2[gp2] + knotSum[1]);
         for(gp1=0;gp1<boundaryGPs1.size();gp1++)
         {
-            param[0] = 0.5 * (knots[0][2] * boundaryGPs1[gp1] + knots[0][3]);
+            param[0] = 0.5 * (knotIncr[0] * boundaryGPs1[gp1] + knotSum[0]);
  
             dvol = JacMultLoc * boundaryGWs2[gp2] * boundaryGWs1[gp1] ;
             
             //printf(" %4d \t %4d \t %12.6f \t %12.6f \n", side, dir, vv, uu);
 
             GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy );
-
-            //GeomData->computeBasisFunctions2D(knots[0][0], knots[1][0], knots[0][2], knots[1][2], uu, vv,
-              //                &d3N_dx3(0), &d3N_dy3(0), &d3N_dxdy2(0), &d3N_dx2dy(0));
+            //                &d3N_dx3(0), &d3N_dy3(0), &d3N_dxdy2(0), &d3N_dx2dy(0));
 
             //dDN_dx = d3N_dx3 + d3N_dxdy2;
             //dDN_dy = d3N_dy3 + d3N_dx2dy;
@@ -1506,10 +1321,6 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
 
             //for(ii=0;ii<totnlbf;ii++)
             //printf(" \t %14.8f \n", NN[ii]);
-
-            //printf("\n\n tracX and tracY ... %12.6f \t %12.6f  \t %12.6f  \t %12.6f  \t %12.6f  \t %12.6f  \t %12.6f \n\n\n", xx, yy, val, val, Jac, JacMult, dvol);
-            //if(pout) printf(" knotsAtGPs = %12.6f \t xx = %12.6f \t yy = %12.6f \n", knotsAtGPs, xx, yy);
-            //printf(" uu = %12.6f \t vv = %12.6f \t dvol = %12.6f \t volume = %12.6f \n", uu, vv, dvol, volume);
 
             //R  = GeomData->computeCoord(0, 1.0);
             R = 0.5;
@@ -1593,175 +1404,6 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
 */
 
 
-/*
-template<>
-void TreeNode<2>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, double inp2)
-{
-    // LSFEM for Poisson's (or Laplace) problem
-    ///////////////////////////////////////
-
-    int      ii, jj, gp1, gp2;
-    double   uu, vv, Jac, dvol, fact, res, xx, yy, r, beta, betax, betay, b;
-    double   beta1, beta2, delta1, delta2, delta, position[2];
-
-    VectorXd  N(totnlbf), dN_dx(totnlbf), d2N_dx2(totnlbf), dN_dy(totnlbf), d2N_dy2(totnlbf), D(totnlbf), NN;
-
-    beta1 = elmDat[5] * GeomData->getGridLength(0) * knots[0][2];
-    beta2 = elmDat[5] * GeomData->getGridLength(1) * knots[1][2];
-
-    //cout << " beta " << beta1 << '\t' << beta2 << endl;
-
-    position[0] = 0.5 * GeomData->getGridLength(0);
-    position[1] = 0.5 * GeomData->getGridLength(0);
-
-    for(gp2=0;gp2<GeomData->getNGP(1);gp2++)
-    {
-       vv  = 0.5*(knots[1][2] * GeomData->gausspoints2[gp2] + knots[1][3]);
-       Jac = GeomData->gaussweights2[gp2] * JacMult;
-       
-       for(gp1=0;gp1<GeomData->getNGP(0);gp1++)
-       {
-          uu   = 0.5*(knots[0][2] * GeomData->gausspoints1[gp1] + knots[0][3]);
-          dvol = GeomData->gaussweights1[gp1] * Jac;
-
-          computeBasisFunctions2D(knots[0][0], knots[1][0], knots[0][2], knots[1][2], uu, vv, &N(0), &dN_dx(0), &dN_dy(0), &d2N_dx2(0), &d2N_dy2(0));
-
-          //printf(" \t %14.8f \t %14.8f \t %14.8f \t %14.8f\n", uu, vv, fact, dvol0);
-          //printf("BasisFuns \n");
-          //for(ii=0;ii<totnlbf;ii++)
-            //printf(" \t %12.6f  \t %12.6f  \t %12.6f \n ", N(ii), dN_dx(ii), dN_dy(ii));
-
-          xx = GeomData->computeCoord(0, uu) - position[0];
-          yy = GeomData->computeCoord(1, vv) - position[1];
-
-          delta1 = DiracDelta1(xx, beta1);
-          delta2 = DiracDelta1(yy, beta2);
-
-          delta = delta1 * delta2;
-
-          //if(delta > 0.0)
-            //printf(" \t %14.8f\t %14.8f\t%14.8f\t %14.8f\t%14.8f\n", xx, yy, delta1, delta2, delta);
-
-          //D = 1.0*(d2N_dx2 + d2N_dy2);
-
-          res = 5.0;
-          //res -= delta*elmDat[4];
-          //res -= computeForce(0, N)*elmDat[4];
-          res -= computeValue(0, D);
-
-          //Flocal += ((dvol*res)*D);
-          //Klocal += ((dvol*D)*D.transpose());
-
-          // GFEM
-          Klocal += (dvol*(dN_dx*dN_dx.transpose()+dN_dy*dN_dy.transpose()));
-          Flocal += ( dvol*(-5.0*N - dN_dx*computeValue(0, dN_dx)  - dN_dy*computeValue(0, dN_dy) ));
-    }//gp1
-    }//gp2
-    
-   return;
-}
-//
-
-
-//
-template<>
-void TreeNode<2>::computeAndReturnJacobian(int index, double* position, double* normal, double* specVal, double arclen, double* data, MatrixXd& D, VectorXd& vec1, VectorXd& vec2)
-{
-    // LSFEM for Poisson problem
-    //
-    //////////////////////////////////////////////////
-
-    int ii, jj, gp1, gp2, TI, TIp1, TIp2, count, TJ;
-    double  uu, vv, Jac, dvol, fact, fact1, fact2, fact3;
-    double  pres, nu, b1, b2, b3, xx, yy, rr;
-    double  delta1, delta2, delta, beta1, beta2, res, Ddelta;
-
-    VectorXd  N(totnlbf), dN_dx(totnlbf), d2N_dx2(totnlbf), dN_dy(totnlbf), d2N_dy2(totnlbf), vectmp;
-    MatrixXd  D1(nsize, 1), D2(nsize, 1);
-
-    beta1 = elmDat[5] * GeomData->getGridLength(0) * knots[0][2];
-    beta2 = elmDat[5] * GeomData->getGridLength(1) * knots[1][2];
-
-    fact1 = 0.0;
-    D2.setZero();
-    Ddelta = 0.0;
-
-    count = 0;
-    for(gp2=0;gp2<GeomData->getNGP(1);gp2++)
-    {
-       vv  = 0.5*(knots[1][2] * GeomData->gausspoints2[gp2] + knots[1][3]);
-       Jac = GeomData->gaussweights2[gp2] * JacMult;
-       
-       for(gp1=0;gp1<GeomData->getNGP(0);gp1++)
-       {
-          uu   = 0.5*(knots[0][2] * GeomData->gausspoints1[gp1] + knots[0][3]);
-          dvol = GeomData->gaussweights1[gp1] * Jac;
-
-          //computeBasisFunctions2D(knots[0][0], knots[1][0], knots[0][2], knots[1][2], uu, vv, &N(0), &dN_dx(0), &dN_dy(0), &d2N_dx2(0), &d2N_dy2(0));
-
-          N = GeomData->shpfns[level][count].N;
-          dN_dx = GeomData->shpfns[level][count].dN_dx;
-          dN_dy = GeomData->shpfns[level][count].dN_dy;
-          d2N_dx2 = GeomData->shpfns[level][count].d2N_dx2;
-          d2N_dy2 = GeomData->shpfns[level][count].d2N_dy2;
-          count++;
-
-          //for(ii=0;ii<totnlbf;ii++)
-            //printf(" \t %14.8f\t %14.8f\t%14.8f\t %14.8f\t%14.8f\n", N[ii], dN_dx[ii], dN_dy[ii], d2N_dx2[ii], d2N_dy2[ii]);
-
-          xx = GeomData->computeCoord(0, uu) - position[0];
-          yy = GeomData->computeCoord(1, vv) - position[1];
-
-          delta1 = DiracDelta1(xx, beta1);
-          delta2 = DiracDelta1(yy, beta2);
-
-          delta = delta1 * delta2;
-
-          //delta = computeForce(0, N);
-
-          //printf(" \t %14.8f\t %14.8f\t%14.8f\t %14.8f\t%14.8f\n", uu, vv, delta1, delta2, delta);
-
-          vectmp = d2N_dx2 + d2N_dy2;
-
-          fact = delta*dvol;
-
-          Ddelta += (delta*fact);
-
-          D2 += (fact*vectmp);
-          fact1 += (5.0 - computeValue(0, vectmp) - delta*data[0])*fact;
-          //fact1 += (5.0 - computeValue(0, vectmp))*fact; // 5.0 is the body force. need to generalise this
-
-          fact = delta*delta*dvol*1.0/knots[0][2]/knots[1][2];
-          //fact = delta*delta*dvol*1.0e2;
-          //Klocal += ( (fact*N)*N.transpose());
-          //Flocal += ( N*((0.2-computeValue(0,N))*fact));
-       }
-    }
-
-    //printf("\n\n");
-    //printVector(Flocal);
-    //printMatrix(D2);
-    //printf("\n\n");
-
-    if(parent == NULL)
-    {
-      //printf("\nAAAAAAAAAAAAAAAAAAAAA\n");
-      D = D2;
-    }
-    else
-    {
-      //printf("\nBBBBBBBBBBBBBBBBBBBB  %5d \t %5d\n", nsize,nsize2);
-      D.resize(nsize2,1);
-      D = SubDivMat*D2;
-    }
-
-    vec1(0) = Ddelta;
-    vec2(0) = fact1;
-
-   return;
-}
-*/
-
 
           /*
           N = &(GeomData->shpfns[0][count].N(0));
@@ -1800,423 +1442,6 @@ void TreeNode<2>::computeAndReturnJacobian(int index, double* position, double* 
 template<>
 void TreeNode<2>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, double inp2)
 {
-    // LSFEM for Navier-Stokes (steady-state)
-    //
-    //////////////////////////////////////////////////
-
-    int ii, jj, gp1, gp2, TI, TIp1, TIp2, count, TJ;
-    double  uu, vv, Jac, dvol, fact, fact1, fact2, fact3;
-    double  pres, nu, b1, b2, b3, xx, yy, trgradu, gamma=1.0, HH;
-    double  delta, delta1, delta2, position[2], beta1, beta2;
-
-    VectorXd  N(totnlbf), dN_dx(totnlbf), d2N_dx2(totnlbf), dN_dy(totnlbf), d2N_dy2(totnlbf);
-    VectorXd  res(3), dp(2), Du(2), vel(2), vectmp;
-    MatrixXd  D(nsize, 3), F(2,2);
-
-    beta1 = elmDat[5] * GeomData->getGridLength(0) * knots[0][2];
-    beta2 = elmDat[5] * GeomData->getGridLength(1) * knots[1][2];
-
-    position[0] = 0.5 * GeomData->getGridLength(0);
-    position[1] = 0.5 * GeomData->getGridLength(1);
-
-    gamma = 1.0/knots[0][2]/knots[1][2];
-    //gamma = 1.0e6;
-    gamma = 1.0;
-
-    count = 0;
-    for(gp2=0;gp2<GeomData->getNGP(1);gp2++)
-    {
-       vv  = 0.5*(knots[1][2] * GeomData->gausspoints2[gp2] + knots[1][3]);
-       Jac = GeomData->gaussweights2[gp2] * JacMult;
-       
-       for(gp1=0;gp1<GeomData->getNGP(0);gp1++)
-       {
-          uu   = 0.5*(knots[0][2] * GeomData->gausspoints1[gp1] + knots[0][3]);
-          dvol = GeomData->gaussweights1[gp1] * Jac;
-
-          computeBasisFunctions2D(knots[0][0], knots[1][0], knots[0][2], knots[1][2], uu, vv, &N(0), &dN_dx(0), &dN_dy(0), &d2N_dx2(0), &d2N_dy2(0));
-          //computeBasisFunctions2D(uu, vv, N, dN_dx, dN_dy, d2N_dx2, d2N_dy2);
-
-          //N = GeomData->shpfns[level][count].N;
-          //dN_dx = GeomData->shpfns[level][count].dN_dx;
-          //dN_dy = GeomData->shpfns[level][count].dN_dy;
-          //d2N_dx2 = GeomData->shpfns[level][count].d2N_dx2;
-          //d2N_dy2 = GeomData->shpfns[level][count].d2N_dy2;
-          count++;
-
-          xx = GeomData->computeCoord(0, uu) - position[0];
-          yy = GeomData->computeCoord(1, vv) - position[1];
-
-          delta1 = DiracDelta1(xx, beta1);
-          delta2 = DiracDelta1(yy, beta2);
-
-          delta = delta1 * delta2;
-
-          //for(ii=0;ii<totnlbf;ii++)
-            //printf(" \t %14.8f\t %14.8f\t%14.8f\t %14.8f\t%14.8f\n", N[ii], dN_dx[ii], dN_dy[ii], d2N_dx2[ii], d2N_dy2[ii]);
-
-          vel(0) = computeValue(0, N);
-          vel(1) = computeValue(1, N);
-
-          vectmp = d2N_dx2 + d2N_dy2;
-          Du(0) = computeValue(0, vectmp);
-          Du(1) = computeValue(1, vectmp);
-
-          dp(0) = computeValue(2, dN_dx);
-          dp(1) = computeValue(2, dN_dy);
-
-          F(0,0) = computeValue(0, dN_dx);
-          F(0,1) = computeValue(0, dN_dy);
-          F(1,0) = computeValue(1, dN_dx);
-          F(1,1) = computeValue(1, dN_dy);
-
-          for(ii=0;ii<totnlbf;ii++)
-          {
-             TI   =  3*ii;
-             TIp1 =  TI+1;
-             TIp2 =  TI+2;
-
-             b1 = dN_dx[ii];
-             b2 = dN_dy[ii];
-             b3 = N[ii];
-
-             fact = rho*(vel(0)*b1 + vel(1)*b2) - mu*vectmp[ii];
-             
-             D(TI,0)   = fact + F(0,0)*b3;
-             D(TIp1,0) = F(0,1)*b3;
-             D(TIp2,0) = b1;
-
-             D(TI,1)   = F(1,0)*b3;
-             D(TIp1,1) = fact + F(1,1)*b3;
-             D(TIp2,1) = b2;
-           
-             D(TI,2)   = gamma*b1;
-             D(TIp1,2) = gamma*b2;
-             D(TIp2,2) = 0.0;
-          }
-
-          res.setZero();
-          //res(0) = computeForce(0, N) ;
-          //res(1) = computeForce(1, N) ;
-
-          //res(0) += delta*0.3;
-          //res(1) -= delta*0.3;
-
-          res(0) += (F(0,0)*vel(0) + F(0,1)*vel(1) - mu*Du(0) + dp(0));
-          res(1) += (F(1,0)*vel(0) + F(1,1)*vel(1) - mu*Du(1) + dp(1));
-          res(2) += (gamma*F.trace());
-
-          //printf("\n\n \t %14.8f\t %14.8f\t%14.8f\t %14.8f\t%14.8f\t%14.8f\t%14.8f\t%14.8f\t%14.8f\n\n\n", res(0), res(1), F(0,0), F(0,1), F(1,0), F(1,1), JacMult, Jac, dvol);
-          //printf(" \t %14.8f\t %14.8f\t%14.8f\t %14.8f\t%14.8f\t%14.8f\t%14.8f\n", res(0), res(1), res(2), F(0,0), F(0,1), F(1,0), F(1,1));
-
-          if(ind1) Klocal += ((dvol*D)*D.transpose());
-          Flocal -= (D*(dvol*res));
-       }
-    }
-
-   return;
-}
-*/
-
-
-
-/*
-template<>
-void TreeNode<2>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, double inp2)
-{
-    // LSFEM for Navier-Stokes (steady-state) 4 DOF
-    //
-    //////////////////////////////////////////////////
-
-    int ii, jj, gp1, gp2, TI, TIp1, TIp2, TIp3, count, TJ;
-    double  uu, vv, Jac, dvol, fact, fact1, fact2, fact3;
-    double  pres, nu, b1, b2, b3, xx, yy, trgradu, gamma=1.0, HH;
-    double  delta, delta1, delta2, position[2], beta1, beta2, vort;
-
-    VectorXd  N(totnlbf), dN_dx(totnlbf), dN_dy(totnlbf);
-    VectorXd  res(4), dp(2), vel(2), dw(2);
-    MatrixXd  D(nsize, 4), F(2,2);
-
-    beta1 = elmDat[5] * GeomData->getGridLength(0) * knots[0][2];
-    beta2 = elmDat[5] * GeomData->getGridLength(1) * knots[1][2];
-
-    position[0] = 0.5 * GeomData->getGridLength(0);
-    position[1] = 0.5 * GeomData->getGridLength(1);
-
-    gamma = 1.0/knots[0][2]/knots[1][2];
-    //gamma = 1.0e6;
-    gamma = 1.0;
-
-    count = 0;
-    for(gp2=0;gp2<GeomData->getNGP(1);gp2++)
-    {
-       vv  = 0.5*(knots[1][2] * GeomData->gausspoints2[gp2] + knots[1][3]);
-       Jac = GeomData->gaussweights2[gp2] * JacMult;
-       
-       for(gp1=0;gp1<GeomData->getNGP(0);gp1++)
-       {
-          uu   = 0.5*(knots[0][2] * GeomData->gausspoints1[gp1] + knots[0][3]);
-          dvol = GeomData->gaussweights1[gp1] * Jac;
-
-          //computeBasisFunctions2D(knots[0][0], knots[1][0], knots[0][2], knots[1][2], uu, vv, &N(0), &dN_dx(0), &dN_dy(0), &d2N_dx2(0), &d2N_dy2(0));
-          //computeBasisFunctions2D(uu, vv, N, dN_dx, dN_dy, d2N_dx2, d2N_dy2);
-
-          N = GeomData->shpfns[level][count].N;
-          dN_dx = GeomData->shpfns[level][count].dN_dx;
-          dN_dy = GeomData->shpfns[level][count].dN_dy;
-          //d2N_dx2 = GeomData->shpfns[level][count].d2N_dx2;
-          //d2N_dy2 = GeomData->shpfns[level][count].d2N_dy2;
-          count++;
-
-          xx = GeomData->computeCoord(0, uu) - position[0];
-          yy = GeomData->computeCoord(1, vv) - position[1];
-
-          delta1 = DiracDelta1(xx, beta1);
-          delta2 = DiracDelta1(yy, beta2);
-
-          delta = delta1 * delta2;
-
-          //for(ii=0;ii<totnlbf;ii++)
-            //printf(" \t %14.8f\t %14.8f\t%14.8f\t %14.8f\t%14.8f\n", N[ii], dN_dx[ii], dN_dy[ii], d2N_dx2[ii], d2N_dy2[ii]);
-
-          vel(0) = computeValue(0, N);
-          vel(1) = computeValue(1, N);
-
-          dp(0) = computeValue(3, dN_dx);
-          dp(1) = computeValue(3, dN_dy);
-
-          dw(0) = computeValue(2, dN_dx);
-          dw(1) = computeValue(2, dN_dy);
-          vort  = computeValue(2, N);
-
-          F(0,0) = computeValue(0, dN_dx);
-          F(0,1) = computeValue(0, dN_dy);
-          F(1,0) = computeValue(1, dN_dx);
-          F(1,1) = computeValue(1, dN_dy);
-
-          for(ii=0;ii<totnlbf;ii++)
-          {
-             TI   =  ndof*ii;
-             TIp1 =  TI+1;
-             TIp2 =  TI+2;
-             TIp3 =  TI+3;
-
-             b1 = dN_dx[ii];
-             b2 = dN_dy[ii];
-             b3 = N[ii];
-
-             fact = rho*(vel(0)*b1 + vel(1)*b2);
-             
-             D(TI,0)   = fact + F(0,0)*b3;
-             D(TIp1,0) = F(0,1)*b3;
-             D(TIp2,0) = mu*b2;
-             D(TIp3,0) = b1;
-
-             D(TI,1)   = F(1,0)*b3;
-             D(TIp1,1) = fact + F(1,1)*b3;
-             D(TIp2,1) = -mu*b1;
-             D(TIp3,1) = b2;
-           
-             D(TI,2)   = b2;
-             D(TIp1,2) = -b1;
-             D(TIp2,2) = b3;
-             D(TIp3,2) = 0.0;
-
-             D(TI,3)   = b1;
-             D(TIp1,3) = b2;
-             D(TIp2,3) = 0.0;
-             D(TIp3,3) = 0.0;
-          }
-
-          res.setZero();
-          //res(0) = computeForce(0, N) ;
-          //res(1) = computeForce(1, N) ;
-
-          //res(0) += delta*0.3;
-          //res(1) -= delta*0.3;
-
-          res(0) += (F(0,0)*vel(0) + F(0,1)*vel(1) + mu*dw(1) + dp(0));
-          res(1) += (F(1,0)*vel(0) + F(1,1)*vel(1) - mu*dw(0) + dp(1));
-          res(2) += (vort+F(0,1)-F(1,0));
-          res(3) += (F.trace());
-
-          //printf("\n\n \t %14.8f\t %14.8f\t%14.8f\t %14.8f\t%14.8f\t%14.8f\t%14.8f\t%14.8f\t%14.8f\n\n\n", res(0), res(1), F(0,0), F(0,1), F(1,0), F(1,1), JacMult, Jac, dvol);
-          //printf(" \t %14.8f\t %14.8f\t%14.8f\t %14.8f\t%14.8f\t%14.8f\t%14.8f\n", res(0), res(1), res(2), F(0,0), F(0,1), F(1,0), F(1,1));
-
-          if(ind1) Klocal += ((dvol*D)*D.transpose());
-          Flocal -= (D*(dvol*res));
-
-       }
-    }
-
-   return;
-}
-*/
-
-
-
-
-/*
-template<>
-void TreeNode<2>::computeAndReturnJacobian(int index, double* position, double* normal, double* specVal, double arclen, double* data, MatrixXd& D, VectorXd& vec1, VectorXd& vec2)
-{
-    // LSFEM for Navier-Stokes (steady-state)
-    //
-    //////////////////////////////////////////////////
-
-    int ii, jj, gp1, gp2, TI, TIp1, TIp2, count, TJ;
-    double  uu, vv, Jac, dvol, fact, fact1, fact2, fact3;
-    double  pres, nu, b1, b2, b3, xx, yy;
-    double  delta1, delta2, delta, Ddelta, beta1, beta2;
-
-    Circle  circle2(10.0,10.0,0.5);
-    
-    VectorXd  N(totnlbf), dN_dx(totnlbf), d2N_dx2(totnlbf), dN_dy(totnlbf), d2N_dy2(totnlbf);
-    VectorXd  res(2), dp(2), Du(2), vel(3), vectmp, vel2(3);
-    MatrixXd  D1(nsize, 2), D2(nsize, 2), F(2,2), NN(nsize,3);
-
-    beta1 = elmDat[5] * GeomData->getGridLength(0) * knots[0][2];
-    beta2 = elmDat[5] * GeomData->getGridLength(1) * knots[1][2];
-
-    Ddelta = 0.0;
-    fact1 = 0.0;
-    fact2 = 0.0;
-    D2.setZero();
-    NN.setZero();
-    vel.setZero();
-
-    count = 0;
-    for(gp2=0;gp2<GeomData->getNGP(1);gp2++)
-    {
-       vv  = 0.5*(knots[1][2] * GeomData->gausspoints2[gp2] + knots[1][3]);
-       Jac = GeomData->gaussweights2[gp2] * JacMult;
-       
-       for(gp1=0;gp1<GeomData->getNGP(0);gp1++)
-       {
-          uu   = 0.5*(knots[0][2] * GeomData->gausspoints1[gp1] + knots[0][3]);
-          dvol = GeomData->gaussweights1[gp1] * Jac;
-
-          //computeBasisFunctions2D(knots[0][0], knots[1][0], knots[0][2], knots[1][2], uu, vv, &N(0), &dN_dx(0), &dN_dy(0), &d2N_dx2(0), &d2N_dy2(0));
-          //computeBasisFunctions2D(uu, vv, N, dN_dx, dN_dy, d2N_dx2, d2N_dy2);
-
-          N = GeomData->shpfns[level][count].N;
-          dN_dx = GeomData->shpfns[level][count].dN_dx;
-          dN_dy = GeomData->shpfns[level][count].dN_dy;
-          d2N_dx2 = GeomData->shpfns[level][count].d2N_dx2;
-          d2N_dy2 = GeomData->shpfns[level][count].d2N_dy2;
-          count++;
-
-          //for(ii=0;ii<totnlbf;ii++)
-            //printf(" \t %14.8f\t %14.8f\t%14.8f\t %14.8f\t%14.8f\n", N[ii], dN_dx[ii], dN_dy[ii], d2N_dx2[ii], d2N_dy2[ii]);
-
-          xx = GeomData->computeCoord(0, uu) - position[0];
-          yy = GeomData->computeCoord(1, vv) - position[1];
-
-          delta1 = DiracDelta1(xx, beta1);
-          delta2 = DiracDelta1(yy, beta2);
-
-          delta = delta1 * delta2;
-
-          //printf(" \t %14.8f\t %14.8f\t%14.8f\t %14.8f\t%14.8f\n", xx, yy, delta1, delta2, delta);
-
-          vel(0) = computeValue(0, N);
-          vel(1) = computeValue(1, N);
-
-          vectmp = d2N_dx2 + d2N_dy2;
-          Du(0) = computeValue(0, vectmp);
-          Du(1) = computeValue(1, vectmp);
-
-          dp(0) = computeValue(2, dN_dx);
-          dp(1) = computeValue(2, dN_dy);
-
-          F(0,0) = computeValue(0, dN_dx);
-          F(0,1) = computeValue(0, dN_dy);
-          F(1,0) = computeValue(1, dN_dx);
-          F(1,1) = computeValue(1, dN_dy);
-
-          for(ii=0;ii<totnlbf;ii++)
-          {
-             TI   =  3*ii;
-             TIp1 =  TI+1;
-             TIp2 =  TI+2;
-
-             b1 = dN_dx[ii];
-             b2 = dN_dy[ii];
-             b3 = N[ii];
-
-             fact = rho*(vel(0)*b1 + vel(1)*b2) - mu*vectmp[ii];
-
-             D1(TI,0)   = fact + F(0,0)*b3;
-             D1(TIp1,0) = F(0,1)*b3;
-             D1(TIp2,0) = b1;
-
-             D1(TI,1)   = F(1,0)*b3;
-             D1(TIp1,1) = fact + F(1,1)*b3;
-             D1(TIp2,1) = b2;
-
-             NN(TI,0)   = b3;
-             NN(TIp1,1) = b3;
-          }
-
-          res.setZero();
-          //res(0) = computeForce(0, N) ;
-          //res(1) = computeForce(1, N) ;
-
-          delta *= arclen;
-
-          res(0) += (F(0,0)*vel(0) + F(0,1)*vel(1) - mu*Du(0) + dp(0) + delta*data[0]) ;
-          res(1) += (F(1,0)*vel(0) + F(1,1)*vel(1) - mu*Du(1) + dp(1) + delta*data[1]);
-
-          fact = delta*dvol;
-
-          D2 += (fact*D1);
-          Ddelta += delta*fact;
-
-          fact1 += (0.0-res(0))*fact; // 0.0 is the body force. need to generalise this
-          fact2 += (0.0-res(1))*fact;
-
-          vel2(0) = 0.0 - vel(0);
-          vel2(1) = 0.0 - vel(1);
-
-          delta = delta1 * delta2;
-
-          fact = delta*delta*dvol*1.0;
-          //Klocal += ( (fact*NN)*NN.transpose());
-          //Flocal += ( NN*(vel2*fact));
-       }
-    }
-
-    //printf("\n\n");
-    //printVector(Flocal);
-    //printMatrix(D2);
-    //printf("\n\n");
-
-    if(parent == NULL)
-    {
-      D = D2;
-    }
-    else
-    {
-      D.resize(nsize2,1);
-      D = SubDivMat*D2;
-    }
-
-    vec1(0) = Ddelta;
-    vec1(1) = Ddelta;
-    vec2(0) = fact1;
-    vec2(1) = fact2;
-
-   return;
-}
-*/
-
-
-
-
-/*
-template<>
-void TreeNode<2>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, double inp2)
-{
     // GFEM for Navier-Stokes flow (steady-state)
     //
     //////////////////////////////////////////////////
@@ -2235,15 +1460,15 @@ void TreeNode<2>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, doub
     count = 0;
     for(gp2=0;gp2<GeomData->getNGP(1);gp2++)
     {
-       vv  = 0.5*(knots[1][2] * GeomData->gausspoints2[gp2] + knots[1][3]);
+       vv  = 0.5*(knotIncr[1] * GeomData->gausspoints2[gp2] + knotSum[1]);
        Jac = GeomData->gaussweights2[gp2] * JacMult;
        
        for(gp1=0;gp1<GeomData->getNGP(0);gp1++)
        {
-          uu   = 0.5*(knots[0][2] * GeomData->gausspoints1[gp1] + knots[0][3]);
+          uu   = 0.5*(knotIncr[0] * GeomData->gausspoints1[gp1] + knotSum[0]);
           dvol = GeomData->gaussweights1[gp1] * Jac;
 
-          computeBasisFunctions2D(knots[0][0], knots[1][0], knots[0][2], knots[1][2], uu, vv, &N(0), &dN_dx(0), &dN_dy(0), &d2N_dx2(0), &d2N_dy2(0));
+          GeomData->computeBasisFunctions2D(knotBegin, knotEnd, param, N, dN_dx, dN_dy, d2N_dx2, d2N_dy2);
 
           //N = GeomData->shpfns[level][count].N;
           //dN_dx = GeomData->shpfns[level][count].dN_dx;
@@ -2412,163 +1637,6 @@ void TreeNode<2>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, doub
     return;
 }
 */
-
-
-//
-template<>
-void TreeNode<2>::computeAndReturnJacobian(int index, double* position, double* normal, double* specVal, double arclen, double* data, MatrixXd& D, VectorXd& vec1, VectorXd& vec2)
-{
-    // LSFEM for Stokes (steady-state)
-    //
-    //////////////////////////////////////////////////
-
-    int ii, jj, gp1, gp2, TI, TIp1, TIp2, count, TJ;
-    double  uu, vv, Jac, dvol, fact, fact1, fact2, fact3;
-    double  pres, nu, b1, b2, b3, xx, yy;
-    double  delta1, delta2, delta, Ddelta, beta1, beta2, h1, h2, stabParam, mu;
-    
-    VectorXd  N(totnlbf), dN_dx(totnlbf), d2N_dx2(totnlbf), dN_dy(totnlbf), d2N_dy2(totnlbf);
-    VectorXd  res(2), dp(2), Du(2), vel(3), vectmp, vel2(3);
-    MatrixXd  D1(nsize, 2), D2(nsize, 2), F(2,2), NN(nsize,2);
-    myPoint  param;
-
-    beta1 = elmDat[5] * GeomData->getGridLength(0) * knots[0][2];
-    beta2 = elmDat[5] * GeomData->getGridLength(1) * knots[1][2];
-    
-    mu = elmDat[4];
-
-    fact1 = 0.0;
-    fact2 = 0.0;
-    Ddelta = 0.0;
-    D2.setZero();
-    NN.setZero();
-    vel.setZero();
-
-    count = 0;
-    for(gp2=0;gp2<GeomData->getNGP(1);gp2++)
-    {
-       param[1]  = 0.5*(knots[1][2] * GeomData->gausspoints2[gp2] + knots[1][3]);
-       Jac = GeomData->gaussweights2[gp2] * JacMultElem;
-       
-       for(gp1=0;gp1<GeomData->getNGP(0);gp1++)
-       {
-          param[0]   = 0.5*(knots[0][2] * GeomData->gausspoints1[gp1] + knots[0][3]);
-          dvol = GeomData->gaussweights1[gp1] * Jac;
-
-          //GeomData->computeBasisFunctions2D(knots[0][0], knots[1][0], knots[0][2], knots[1][2], uu, vv, &N(0), &dN_dx(0), &dN_dy(0), &d2N_dx2(0), &d2N_dy2(0));
-
-          //N = GeomData->shpfns[level][count].N;
-          //dN_dx = GeomData->shpfns[level][count].dN_dx;
-          //dN_dy = GeomData->shpfns[level][count].dN_dy;
-          //d2N_dx2 = GeomData->shpfns[level][count].d2N_dx2;
-          //d2N_dy2 = GeomData->shpfns[level][count].d2N_dy2;
-          count++;
-
-          //for(ii=0;ii<totnlbf;ii++)
-            //printf(" \t %14.8f\t %14.8f\t%14.8f\t %14.8f\t%14.8f\n", N[ii], dN_dx[ii], dN_dy[ii], d2N_dx2[ii], d2N_dy2[ii]);
-
-          xx = GeomData->computeCoord(0, uu) - position[0];
-          yy = GeomData->computeCoord(1, vv) - position[1];
-
-          delta1 = DiracDelta1(xx, beta1);
-          delta2 = DiracDelta1(yy, beta2);
-
-          delta = delta1 * delta2;
-
-          //printf(" \t %14.8f\t %14.8f\t%14.8f\t %14.8f\t%14.8f\n", xx, yy, delta1, delta2, delta);
-
-          vectmp = d2N_dx2 + d2N_dy2;
-
-          Du(0) = computeValue(0, vectmp);
-          Du(1) = computeValue(1, vectmp);
-
-          dp(0) = computeValue(2, dN_dx);
-          dp(1) = computeValue(2, dN_dy);
-
-          for(ii=0;ii<totnlbf;ii++)
-          {
-             TI   =  3*ii;
-             TIp1 =  TI+1;
-             TIp2 =  TI+2;
-
-             fact = -mu * vectmp[ii];
-
-             D1(TI,0)   = fact;
-             D1(TIp1,0) = 0.0;
-             D1(TIp2,0) = dN_dx[ii];
-
-             D1(TI,1)   = 0.0;
-             D1(TIp1,1) = fact;
-             D1(TIp2,1) = dN_dy[ii];
-
-             NN(TI,0)   = N[ii];
-             NN(TIp1,1) = N[ii];
-          }
-
-          //printf(" \t %14.8f\t %14.8f\t%14.8f\t %14.8f\t%14.8f\n", res(0), res(1), delta1, delta2, delta);
-
-          //delta *= arclen;
-          
-          delta *= stabParam;
-
-          fact = delta*dvol;
-
-          D2 += (fact*D1+NN*dvol*delta*1.0e3);
-
-          //Ddelta += (delta*fact);
-
-          res.setZero();
-          //res(0) = computeForce(0, N) ;
-          //res(1) = computeForce(1, N) ;
-
-          //res(0) = -mu*Du(0) + dp(0) + delta*data[0];
-          //res(1) = -mu*Du(1) + dp(1) + delta*data[1];
-
-          res(0) = -mu*Du(0) + dp(0) ;
-          res(1) = -mu*Du(1) + dp(1) ;
-          
-          fact1  += (0.0-res(0))*fact; // 0.0 is the body force. need to generalise this
-          fact2  += (0.0-res(1))*fact;
-
-          //vel(0) = computeValue(0, N);
-          //vel(1) = computeValue(1, N);
-
-          //vel2.setZero();
-
-          //vel2(0) = 0.0 - vel(0);
-          //vel2(1) = 0.0 - vel(1);
-
-          //delta = delta1 * delta2;
-
-          //fact = delta*delta*dvol*1.0;
-          //Klocal += ( (fact*NN)*NN.transpose());
-          //Flocal += ( NN*(vel2*fact));
-       }
-    }
-
-    //printf("\n\n");
-    //printVector(Flocal);
-    //printMatrix(D2);
-    //printf("\n\n");
-
-    /*
-    if(parent == NULL)
-    {
-      D = D2;
-    }
-    else
-    {
-      D.resize(nsize2,2);
-      D = SubDivMat2*D2;
-    }
-    */
-
-    vec2(0) = fact1;
-    vec2(1) = fact2;
-
-   return;
-}
-//
 
 
 

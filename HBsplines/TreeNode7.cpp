@@ -11,8 +11,8 @@
 template<>
 int TreeNode<1>::prepareCutCell(vector<double>& cutFEMparams)
 {
-  double  x0 = GeomData->computeCoord(0, knots[0][0]);
-  double  x1 = GeomData->computeCoord(0, knots[0][1]);
+  double  x0 = GeomData->computeCoord(0, knotBegin[0]);
+  double  x1 = GeomData->computeCoord(0, knotEnd[0]);
   double  xif=0.5;
 
   bool f0 = ( x0 <= xif );
@@ -225,7 +225,7 @@ int TreeNode<2>::computeGaussPointsSubTrias(int nGP, int inclFlag, int flag1, in
   
   if(inclFlag)
   {
-    QuadratureDomNums.clear();
+    //QuadratureDomNums.clear();
 
     for(vector<myPoly*>::iterator poly = subTrias.begin() ; poly != subTrias.end(); ++poly)
     {
@@ -249,13 +249,13 @@ int TreeNode<2>::computeGaussPointsSubTrias(int nGP, int inclFlag, int flag1, in
             param[ii] = GeomData->computeParam(ii, ptTemp[ii]);
 
             // parametric domain to integration master-quadrilateral domain
-            ptTemp[ii] = (2.0*param[ii] - knots[ii][3])/knots[ii][2];
+            ptTemp[ii] = (2.0*param[ii] - knotSum[ii])/knotIncr[ii];
           }
 
           Quadrature.gausspoints.push_back(ptTemp);
           Quadrature.gaussweights.push_back(gwsLoc[gp]);
 
-          QuadratureDomNums.push_back( domTemp ) ;
+          //QuadratureDomNums.push_back( domTemp ) ;
         }
     }
   }
@@ -284,7 +284,7 @@ int TreeNode<2>::computeGaussPointsSubTrias(int nGP, int inclFlag, int flag1, in
             param[ii] = GeomData->computeParam(ii, geom[ii]);
 
             // parametric domain to integration master-quadrilateral domain
-            ptTemp[ii] = (2.0*param[ii] - knots[ii][3])/knots[ii][2];
+            ptTemp[ii] = (2.0*param[ii] - knotSum[ii])/knotIncr[ii];
           }
 
           Quadrature.gausspoints.push_back(ptTemp);
@@ -390,7 +390,7 @@ int TreeNode<3>::computeGaussPointsSubTrias(int nGP, int refLev2, int inclFlag, 
             param[ii] = GeomData->computeParam(ii, ptTemp[ii]);
 
             // parametric domain to integration master-quadrilateral domain
-            ptTemp[ii] = (2.0*param[ii] - knots[ii][3])/knots[ii][2];
+            ptTemp[ii] = (2.0*param[ii] - knotSum[ii])/knotIncr[ii];
           }
 
           Quadrature.gausspoints.push_back(ptTemp);
@@ -471,7 +471,7 @@ int TreeNode<2>::computeGaussPointsAdapIntegration(int refLev1, int refLev2, int
   //adapIntegNode = new AdaptiveBinarytree<2>(0);
   adapIntegNode = new AdaptiveOctree<2>(0);
 
-  adapIntegNode->setKnots(knots[0][0], knots[0][1], knots[1][0], knots[1][1]);
+  adapIntegNode->setKnots(knotBegin[0], knotEnd[0], knotBegin[1], knotEnd[1]);
 
   adapIntegNode->GeomData = GeomData;
   adapIntegNode->domNums = domNums;
@@ -494,22 +494,22 @@ int TreeNode<2>::computeGaussPointsAdapIntegration(int refLev1, int refLev2, int
   for(gp=0; gp<Quadrature.gausspoints.size(); gp++)
   {
     for(ii=0; ii<2; ii++)
-      Quadrature.gausspoints[gp][ii] = (2.0*Quadrature.gausspoints[gp][ii] - knots[ii][3])/knots[ii][2];
+      Quadrature.gausspoints[gp][ii] = (2.0*Quadrature.gausspoints[gp][ii] - knotSum[ii])/knotIncr[ii];
   }
 
   if(inclFlag)
   {
     myPoint  param, geom;
-    QuadratureDomNums.clear();
+    //QuadratureDomNums.clear();
     for(gp=0; gp<Quadrature.gausspoints.size(); gp++)
     {
-      param[0]  = 0.5*(knots[0][2] * Quadrature.gausspoints[gp][0] + knots[0][3]);
-      param[1]  = 0.5*(knots[1][2] * Quadrature.gausspoints[gp][1] + knots[1][3]);
+      param[0]  = 0.5*(knotIncr[0] * Quadrature.gausspoints[gp][0] + knotSum[0]);
+      param[1]  = 0.5*(knotIncr[1] * Quadrature.gausspoints[gp][1] + knotSum[1]);
 
       geom[0] = GeomData->computeCoord(0, param[0]);
       geom[1] = GeomData->computeCoord(1, param[1]);
 
-      QuadratureDomNums.push_back( GeomData->within(geom) ) ;
+      //QuadratureDomNums.push_back( GeomData->within(geom) ) ;
     }
   }
 
@@ -572,7 +572,7 @@ int TreeNode<3>::computeGaussPointsAdapIntegration(int refLev1, int refLev2, int
   //adapIntegNode = new AdaptiveBinarytree<3>(0);
   adapIntegNode = new AdaptiveOctree<3>(0);
   
-  adapIntegNode->setKnots(knots[0][0], knots[0][1], knots[1][0], knots[1][1], knots[2][0], knots[2][1]);
+  adapIntegNode->setKnots(knotBegin[0], knotEnd[0], knotBegin[1], knotEnd[1], knotBegin[2], knotEnd[2]);
 
   adapIntegNode->GeomData = GeomData;
   adapIntegNode->domNums = domNums;
@@ -596,24 +596,24 @@ int TreeNode<3>::computeGaussPointsAdapIntegration(int refLev1, int refLev2, int
   for(gp=0; gp<Quadrature.gausspoints.size(); gp++)
   {
     for(ii=0; ii<3; ii++)
-      Quadrature.gausspoints[gp][ii] = (2.0*Quadrature.gausspoints[gp][ii] - knots[ii][3])/knots[ii][2];
+      Quadrature.gausspoints[gp][ii] = (2.0*Quadrature.gausspoints[gp][ii] - knotSum[ii])/knotIncr[ii];
   }
 
   if(inclFlag)
   {
     myPoint  param, geom;
-    QuadratureDomNums.clear();
+    //QuadratureDomNums.clear();
     for(gp=0; gp<Quadrature.gausspoints.size(); gp++)
     {
-      param[0]  = 0.5*(knots[0][2] * Quadrature.gausspoints[gp][0] + knots[0][3]);
-      param[1]  = 0.5*(knots[1][2] * Quadrature.gausspoints[gp][1] + knots[1][3]);
-      param[2]  = 0.5*(knots[2][2] * Quadrature.gausspoints[gp][2] + knots[2][3]);
+      param[0]  = 0.5*(knotIncr[0] * Quadrature.gausspoints[gp][0] + knotSum[0]);
+      param[1]  = 0.5*(knotIncr[1] * Quadrature.gausspoints[gp][1] + knotSum[1]);
+      param[2]  = 0.5*(knotIncr[2] * Quadrature.gausspoints[gp][2] + knotSum[2]);
 
       geom[0] = GeomData->computeCoord(0, param[0]);
       geom[1] = GeomData->computeCoord(1, param[1]);
       geom[2] = GeomData->computeCoord(1, param[2]);
 
-      QuadratureDomNums.push_back( GeomData->within(geom) ) ;
+      //QuadratureDomNums.push_back( GeomData->within(geom) ) ;
     }
   }
 
@@ -673,11 +673,11 @@ int TreeNode<2>::checkCutCellValidityAdapIntegration()
   vector<int>  vectmp(4);
   double  vv[2], uu[2];
   
-  uu[0] = knots[0][0] + 0.25*( knots[0][1] - knots[0][0]);
-  uu[1] = knots[0][0] + 0.75*( knots[0][1] - knots[0][0]);
+  uu[0] = knotBegin[0] + 0.25*( knotEnd[0] - knotBegin[0]);
+  uu[1] = knotBegin[0] + 0.75*( knotEnd[0] - knotBegin[0]);
 
-  vv[0] = knots[1][0] + 0.25*( knots[1][1] - knots[1][0]);
-  vv[1] = knots[1][0] + 0.75*( knots[1][1] - knots[1][0]);
+  vv[0] = knotBegin[1] + 0.25*( knotEnd[1] - knotBegin[1]);
+  vv[1] = knotBegin[1] + 0.75*( knotEnd[1] - knotBegin[1]);
 
   //cout << " AAAAAAAAAA " << endl;
 

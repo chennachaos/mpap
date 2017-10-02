@@ -179,7 +179,7 @@ void ImmersedFlexibleSolid::prepareMatrixPattern()
       }
     }
 
-    cout << " totalDOF " << totalDOF << endl;
+    //cout << " totalDOF " << totalDOF << endl;
     //assy4r.resize(totalDOF);
 
 
@@ -234,7 +234,7 @@ void ImmersedFlexibleSolid::prepareMatrixPattern()
     }
 
     //cout << " totalDOF " << totalDOF << endl;
-    cout << " nElem " << nElem << endl;
+    //cout << " nElem " << nElem << endl;
     for(ee=0; ee<nElem; ee++)
     {
       elems[ee]->forAssyVec = LM[ee];

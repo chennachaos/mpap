@@ -10,7 +10,6 @@
 #include "Debug.h"
 #include "RunControl.h"
 #include "Domain.h"
-//#include "IsogeometricFEM.h"
 #include "HBSplineFEM.h"
 #include "HBSplineCutFEM.h"
 #include "StandardFEM.h"
@@ -24,7 +23,7 @@ extern bool       keep;
 extern RunControl runCtrl;
 
 
-bool prgReadFile(void)
+bool prgReadFile()
 {
   int      key, n, i;
   
@@ -43,21 +42,23 @@ bool prgReadFile(void)
 
   pathAndFile.append(files.projDir).append(SLASH).append(files.Ifile);
 
-  if (debug) cout << " " << pathAndFile << "\n\n";
+  if(debug)
+    cout << " " << pathAndFile << "\n\n";
   
   Ifile->open(pathAndFile.asCharArray());
 
-  if (!*Ifile) prgError(1,"prgReadFile","failed to open the input file.");
+  if(!*Ifile)
+    prgError(1,"prgReadFile","failed to open the input file.");
 
   runCtrl.newStatus(LOADING);
-		
+
   
   // check for MPAP2 identifier ..................................................................
   
   line.read(*Ifile);
 
-  if (debug) cout << " >" << line << "<\n\n";
-  if (debug) cout << " >" << line.stripToMin() << "<\n\n";
+  if(debug) cout << " >" << line << "<\n\n";
+  if(debug) cout << " >" << line.stripToMin() << "<\n\n";
   
   if (line.stripToMin() != "MPAP2")  prgError(2,"prgReadFile","'MPAP2' identifier not found.");
 
@@ -68,7 +69,7 @@ bool prgReadFile(void)
      line.read(*Ifile).stripToMin();
 
   if (*Ifile) 
-    { 
+  {
        if (debug) cout << " '#INCLUDE' found in Ifile. Generate Ifile.tmp ....\n\n";
        tmpIfileFlag = true;
        Ifile->close();  // close Ifile (it will be opened and read by 'prgResolveIncludeFile' )
@@ -79,16 +80,17 @@ bool prgReadFile(void)
 
        tmpIfile.close();                             // close output stream Ifile.tmp
        Ifile->open(tmpPathAndFile.asCharArray());     // open Ifile.tmp as input stream
-    } 
-  else 
-    {  if (debug) cout << " no '#INCLUDE' found in Ifile. Proceed with original Ifile ...\n\n";
-       Ifile->close();                           //
-       delete Ifile; Ifile = new ifstream;  // move to beginning of Ifile stream   
-       Ifile->open(pathAndFile.asCharArray()); } // 
+  }
+  else
+  {
+      if (debug) cout << " no '#INCLUDE' found in Ifile. Proceed with original Ifile ...\n\n";
+      Ifile->close();                           //
+      delete Ifile; Ifile = new ifstream;  // move to beginning of Ifile stream   
+      Ifile->open(pathAndFile.asCharArray()); } // 
        
-  // read domains and what_to_do part ............................................................
+      // read domains and what_to_do part ............................................................
 
-  do {
+  do{
      key = prgNextDomainKey(*Ifile);
      
     if (debug) cout << " key = " << key << "\n\n";

@@ -41,7 +41,7 @@ void GeomDataHBSplines::build()
 {
     int size, ii, jj, kk, ind, ind1, ind2, ind3, lev, gp1, gp2, gp3;
 
-    nlbf = totalNGP = 1;
+    totnlbf = totalNGP = 1;
     Jfull = 1.0;
     for(ii=0;ii<DIM;ii++)
     {
@@ -52,7 +52,7 @@ void GeomDataHBSplines::build()
       //as the parameter range is from 0.0 to 1.0, Jacobian in each direction is just the length of the domain in the respective direction
       Jacobian[ii] = gridLEN[ii];
 
-      nlbf     *= (degree[ii]+1);
+      totnlbf  *= (degree[ii]+1);
       totalNGP *= nGP[ii];
       Jfull    *= Jacobian[ii];
     }
@@ -193,7 +193,7 @@ void GeomDataHBSplines::build()
     gwsLeft.push_back(1.0);
     gwsRight.push_back(1.0);
 
-//
+
     double  du = 1.0/nelem[0];
     double  dv = 1.0/nelem[1];
     double  dw = 1.0/nelem[2];
@@ -207,7 +207,7 @@ void GeomDataHBSplines::build()
     param = knotBegin;
 
     incr1 = du;    incr2 = dv;    incr3 = dw;
-
+/*
     for(lev=0;lev<8;lev++)
     {
       shpfns[lev].resize(totalNGP);
@@ -296,7 +296,7 @@ void GeomDataHBSplines::build()
       }
     }
     //printf("KKKKKKKKKKK \n");
-//
+*/
 
     // set boundary normals
     // used to imposing boundary conditions on the boundaries of the background grid

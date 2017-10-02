@@ -21,6 +21,7 @@ void  HBSplineBase::buildBase()
 void  HBSplineBase::buildBase1D()
 {
     int  kk, nn, ii, jj;
+    int  totnlbfdd = GeomData.getLocalBFsSize();
 
     double  du = (knotsRight[0] - knotsLeft[0])/nelem[0];
     double  val1(0.0), val2(0.0);
@@ -37,13 +38,11 @@ void  HBSplineBase::buildBase1D()
     {
         nodetmp = new node(0);
         
-        //nodetmp->setDegree(degree);
-        
         elems.push_back(nodetmp);
         
         //elems.push_back(std::tr1::unqiue_ptr<node> node(0));
         
-        elems[ii]->setDegree(degree);
+        elems[ii]->setLocalBFsSize(totnlbfdd);
         
         NodeNumsAtLevel[0].push_back(nodetmp->getID());
 
@@ -99,6 +98,7 @@ void  HBSplineBase::buildBase1D()
 void  HBSplineBase::buildBase2D()
 {
     int  ii, jj, kk, ll, nn0, nn1, count=0, nor, sou, ind1, ind2;
+    int  totnlbfdd = GeomData.getLocalBFsSize();
 
     double  du = (knotsRight[0] - knotsLeft[0])/nelem[0];
     double  dv = (knotsRight[1] - knotsLeft[1])/nelem[1];
@@ -127,8 +127,8 @@ void  HBSplineBase::buildBase2D()
 
             //nodetmp = std::make_unique<node>(0); // won't leak, frees itself
 
-            nodetmp->setDegree(degree);
-        
+            nodetmp->setLocalBFsSize(totnlbfdd);
+
             u2 = u1 + du;
 
             nodetmp->setKnots(Dir1, u1, u2);
@@ -286,6 +286,7 @@ void  HBSplineBase::buildBase2D()
 void  HBSplineBase::buildBase3D()
 {
     int  ii, jj, kk, ll, ee, nn0, nn1, nn2, count=0, eas, wes, nor, sou, fro, bac, ind1, ind2, nelm;
+    int  totnlbfdd = GeomData.getLocalBFsSize();
 
     double  du = (knotsRight[0] - knotsLeft[0])/nelem[0];
     double  dv = (knotsRight[1] - knotsLeft[1])/nelem[1];
@@ -320,24 +321,24 @@ void  HBSplineBase::buildBase3D()
 
           for(ii=0;ii<nn0;ii++)
           {
-             nodetmp = new node(0);
+            nodetmp = new node(0);
         
-             nodetmp->setDegree(degree);
-        
-             u2 = u1 + du;
+            nodetmp->setLocalBFsSize(totnlbfdd);
 
-             nodetmp->setKnots(Dir1, u1, u2);
-             nodetmp->setKnots(Dir2, v1, v2);
-             nodetmp->setKnots(Dir3, w1, w2);
+            u2 = u1 + du;
 
-             nodetmp->SolnData = &(SolnData);
-             nodetmp->GeomData = &(GeomData);
+            nodetmp->setKnots(Dir1, u1, u2);
+            nodetmp->setKnots(Dir2, v1, v2);
+            nodetmp->setKnots(Dir3, w1, w2);
 
-             elems.push_back(nodetmp);
+            nodetmp->SolnData = &(SolnData);
+            nodetmp->GeomData = &(GeomData);
+
+            elems.push_back(nodetmp);
             
-             NodeNumsAtLevel[0].push_back(nodetmp->getID());
+            NodeNumsAtLevel[0].push_back(nodetmp->getID());
         
-             u1 = u2;
+            u1 = u2;
           }
           v1 = v2;
        }

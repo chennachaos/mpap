@@ -5,6 +5,7 @@
 #include <cstddef>
 
 //#include "Element.h"
+#include "FunctionsProgram.h"
 
 class Element;
 // functions in material

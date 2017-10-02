@@ -4,8 +4,6 @@
 #include "SolutionData.h"
 
 
-
-
 template <>
 bool  TreeNode<1>::isBoundary()
 {
@@ -43,7 +41,7 @@ void TreeNode<1>::subDivide()
     {
        child[ii] = new TreeNode<1>(temp);
 
-       child[ii]->setDegree(degree);
+       child[ii]->setLocalBFsSize(totnlbf);
        child[ii]->setParent(this);
     }
     
@@ -53,7 +51,7 @@ void TreeNode<1>::subDivide()
          child[ii]->setGhostOn();
     }
     
-    double  mid = 0.5*(knots[0][0] + knots[0][1]);
+    double  mid = 0.5*(knotBegin[0] + knotEnd[0]);
 
     TreeNode_PTR  tmpnode;
     
@@ -62,8 +60,8 @@ void TreeNode<1>::subDivide()
     
     //cout << " AAAAAAAAAAAAAA " << endl;
 
-    child[LEFT]->setKnots(Dir1, knots[0][0], mid);
-    child[RIGHT]->setKnots(Dir1, mid, knots[0][1]);
+    child[LEFT]->setKnots(Dir1, knotBegin[0], mid);
+    child[RIGHT]->setKnots(Dir1, mid, knotEnd[0]);
 
     // link the children
 
@@ -116,7 +114,7 @@ void TreeNode<2>::subDivide()
     {
        child[ii] = new TreeNode<2>(temp);
 
-       child[ii]->setDegree(degree);
+       child[ii]->setLocalBFsSize(totnlbf);
        
        child[ii]->setParent(this);
     }
@@ -138,20 +136,20 @@ void TreeNode<2>::subDivide()
     //cout << " child[NW]->orientation " << '\t' << NW << '\t' << child[NW]->orientation << endl;
     //cout << " child[NE]->orientation " << '\t' << NE << '\t' << child[NE]->orientation << endl;
 
-    double  midu = 0.5*(knots[0][1] + knots[0][0]);
-    double  midv = 0.5*(knots[1][1] + knots[1][0]);
+    double  midu = 0.5*(knotEnd[0] + knotBegin[0]);
+    double  midv = 0.5*(knotEnd[1] + knotBegin[1]);
 
-    child[SW]->setKnots(Dir1, knots[0][0], midu);
-    child[SW]->setKnots(Dir2, knots[1][0], midv);
+    child[SW]->setKnots(Dir1, knotBegin[0], midu);
+    child[SW]->setKnots(Dir2, knotBegin[1], midv);
 
-    child[SE]->setKnots(Dir1, midu,        knots[0][1]);
-    child[SE]->setKnots(Dir2, knots[1][0], midv);
+    child[SE]->setKnots(Dir1, midu,        knotEnd[0]);
+    child[SE]->setKnots(Dir2, knotBegin[1], midv);
 
-    child[NW]->setKnots(Dir1, knots[0][0], midu);
-    child[NW]->setKnots(Dir2, midv,        knots[1][1]);
+    child[NW]->setKnots(Dir1, knotBegin[0], midu);
+    child[NW]->setKnots(Dir2, midv,        knotEnd[1]);
 
-    child[NE]->setKnots(Dir1, midu,        knots[0][1]);
-    child[NE]->setKnots(Dir2, midv,        knots[1][1]);
+    child[NE]->setKnots(Dir1, midu,        knotEnd[0]);
+    child[NE]->setKnots(Dir2, midv,        knotEnd[1]);
 
 
     child[SW]->setNeighbour(EAST,  child[SE]);
@@ -272,7 +270,7 @@ void TreeNode<3>::subDivide()
     {
        child[ii] = new TreeNode<3>(temp);
 
-       child[ii]->setDegree(degree);
+       child[ii]->setLocalBFsSize(totnlbf);
        child[ii]->setParent(this);
     }
 
@@ -291,45 +289,45 @@ void TreeNode<3>::subDivide()
     child[SE_BACK]->orientation = SE_BACK;
     child[NW_BACK]->orientation = NW_BACK;
     child[NE_BACK]->orientation = NE_BACK;
-    
+
     
     ///////////////////////////////////////////////
     //
-    // set the knots
+    // set the knot values
 
-    double  midu = 0.5*(knots[0][0] + knots[0][1]);
-    double  midv = 0.5*(knots[1][0] + knots[1][1]);
-    double  midw = 0.5*(knots[2][0] + knots[2][1]);
+    double  midu = 0.5*(knotBegin[0] + knotEnd[0]);
+    double  midv = 0.5*(knotBegin[1] + knotEnd[1]);
+    double  midw = 0.5*(knotBegin[2] + knotEnd[2]);
 
-    child[SW_BACK ]->setKnots(Dir1, knots[0][0], midu);
-    child[SW_FRONT]->setKnots(Dir1, knots[0][0], midu);
-    child[NW_BACK ]->setKnots(Dir1, knots[0][0], midu);
-    child[NW_FRONT]->setKnots(Dir1, knots[0][0], midu);
+    child[SW_BACK ]->setKnots(Dir1, knotBegin[0], midu);
+    child[SW_FRONT]->setKnots(Dir1, knotBegin[0], midu);
+    child[NW_BACK ]->setKnots(Dir1, knotBegin[0], midu);
+    child[NW_FRONT]->setKnots(Dir1, knotBegin[0], midu);
 
-    child[SE_BACK ]->setKnots(Dir1, midu,        knots[0][1]);
-    child[SE_FRONT]->setKnots(Dir1, midu,        knots[0][1]);
-    child[NE_BACK ]->setKnots(Dir1, midu,        knots[0][1]);
-    child[NE_FRONT]->setKnots(Dir1, midu,        knots[0][1]);
+    child[SE_BACK ]->setKnots(Dir1, midu,        knotEnd[0]);
+    child[SE_FRONT]->setKnots(Dir1, midu,        knotEnd[0]);
+    child[NE_BACK ]->setKnots(Dir1, midu,        knotEnd[0]);
+    child[NE_FRONT]->setKnots(Dir1, midu,        knotEnd[0]);
 
-    child[SW_BACK ]->setKnots(Dir2, knots[1][0], midv);
-    child[SW_FRONT]->setKnots(Dir2, knots[1][0], midv);
-    child[SE_BACK ]->setKnots(Dir2, knots[1][0], midv);
-    child[SE_FRONT]->setKnots(Dir2, knots[1][0], midv);
+    child[SW_BACK ]->setKnots(Dir2, knotBegin[1], midv);
+    child[SW_FRONT]->setKnots(Dir2, knotBegin[1], midv);
+    child[SE_BACK ]->setKnots(Dir2, knotBegin[1], midv);
+    child[SE_FRONT]->setKnots(Dir2, knotBegin[1], midv);
 
-    child[NW_BACK ]->setKnots(Dir2, midv,        knots[1][1]);
-    child[NW_FRONT]->setKnots(Dir2, midv,        knots[1][1]);
-    child[NE_BACK ]->setKnots(Dir2, midv,        knots[1][1]);
-    child[NE_FRONT]->setKnots(Dir2, midv,        knots[1][1]);
+    child[NW_BACK ]->setKnots(Dir2, midv,        knotEnd[1]);
+    child[NW_FRONT]->setKnots(Dir2, midv,        knotEnd[1]);
+    child[NE_BACK ]->setKnots(Dir2, midv,        knotEnd[1]);
+    child[NE_FRONT]->setKnots(Dir2, midv,        knotEnd[1]);
 
-    child[SW_BACK ]->setKnots(Dir3, knots[2][0], midw);
-    child[SE_BACK ]->setKnots(Dir3, knots[2][0], midw);
-    child[NW_BACK ]->setKnots(Dir3, knots[2][0], midw);
-    child[NE_BACK ]->setKnots(Dir3, knots[2][0], midw);
+    child[SW_BACK ]->setKnots(Dir3, knotBegin[2], midw);
+    child[SE_BACK ]->setKnots(Dir3, knotBegin[2], midw);
+    child[NW_BACK ]->setKnots(Dir3, knotBegin[2], midw);
+    child[NE_BACK ]->setKnots(Dir3, knotBegin[2], midw);
 
-    child[SW_FRONT]->setKnots(Dir3, midw,        knots[2][1]);
-    child[SE_FRONT]->setKnots(Dir3, midw,        knots[2][1]);
-    child[NW_FRONT]->setKnots(Dir3, midw,        knots[2][1]);
-    child[NE_FRONT]->setKnots(Dir3, midw,        knots[2][1]);
+    child[SW_FRONT]->setKnots(Dir3, midw,        knotEnd[2]);
+    child[SE_FRONT]->setKnots(Dir3, midw,        knotEnd[2]);
+    child[NW_FRONT]->setKnots(Dir3, midw,        knotEnd[2]);
+    child[NE_FRONT]->setKnots(Dir3, midw,        knotEnd[2]);
 
 
     ///////////////////////////////////////////////
@@ -665,7 +663,7 @@ void TreeNode<1>::printSelf()
     {
         printf("\t   ID          = %5d\n", id);
         printf("\t   Level       = %5d\n", level);
-        printf("\t   Degree      = %5d\n", degree[0]);
+        //printf("\t   Degree      = %5d\n", degree[0]);
         printf("\t   Ghost       = %5d\n", isGhost());
         if(parent == NULL)
           printf("\t   Parent      = %5d\n", -1);
@@ -685,7 +683,7 @@ void TreeNode<1>::printSelf()
           printf(" NONE \n");
         
         printf("\t   Parameters ... \n");
-        printf("\t\t direction #%5d ---> \t%12.6f \t %12.6f\n", 1, knots[0][0], knots[0][1]);
+        printf("\t\t direction #%5d ---> \t%12.6f \t %12.6f\n", 1, knotBegin[0], knotEnd[0]);
 
         printf("\n\t   Neighbours ... \n");
         if(neighbours != NULL)
@@ -725,10 +723,10 @@ void TreeNode<2>::printSelf()
 {
     printf("\t   ID          = %5d\n", id);
     printf("\t   Level       = %5d\n", level);
-    printf("\t   Degree      = ");
-    for(int ii=0;ii<2;ii++)
-      printf("%5d\t", degree[ii]);
-    printf("\n");
+    //printf("\t   Degree      = ");
+    //for(int ii=0;ii<2;ii++)
+      //printf("%5d\t", degree[ii]);
+    //printf("\n");
     
     if(parent == NULL)
       printf("\t   Parent      = %5d\n", -1);
@@ -749,7 +747,7 @@ void TreeNode<2>::printSelf()
     printf("\t   Parameters ... \n");
     for(int ii=0;ii<2;ii++)
     {
-      printf("\t\t direction #%5d ---> \t%12.6f \t %12.6f\n", (ii+1), knots[ii][0], knots[ii][1]);
+      printf("\t\t direction #%5d ---> \t%12.6f \t %12.6f\n", (ii+1), knotBegin[ii], knotEnd[ii]);
     }
 
     printf("\n\t   Neighbours ... \n");
@@ -804,11 +802,11 @@ void TreeNode<3>::printSelf()
 {
     printf("\t   ID          = %5d\n", id);
     printf("\t   Level       = %5d\n", level);
-    printf("\t   Degree      = ");
-    for(int ii=0;ii<3;ii++)
-      printf("%5d\t", degree[ii]);
-    printf("\n");
-            
+    //printf("\t   Degree      = ");
+    //for(int ii=0;ii<3;ii++)
+      //printf("%5d\t", degree[ii]);
+    //printf("\n");
+
     if(parent == NULL)
       printf("\t   Parent      = %5d\n", -1);
     else
@@ -828,7 +826,7 @@ void TreeNode<3>::printSelf()
     printf("\t   Parameters ... \n");
     for(int ii=0;ii<3;ii++)
     {
-      printf("\t\t direction #%5d ---> \t%12.6f \t %12.6f\n", (ii+1), knots[ii][0], knots[ii][1]);
+      printf("\t\t direction #%5d ---> \t%12.6f \t %12.6f\n", (ii+1), knotBegin[ii], knotEnd[ii]);
     }
 
     printf("\n\t   Neighbours ... \n");
@@ -897,7 +895,7 @@ void TreeNode<3>::printSelf()
 template<>
 bool  TreeNode<1>::pointLiesInside(const myPoint& pt)
 {
-    if( (pt[0] >= knots[0][0]) && (pt[0] <= knots[0][1]) )
+    if( (pt[0] >= knotBegin[0]) && (pt[0] <= knotEnd[0]) )
       return true;
     else
       return false;
@@ -907,9 +905,9 @@ bool  TreeNode<1>::pointLiesInside(const myPoint& pt)
 template<>
 bool  TreeNode<2>::pointLiesInside(const myPoint& pt)
 {
-    if( (pt[0] >= knots[0][0]) && (pt[0] <= knots[0][1]) )
+    if( (pt[0] >= knotBegin[0]) && (pt[0] <= knotEnd[0]) )
     {
-      if( (pt[1] >= knots[1][0]) && (pt[1] <= knots[1][1]) )
+      if( (pt[1] >= knotBegin[1]) && (pt[1] <= knotEnd[1]) )
         return true;
       else
         return false;
@@ -923,11 +921,11 @@ bool  TreeNode<2>::pointLiesInside(const myPoint& pt)
 template<>
 bool  TreeNode<3>::pointLiesInside(const myPoint& pt)
 {
-    if( (pt[0] >= knots[0][0]) && (pt[0] <= knots[0][1]) )
+    if( (pt[0] >= knotBegin[0]) && (pt[0] <= knotEnd[0]) )
     {
-      if( (pt[1] >= knots[1][0]) && (pt[1] <= knots[1][1]) )
+      if( (pt[1] >= knotBegin[1]) && (pt[1] <= knotEnd[1]) )
       {
-        if( (pt[2] >= knots[2][0]) && (pt[2] <= knots[2][1]) )
+        if( (pt[2] >= knotBegin[2]) && (pt[2] <= knotEnd[2]) )
           return true;
         else
           return false;

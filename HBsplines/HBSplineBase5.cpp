@@ -37,7 +37,8 @@ int  HBSplineBase::findCellNumber(const myPoint& geom)
   }
   else
   {
-     double  uu, vv, ww, *tmp1, *tmp2, *tmp3;
+     double  uu, vv, ww;
+     myPoint knotEnd;
 
      node *nd, *nd1, *nd2, *nd3;
 
@@ -50,9 +51,10 @@ int  HBSplineBase::findCellNumber(const myPoint& geom)
        while(!nd->isLeaf())
        {
          nd1  = nd->getChild(LEFT);
-         tmp1 = nd1->getKnots(0);
 
-         if( uu < tmp1[1] ) // LEFT
+         knotEnd = nd1->getKnotEnd();
+
+         if( uu < knotEnd[0] ) // LEFT
            nd2 = nd->getChild(LEFT);
          else  //RIGHT
            nd2 = nd->getChild(RIGHT);
@@ -69,19 +71,18 @@ int  HBSplineBase::findCellNumber(const myPoint& geom)
        {
          nd1 = nd->getChild(SW);
 
-         tmp1 = nd1->getKnots(0);
-         tmp2 = nd1->getKnots(1);
+         knotEnd = nd1->getKnotEnd();
 
-         if( uu < tmp1[1] ) // SW or NW
+         if( uu < knotEnd[0] ) // SW or NW
          {
-           if( vv < tmp2[1] ) // SW
+           if( vv < knotEnd[1] ) // SW
              nd2 = nd1;
            else // NW
              nd2 = nd->getChild(NW);
          }
          else  //SE or NE
          {
-           if( vv < tmp2[1] ) // SE
+           if( vv < knotEnd[1] ) // SE
              nd2 = nd->getChild(SE);
            else // NE
              nd2 = nd->getChild(NE);
@@ -99,22 +100,20 @@ int  HBSplineBase::findCellNumber(const myPoint& geom)
        {
          nd1 = nd->getChild(SW_BACK);
 
-         tmp1 = nd1->getKnots(0);
-         tmp2 = nd1->getKnots(1);
-         tmp3 = nd1->getKnots(2);
+         knotEnd = nd1->getKnotEnd();
 
-         if( uu < tmp1[1] ) // SW_FRONT or NW_FRONT or SW_BACK or NW_BACK
+         if( uu < knotEnd[0] ) // SW_FRONT or NW_FRONT or SW_BACK or NW_BACK
          {
-           if( vv < tmp2[1] ) // SW_FRONT or SW_BACK
+           if( vv < knotEnd[1] ) // SW_FRONT or SW_BACK
            {
-             if( ww < tmp3[1] )
+             if( ww < knotEnd[2] )
                nd2 = nd->getChild(SW_BACK);
              else
                nd2 = nd->getChild(SW_FRONT);
            }
            else // NW_FRONT or NW_BACK
            {
-             if( ww < tmp3[1] )
+             if( ww < knotEnd[2] )
                nd2 = nd->getChild(NW_BACK);
              else
                nd2 = nd->getChild(NW_FRONT);
@@ -122,16 +121,16 @@ int  HBSplineBase::findCellNumber(const myPoint& geom)
          }
          else  //SE_FRONT or NE_FRONT or SE_BACK or NE_BACK
          {
-           if( vv < tmp2[1] ) // SE_FRONT or SE_BACK
+           if( vv < knotEnd[1] ) // SE_FRONT or SE_BACK
            {
-             if( ww < tmp3[1] )
+             if( ww < knotEnd[2] )
                nd2 = nd->getChild(SE_BACK);
              else
                nd2 = nd->getChild(SE_FRONT);
            }
            else // NE_FRONT or NE_BACK
            {
-             if( ww < tmp3[1] )
+             if( ww < knotEnd[2] )
                nd2 = nd->getChild(NE_BACK);
              else
                nd2 = nd->getChild(NE_FRONT);
@@ -186,7 +185,7 @@ void HBSplineBase::setInitialConditions()
       {
         //cout << " elems[ee]->getID() " <<  elems[ee]->getID() << '\t' <<  elems[ee]->getLevel() << endl;
 
-        elems[ee]->resetMatrixAndVector();
+        //elems[ee]->resetMatrixAndVector();
         elems[ee]->setInitialProfile();
         //elems[ee]->assembleMatrixAndVector(1, solver->mtx, &(rhsVec(0)));
       }

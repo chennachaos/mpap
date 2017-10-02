@@ -39,7 +39,7 @@ void  HBSplineCutFEM::solveSolidProblem()
     }
   }
 
-  PetscPrintf(MPI_COMM_WORLD,"aaaaaaaaaa \n");
+  //PetscPrintf(MPI_COMM_WORLD,"aaaaaaaaaa \n");
 
   //MPI_Barrier(MPI_COMM_WORLD);
 
@@ -50,7 +50,7 @@ void  HBSplineCutFEM::solveSolidProblem()
     MPI_Bcast(&(ImmersedBodyObjects[bb]->SolnData.var1[0]), count, MPI_DOUBLE, rootProc, MPI_COMM_WORLD);
   }
 
-  PetscPrintf(MPI_COMM_WORLD,"bbbbbbbbbb \n");
+  //PetscPrintf(MPI_COMM_WORLD,"bbbbbbbbbb \n");
 
   IB_MOVED = false;
   //if(this_mpi_proc != 0)
@@ -65,9 +65,6 @@ void  HBSplineCutFEM::solveSolidProblem()
       IB_MOVED = (IB_MOVED || ImmersedBodyObjects[bb]->updatePointPositions() );
     }
   //}
-
-  // don't use this
-  //updateImmersedPointPositions();
 
   return;
 }
@@ -1509,8 +1506,8 @@ void  HBSplineCutFEM::computeTotalForce2D(int bb)
               trac[0] += PENALTY*(velSpec[0]-vel[0]);
               trac[1] += PENALTY*(velSpec[1]-vel[1]);
 
-              //trac[0] += (stagParams[3]*rho)*acceFluid[0];
-              //trac[1] += (stagParams[3]*rho)*acceFluid[1];
+              trac[0] += (stagParams[3]*rho)*acceFluid[0];
+              trac[1] += (stagParams[3]*rho)*acceFluid[1];
 
               //trac[0] += stagParams[3]*rho*(acceFluid[0] - acceSpec[0]);
               //trac[1] += stagParams[3]*rho*(acceFluid[1] - acceSpec[1]);
@@ -1607,9 +1604,6 @@ void  HBSplineCutFEM::computeTotalForce3D(int bb)
       getGaussPointsTriangle(nGauss, gausspoints1, gausspoints2, gaussweights);
     else
       getGaussPointsQuad(nGauss, gausspoints1, gausspoints2, gaussweights);
-
-    //printVector(gausspoints);          printf("\n\n\n\n");
-    //printVector(gaussweights);          printf("\n\n\n\n");
 
     bool rigidflag = ImmersedBodyObjects[bb]->isRigidBody() ;
 
