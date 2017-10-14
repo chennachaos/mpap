@@ -23,7 +23,7 @@ class  LagrangeElem2DStructSolidMixed : public LagrangeElement
 
     void prepareElemData2();
 
-    virtual int calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal);
+    virtual int calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal, bool firstIter=false);
     
     int calcStiffnessAndResidualSS(MatrixXd& Klocal, VectorXd& Flocal);
 

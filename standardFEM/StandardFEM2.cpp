@@ -468,7 +468,7 @@ int StandardFEM::prepareMatrixPattern()
     {
       for(jj=0;jj<ndof;jj++)
       {
-        //if(!NodeType[ii][jj])
+        if(!NodeType[ii][jj])
           ID[ii][jj] = totalDOF++;
       }
     }
@@ -795,13 +795,11 @@ int StandardFEM::solveStep(int niter)
 
 int StandardFEM::calcStiffnessAndResidual(int printRes, bool zeroMtx, bool zeroRes)
 {
-    //cout << "     StandardFEM: generating coefficient Matrices ...\n\n";
-
+    cout << "     StandardFEM: generating coefficient Matrices ...\n\n";
     char fct[] = "StandardFEM::calcStiffnessAndResidual";
-
     //computerTime.go(fct);
 
-    //if(solver == NULL || solver2 == NULL)
+    //if(solverEigen == NULL || solverPetsc == NULL)
     //{
       //COUT << "You need to select a solver first!\n\n";
       //return 1;
@@ -855,7 +853,10 @@ int StandardFEM::calcStiffnessAndResidual(int printRes, bool zeroMtx, bool zeroR
 
         //elems[ee]->resetMatrixAndVector();
         //cout << " MMMMMMMMMMM " << endl;
-        elems[ee]->calcStiffnessAndResidual(Klocal, Flocal);
+        elems[ee]->calcStiffnessAndResidual(Klocal, Flocal, firstIter);
+
+        if(firstIter)
+          elems[ee]->applyDirichletBCs(Klocal, Flocal);
 
         //cout << " MMMMMMMMMMM " << endl;
         //elems[ee]->assembleElementMatrixAndVector(0, solver->mtx, &(solver->rhsVec(0)));
@@ -871,37 +872,28 @@ int StandardFEM::calcStiffnessAndResidual(int printRes, bool zeroMtx, bool zeroR
     //cout << " MMMMMMMMMMM " << endl;
 
     //cout << solver->mtx << endl;
-
     //cout << " solver->rhsVec " << endl;        printVector(solver->rhsVec);
-
     //printf("\n solver->rhsVec norm = %12.6E \n", solver->rhsVec.norm());
 
-    applyBoundaryConditions();
+    //applyBoundaryConditions();
 
     applyExternalForces();
    
     //cout << solver->mtx << endl;
-
-    // rhs due to external forces
-    //rhsVec += rhsVec2;
-
     //cout << " rhsVec " << endl;        printVector(&(rhsVec[0]), totalDOF);
-
     //printf("\n rhsVec norm = %12.6E \n", solver->rhsVec.norm());
 
-/*
   if(firstIter)
   {
-    //SolnData.var1 = fact1*SolnData.var1applied;
+    //double fact1=1.0;
+    double fact1 = timeFunction[0].prop;
+    
+    SolnData.var1 = fact1*SolnData.var1applied;
 
+    /*
     int ii, jj, nn, dof, aa, ind;
-
-    double fact1=1.0, specVal;
-
-    fact1 = timeFunction[0].prop;
-
+    double specVal;
     vector<int>::iterator itint;
-
     for(aa=0;aa<DirichletBCs.size();aa++)
     {
       nn  = (int) (DirichletBCs[aa][0]);
@@ -910,15 +902,13 @@ int StandardFEM::calcStiffnessAndResidual(int printRes, bool zeroMtx, bool zeroR
 
       //itint = find(GlobalPointNumbers.begin(), GlobalPointNumbers.end(), nn);
       //nn   = distance(GlobalPointNumbers.begin(), itint);
-
       ind = nn*ndof+dof;
 
       //SolnData.var1[ind] = fact1*SolnData.var1applied[ind];
-
       SolnData.var1[ind] = fact1*specVal ;
     }
+    */
   }
-*/
 
     firstIter = false;
     rNormPrev = rNorm;
@@ -1004,8 +994,7 @@ int StandardFEM::factoriseSolveAndUpdate()
     //printVector(&(solver->rhsVec[0]), totalDOF);
 
     //cout << solver->mtx << endl;
-
-    cout << " Eigen Solver " << endl;
+    //cout << " Eigen Solver " << endl;
     solverEigen->factoriseAndSolve();
 
     //printVector(solver->soln); printf("\n\n\n");
@@ -1027,47 +1016,11 @@ int StandardFEM::factoriseSolveAndUpdate()
     //SolnData.var1Prev = SolnData.var1;
     //SolnData.var1 = soln;
 
-  //printVector(SolnData.var1);
+    //cout << " result " << endl;        printVector(SolnData.var1);
 
-/*
-  //if(firstIter)
-  //{
-    //SolnData.var1 = fact1*SolnData.var1applied;
+    //ctimFactSolvUpdt += computerTime.stop(fct);
 
-    int ii, jj, nn, dof, aa, ind;
-
-    double fact1=1.0, specVal;
-
-    fact1 = timeFunction[0].prop;
-
-    vector<int>::iterator itint;
-
-    for(aa=0;aa<DirichletBCs.size();aa++)
-    {
-      nn  = (int) (DirichletBCs[aa][0]);
-      dof = (int) (DirichletBCs[aa][1]);
-      specVal = DirichletBCs[aa][2];
-
-      //itint = find(GlobalPointNumbers.begin(), GlobalPointNumbers.end(), nn);
-      //nn   = distance(GlobalPointNumbers.begin(), itint);
-
-      ind = nn*ndof+dof;
-
-      //SolnData.var1[ind] = fact1*SolnData.var1applied[ind];
-
-      SolnData.var1[ind] = fact1*specVal ;
-    }
-  //}
-*/
-
-    //cout << " Max displacement = " << SolnData.var1.maxCoeff() << endl;
-    //cout << " Tip displacement = " << SolnData.var1[104*2+1] << endl;
-
-  //cout << " result " << endl;        printVector(SolnData.var1);
-
-  //ctimFactSolvUpdt += computerTime.stop(fct);
-
-  return 0;
+    return 0;
 }
 
 
@@ -1084,7 +1037,7 @@ void StandardFEM::applyBoundaryConditions()
     //printVector(SolnData.td);
 
     int ii, jj, nn, dof, aa, ind;
-    double  specVal, PENALTY=1.0e6, val1, val2;
+    double  specVal, PENALTY=1.0e8, val1, val2;
 
     double  af = SolnData.td(2);
 

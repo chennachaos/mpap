@@ -541,8 +541,6 @@ bool  TreeNode<DIM>::isBackBoundary()
 template<int DIM>
 void TreeNode<DIM>::prepareElemData()
 {
-    int ii;
-
     elmDat = &(GeomData->FluidProps[0]);
 
     //JacMultElem = SolnData->getJacobianFull() * (0.5*knotIncr[0]) * (0.5*knotIncr[1]) * (0.5*knotIncr[2]);
@@ -551,7 +549,7 @@ void TreeNode<DIM>::prepareElemData()
 
     JacMultElem = GeomData->getJacobianFull();
 
-    for(ii=0;ii<DIM;ii++)
+    for(int ii=0;ii<DIM;ii++)
     {
       JacMultElem *= (0.5*knotIncr[ii]);
 
@@ -569,7 +567,7 @@ void TreeNode<DIM>::initialiseDOFvalues()
 {
     if(ndof > 1)
     {
-      int  ii, jj, ind1, ind2;
+      int  ii=0, jj=0, ind1=0, ind2=0;
       int  nsize2 = GlobalBasisFuncs.size() * ndof;
 
       forAssyVec.resize(nsize2);

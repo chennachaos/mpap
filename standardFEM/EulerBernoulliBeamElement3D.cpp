@@ -77,7 +77,7 @@ int EulerBernoulliBeamElement3D::calcLoadVector()
 }
 
 
-int EulerBernoulliBeamElement3D::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)
+int EulerBernoulliBeamElement3D::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal, bool firstIter)
 {
     int  ii, jj, gp, kk, ll, TI, TIp1, TIp2, count, TJ, TJp1, TJp2, ind1, ind2;
     

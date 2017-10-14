@@ -89,7 +89,7 @@ int LagrangeElem2DStructSolidQuad4NodeStab::calcLoadVector()
 }
 
 
-int LagrangeElem2DStructSolidQuad4NodeStab::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)
+int LagrangeElem2DStructSolidQuad4NodeStab::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal, bool firstIter)
 {
 //   char fct[] = "LagrangeElem2DStructSolidQuad4NodeStab::calcStiffnessAndResidual";
 //   computerTime.go(fct);

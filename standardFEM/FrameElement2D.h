@@ -21,7 +21,7 @@ class  FrameElement2D : public LagrangeElement
 
     void prepareElemData2();
 
-    virtual int  calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal);
+    virtual int  calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal, bool firstIter=false);
 
     void calcStiffnessAndResidual2(bool flag);
 

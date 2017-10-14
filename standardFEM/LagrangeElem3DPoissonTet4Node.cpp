@@ -54,7 +54,7 @@ int LagrangeElem3DPoissonTet4Node::calcLoadVector()
 
 
 
-int LagrangeElem3DPoissonTet4Node::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)
+int LagrangeElem3DPoissonTet4Node::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal, bool firstIter)
 {
 //   char fct[] = "LagrangeElem3DPoissonTet4Node::calcStiffnessAndResidual";
 //   computerTime.go(fct);

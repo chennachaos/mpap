@@ -2,15 +2,12 @@
 #define incl_ContactElementPointToPoint2D_h
 
 #include "SolverEigen.h"
-
 #include <vector>
 
 using std::vector;
 
 class  ImmersedSolid;
 class  SolutionData;
-//class  SolutionDataFluid ;
-//class  SolutionDataSolid ;
 
 
 

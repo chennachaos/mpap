@@ -89,7 +89,7 @@ int LagrangeElem2DStructSolidTria3NodeStab::calcLoadVector()
 }
 
 
-int LagrangeElem2DStructSolidTria3NodeStab::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)
+int LagrangeElem2DStructSolidTria3NodeStab::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal, bool firstIter)
 {
 //   char fct[] = "LagrangeElem2DStructSolidTria3NodeStab::calcStiffnessAndResidual";
 //   computerTime.go(fct);

@@ -17,11 +17,7 @@ class ContactElement2D1nodedContactWithXaxis: public LagrangeElement
 
         virtual void prepareElemData();
 
-        virtual int  calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal);
-
-        //void  assembleElementVector(int ind, bool flag, double* rhs);
-
-        //void  assembleMatrixAndVector(int, SparseMatrixXd&, double*);
+        virtual int  calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal, bool firstIter=false);
 };
 
 

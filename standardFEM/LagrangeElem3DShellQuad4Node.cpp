@@ -79,7 +79,7 @@ int LagrangeElem3DShellQuad4Node::calcLoadVector()
 
 
 
-int LagrangeElem3DShellQuad4Node::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)
+int LagrangeElem3DShellQuad4Node::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal, bool firstIter)
 {
   cout << " need to be corrected " << endl;
 

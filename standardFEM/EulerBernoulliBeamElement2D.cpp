@@ -256,7 +256,7 @@ int EulerBernoulliBeamElement2D::calcStiffnessAndResidual()
 
 
 //
-int EulerBernoulliBeamElement2D::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)
+int EulerBernoulliBeamElement2D::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal, bool firstIter)
 {
     int  ii, jj, gp, kk, ind1, ind2, TI;
     

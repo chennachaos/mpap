@@ -57,7 +57,7 @@ int LagrangeElem3DStokesHex8Node::calcLoadVector()
 
 
 
-int LagrangeElem3DStokesHex8Node::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)
+int LagrangeElem3DStokesHex8Node::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal, bool firstIter)
 {
   double  dvol, b1, b2, b3, b4, b5, b6, b7, b8;
   double  Jac, totvol, pres, fact, fact2;

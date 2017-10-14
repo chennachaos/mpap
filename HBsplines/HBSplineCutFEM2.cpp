@@ -146,18 +146,17 @@ void  HBSplineCutFEM::prepareCutElements()
             //nd1->computeGaussPointsAdapIntegration(cutFEMparams[3], cutFEMparams[4], false, true);
         }
       }
-      //cout << " iiiiiii " << endl;
 
       if( nd1->getDomainNumber() <= 0 )
       {
         fluidElementIds.push_back( nd1->getID() );
 
-        //printVector(nd1->GlobalBasisFuncs);
-
         for(ii=0; ii<nd1->GlobalBasisFuncs.size(); ii++)
           grid_to_cutfem_BF[nd1->GlobalBasisFuncs[ii]] = 1;
       }
     }
+
+    cout << " number of cut cells " << cutCellIds.size() << endl;
 
     nNode = 0;
     for(ee=0; ee<gridBF1; ee++)
@@ -192,7 +191,6 @@ void  HBSplineCutFEM::prepareCutElements()
 
 
 /*
-
 void  HBSplineCutFEM::prepareCutElements()
 {
   //PetscPrintf(MPI_COMM_WORLD, "  HBSplineCutFEM::prepareCutElements() \n");
@@ -215,7 +213,6 @@ void  HBSplineCutFEM::prepareCutElements()
 
   cutfem_to_grid_BF.clear();
   cutfem_to_grid_DOF.clear();
-
 
   if( ImmersedBodyObjects.size() == 0 )
   {
@@ -259,9 +256,7 @@ void  HBSplineCutFEM::prepareCutElements()
   //GeomData.domainFixedYesNo[0] = 0;
   //GeomData.domainFixedYesNo[1] = 0;
 
-
-      node *ndTemp;
-
+  node *ndTemp;
 
   for(ee=0; ee<nElem; ee++)
   {
@@ -269,7 +264,6 @@ void  HBSplineCutFEM::prepareCutElements()
 
     ndTemp->domNums.clear();
   }
-
 
       // go through all the Gauss points on the immersed faces of all immsersed solids
       // and find the element in which each GP lies.
@@ -330,8 +324,6 @@ void  HBSplineCutFEM::prepareCutElements()
       
       // remove duplicate immsered solid numbers from 'domNums' of cut cells
       //
-      //
-
 
   for(ee=0; ee<nElem; ee++)
   {
@@ -344,8 +336,6 @@ void  HBSplineCutFEM::prepareCutElements()
     }
   }
 
-
-
   //////
   // adjust the cut cells
   // check whether a cell is completely inside solid domains
@@ -353,13 +343,11 @@ void  HBSplineCutFEM::prepareCutElements()
   for(ee=0; ee<nElem; ee++)
   {
     nd1 = elems[activeElements[ee]];
-    //cout << ee << '\t' << nd1->getID() << endl;
 
     flag = true;
 
     //if( flag )
     //{
-
       if( !(nd1->isCutElement()) )
       {
         kk = nd1->prepareCutCell(cutFEMparams);
@@ -456,8 +444,6 @@ void  HBSplineCutFEM::prepareCutElementsAdapIntegration3D()
 
 
 
-
-
 void  HBSplineCutFEM::prepareCutElementsSubTrias1D()
 {
   return;
@@ -528,7 +514,7 @@ void  HBSplineCutFEM::prepareCutElementsSubTrias2D()
       for(ii=0; ii<ptOut.size(); ii++)
       {
         ptNew = ptOut[ii];
-        //cout << ii << '\t' << ptNew[0] << '\t' << ptNew[1] << '\t' << ptNew[2] << endl;
+
         if( !( pointExists(ptVec, ptNew) ) )
         {
           ptVec.push_back(ptNew);
@@ -536,10 +522,6 @@ void  HBSplineCutFEM::prepareCutElementsSubTrias2D()
         }
       }
 
-      //cout << " domTemp = " << activeElements[ee] << '\t' << domTemp << '\t' << ptOut.size() << '\t' << ptVec.size() <<  endl;
-
-      //cout << " AAAAAAAAA " << endl;
-      
       // generate subtriangulation using Delauny procedure in VTK library
 
       polyDataLoc->SetPoints(pointsLoc);
@@ -554,7 +536,6 @@ void  HBSplineCutFEM::prepareCutElementsSubTrias2D()
       #else
         delaunay->SetInputData(polyDataLoc);
       #endif
-
 
       delaunay->Update();
 
@@ -575,7 +556,6 @@ void  HBSplineCutFEM::prepareCutElementsSubTrias2D()
         myPoly  *poly = new myTria(pt1, pt2, pt3);
 
         poly->centroid(pt4);
-        //pt4[1] += 1.0e-6;
 
         dd = 0;
         for(bb=0; bb<ImmersedBodyObjects.size(); bb++)
@@ -583,7 +563,6 @@ void  HBSplineCutFEM::prepareCutElementsSubTrias2D()
           if( ImmersedBodyObjects[bb]->within(pt4) )
             dd = bb+1;
         }
-        //cout << cellId2 << '\t' << dd << endl;
 
         vecTemp.push_back(dd);
         
@@ -934,7 +913,6 @@ void  HBSplineCutFEM::prepareCutElements3D()
   std::vector<int>  vecTemp(8);
   std::vector<int>::iterator  minVal, maxVal;
 
-
   for(int bb=0; bb<ImmersedBodyObjects.size(); bb++)
   {
     ImmersedBodyObjects[bb]->selectEnclosedPoints->SetInputData(pointsPolydata);
@@ -947,8 +925,6 @@ void  HBSplineCutFEM::prepareCutElements3D()
 
   for(cellId=0; cellId<uGridVTKfluid->GetNumberOfCells(); cellId++)
   {
-    //cout << " cellId = " << cellId << endl;
-
     nd1 = elems[activeElements[cellId]];
 
     bbTemp = nd1->getAABB();
@@ -959,11 +935,8 @@ void  HBSplineCutFEM::prepareCutElements3D()
     {
       if( ImmersedBodyObjects[bb]->doAABBintersect(bbTemp) )
       {
-        //cout << " aaaaaaa " << cellId << '\t' << bb << endl;
-
         for(pp=0; pp<cellVTK->GetNumberOfPoints(); pp++)
         {
-          //cout << " pp = " << pp << endl;
           vecTemp[pp] = ImmersedBodyObjects[bb]->selectEnclosedPoints->IsInside(cellVTK->GetPointId(pp));
         }
 
@@ -989,45 +962,6 @@ void  HBSplineCutFEM::prepareCutElements3D()
     {
       nd1->SetDomainNumber(-1);
     }
-  }
-  return;
-}
-*/
-
-
-/*
-void  HBSplineCutFEM::prepareCutElements3D()
-{
-  int  ee, bb, ii, jj;
-
-  node  *nd1;
-
-  int  domTemp;
-
-  AABB  bbTemp;
-
-  for(int bb=0; bb<ImmersedBodyObjects.size(); bb++)
-  {
-    //ImmersedBodyObjects[bb]->computeFaceNormals();
-    for(ii=0; ii<ImmersedBodyObjects[bb]->ImmersedFaces.size(); ii++)
-      ImmersedBodyObjects[bb]->ImmersedFaces[ii]->computeNormal();
-  }
-
-  for(ee=0; ee<activeElements.size(); ee++)
-  {
-    nd1 = elems[activeElements[ee]];
-
-    bbTemp = nd1->getAABB();
-    
-    //cout << " ee = " << ee << endl;
-
-    //for(bb=0; bb<ImmersedBodyObjects.size(); bb++)
-      //domTemp[bb] = ImmersedBodyObjects[bb]->doIntersect3D(bbTemp) ;
-
-    domTemp = ImmersedBodyObjects[0]->doIntersect3D(bbTemp) ;
-    //cout << " domTemp = " << domTemp[0] << endl;
-
-     nd1->SetDomainNumber(domTemp);
   }
   return;
 }

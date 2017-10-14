@@ -28,7 +28,7 @@ void ContactElement2D1nodedContactWithYaxis::prepareElemData()
 }
 
 
-int ContactElement2D1nodedContactWithYaxis::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)
+int ContactElement2D1nodedContactWithYaxis::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal, bool firstIter)
 {
     if(Klocal.rows() != nsize)
     {

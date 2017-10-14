@@ -138,7 +138,7 @@ int LagrangeElem2DPoissonTria3Node::calcStiffnessAndResidual(double* xco, double
 
 //int LagrangeElem2DPoissonTria3Node::calcStiffnessAndResidual(double* xco, double* yco, double* SolnData)
 
-int LagrangeElem2DPoissonTria3Node::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)
+int LagrangeElem2DPoissonTria3Node::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal, bool firstIter)
 {
   int ii, jj, gp;
 

@@ -366,7 +366,7 @@ int LagrangeElem2DNavierStokesQuad4Node::calcStiffnessAndResidual(MatrixXd& Kloc
 
 
 //
-int LagrangeElem2DNavierStokesQuad4Node::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)
+int LagrangeElem2DNavierStokesQuad4Node::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal, bool firstIter)
 {
   // Semi-implicit formulation - type A
   

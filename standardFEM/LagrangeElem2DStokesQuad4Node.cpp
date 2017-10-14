@@ -59,7 +59,7 @@ int LagrangeElem2DStokesQuad4Node::calcLoadVector()
 
 
 
-int LagrangeElem2DStokesQuad4Node::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)
+int LagrangeElem2DStokesQuad4Node::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal, bool firstIter)
 {
     //Stokes2DEx1 analy;
     //Kovasznay  analy;

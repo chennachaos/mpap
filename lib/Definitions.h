@@ -191,17 +191,17 @@
 
 
 #define MATERIAL_TYPE_NAMES {"smallStrainElasticity",          \
-	                     "NeoHookeElasticity",             \
-	                     "OgdenElasticity",                \
-	                     "vonMisesElastoPlasticity",       \
-	                     "smallStrainVonMisesEP",          \
-	                     "vonMisesEPWithKinematicHardening", \
-			     "multiscaleMaterial2D",           \
-			     "multiscaleMaterial3D",           \
-	                     "dummy",                          \
-	                     "NeoHookeElasticity1D",           \
-	                     "sfVonMisesIsotropicElpl",        \
-			     "sHillAnisotropicElpl",           \
+	                           "NeoHookeElasticity",             \
+     	                       "OgdenElasticity",                \
+	                           "vonMisesElastoPlasticity",       \
+	                           "smallStrainVonMisesEP",          \
+	                           "vonMisesEPWithKinematicHardening", \
+			                       "multiscaleMaterial2D",           \
+			                       "multiscaleMaterial3D",           \
+	                           "dummy",                          \
+	                           "NeoHookeElasticity1D",           \
+	                           "sfVonMisesIsotropicElpl",        \
+   	 	                       "sHillAnisotropicElpl",           \
                              "testTangent",                    \
                              "EVEP",                           \
                              "HenckyElasticity",               \
@@ -209,17 +209,17 @@
                              "genericHyperelasticity",         \
                              "smallStrainAnisotropicElasticity",\
                              "smallStrainElasticLamina2D",     \
- 	                     "HyplasELASTC",                   \
-	                     "HyplasTRESCA",                   \
-	                     "HyplasVMISES",                   \
-	                     "HyplasMOHCOU",                   \
-	                     "HyplasDRUPRA",                   \
-	                     "HyplasCAPDP",                    \
-	                     "HyplasLEMDAM",                   \
-	                     "HyplasDAMELA",                   \
-	                     "HyplasOGDEN",                    \
-	                     "HyplasPDSCRY",                   \
-	                     "HyplasVMMIXD", NULL }
+ 	                           "HyplasELASTC",                   \
+	                           "HyplasTRESCA",                   \
+	                           "HyplasVMISES",                   \
+	                           "HyplasMOHCOU",                   \
+	                           "HyplasDRUPRA",                   \
+	                           "HyplasCAPDP",                    \
+	                           "HyplasLEMDAM",                   \
+	                           "HyplasDAMELA",                   \
+	                           "HyplasOGDEN",                    \
+	                           "HyplasPDSCRY",                   \
+	                           "HyplasVMMIXD", NULL }
 
 
 #define MATERIAL_DIMENSIONS { 3,  \

@@ -24,10 +24,7 @@ LagrangeElem2DStructSolidQuad4Node::LagrangeElem2DStructSolidQuad4Node()
 
   degree = 1;
   npElem = 4;
-  nlbf   = 4;
   ndof   = 2;
-  nsize  = nlbf*ndof;
-
 }
 
 LagrangeElem2DStructSolidQuad4Node::~LagrangeElem2DStructSolidQuad4Node()
@@ -39,37 +36,6 @@ LagrangeElem2DStructSolidQuad4Node::~LagrangeElem2DStructSolidQuad4Node()
 void LagrangeElem2DStructSolidQuad4Node::prepareElemData()
 {
   LagrangeElement::prepareElemData();
-
-  int ii, jj;
-
-  degree = 1;
-  npElem = 4;
-  nlbf   = 4;
-  ndof   = 2;
-  nsize  = nlbf*ndof;
-
-
-   // set the element property variables
-
-    elmDat = &(SolnData->ElemProp[elmType].data[0]);
-    matDat = &(SolnData->MatlProp[matType].data[0]);
-
-   int nGP1  = (int) elmDat[0] ;
-   int nGP2  = nGP1;
-   nGP   = nGP1 * nGP2;
-   finiteInt  = (int) elmDat[2] ;
-   sss        = (int) elmDat[3] ;
-   thick      = elmDat[4] ;
-   //rho        = elmDat[5] ;
-   //bforce[0]  = elmDat[6] ;
-   //bforce[1]  = elmDat[7] ;
-   matId      = SolnData->MatlProp[matType].id + 1;
-   finite     = (finiteInt >= 1) ;
-   axsy       = (sss == 3);
-   //followerLoadFlag = (elmDat[8] == 1);
-   followerLoadFlag = false;
-
-  if(sss != 1) thick = 1.0; // for plane strain and axisymmetric problems
 
   return;
 }
@@ -90,41 +56,36 @@ int LagrangeElem2DStructSolidQuad4Node::calcLoadVector()
 
 
 
-int LagrangeElem2DStructSolidQuad4Node::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)
+int LagrangeElem2DStructSolidQuad4Node::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal, bool firstIter)
 {
-  double  F[4], detF=0.0, F33, fact, fact1, fact2, dvol, dvol0;
-  double  Jac, dt, totvol=0.0, bb1, bb2, bb3, JacMult;
-  double  af, am, d1, acceFact;
+    double  F[4], detF=0.0, F33, fact, fact1, fact2, dvol, dvol0;
+    double  Jac, bb1, bb2, bb3;
 
-  VectorXd  N(nlbf), dN_dx(nlbf), dN_dy(nlbf);
-  VectorXd  dispC(nsize), velC(nsize), accC(nsize);
-  MatrixXd  Mlocal(nsize, nsize);
+    VectorXd  N(nlbf), dN_dx(nlbf), dN_dy(nlbf);
+    VectorXd  dispC(nsize), velC(nsize), accC(nsize);
+    MatrixXd  Mlocal(nsize, nsize);
 
-  double  stre[4], cc[4][4], bc[2][4], param[2], bforce[2];
+    double  stre[4], cc[4][4], bc[2][4], param[2], bforce[2];
 
-  int   err,  isw,  count,  count1, index, ll = 0, ii, jj, gp1, gp2, TI, TIp1, TJ, TJp1;
-  int   ind1, ind2, kk;
+    int   err,  isw,  count,  count1, index, ll = 0, ii, jj, gp, TI, TIp1, TJ, TJp1;
+    int   ind1, ind2, kk;
   
-  double  BULK = matDat[0] ;
-  double  mu   = matDat[1] ;
-  double  lamb = BULK - 2.0*mu/3.0;
+    //double  BULK = matDat[0] ;
+    //double  mu   = matDat[1] ;
+    //double  lamb = BULK - 2.0*mu/3.0;
+    double rho = elmDat[5] ;
+    bforce[0]  = elmDat[6]*timeFunction[0].prop ;
+    bforce[1]  = elmDat[7]*timeFunction[0].prop ;
+    double af = SolnData->td(2);
+    double d1 = SolnData->td(5);
+    double acceFact = SolnData->td(10);
+    double dt = mpapTime.dt;
 
-  double rho = elmDat[5] ;
-  bforce[0]  = 0.0;
-  bforce[1]  = 0.0;
+    //printf(" %14.12f \t %14.12f \t %14.12f \t %14.12f \n ", BULK, mu, bforce[0], bforce[1]);
+    //printf(" %14.12f \t %14.12f \t %14.12f \t %14.12f \n ", rho, af, d1, aa);
+    //printf(" %5d \t %5d \t %5d \t %5d \n ", nodeNums[0], nodeNums[1], nodeNums[2], nodeNums[3]);
 
-  bforce[0]  = elmDat[6]*timeFunction[0].prop ;
-  bforce[1]  = elmDat[7]*timeFunction[0].prop ;
-
-  af = SolnData->td(2);
-  d1 = SolnData->td(5);
-  acceFact = SolnData->td(10);
-
-  //printf(" %14.12f \t %14.12f \t %14.12f \t %14.12f \n ", BULK, mu, bforce[0], bforce[1]);
-  //printf(" %14.12f \t %14.12f \t %14.12f \t %14.12f \n ", rho, af, d1, aa);
-  //printf(" %5d \t %5d \t %5d \t %5d \n ", nodeNums[0], nodeNums[1], nodeNums[2], nodeNums[3]);
-
-  double xNode[4], yNode[4], xx, yy;
+    double xNode[4], yNode[4], xx, yy;
 
     for(ii=0;ii<npElem;ii++)
     {
@@ -145,8 +106,8 @@ int LagrangeElem2DStructSolidQuad4Node::calcStiffnessAndResidual(MatrixXd& Kloca
       }
     }
 
-  //printf(" %14.12f \t %14.12f \t %14.12f \t %14.12f \n ", xNode[0], xNode[1], xNode[2], xNode[3]);
-  //printf(" %14.12f \t %14.12f \t %14.12f \t %14.12f \n\n\n ", yNode[0], yNode[1], yNode[2], yNode[3]);
+    //printf(" %14.12f \t %14.12f \t %14.12f \t %14.12f \n ", xNode[0], xNode[1], xNode[2], xNode[3]);
+    //printf(" %14.12f \t %14.12f \t %14.12f \t %14.12f \n\n\n ", yNode[0], yNode[1], yNode[2], yNode[3]);
 
     if(Klocal.rows() != nsize)
     {
@@ -158,47 +119,35 @@ int LagrangeElem2DStructSolidQuad4Node::calcStiffnessAndResidual(MatrixXd& Kloca
     Mlocal.setZero();
 
 
-  count = 1;   ll = 0;   err = 0;   isw = 3;
-  dt = mpapTime.dt;
+    count = 1;   ll = 0;   err = 0;   isw = 3;
 
-  //cout << " finite = " << finite << endl;
+    vector<double>  gausspoints1, gausspoints2, gaussweights;
 
-  int nGP = (int) elmDat[0] ;
+    getGaussPointsQuad(nGP, gausspoints1, gausspoints2, gaussweights);
 
-  vector<double>  gausspoints1, gaussweights1;
-
-  getGaussPoints1D(nGP, gausspoints1, gaussweights1);
-
-
-  for(gp2=0;gp2<nGP;gp2++)
-  {
-    JacMult = gaussweights1[gp2] * thick;
-
-    param[1] = gausspoints1[gp2];
-
-  for(gp1=0;gp1<nGP;gp1++)
-  {
-        param[0] = gausspoints1[gp1];
+    for(gp=0; gp<nGP; gp++)
+    {
+        param[0] = gausspoints1[gp];
+        param[1] = gausspoints2[gp];
 
         GeomData->computeBasisFunctions2D(0, 2, degree, param, nodeNums, &N(0), &dN_dx(0), &dN_dy(0), Jac);
 
-          xx = yy= 0.0;
-          for(ii=0;ii<nlbf;ii++)
-          {
-            xx += N[ii]*xNode[ii];
-            yy += N[ii]*yNode[ii];
-          }
+        xx = yy= 0.0;
+        for(ii=0;ii<nlbf;ii++)
+        {
+          xx += N[ii]*xNode[ii];
+          yy += N[ii]*yNode[ii];
+        }
 
         //for(ii=0; ii<nlbf; ii++)
           //cout << N[ii] << '\t' << dN_dx[ii] << '\t' << dN_dy[ii] << endl;
 
-        fact = gaussweights1[gp1] * JacMult;
-
+        fact  = gaussweights[gp] * thick;
         dvol0 = Jac * fact;
-        dvol = dvol0;
+        dvol  = dvol0;
 
-        //if(axsy)
-          //dvol *= 2.0*PI*yy;
+        if(axsy)
+          dvol *= 2.0*PI*yy;
 
         //GeomData->computeDeformationGradient(1, nodeNums, &dN_dx(0), &dN_dy(0), F, detF);
 
@@ -209,7 +158,7 @@ int LagrangeElem2DStructSolidQuad4Node::calcStiffnessAndResidual(MatrixXd& Kloca
 
         detF =  F[0]*F[3] - F[1]*F[2];
 
-        //if(detF < 0.0)   return 1;
+        if(detF < 0.0)   return 1;
 
         if(finite)
         {
@@ -329,21 +278,29 @@ int LagrangeElem2DStructSolidQuad4Node::calcStiffnessAndResidual(MatrixXd& Kloca
               }
           }
         }
+    } //gp
 
-  }//gp1
-  }//gp2
+    /*
+    int vec[]={0,1,2,3,6,7,4,5};
+  
+    MatrixXd  K2(nsize, nsize);
+    for(ii=0; ii<nsize; ii++)
+    {
+      for(jj=0; jj<nsize; jj++)
+        K2(ii,jj) = Klocal(vec[ii], vec[jj]);
+    }
+  
+    printMatrix(Klocal);
+    printf("\n\n\n");
+    printMatrix(K2);
+  
+    //printMatrix(Klocal);  printf("\n\n\n");  printVector(Flocal);
+    */
 
-  //printMatrix(Klocal);  printf("\n\n\n");  printVector(Flocal);
+    Klocal +=  d1*Mlocal;
+    Flocal -=  Mlocal*accC;
 
-  Klocal +=  d1*Mlocal;
-  Flocal -=  Mlocal*accC;
-
-  //if(!SolnData->STAGGERED)
-    //Klocal /= aa;
-
-  //printVector(Flocal);
-
-  return 0;
+    return 0;
 }
 
 
@@ -403,52 +360,40 @@ void LagrangeElem2DStructSolidQuad4Node::toPostprocess(int vartype, int varindex
 
 void  LagrangeElem2DStructSolidQuad4Node::computeEnergy(int index1, int index2, VectorXd& energy)
 {
-  // compute total energy for structural dynamic problems
-  ///////////////////////////////////////////////////////////
+    // compute total energy for structural dynamic problems
+    ///////////////////////////////////////////////////////////
 
-  //elmDat = &(SolnData->ElemProp.data[0]);
-  //matDat = &(SolidSolnData->MatlProp.data[0]);
+    double  F[4], detF=0.0, F33, fact, dvol, dvol0, Jac;
+    double  posi[2], disp[2], velo[2];
+    double  stress[4], strain[4], cc[4][4], param[2], bforce[2];
 
-  double  F[4], detF=0.0, F33, fact, dvol, dvol0, Jac, dt, JacMult;
-  double  posi[2], disp[2], velo[2];
-  double  stress[4], strain[4], cc[4][4], param[2], bforce[2];
+    VectorXd  N(nlbf), dN_dx(nlbf), dN_dy(nlbf);
 
-  VectorXd  N(nlbf), dN_dx(nlbf), dN_dy(nlbf);
-
-  int   err,  isw,  count,  count1, index, ll = 0, ii, jj, gp1, gp2, TI, TIp1, TJ, TJp1;
-  int   ind1, ind2, kk;
+    int   err,  isw,  count,  count1, index, ll = 0, ii, jj, gp, TI, TIp1, TJ, TJp1;
+    int   ind1, ind2, kk;
   
-  double  rho  = elmDat[5] ;
+    double  rho  = elmDat[5] ;
 
-  count = 1;   ll = 0;   err = 0;   isw = 3;
-  dt = mpapTime.dt;
+    count = 1;   ll = 0;   err = 0;   isw = 3;
+    double dt = mpapTime.dt;
 
-  //cout << " finite = " << finite << endl;
 
-  int nGP = (int) elmDat[0] ;
+    vector<double>  gausspoints1, gausspoints2, gaussweights;
 
-  vector<double>  gausspoints1, gaussweights1;
+    getGaussPointsQuad(nGP, gausspoints1, gausspoints2, gaussweights);
 
-  getGaussPoints1D(nGP, gausspoints1, gaussweights1);
+    energy.setZero();
 
-  energy.setZero();
-
-  for(gp2=0;gp2<nGP;gp2++)
-  {
-    JacMult = gaussweights1[gp2] * thick;
-
-    param[1] = gausspoints1[gp2];
-
-  for(gp1=0;gp1<nGP;gp1++)
-  {
-        param[0] = gausspoints1[gp1];
+    for(gp=0; gp<nGP; gp++)
+    {
+        param[0] = gausspoints1[gp];
+        param[1] = gausspoints2[gp];
 
         GeomData->computeBasisFunctions2D(0, 2, degree, param, nodeNums, &N(0), &dN_dx(0), &dN_dy(0), Jac);
 
-        fact = gaussweights1[gp1] * JacMult;
-
+        fact  = gaussweights[gp] * thick;
         dvol0 = Jac * fact;
-        dvol = dvol0;
+        dvol  = dvol0;
 
         //if(axsy)
           //dvol *= 2.0*PI*yy;
@@ -503,13 +448,10 @@ void  LagrangeElem2DStructSolidQuad4Node::computeEnergy(int index1, int index2, 
         // kinetic energy
         energy[0] += (0.5*dvol0*rho*(velo[0]*velo[0]+velo[1]*velo[1]));
         energy[1] += (0.5*dvol*(strain[0]*stress[0]+strain[1]*stress[1]+strain[2]*stress[2]+strain[3]*stress[3]));
+    }//gp
 
-  }//gp1
-  }//gp2
-
-  //printf("\n\n");
-
-  return;
+    //printf("\n\n");
+    return;
 }
 
 

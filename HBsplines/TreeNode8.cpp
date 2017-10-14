@@ -1536,7 +1536,7 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
     //double beta[6]; get_stabilisation_beta_wulf(beta);
 
     VectorXd  NN(totnlbf), dNN_dx(totnlbf), d2NN_dx2(totnlbf), dNN_dy(totnlbf), d2NN_dy2(totnlbf);
-    VectorXd  N, dN_dx, d2N_dx2, dN_dy, d2N_dy2, d2N;
+    VectorXd  N(totnlbf), dN_dx(totnlbf), d2N_dx2(totnlbf), dN_dy(totnlbf), d2N_dy2(totnlbf), d2N(totnlbf);
     VectorXd  res(3), res2(2), dp(2), Du(2), vel(2), velDot(2), velTemp(3);
     VectorXd  force(2), gradTvel(2), rStab(3), velPrev(2);
     MatrixXd  Dj(2, 3), grad(2,2), gradN(2,2), stress(2,2), gradPrev(2,2), matG(3,3);
@@ -1623,32 +1623,20 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
         geom[0] = GeomData->computeCoord(0, param[0]);
         geom[1] = GeomData->computeCoord(1, param[1]);
 
-        //cout << uu << '\t' << vv << endl;
-        //cout << xx << '\t' << yy << endl;
-
+        if(parent == NULL)  //cout << " parent is NULL " << endl;
+        {
+          GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, N, dN_dx, dN_dy, d2N_dx2, d2N_dy2);
+        }
+        else
+        {
           GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy, d2NN_dx2, d2NN_dy2);
-
-          if(parent == NULL)
-          {
-            //cout << " parent is NULL " << endl;
-            N = NN;
-            dN_dx = dNN_dx;
-            dN_dy = dNN_dy;
-            d2N_dx2 = d2NN_dx2;
-            d2N_dy2 = d2NN_dy2;
-          }
-          else
-          {
-            //cout << " parent is not NULL " << endl;
-            N = SubDivMat*NN;
-            dN_dx = SubDivMat*dNN_dx;
-            dN_dy = SubDivMat*dNN_dy;
-            d2N_dx2 = SubDivMat*d2NN_dx2;
-            d2N_dy2 = SubDivMat*d2NN_dy2;
-          }
-
-        //cout <<  " gpDomainId = " << gpDomainId << '\t' << totnlbf2 << endl;
-        //printVector(GlobalBasisFuncs);
+          //cout << " parent is not NULL " << endl;
+          N = SubDivMat*NN;
+          dN_dx = SubDivMat*dNN_dx;
+          dN_dy = SubDivMat*dNN_dy;
+          d2N_dx2 = SubDivMat*d2NN_dx2;
+          d2N_dy2 = SubDivMat*d2NN_dy2;
+        }
 
         d2N = d2N_dx2 + d2N_dy2;
 
@@ -1704,8 +1692,8 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
             velDot(1) += ( b2 * N(ii) );
           }
 
-          // this is pseudo-stress
           //stress = mu*(grad+grad.transpose());
+          // this is pseudo-stress
           stress = mu*grad;
           stress(0,0) -= pres;
           stress(1,1) -= pres;
@@ -2711,26 +2699,20 @@ void TreeNode<2>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
     double  hx = bbox.maxBB[0]-bbox.minBB[0];
     double  hy = bbox.maxBB[1]-bbox.minBB[1];
 
-    VectorXd  N, dN_dx, dN_dy;
+    VectorXd  N(totnlbf), dN_dx(totnlbf), dN_dy(totnlbf);
     VectorXd  NN(totnlbf), dNN_dx(totnlbf), dNN_dy(totnlbf), trac(2);
     MatrixXd  grad(2, 2), stress(2,2);
     myPoint  param, normal, geom;
     double *gws;
     myPoint *gps;
     
-    //y0 = -5.0;  y1 = 5.0;
-    //y0 = 0.90;  y1 = 1.30;
-    //y0 = 0.5;  y1 = 1.50;
-
-
     //KimMoinFlow  analy(rho, mu);
-    Kovasznay  analy;
+    //Kovasznay  analy;
     //Stokes2DEx1  analy;
 
     for(aa=0;aa<DirichletData.size();aa++)
     {
         // printVector(DirichletData[aa]);
-
         isNitsche   = false;
         side        = (int) (DirichletData[aa][0] - 1);
         dir         = (int) (DirichletData[aa][1] - 1);
@@ -2741,8 +2723,6 @@ void TreeNode<2>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
 
         //for symmetric Nitsche method -> NitscheFact = 1.0
         //for unsymmetric Nitsche method -> NitscheFact = -1.0
-
-        //cout << " PENALTY " << PENALTY << endl;
 
         normal = GeomData->boundaryNormals[side];
 
@@ -2774,12 +2754,8 @@ void TreeNode<2>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
 
             dvol = JacTemp * gws[gp] ;
 
-            //printf(" %4d \t %4d \t %12.6f \t %12.6f \n", side, dir, vv, uu);
-
             geom[0] = GeomData->computeCoord(0, param[0]);
             geom[1] = GeomData->computeCoord(1, param[1]);
-            //rad = sqrt(xx*xx+yy*yy);
-            //cout << xx << '\t' << yy << endl;
 
             if(axsy)
             {
@@ -2787,43 +2763,21 @@ void TreeNode<2>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
                 dvol *= 2.0*PI*geom[0];
             }
 
-            //if(! GeomData->polyImm.within(xx, yy) )
-            //{
+            if(parent == NULL)
+            {
+              GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, N, dN_dx, dN_dy );
+            }
+            else
+            {
               GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy );
 
-              if(parent == NULL)
-              {
-                N = NN;
-                dN_dx = dNN_dx;
-                dN_dy = dNN_dy;
-              }
-              else
-              {
-                N = SubDivMat*NN;
-                dN_dx = SubDivMat*dNN_dx;
-                dN_dy = SubDivMat*dNN_dy;
-              }
-
-              specVal = DirichletData[aa][2];
-
-            /*
-            R=0.5;
-            if(side == 0 || side == 11)
-            {
-              if(dir == 0)
-              {
-                //specVal = DirichletData[aa][2]*(yy-0.25);
-                //specVal = 1.5*yy*(2.0-yy);
-                //if(yy <= y0 || yy >= y1)
-                //if(xx > 1.5)
-                  //specVal = 0.0;
-                //else
-                  //specVal = DirichletData[aa][2]*(y1-yy)*(yy-y0);
-                  //specVal = (y1-xx)*(xx-y0);
-                  specVal = 3600.0*(1.0-yy*yy/R/R);
-              }
+              N = SubDivMat*NN;
+              dN_dx = SubDivMat*dNN_dx;
+              dN_dy = SubDivMat*dNN_dy;
             }
-             */
+
+            specVal = DirichletData[aa][2];
+
               //
               if(side == 0 )
               {

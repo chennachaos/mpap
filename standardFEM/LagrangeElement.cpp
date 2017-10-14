@@ -25,10 +25,9 @@ using namespace std;
 LagrangeElement::LagrangeElement()
 {
   if (debug) cout << " constructor LagrangeElement\n\n";
-
   // cout << "     LagrangeElement: constructor ...\n\n";
 
-  //nlbf = ndof = nsize = nivGP = nGP = elenum = patchnum = counter = 0;
+  nlbf = ndof = nsize = nivGP = nGP = elenum = 0;
   subdomId = 0;
 
   tracflag = false;
@@ -37,7 +36,6 @@ LagrangeElement::LagrangeElement()
   intVar2  = NULL;
   elmDat   = NULL;
   matDat   = NULL;
-
 }
 
 
@@ -62,16 +60,16 @@ LagrangeElement::~LagrangeElement()
 
 void LagrangeElement::prepareElemData()
 {
-    int ii, jj, kk, ind;
+    assert(nodeNums.size() == npElem);
 
-    nlbf = nodeNums.size();
+    nlbf = npElem;
     nsize = nlbf*ndof;
 
     //printVector(nodeNums);
     globalDOFnums.resize(nsize);
 
-    kk=0;
-    for(ii=0;ii<nodeNums.size();ii++)
+    int ii, jj, kk=0, ind;
+    for(ii=0; ii<nodeNums.size(); ii++)
     {
       ind = nodeNums[ii]*ndof;
       for(jj=0;jj<ndof;jj++)
@@ -82,8 +80,114 @@ void LagrangeElement::prepareElemData()
     //resi.setDim(nsize);
     //printVector(globalDOFnums);
 
+    // set the element property variables
+
+    elmDat = &(SolnData->ElemProp[elmType].data[0]);
+    matDat = &(SolnData->MatlProp[matType].data[0]);
+
+    nGP         = (int) elmDat[0] ;
+
+    finiteInt   = (int) elmDat[2] ;
+    sss         = (int) elmDat[3] ;
+    thick       = elmDat[4] ;
+    //bforce[0] = elmDat[5] ;
+    //bforce[1] = elmDat[6] ;
+    //rho0      = elmDat[7] ;
+    matId       = SolnData->MatlProp[matType].id + 1;
+    finite      = (finiteInt >= 1) ;
+    axsy        = (sss == 3);
+    //followerLoadFlag = (elmDat[8] == 1);
+    followerLoadFlag = false;
+
+    if(sss != 1) thick = 1.0; // for plane strain and axisymmetric problems
+
+    //cout << " matId = " << matId << endl;
+
+    // allocate internal variables for elastoplastic material models
+    if(   (matId == 4)  // ! von Mises elasto-plasticity with isotropic hardening
+       || (matId == 5)  // ! small strain von Mises elasto-plasticity with linear isotropic hardening
+       || (matId == 6)  // ! von Mises elasto-plasticity with kinematic hardening
+       || (matId == 11)) // Small/Finite Strains Von Mises Isotropic Elastoplasticity (Isotropic Hardening) (Deniz)
+      initialiseIntVar();
+
+    return;
+}
+
+
+
+
+void LagrangeElement::setnivGP()
+{
+  // get number of internal variable per Gauss point
+
+  double dmy[10];
+
+  int  dmyI[3], isw = 1, mDim = matdim_(&matId);
+
+  if (mDim == 1) matlib1d_(matDat,dmy,dmy,dmy,dmy,dmy,dmy,dmy,
+                           &matId,&nivGP,&finiteInt,&sss,&isw,dmyI);
+
+  else if (mDim == 2) matlib2d_(matDat,dmy,dmy,dmy,dmy,dmy,dmy,dmy,
+                                  &matId,&nivGP,&finiteInt,&sss,&isw,dmyI);
+
+  else if (mDim == 3) matlib3d_(matDat,dmy,dmy,dmy,dmy,dmy,dmy,
+                                    &matId,&nivGP,&finiteInt,&isw,dmyI);
+
+  else prgError(1,"NurbsElementSolid::nivGP","invalid value of ndm!");
+
   return;
 }
+
+
+
+
+void LagrangeElement::initialiseIntVar()
+{
+  // set nivGP value
+  setnivGP();
+
+  if(nivGP > 0)
+  {
+      // allocate memory
+      int n = nivGP * nGP;
+
+      intVar1 = new double [n];
+      intVar2 = new double [n];
+
+      // initialise values
+
+      double dmy[10];
+
+      int   dmyI[3], gp,
+            ll   = 0,
+            isw  = 2,
+            mDim = matdim_(&matId);
+
+      for(gp=0; gp<nGP; gp++)
+      {
+        if (mDim == 1) matlib1d_(matDat,dmy,dmy,dmy,dmy,&(intVar1[ll]),&(intVar2[ll]),dmy,
+      	                         &matId,&nivGP,&finiteInt,&sss,&isw,dmyI);
+
+        else if (mDim == 2) matlib2d_(matDat,dmy,dmy,dmy,dmy,&(intVar1[ll]),&(intVar2[ll]),dmy,
+                                      &matId,&nivGP,&finiteInt,&sss,&isw,dmyI);
+
+        else if (mDim == 3) matlib3d_(matDat,dmy,dmy,dmy,&(intVar1[ll]),&(intVar2[ll]),dmy,
+	                                    &matId,&nivGP,&finiteInt,&isw,dmyI);
+
+        else prgError(1,"NurbsElementSolid::initialiseIntVar","invalid value of ndm!");
+
+        ll += nivGP;
+     }
+     //   for (int i=0; i<n; i++)  cout << '\t' << i << '\t' << intVar1[i] << '\t' << intVar2[i] << endl;
+  }
+
+  return;
+}
+
+
+
+
+
 
 
 double  LagrangeElement::computeGeomOrig(int dir, VectorXd& NN)
@@ -328,6 +432,41 @@ double  LagrangeElement::computeForceCur(int dir, VectorXd& NN)
   return  val;
 }
 
+
+
+
+int  LagrangeElement::applyDirichletBCs(MatrixXd& Klocal, VectorXd& Flocal)
+{
+  // add contributions to the rhs vector
+  // from nodes with specified displacement BCs
+
+  //printVector(SolnData->var1applied);
+  //printVector(globalDOFnums);
+
+  int aa, bb, ii, jj;
+
+  double loadFact = timeFunction[0].prop;
+  double fact=0.0;
+  for(ii=0; ii<nsize; ii++)
+  {
+    aa = forAssyVec[ii];
+    if(aa == -1) // this DOF has a prescibed value
+    {
+      fact = loadFact * SolnData->var1applied[globalDOFnums[ii]];
+
+      for(jj=0; jj<nsize; jj++)
+      {
+        bb = forAssyVec[jj];
+        if( bb != -1 )
+        {
+          Flocal(jj) -= Klocal(jj, ii) * fact;
+		    }
+      }
+    }
+  }
+
+  return 0;
+}
 
 
 /*

@@ -40,6 +40,7 @@ c...  small strains .........
      *  call prgError(1,"von_Mises_elastoPlasticity",
      *                  "no small strain version implemented!")
 
+      !write(*,*) finite
 
 c...  finite strains .........  
 c
@@ -61,16 +62,21 @@ c
       sigInf    = matData(i+3)
       Hlin      = matData(i+4)
 
+      !write(*,*) Hlin
+
       if (nip.lt.0)      nip =  4
       if (mxi.le.0)      mxi = 10
       if (tol.lt.1.d-14) tol = 1.d-14
 
       Dsig      = sigInf - sigY
+
+      !write(*,*) "Dsig =", Dsig
+
       if (Dsig .lt. 1.d-10) then
         H = r0
         mHdDsig = r0
       else
-        mHdDsig = - H / Dsig
+        mHdDsig = -H/Dsig
       endif
 
       expFact   = exp(mHdDsig * xi)
@@ -100,7 +106,6 @@ c     compute trial state
       Phi  = n - sr2d3 * (sigInf - Dsig*expFact + Hlin*xi) !
 
 c      Phi  = n - sr2d3 * (sigY + Dsig*(1.0-expFact) + Hlin*xi) !
-
 
       !write(*,*) Phi
 

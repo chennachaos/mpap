@@ -1355,16 +1355,16 @@ int  GeomDataHBSplines::doIntersect3D(AABB& bbTemp, bool flag, vector<int>& vecT
         domVec.push_back(0);
         domVec.push_back(bb+1);
 
-        ff = true;
+        //ff = true;
       }
       else if(domTemp != 0)
       {
         domVec.push_back(domTemp);
-        ff = false;
+        //ff = false;
       }
       
-      if(ff)
-        break;
+      //if(ff)
+        //break;
     }
   }
 

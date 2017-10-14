@@ -55,6 +55,8 @@ class HBSplineBase: public Domain
         double  origin[3], gridLEN[3], knotsLeft[3], knotsRight[3];
         double  rNormPrev, rNorm,  ctimFactSolvUpdt, ctimCalcStiffRes, totalError, rhoInfty;
 
+        vector<myPoint>  gridVertices;
+
         bool  STATUS_BCS, localStiffnessError, PERIODIC_BCS, CREATE_POSTPROCESS_GRID;
         bool  GRID_CHANGED, IB_MOVED, STAGGERED, STABILISED;
 

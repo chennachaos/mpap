@@ -51,7 +51,7 @@ int LagrangeElem3DPoissonHex8Node::calcLoadVector()
 
 
 
-int LagrangeElem3DPoissonHex8Node::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)
+int LagrangeElem3DPoissonHex8Node::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal, bool firstIter)
 {
 //   char fct[] = "LagrangeElem3DPoissonHex8Node::calcStiffnessAndResidual";
 //   computerTime.go(fct);

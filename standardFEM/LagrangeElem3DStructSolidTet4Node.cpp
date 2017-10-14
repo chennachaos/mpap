@@ -93,7 +93,7 @@ int LagrangeElem3DStructSolidTet4Node::calcLoadVector()
 }
 
 
-int LagrangeElem3DStructSolidTet4Node::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)
+int LagrangeElem3DStructSolidTet4Node::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal, bool firstIter)
 {
 //   char fct[] = "LagrangeElem3DStructSolidTet4Node::calcStiffnessAndResidual";
 //   computerTime.go(fct);

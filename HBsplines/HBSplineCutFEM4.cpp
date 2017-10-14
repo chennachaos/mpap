@@ -88,6 +88,13 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
 
     double tstart = MPI_Wtime();
 
+    // create one matrix and vector of large enough size 
+    // to compute element stiffness and residual
+    // This way, we avoid storing, or creating a new one,
+    // local matrix/vector for every element
+    //MatrixXd  Klocal(50,50);
+    //VectorXd  Flocal(50);
+
     solverPetsc->zeroMtx();
 
     for(ee=0; ee<fluidElementIds.size(); ee++)
@@ -95,6 +102,7 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
       node *nd = elems[fluidElementIds[ee]];
 
       //cout << " nd->getID() " <<  nd->getID() << '\t' <<  nd->getLevel() << '\t' << nd->getDomainNumber() << endl;
+      //cout << nd->getSubdomainId() << '\t' << this_mpi_proc << endl;
 
       if( nd->getSubdomainId() == this_mpi_proc )
       {
@@ -104,31 +112,31 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
         {
           nr = nd->forAssyVec.size();
 
-          MatrixXd  Klocal;
-          VectorXd  Flocal;
+          MatrixXd  Klocal = MatrixXd::Zero(nr, nr);
+          VectorXd  Flocal = VectorXd::Zero(nr);
+          //Klocal = MatrixXd::Zero(nr, nr);
+          //Flocal = VectorXd::Zero(nr);
+          //Klocal.setZero();
+          //Flocal.setZero();
 
-          Klocal = MatrixXd::Zero(nr, nr);
-          Flocal = VectorXd::Zero(nr);
-
-          //cout << " AAAAAAAAAAAAAAAAA " << endl;
-          //nd->calcStiffnessAndResidualGFEM(Klocal, Flocal, domTemp);
+          //cout << " AAAAAAAAAAAAAAAAA " << nr << endl;
+          //nd->calcStiffnessAndResidualGFEM(Klocal, Flocal);
           nd->calcStiffnessAndResidualCutFEMFluid(Klocal, Flocal, domTemp);
 
           //cout << " BBBBBBBBBBBBBBBBB " << endl;
-          //nd->applyDirichletBCsGFEM(Klocal, Flocal, domTemp);
           nd->applyDirichletBCsCutFEMFluid(Klocal, Flocal, domTemp);
-          //cout << " DDDDDDDDDDDDDDDDD " << endl;
+          //cout << " CCCCCCCCCCCCCCCCC " << endl;
 
           //cout << " DDDDDDDDDDDDDDDDD " << endl;
           nd->applyNeumannBCsCutFEMFluid(Klocal, Flocal, domTemp);
-          //cout << " BBBBBBBBBBBBBBBBB " << endl;
+          //cout << " EEEEEEEEEEEEEEEEE " << endl;
 
           //printMatrix(Klocal);
           //printf("\n\n\n");
           //printVector(Flocal);
 
           solverPetsc->assembleMatrixAndVectorCutFEM(start, start, nd->forAssyVec, grid_to_proc_DOF, Klocal, Flocal);
-          //cout << " CCCCCCCCCCCCCCCC " << endl;
+          //cout << " FFFFFFFFFFFFFFFFFF " << endl;
         }
       }
     }
@@ -179,8 +187,7 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
     }
 
     //cout << " rhsVec " << endl;
-    //       printVector(&(solver->rhsVec(0)), totalDOF);
-
+    //printVector(&(solver->rhsVec(0)), totalDOF);
     //printf("\n rhsVec norm = %12.6E \n", solverEigen->rhsVec.norm());
 
     if(DIM == 2)

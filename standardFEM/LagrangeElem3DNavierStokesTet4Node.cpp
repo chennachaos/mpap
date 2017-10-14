@@ -59,7 +59,7 @@ int LagrangeElem3DNavierStokesTet4Node::calcLoadVector()
 
 
 //
-int LagrangeElem3DNavierStokesTet4Node::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)
+int LagrangeElem3DNavierStokesTet4Node::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal, bool firstIter)
 {
   // Fully-implicit formulation
 

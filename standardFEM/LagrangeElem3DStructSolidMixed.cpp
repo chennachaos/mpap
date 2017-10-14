@@ -74,7 +74,7 @@ int LagrangeElem3DStructSolidMixed::calcLoadVector()
 
 
 
-int LagrangeElem3DStructSolidMixed::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)
+int LagrangeElem3DStructSolidMixed::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal, bool firstIter)
 {
   if(finite)
     calcStiffnessAndResidualFS(Klocal, Flocal);

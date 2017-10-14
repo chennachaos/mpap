@@ -80,7 +80,7 @@ int ElementGeomExactTruss2D::calcLoadVector()
 }
 
 
-int ElementGeomExactTruss2D::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)
+int ElementGeomExactTruss2D::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal, bool firstIter)
 {
   // From NFEM course material
   // http://www.colorado.edu/engineering/cas/courses.d/NFEM.d/Home.html

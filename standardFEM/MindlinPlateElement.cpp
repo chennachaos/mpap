@@ -76,7 +76,7 @@ void MindlinPlateElement::prepareElemData2()
 
 
 
-int MindlinPlateElement::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)
+int MindlinPlateElement::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal, bool firstIter)
 {
     int  ii, jj, gp1, gp2, kk, ind1, ind2, TI, TIp1, TIp2, TJ, TJp1, TJp2;
 

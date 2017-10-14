@@ -83,7 +83,7 @@ int LagrangeElem1Dbar2Node::calcLoadVector()
 
 
 
-int LagrangeElem1Dbar2Node::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)
+int LagrangeElem1Dbar2Node::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal, bool firstIter)
 {
     int  ii, jj, gp, kk, ll, TI, TIp1, TIp2, count, TJ, TJp1, TJp2;
     

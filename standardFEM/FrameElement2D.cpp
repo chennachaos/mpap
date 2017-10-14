@@ -77,7 +77,7 @@ int FrameElement2D::calcLoadVector()
 
 
 //
-int FrameElement2D::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)
+int FrameElement2D::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal, bool firstIter)
 {
     int  ii, jj, gp, kk, ll, TI, TIp1, TIp2, count, TJ, TJp1, TJp2;
     

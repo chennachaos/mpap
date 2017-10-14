@@ -69,7 +69,7 @@ void LagrangeElem3DBbarFbar::prepareElemData2()
 }
 
 
-int LagrangeElem3DBbarFbar::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)
+int LagrangeElem3DBbarFbar::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal, bool firstIter)
 {
   if(finite)
     calcStiffnessAndResidualFS(Klocal, Flocal);

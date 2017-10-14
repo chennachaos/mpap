@@ -82,7 +82,7 @@ int ElementGeomExactBeam2D::calcLoadVector()
 
 
 //
-int ElementGeomExactBeam2D::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)
+int ElementGeomExactBeam2D::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal, bool firstIter)
 {
     if(Klocal.rows() != nsize)
     {

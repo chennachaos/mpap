@@ -293,7 +293,7 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
 
 int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool zeroRes)
 {
-    //cout << "     HBSplineFEM: generating coefficient Matrices ...\n\n";
+    cout << "     HBSplineFEM: generating coefficient Matrices ...\n\n";
 
     char fct[] = "HBSplineFEM::calcStiffnessAndResidual";
     computerTime.go(fct);

@@ -80,7 +80,7 @@ int LagrangeElem3DStructSolidHex8NodeStab::calcLoadVector()
 }
 
 
-int LagrangeElem3DStructSolidHex8NodeStab::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)
+int LagrangeElem3DStructSolidHex8NodeStab::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal, bool firstIter)
 {
 //   char fct[] = "LagrangeElem3DStructSolidHex8NodeStab::calcStiffnessAndResidual";
 //   computerTime.go(fct);

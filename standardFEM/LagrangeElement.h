@@ -103,14 +103,13 @@ class LagrangeElement
     virtual void initialiseDOFvalues()
     { cout << "   'initialiseDOFvalues' is not defined for this element!\n\n"; return; }
 
-    virtual void initialiseKnotsAtGPs()
-    { cout << "   'initialiseKnotsAtGPs' is not defined for this element!\n\n"; return; }
-
     virtual int calcOutput(double u1, double v1)
     { cout << "   'calcOutput' is not defined for this element!\n\n"; return 0; }
 
-    virtual void initialiseIntVar()
-    { cout << "   'initialiseIntVar' is not defined for this element!\n\n"; }
+    virtual void setnivGP();
+
+    virtual void initialiseIntVar();
+    //{ cout << "   'initialiseIntVar' is not defined for this element!\n\n"; }
 
     virtual void createTractionDataVariable()
     { cout << "  'createTractionDataVariable' is not available for this element!\n\n"; return; }
@@ -124,16 +123,12 @@ class LagrangeElement
     virtual int calcLoadVector()
     { cout << "   'calcAndAssyLoadVec' is not defined for this element!\n\n"; return 0; }
 
-    virtual int  calcStiffnessAndResidual()
+    virtual int  calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal, bool firstIter=false)
     { cout << "   'calcStiffnessAndResidual' is not defined for this element!\n\n"; return 0; }
 
-    virtual int  calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)
-    { cout << "   'calcStiffnessAndResidual' is not defined for this element!\n\n"; return 0; }
+    virtual int  applyDirichletBCs(MatrixXd& Klocal, VectorXd& Flocal);
 
-    virtual int applyDirichletBCs()
-    { cout << "   'applyDirichletBCs' is not defined for this element!\n\n"; return 0; }
-
-    virtual void  assembleElementMatrixAndVector(int, SparseMatrixXd&, double*);
+    virtual void assembleElementMatrixAndVector(int, SparseMatrixXd&, double*);
 
     virtual void assembleElementMatrix(int, Mat);
 

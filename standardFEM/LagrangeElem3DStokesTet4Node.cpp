@@ -55,7 +55,7 @@ int LagrangeElem3DStokesTet4Node::calcLoadVector()
 
 
 
-int LagrangeElem3DStokesTet4Node::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)
+int LagrangeElem3DStokesTet4Node::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal, bool firstIter)
 {
   double  dvol, b1, b2, b3, b4, b5, b6, b7, b8;
   double  Jac, totvol, pres, fact, fact2, *elmDat;

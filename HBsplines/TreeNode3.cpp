@@ -774,10 +774,11 @@ void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
 
     myPoint  param, geom;
 
-    double  mu  = elmDat[4];
+    //double  mu  = elmDat[4];
+    double mu = 1.0;
 
-    //cout << " uuuuuuuuuuuuuuu " << endl;
-    //cout << GeomData->getNGP(1) << '\t' << GeomData->getNGP(0) << endl;
+    cout << " uuuuuuuuuuuuuuu " << endl;
+    cout << GeomData->getNGP(1) << '\t' << GeomData->getNGP(0) << endl;
     //printVector(GeomData->gausspoints1);
     //printVector(GeomData->gausspoints2);
     //printVector(GeomData->gaussweights1);
@@ -815,7 +816,9 @@ void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
           force = analy.computeForce(0, geom[0], geom[1]);
           //fact = 0.0;
 
-        Klocal += ((dvol*mu)*(dN_dx*dN_dx.transpose()+dN_dy*dN_dy.transpose()));
+        Klocal += (dvol*(N*N.transpose()));
+
+        //Klocal += ((dvol*mu)*(dN_dx*dN_dx.transpose()+dN_dy*dN_dy.transpose()));
 
         //for(ii=0;ii<totnlbf2;ii++)
         //{
@@ -830,7 +833,7 @@ void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
     }//gp1
     }//gp2
 
-  //printMatrix(Klocal);
+  printMatrix(Klocal);
   //printVector(Flocal);
 
   return;

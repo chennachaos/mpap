@@ -256,7 +256,7 @@ int KirchhoffPlateElement::calcStiffnessAndResidual()
 
 
 //
-int KirchhoffPlateElement::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)
+int KirchhoffPlateElement::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal, bool firstIter)
 {
     int  ii, jj, gp, kk, ind1, ind2, TI;
     

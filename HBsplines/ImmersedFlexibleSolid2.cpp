@@ -444,7 +444,7 @@ int ImmersedFlexibleSolid::calcStiffnessAndResidual(int printRes, bool zeroMtx, 
     {
       //cout << "       elem... : " << (ee+1) << endl;
 
-      elems[ee]->calcStiffnessAndResidual(Klocal, Flocal);
+      elems[ee]->calcStiffnessAndResidual(Klocal, Flocal, firstIter);
 
       //cout << " MMMMMMMMMMM " << endl;
       //elems[ee]->assembleElementMatrixAndVector(0, solver->mtx, &(solver->rhsVec(0)));
@@ -711,7 +711,7 @@ int ImmersedFlexibleSolid::assembleGlobalMatrixAndVector(int start1, int start2,
 
       //elems[ee]->resetMatrixAndVector();
 
-      elems[ee]->calcStiffnessAndResidual();
+      //elems[ee]->calcStiffnessAndResidual();
 
       //cout << " MMMMMMMMMMM " << endl;
       elems[ee]->assembleElementMatrixAndVector(start2, mtx, rhs);

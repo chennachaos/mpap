@@ -56,7 +56,7 @@ template<>
 int node1D::ndof = 1;
 
 template<>
-int node2D::ndof = 3;
+int node2D::ndof = 1;
 
 template<>
 int node3D::ndof = 4;
@@ -189,9 +189,22 @@ HBSplineBase::~HBSplineBase()
 
 void HBSplineBase::prepareInputData()
 {
-    //printf("\n     HBSplineBase::prepareInputData()  .... STARTED ...\n");
+    printf("\n     HBSplineBase::prepareInputData()  .... STARTED ...\n");
 
     int ii, jj, kk, ee, aa, bb, cc, gp, r;
+
+    /*
+    if(DIM == 2)
+    {
+      kk = ((nelem[0]+1)*(nelem[1]+1))*pow(4,refinementData[1]);
+    }
+    else if(DIM == 3)
+    {
+      kk = ((nelem[0]+1)*(nelem[1]+1)*(nelem[2]+1))*pow(8,refinementData[1]);
+    }
+
+    gridVertices.reserve(kk);
+    */
 
     // go and inherit from ancestors
     Domain::prepareInputData();
@@ -251,7 +264,7 @@ void HBSplineBase::prepareInputData()
     GeomData.setNdof(ndf);
     GeomData.build();
     
-    //cout << " BBBBBBBBBBBBBBB " << endl;
+    cout << " BBBBBBBBBBBBBBB " << endl;
 
     ///////////////////////////////////////////////////////////////////
     //

@@ -58,6 +58,12 @@ class AdaptiveOctree
 
         GaussQuadrature  Quadrature;
 
+        // vector of points for storing vertices
+        vector<myPoint>  vertices;
+
+        // vector for storing whether a vertex lies inside/outside the immersed solid
+        vector<int>  vertexInOut;
+
         AdaptiveOctree();
         
         AdaptiveOctree(int lev=0);
@@ -308,6 +314,42 @@ void AdaptiveOctree<DIM>::prepareData()
       bbox.maxBB[ii] = GeomData->computeCoord(ii, knotEnd[ii]);
 
       JacMultElem *= (0.5*knotIncr[ii]);
+    }
+
+    vertices.clear();
+
+    myPoint  ptTemp;
+
+    if(DIM == 2)
+    {
+      ptTemp[0] = bbox.minBB[0];    ptTemp[1] = bbox.minBB[1];    ptTemp[2] = 0.0;
+      vertices.push_back(ptTemp);
+      ptTemp[0] = bbox.maxBB[0];    ptTemp[1] = bbox.minBB[1];    ptTemp[2] = 0.0;
+      vertices.push_back(ptTemp);
+      ptTemp[0] = bbox.minBB[0];    ptTemp[1] = bbox.maxBB[1];    ptTemp[2] = 0.0;
+      vertices.push_back(ptTemp);
+      ptTemp[0] = bbox.maxBB[0];    ptTemp[1] = bbox.maxBB[1];    ptTemp[2] = 0.0;
+      vertices.push_back(ptTemp);
+    }
+    else if(DIM == 3)
+    {
+      ptTemp[0] = bbox.minBB[0];  ptTemp[1] = bbox.minBB[1];  ptTemp[2] = bbox.minBB[2];
+      vertices.push_back(ptTemp);
+      ptTemp[0] = bbox.maxBB[0];  ptTemp[1] = bbox.minBB[1];  ptTemp[2] = bbox.minBB[2];
+      vertices.push_back(ptTemp);
+      ptTemp[0] = bbox.minBB[0];  ptTemp[1] = bbox.maxBB[1];  ptTemp[2] = bbox.minBB[2];
+      vertices.push_back(ptTemp);
+      ptTemp[0] = bbox.maxBB[0];  ptTemp[1] = bbox.maxBB[1];  ptTemp[2] = bbox.minBB[2];
+      vertices.push_back(ptTemp);
+
+      ptTemp[0] = bbox.minBB[0];  ptTemp[1] = bbox.minBB[1];  ptTemp[2] = bbox.maxBB[2];
+      vertices.push_back(ptTemp);
+      ptTemp[0] = bbox.maxBB[0];  ptTemp[1] = bbox.minBB[1];  ptTemp[2] = bbox.maxBB[2];
+      vertices.push_back(ptTemp);
+      ptTemp[0] = bbox.minBB[0];  ptTemp[1] = bbox.maxBB[1];  ptTemp[2] = bbox.maxBB[2];
+      vertices.push_back(ptTemp);
+      ptTemp[0] = bbox.maxBB[0];  ptTemp[1] = bbox.maxBB[1];  ptTemp[2] = bbox.maxBB[2];
+      vertices.push_back(ptTemp);
     }
 
     if(sideTemp != -1)

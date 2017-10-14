@@ -21,7 +21,7 @@ class  LagrangeElem2DPoissonQuad4Node : public LagrangeElement
 
     void prepareElemData2();
 
-    virtual int calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal);
+    virtual int calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal, bool firstIter=false);
 
     virtual int calcInternalForces();
 

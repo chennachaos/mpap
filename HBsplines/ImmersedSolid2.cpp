@@ -247,6 +247,7 @@ void  ImmersedSolid::setImmersedFaces()
 
     writerPolyData->Write();
 
+    selectEnclosedPoints->SetTolerance(0.000001);
     //selectEnclosedPoints->Update();
     selectEnclosedPoints->Initialize(polyDataVTK);
 
@@ -934,32 +935,28 @@ int  ImmersedSolid::doIntersect2Dfor3D(int sideTemp, double coord3, AABB&  bbTem
 
 int  ImmersedSolid::doIntersect3D(AABB&  bbTemp, bool flag, vector<int>& vecTemp, vector<myPoint>&  ptOut)
 {
-  // return value = 0       ---> the cell is the domain '0' which is the default background grid
-  // return value = -1      ---> the cell is cut by the current immersed body
-  // return value = (bb+1)  ---> the cell is completely inside the immersed body 'bb'
-
   // this method is used to test whether 
   // a background grid cell is cut by the immersed body (IB)
   // 
   // bbTemp is the boundingbox of the cell to be tested
 
+  // return value = 0       ---> the cell is the domain '0' which is the default background grid
+  // return value = -1      ---> the cell is cut by the current immersed body
+  // return value = (bb+1)  ---> the cell is completely inside the immersed body 'bb'
+
   // check if the boundingbox 'bbTemp' intersects the boundingbox of the IB
-  // if the boundingbox 'bbTemp' does not intersect the boundingbox of the IB then
+  // If the boundingbox 'bbTemp' does not intersect the boundingbox of the IB then
   // the IB does not intersect the cell
 
-  // if the boundingbox 'bbTemp' intersects the boundingbox of the IB then
-  // the IB may intersect the cell and needs further testing
-  
-    //bb2.printSelf();
+    //if( !(bbox.doIntersect(bbTemp)) )
+      //return 0;
 
-    if( !(bbox.doIntersect(bbTemp)) )
-      return 0;
+    // If the boundingbox of the cell intersects the boundingbox of the IB then
+    // the IB may intersect the cell and needs further testing
 
     int val=0, ii=0, jj=0, c=0, pp=0;
     myPoint  ptTemp;
     vector<myPoint>  ptVec(8);
-
-    //bbTemp.printSelf();
 
     //
     // using VTK subroutines

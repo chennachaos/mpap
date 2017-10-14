@@ -367,7 +367,7 @@ int LagrangeElem3DNavierStokesHex8Node::calcStiffnessAndResidual(MatrixXd& Kloca
 
 
 //
-int LagrangeElem3DNavierStokesHex8Node::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)
+int LagrangeElem3DNavierStokesHex8Node::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal, bool firstIter)
 {
   // Semi-implicit formulation - type A
   

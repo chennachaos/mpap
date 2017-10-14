@@ -56,7 +56,7 @@ int LagrangeElem2DNavierStokesTria3Node::calcLoadVector()
 
 
 //
-int LagrangeElem2DNavierStokesTria3Node::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal)
+int LagrangeElem2DNavierStokesTria3Node::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal, bool firstIter)
 {
 //   char fct[] = "LagrangeElem2DNavierStokes4Node::calcStiffnessAndResidual";
 //   computerTime.go(fct);
