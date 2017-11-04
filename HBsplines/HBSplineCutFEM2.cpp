@@ -156,7 +156,7 @@ void  HBSplineCutFEM::prepareCutElements()
       }
     }
 
-    cout << " number of cut cells " << cutCellIds.size() << endl;
+    //cout << " number of cut cells " << cutCellIds.size() << endl;
 
     nNode = 0;
     for(ee=0; ee<gridBF1; ee++)

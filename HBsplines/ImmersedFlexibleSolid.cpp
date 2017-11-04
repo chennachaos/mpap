@@ -184,8 +184,8 @@ void  ImmersedFlexibleSolid::setSolidElements(vector<vector<int> >& elemConn)
     int ndof_temp1 = ndof;
     int ndof_temp2 = ndof_temp1;
 
-    PetscPrintf(MPI_COMM_WORLD, "\n    nContX = %5d ...\n", nContX);
-    PetscPrintf(MPI_COMM_WORLD, "\n    nContY = %5d ...\n", nContY);
+    //PetscPrintf(MPI_COMM_WORLD, "\n    nContX = %5d ...\n", nContX);
+    //PetscPrintf(MPI_COMM_WORLD, "\n    nContY = %5d ...\n", nContY);
 
     if(nContX || nContY)
     {

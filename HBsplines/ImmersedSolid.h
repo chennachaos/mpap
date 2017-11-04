@@ -10,7 +10,7 @@
 #include  "SolverEigen.h"
 #include  "SolverPetsc.h"
 
-//#include "myCGALroutines.h"
+#include "myCGALroutines.h"
 
 /*
 #include <list>
@@ -92,12 +92,14 @@ class ImmersedSolid
         vtkSmartPointer<vtkSelectEnclosedPoints> selectEnclosedPoints2;
 
         // CGAL related
-        //vector<CGAL_Point>   pointsCGAL;
-        ////list<CGAL_Triangle>  trianglesCGAL;
-        //vector<int>  facesCGAL;
-        //CGAL_Polyhedron  polyhedronTemp;
-        //CGAL_Tree treeCGAL;
-        //CGAL_Point_inside  *point_inside_tester;
+        vector<CGAL_Point>   pointsCGAL;
+
+        list<CGAL_Triangle>  trianglesCGAL;
+        CGAL_Tree treeCGAL;
+
+        vector<int>  facesCGAL;
+        CGAL_Polyhedron  polyhedronTemp;
+        CGAL_Point_inside  *point_inside_tester;
 
         //////////////////////////////////////////////////////
         // member functions

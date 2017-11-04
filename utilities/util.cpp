@@ -1,13 +1,9 @@
 
 #include "headersBasic.h"
-
-//#include "NurbsUtilities.h"
 #include "util.h"
-
 #include "myConstants.h"
 
 using namespace std;
-
 using namespace Eigen;
 
 

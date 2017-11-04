@@ -149,7 +149,7 @@ inline void Idev3D(double  Idev[][6])
 double dotProductVecs(double* vec1, double* vec2, int N);
 
 
-inline bool my_any_of(std::vector<int>& vecTemp, int data )
+inline bool my_any_of(vector<int>& vecTemp, int data )
 {
   bool val = false;
   for(int ii=0; ii<vecTemp.size(); ii++)
@@ -164,7 +164,20 @@ inline bool my_any_of(std::vector<int>& vecTemp, int data )
   return val;
 }
 
+inline int my_equal(vector<int>& vecTemp)
+{
+  int val = -1;
+  if( std::equal(vecTemp.begin()+1, vecTemp.end(), vecTemp.begin()) )
+  {
+    if( vecTemp[0] == 1 )
+      // val = id+1;
+      val = 1;
+    else
+      val = 0;
+  }
 
+  return val;
+}
 
 
 #endif

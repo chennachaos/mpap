@@ -1615,7 +1615,7 @@ void TreeNode<3>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
 
               specVal = DirichletData[aa][2];
 
-              /*
+              //
               if(side == 0 )
               {
                 if(dir == 0)
@@ -1631,7 +1631,7 @@ void TreeNode<3>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
                   specVal = DirichletData[aa][2]*(6.0/y1/y1)*(y1-geom[1])*(geom[1]-y0)*(6.0/z1/z1)*(z1-geom[2])*(geom[2]-z0);
                 }
               }
-              */
+              //
 
               specVal *= timeFunction[0].prop;
 

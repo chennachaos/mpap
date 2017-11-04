@@ -350,14 +350,14 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
 
       //cout << " AAAAAAAAAAAAAAAAA " << endl;
       nd->calcStiffnessAndResidualGFEM(Klocal, Flocal);
-      matK = Klocal;
+      //matK = Klocal;
       //cout << " AAAAAAAAAAAAAAAAA " << endl;
       //printMatrix(Klocal);
       //printf("\n\n");
       //printVector(Flocal);
-      Klocal.setZero();
+      //Klocal.setZero();
       nd->applyDirichletBCsGFEM(Klocal, Flocal);
-      matM = Klocal;
+      //matM = Klocal;
       //cout << " BBBBBBBBBBBBBBBBB " << endl;
       //nd->applyNeumannBCsGFEM(Klocal, Flocal);
       //cout << " BBBBBBBBBBBBBBBBB " << endl;
@@ -391,15 +391,15 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
     // for computing CI
     //GeneralizedSelfAdjointEigenSolver<MatrixXd> es(matK, matM);
     // for computing penalty parameter
-    GeneralizedSelfAdjointEigenSolver<MatrixXd> es(matM, matK);
+    //GeneralizedSelfAdjointEigenSolver<MatrixXd> es(matM, matK);
     //cout << " AAAAAAAAAAAAAAAAA " << endl;
-    VectorXd  eig_vals = es.eigenvalues();
-    cout << "The eigenvalues of the pencil (A,B) are:" << endl << eig_vals << endl;
+    //VectorXd  eig_vals = es.eigenvalues();
+    //cout << "The eigenvalues of the pencil (A,B) are:" << endl << eig_vals << endl;
 
-    printf("\n %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% \n");
-    printf("\n\n\n Maximum eigenvalue = %12.6f \n\n\n", eig_vals.maxCoeff() );
+    //printf("\n %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% \n");
+    //printf("\n\n\n Maximum eigenvalue = %12.6f \n\n\n", eig_vals.maxCoeff() );
     //printf("\n\n\n CI value = %14.10f \n\n\n", pow(eig_vals.maxCoeff(),1.0/3.0) );
-    printf("\n %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% \n");
+    //printf("\n %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% \n");
 
     //
     if(pointBCs.size() > 0)

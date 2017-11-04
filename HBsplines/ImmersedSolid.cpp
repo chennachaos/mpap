@@ -84,13 +84,6 @@ void ImmersedSolid::timeUpdate()
   
   SolnData.timeUpdate();
 
-  //SolnData.var1 = SolnData.var1Extrap;
-  //SolnData.var1.setZero();
-
-  //SolnData.var1  = SolnData.var1Prev;
-  //SolnData.var1 += mpapTime.dt * SolnData.var1DotPrev;
-  //SolnData.var1 += (0.5*mpapTime.dt * mpapTime.dt)*SolnData.var1DotDotPrev;
-
   if(STAGGERED)
     updateIterStep();
 

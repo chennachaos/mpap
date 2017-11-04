@@ -13,9 +13,6 @@
 #include "mpi.h"
 #include "metis.h"
 
-//#include <chrono>
-//typedef std::chrono::high_resolution_clock Clock;
-
 
 extern ComputerTime       computerTime;
 extern MpapTime           mpapTime;
@@ -480,124 +477,123 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
       //cout << " elem_start = " << elem_start << '\t' << elem_end << '\t' << nElem_local << endl;
 
-      PetscInt  *eptr, *eind, *epart, *npart, *vwgtElem;
+      PetscInt  *eptr, *eind, *elem_proc_id, *node_proc_id, *vwgtElem;
 
-      ierr  = PetscMalloc1(nElem+1,  &eptr);  CHKERRQ(ierr);
-      ierr  = PetscMalloc1(nElem,    &epart); CHKERRQ(ierr);
-      ierr  = PetscMalloc1(nNode,    &npart); CHKERRQ(ierr);
-      ierr  = PetscMalloc1(nElem,    &vwgtElem); CHKERRQ(ierr);
+      ierr  = PetscMalloc1(nElem,    &elem_proc_id); CHKERRQ(ierr);
+      ierr  = PetscMalloc1(nNode,    &node_proc_id); CHKERRQ(ierr);
 
-      //ierr  = PetscMalloc1(nElem_local+1,  &eptr);CHKERRQ(ierr);
-
-      eptr[0] = 0;
-
-      PetscInt npElem_total = 0;
-      for(ee=0; ee<nElem; ee++)
+      // paritioning is performed only by the first processor
+      //
+      if(this_mpi_proc == 0)
       {
-        npElem_total += elems[fluidElementIds[ee]]->GlobalBasisFuncs.size();
+        ierr  = PetscMalloc1(nElem+1,  &eptr);  CHKERRQ(ierr);
+        ierr  = PetscMalloc1(nElem,    &vwgtElem); CHKERRQ(ierr);
 
-        eptr[ee+1] = npElem_total;
+        eptr[0] = 0;
 
-        //vwgtElem[ee] = elems[fluidElementIds[ee]]->getComputationalEffort();
-        vwgtElem[ee] = elems[fluidElementIds[ee]]->getNumberOfQuadraturePoints();
-      }
+        PetscInt npElem_total = 0;
+        for(ee=0; ee<nElem; ee++)
+        {
+          npElem_total += elems[fluidElementIds[ee]]->GlobalBasisFuncs.size();
 
-      //cout << " npElem_total = " << npElem_total << endl;
+          eptr[ee+1] = npElem_total;
 
-      ierr  = PetscMalloc1(npElem_total,  &eind); CHKERRQ(ierr);
+          //vwgtElem[ee] = elems[fluidElementIds[ee]]->getComputationalEffort();
+          vwgtElem[ee] = elems[fluidElementIds[ee]]->getNumberOfQuadraturePoints();
+        }
 
-      //PetscSynchronizedPrintf(PETSC_COMM_WORLD,"%d \n", elem_start);
+        //cout << " npElem_total = " << npElem_total << endl;
 
-      vector<int>  vecTemp2;
+        ierr  = PetscMalloc1(npElem_total,  &eind); CHKERRQ(ierr);
 
-      kk=0;
-      //for(e1=0; e1<nElem_local; e1++)
-      for(e1=0; e1<nElem; e1++)
-      {
-        //e2 = elem_start + e1;
+        //PetscSynchronizedPrintf(PETSC_COMM_WORLD,"%d \n", elem_start);
 
-        vecTemp2 = elems[fluidElementIds[e1]]->GlobalBasisFuncs ;
+        vector<int>  vecTemp2;
 
-        //if(this_mpi_proc == 0)
-          //printVector(vecTemp2);
-        //findUnique(vecTemp2);
+        kk=0;
+        for(e1=0; e1<nElem; e1++)
+        {
+          vecTemp2 = elems[fluidElementIds[e1]]->GlobalBasisFuncs ;
 
-        npElem = vecTemp2.size();
+          npElem = vecTemp2.size();
 
-        for(ii=0; ii<npElem; ii++)
-          eind[kk+ii] = grid_to_cutfem_BF[vecTemp2[ii]] ;
+          for(ii=0; ii<npElem; ii++)
+            eind[kk+ii] = grid_to_cutfem_BF[vecTemp2[ii]] ;
 
-        kk += npElem;
-      }
+          kk += npElem;
+        }
 
-      //for(e1=0; e1<nElem; e1++)
-      //{
-        //kk = e1*npElem;
-        //for(ii=0; ii<npElem; ii++)
-          //cout << eind[kk+ii] << '\t' ;
-        //cout << endl;
-      //}
+        int  nodes_per_side=2;
 
-      int  nodes_per_side=2;
+        if(DIM == 3)
+          nodes_per_side = 4;
 
-      if(DIM == 2)
-        nodes_per_side = 2;
-      else
-        nodes_per_side = 4;
+        int  nWeights  = 1, numflag=0, node_proc_ids = n_mpi_procs, objval;
+        int  *xadj, *adjncy;
+        int  options[METIS_NOPTIONS];
 
+        METIS_SetDefaultOptions(options);
 
-      int  nWeights  = 1, numflag=0, nParts = n_mpi_procs, objval;
-      int  *xadj, *adjncy;
-      int  options[METIS_NOPTIONS];
+        // Specifies the partitioning method.
+        //options[METIS_OPTION_PTYPE] = METIS_PTYPE_RB;    // Multilevel recursive bisectioning.
+        options[METIS_OPTION_PTYPE] = METIS_PTYPE_KWAY;  // Multilevel k-way partitioning.
 
-      METIS_SetDefaultOptions(options);
+        //options[METIS_OPTION_NSEPS] = 10;
 
-      // Specifies the partitioning method.
-      //options[METIS_OPTION_PTYPE] = METIS_PTYPE_RB;    // Multilevel recursive bisectioning.
-      options[METIS_OPTION_PTYPE] = METIS_PTYPE_KWAY;  // Multilevel k-way partitioning.
+        //options[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_CUT;   // Edge-cut minimization
+        options[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_VOL; // Total communication volume minimization
 
-      //options[METIS_OPTION_NSEPS] = 10;
-
-      //options[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_CUT;   // Edge-cut minimization
-      options[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_VOL; // Total communication volume minimization
-
-      options[METIS_OPTION_NUMBERING] = 0;  // C-style numbering is assumed that starts from 0.
+        options[METIS_OPTION_NUMBERING] = 0;  // C-style numbering is assumed that starts from 0.
 
 
-      // METIS partition routine - based on the nodal graph of the mesh
-      //int ret = METIS_PartMeshNodal(&nElem, &nNode, eptr, eind, NULL, NULL, &nParts, NULL, options, &objval, epart, npart);
+        // METIS partition routine - based on the nodal graph of the mesh
+        //int ret = METIS_PartMeshNodal(&nElem, &nNode, eptr, eind, NULL, NULL, &node_proc_ids, NULL, options, &objval, elem_proc_id, node_proc_id);
 
-      // METIS partition routine - based on the dual graph of the mesh
-      int ret = METIS_PartMeshDual(&nElem, &nNode, eptr, eind, NULL, NULL, &nodes_per_side, &n_mpi_procs, NULL, options, &objval, epart, npart);
-      //int ret = METIS_PartMeshDual(&nElem, &nNode, eptr, eind, vwgtElem, NULL, &nodes_per_side, &n_mpi_procs, NULL, options, &objval, epart, npart);
+        // METIS partition routine - based on the dual graph of the mesh
+        int ret = METIS_PartMeshDual(&nElem, &nNode, eptr, eind, NULL, NULL, &nodes_per_side, &n_mpi_procs, NULL, options, &objval, elem_proc_id, node_proc_id);
+        //int ret = METIS_PartMeshDual(&nElem, &nNode, eptr, eind, vwgtElem, NULL, &nodes_per_side, &n_mpi_procs, NULL, options, &objval, elem_proc_id, node_proc_id);
 
-      //idx_t  wgtflag=0, numflag=0, ncon=0, ncommonnodes=2, nparts=n_mpi_procs;
-      //idx_t  *elmdist;
+        //idx_t  wgtflag=0, numflag=0, ncon=0, ncommonnodes=2, node_proc_ids=n_mpi_procs;
+        //idx_t  *elmdist;
 
-      //int ret = ParMETIS_V3_PartMeshKway(elmdist, eptr, eind, NULL, &wgtflag, &numflag, &ncon, &ncommonnodes, &nparts, NULL, NULL, options, NULL, npart, MPI_COMM_WORLD);
+        //int ret = ParMETIS_V3_PartMeshKway(elmdist, eptr, eind, NULL, &wgtflag, &numflag, &ncon, &ncommonnodes, &node_proc_ids, NULL, NULL, options, NULL, node_proc_id, MPI_COMM_WORLD);
 
-      //pcout <<  " ccccccccccc " << endl;
+        if(ret == METIS_OK)
+          PetscPrintf(MPI_COMM_WORLD, "   METIS partition routine successful \n");
+        else
+          PetscPrintf(MPI_COMM_WORLD, "   METIS partition routine FAILED \n");
 
-      if(ret == METIS_OK)
-        PetscPrintf(MPI_COMM_WORLD, "   METIS partition routine successful \n");
-      else
-        PetscPrintf(MPI_COMM_WORLD, "   METIS partition routine FAILED \n");
 
-      //if(this_mpi_proc == 0)
-      //{
         //for(ee=0; ee<nElem; ee++)
-          //cout << ee << '\t' << epart[ee] << endl;
+          //cout << ee << '\t' << elem_proc_id[ee] << endl;
 
         //cout << " \n\n\n\n " << endl;
 
         //for(ee=0; ee<nNode; ee++)
-          //cout << ee << '\t' << npart[ee] << endl;
-      //}
+          //cout << ee << '\t' << node_proc_id[ee] << endl;
+
+          ierr  = PetscFree(eptr);  CHKERRQ(ierr);
+          ierr  = PetscFree(eind);  CHKERRQ(ierr);    
+          ierr  = PetscFree(vwgtElem); CHKERRQ(ierr);
+        }  //if(this_mpi_proc == 0)
+
+
+      ierr = MPI_Barrier(MPI_COMM_WORLD);
+
+      ierr = PetscPrintf(MPI_COMM_WORLD, " After Metis \n");
+
+      ierr = MPI_Bcast(elem_proc_id, nElem, MPI_INT, 0, MPI_COMM_WORLD);
+
+      ierr = MPI_Barrier(MPI_COMM_WORLD);
+
+      ierr = MPI_Bcast(node_proc_id, nNode, MPI_INT, 0, MPI_COMM_WORLD);
+
+      ierr = MPI_Barrier(MPI_COMM_WORLD);
 
       //cout << " nNode_local = " << nNode_local << endl;
 
       for(e1=0; e1<nElem; e1++)
-        elems[fluidElementIds[e1]]->setSubdomainId(epart[e1]);
+        elems[fluidElementIds[e1]]->setSubdomainId(elem_proc_id[e1]);
 
       // find nodes local to each processor
 
@@ -606,9 +602,9 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
       locally_owned_nodes_total.resize(n_subdomains);
 
-      for(ee=0; ee<nNode; ee++)
+      for(ii=0; ii<nNode; ii++)
       {
-        locally_owned_nodes_total[npart[ee]].push_back(ee);
+        locally_owned_nodes_total[node_proc_id[ii]].push_back(ii);
       }
 
       locally_owned_nodes = locally_owned_nodes_total[this_mpi_proc];
@@ -662,11 +658,8 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
       ndofs_local = row_end - row_start + 1;
 
-      ierr  = PetscFree(eptr);  CHKERRQ(ierr);
-      ierr  = PetscFree(eind);  CHKERRQ(ierr);
-      ierr  = PetscFree(epart); CHKERRQ(ierr);
-      ierr  = PetscFree(npart); CHKERRQ(ierr);
-      ierr  = PetscFree(vwgtElem); CHKERRQ(ierr);
+      ierr  = PetscFree(elem_proc_id); CHKERRQ(ierr);
+      ierr  = PetscFree(node_proc_id); CHKERRQ(ierr);
 
       locally_owned_nodes.clear();
       locally_owned_nodes_total.clear();
@@ -751,9 +744,6 @@ int  HBSplineCutFEM::prepareMatrixPattern()
         //tt1  =  &(nd1->forAssyVec[0]);
         vecIntTemp  =  nd1->forAssyVec;
 
-        //if(this_mpi_proc == 0)
-          //printVector(nd1->forAssyVec);
-
         if( nd1->domNums[0] == 0 )
         {
           for(ii=0; ii<val1; ii++)
@@ -772,9 +762,6 @@ int  HBSplineCutFEM::prepareMatrixPattern()
           }
         }
 
-        //PetscPrintf(MPI_COMM_WORLD, " aaaaaaaaaaaaa \n");
-
-        //
         // connectivity for ghost-penalty terms
         if( nd1->isCutElement() )
         {
@@ -802,7 +789,6 @@ int  HBSplineCutFEM::prepareMatrixPattern()
             }
           } //for(side=0; side<NUM_NEIGHBOURS; side++)
         } //if( nd1->isCutElement() )
-        //
       //} //if( nd1->getSubdomainId() == this_mpi_proc )
     } // for(e=0;e<fluidElementIds.size();e++)
 
@@ -865,8 +851,8 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
     MPI_Barrier(MPI_COMM_WORLD);
 
-    //cout << " iiiiiiiiiiiii " << count_diag << '\t' << count_offdiag << endl;
-    //cout << " totalDOF " << this_mpi_proc << '\t' << totalDOF << endl;
+    // PetscPrintf(MPI_COMM_WORLD, " count_diag ... %d \t %d \n", count_diag, count_offdiag );
+    // cout << " count_diag ..." << this_mpi_proc << '\t' << count_diag << '\t' << count_offdiag << endl;
 
 
     //Create parallel matrix, specifying only its global dimensions.
@@ -924,8 +910,6 @@ int  HBSplineCutFEM::prepareMatrixPattern()
     ierr = VecDuplicate(solverPetsc->soln, &solverPetsc->rhsVec);CHKERRQ(ierr);
     ierr = VecDuplicate(solverPetsc->soln, &solverPetsc->solnPrev);CHKERRQ(ierr);
     ierr = VecDuplicate(solverPetsc->soln, &solverPetsc->reac);CHKERRQ(ierr);
-
-    //cout << " aaaaaaaa " << this_mpi_proc << endl;
 
     solverPetsc->currentStatus = PATTERN_OK;
 
@@ -1073,7 +1057,11 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
       } // for(bb=0; bb<ImmersedBodyObjects.size(); bb++)
     } // if(!STAGGERED)
+*/
 
+
+
+/*
 int HBSplineCutFEM::prepareMatrixPattern()
 {
     // subroutine for Eigen based solver

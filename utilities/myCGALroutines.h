@@ -16,11 +16,13 @@
 #include <CGAL/AABB_triangle_primitive.h>
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 
+
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/boost/graph/graph_traits_Polyhedron_3.h>
 #include <CGAL/AABB_face_graph_triangle_primitive.h>
 #include <CGAL/Side_of_triangle_mesh.h>
  
+#include<CGAL/Polyhedron_incremental_builder_3.h>
 
 
 typedef CGAL::Simple_cartesian<double> CGAL_K;
@@ -122,6 +124,19 @@ inline CGAL_Point_inside*  createPointerToCGALPointInsideFromCGALTree(CGAL_Tree&
     
     return inside_tester;
 }
+
+
+
+
+inline int  checkBoundedSideCGAL(CGAL::Bounded_side res)
+{
+    if( (res == CGAL::ON_BOUNDED_SIDE) || (res == CGAL::ON_BOUNDARY) )
+      return 1;
+
+    return 0;
+}
+
+
 
 
 #endif

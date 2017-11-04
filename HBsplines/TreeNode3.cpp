@@ -755,7 +755,7 @@ void TreeNode<2>::setInitialProfile()
 }
 
 
-//
+/*
 template<>
 void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
 {
@@ -767,7 +767,7 @@ void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
 
     int ii, jj, gp1, gp2, TI, TIp1, TIp2, count, TJ, TJp1, TJp2;
    
-    double  Jac, dvol, force, bb1;
+    double  Jac, dvol, force, bb1, rad;
 
     VectorXd  NN(totnlbf), dNN_dx(totnlbf), dNN_dy(totnlbf);
     VectorXd  N, dN_dx, dN_dy;
@@ -777,8 +777,8 @@ void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
     //double  mu  = elmDat[4];
     double mu = 1.0;
 
-    cout << " uuuuuuuuuuuuuuu " << endl;
-    cout << GeomData->getNGP(1) << '\t' << GeomData->getNGP(0) << endl;
+    //cout << " uuuuuuuuuuuuuuu " << endl;
+    //cout << GeomData->getNGP(1) << '\t' << GeomData->getNGP(0) << endl;
     //printVector(GeomData->gausspoints1);
     //printVector(GeomData->gausspoints2);
     //printVector(GeomData->gaussweights1);
@@ -813,8 +813,12 @@ void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
           geom[0] = GeomData->computeCoord(0, param[0]);
           geom[1] = GeomData->computeCoord(1, param[1]);
 
-          force = analy.computeForce(0, geom[0], geom[1]);
+          //force = analy.computeForce(0, geom[0], geom[1]);
           //fact = 0.0;
+          rad = sqrt(geom[0]*geom[0]+geom[1]*geom[1]);
+          force = 0.0;
+          if ( rad <= 0.25 )
+            force = 1.0;
 
         Klocal += (dvol*(N*N.transpose()));
 
@@ -828,8 +832,92 @@ void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
         //}
 
         //cout << " AAAAAAAAAAA " << endl;
-        Flocal += (dvol*(N*force - dN_dx*(mu*computeValue(0,dN_dx)) - dN_dy*(mu*computeValue(0,dN_dy))) );
+        //Flocal += (dvol*(N*force - dN_dx*(mu*computeValue(0,dN_dx)) - dN_dy*(mu*computeValue(0,dN_dy))) );
+        Flocal += (dvol*(N*(force - computeValue(0,N))) );
         //cout << " AAAAAAAAAAA " << endl;
+    }//gp1
+    }//gp2
+
+  //printMatrix(Klocal);
+  //printVector(Flocal);
+
+  return;
+}
+*/
+
+template<>
+void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
+{
+    // Test stiffness terms
+    ///////////////////////////////////////
+
+    int ii, jj, gp1, gp2, TI, TIp1, TIp2, count, TJ, TJp1, TJp2;
+   
+    double  Jac, dvol, force, bb1, rad, b1, b2, b4;
+
+    VectorXd  NN(totnlbf), dNN_dx(totnlbf), dNN_dy(totnlbf);
+    VectorXd  N, dN_dx, dN_dy;
+
+    myPoint  param, geom;
+
+    //double  mu  = elmDat[4];
+    double mu = 1.0;
+
+    //cout << " uuuuuuuuuuuuuuu " << endl;
+    //cout << GeomData->getNGP(1) << '\t' << GeomData->getNGP(0) << endl;
+    //printVector(GeomData->gausspoints1);
+    //printVector(GeomData->gausspoints2);
+    //printVector(GeomData->gaussweights1);
+    //printVector(GeomData->gaussweights2);
+    for(gp2=0;gp2<GeomData->getNGP(1);gp2++)
+    {
+       param[1]  = 0.5*(knotIncr[1] * GeomData->gausspoints2[gp2] + knotSum[1]);
+       Jac = GeomData->gaussweights2[gp2] * JacMultElem;
+       
+       for(gp1=0;gp1<GeomData->getNGP(0);gp1++)
+       {
+          param[0]   = 0.5*(knotIncr[0] * GeomData->gausspoints1[gp1] + knotSum[0]);
+          dvol = GeomData->gaussweights1[gp1] * Jac;
+
+          GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy);
+
+          if(parent == NULL)
+          {
+            N = NN;
+            dN_dx = dNN_dx;
+            dN_dy = dNN_dy;
+          }
+          else
+          {
+            N = SubDivMat*NN;
+            dN_dx = SubDivMat*dNN_dx;
+            dN_dy = SubDivMat*dNN_dy;
+          }
+
+          for(ii=0;ii<totnlbf2;ii++)
+          {
+            TI   = ndof*ii;
+            TIp1 = TI+1;
+            TIp2 = TI+2;
+
+            b1 = dN_dx[ii]*dvol;
+            b2 = dN_dy[ii]*dvol;
+            b4 = N[ii]*dvol;
+
+            for(jj=0;jj<totnlbf2;jj++)
+            {
+              TJ   = ndof*jj;
+              TJp1 = TJ+1;
+              TJp2 = TJ+2;
+
+              Klocal(TI,   TJ)   += b1*dN_dx(jj);
+              Klocal(TI,   TJp1) += b1*dN_dy(jj);
+              Klocal(TIp1, TJ)   += b2*dN_dx(jj);
+              Klocal(TIp1, TJp1) += b2*dN_dy(jj);
+
+            }
+          } // for(ii=0;ii<totnlbf2;ii++)
+
     }//gp1
     }//gp2
 
@@ -838,7 +926,6 @@ void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
 
   return;
 }
-//
 
 
 /*
@@ -920,7 +1007,7 @@ void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
 
 
 
-
+/*
 template<>
 void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
 {
@@ -1011,9 +1098,10 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
 
   return;
 }
+*/
 
 
-/*
+//
 template<>
 void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
 {
@@ -1165,7 +1253,7 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
 
   return;
 }
-*/
+//
 
 
 

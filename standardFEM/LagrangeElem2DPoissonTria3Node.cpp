@@ -223,7 +223,7 @@ int LagrangeElem2DPoissonTria3Node::calcStiffnessAndResidual(MatrixXd& Klocal, V
           }
   }//gp1
   
-  //printMatrix(Klocal); printf("\n\n\n");
+  printMatrix(Klocal); printf("\n\n\n");
   //printVector(Flocal); printf("\n\n\n");
 
   return 1;

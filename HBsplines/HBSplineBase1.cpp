@@ -56,7 +56,7 @@ template<>
 int node1D::ndof = 1;
 
 template<>
-int node2D::ndof = 1;
+int node2D::ndof = 3;
 
 template<>
 int node3D::ndof = 4;
@@ -189,7 +189,7 @@ HBSplineBase::~HBSplineBase()
 
 void HBSplineBase::prepareInputData()
 {
-    printf("\n     HBSplineBase::prepareInputData()  .... STARTED ...\n");
+    //printf("\n     HBSplineBase::prepareInputData()  .... STARTED ...\n");
 
     int ii, jj, kk, ee, aa, bb, cc, gp, r;
 
@@ -264,7 +264,7 @@ void HBSplineBase::prepareInputData()
     GeomData.setNdof(ndf);
     GeomData.build();
     
-    cout << " BBBBBBBBBBBBBBB " << endl;
+    //cout << " BBBBBBBBBBBBBBB " << endl;
 
     ///////////////////////////////////////////////////////////////////
     //
