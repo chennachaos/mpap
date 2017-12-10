@@ -106,9 +106,9 @@ void Lagrange_BasisFuns1D(int p, double xi, double* N, double* dN_dxi, double* d
           dN_dxi[2] =    4.0 * (  0  - 2.5*xi  -   0.0     + val4);
           dN_dxi[3] =  fact2 * (0.5  + 2.0*xi  - 1.5*val1  - val4);
           dN_dxi[4] = -fact1 * (0.25 + 0.5*xi  - 3.0*val1  - val4);
-    
+
           val4 = 12.0*val1;
-    
+
           d2N_dxi2[0] =  fact1 * (-0.5  -  6.0*xi  +  val4);
           d2N_dxi2[1] = -fact2 * (-2.0  -  3.0*xi  +  val4);
           d2N_dxi2[2] =    4.0 * (-2.5  -  0.0     +  val4);
@@ -147,7 +147,7 @@ void Lagrange_BasisFuns1D(int p, double xi, double* N, double* dN_dxi)
 
           N[0] = 0.5*(1.0 - xi);
           N[1] = 0.5*(1.0 + xi);
-    
+
           dN_dxi[0] = -0.5;
           dN_dxi[1] =  0.5;
 
@@ -160,9 +160,9 @@ void Lagrange_BasisFuns1D(int p, double xi, double* N, double* dN_dxi)
           N[0] = -0.5 * (xi - val1);
           N[1] = 1.0 - val1;
           N[2] = 0.5 *(xi + val1);
-    
+
           val1 = 2.0*xi;
-    
+
           dN_dxi[0] = -0.5*(1.0 - val1);
           dN_dxi[1] = -val1;
           dN_dxi[2] =  0.5*(1.0 + val1);
@@ -174,12 +174,12 @@ void Lagrange_BasisFuns1D(int p, double xi, double* N, double* dN_dxi)
           fact1 = 9.0/16.0;
           fact2 = 27.0/16.0;
           val1 = xi*xi;
-    
+
           N[0] = -fact1 * (1 - xi)   * (1/9 - val1);
           N[1] =  fact2 * (1 - val1) * (1/3 - xi);
           N[2] =  fact2 * (1 - val1) * (1/3 + xi);
           N[3] = -fact1 * (1 + xi)   * ( 1/9 - val1);
-    
+
           val2 = 3.0*val1;
 
           dN_dxi[0] = -fact1*(-1/9 - 2.0*xi   +  val2);
@@ -196,13 +196,13 @@ void Lagrange_BasisFuns1D(int p, double xi, double* N, double* dN_dxi)
           val1 = xi*xi;
           val2 = val1*xi;
           val3 = val2*xi;
-    
+
           N[0] =  fact1 * (0.25*xi  - 0.25*val1  -  val2     + val3);
           N[1] = -fact2 * (0.5 *xi  - val1       -  0.5*val2 + val3);
           N[2] =    4.0 * (0.25     - 1.25*val1  -  0        + val3);
           N[3] =  fact2 * (0.5*xi   + val1       -  0.5*val2 - val3);
           N[4] = -fact1 * (0.25*xi  + 0.25*val1  -  val2     - val3);
-    
+
           val4 = 4.0*val2;
 
           dN_dxi[0] =  fact1 * (0.25 - 0.5*xi  - 3.0*val1  + val4);
@@ -259,7 +259,7 @@ void Lagrange_BasisFuns1D(int p, double xi, double* N)
           fact1 = 9.0/16.0;
           fact2 = 27.0/16.0;
           val1 = xi*xi;
-    
+
           N[0] = -fact1 * (1 - xi)   * (1/9 - val1);
           N[1] =  fact2 * (1 - val1) * (1/3 - xi);
           N[2] =  fact2 * (1 - val1) * (1/3 + xi);
@@ -273,7 +273,7 @@ void Lagrange_BasisFuns1D(int p, double xi, double* N)
           val1 = xi*xi;
           val2 = val1*xi;
           val3 = val2*xi;
-    
+
           N[0] =  fact1 * (0.25*xi  - 0.25*val1  -  val2     + val3);
           N[1] = -fact2 * (0.5 *xi  - val1       -  0.5*val2 + val3);
           N[2] =    4.0 * (0.25     - 1.25*val1  -  0        + val3);

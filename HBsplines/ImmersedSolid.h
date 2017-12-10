@@ -73,13 +73,13 @@ class ImmersedSolid
 
         SolutionData  SolnData;
         GeomDataLagrange  GeomData;
-        
+
         AABB  bbox;
 
         Ray ray1;
 
         vector<ImmersedIntegrationElement*>  ImmIntgElems;
-        
+
         vector<myPoly*>  ImmersedFaces;
 
         SolverEigen *solver;

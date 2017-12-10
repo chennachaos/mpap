@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <math.h>
+#include <assert.h>
 
 using namespace std;
 
@@ -220,10 +221,57 @@ void getGaussPoints1D(int ngp, vector<double>& gausspoints, vector<double>& gaus
 }
 
 
+void getGaussPointsQuad(int ngp, vector<double>& gp1, vector<double>& gp2, vector<double>& gws)
+{
+  int  nn=0;
+
+  if(ngp == 1)       nn = 1;
+  else if(ngp == 4)  nn = 2;
+  else if(ngp == 9)  nn = 3;
+  else if(ngp == 16) nn = 4;
+  else
+  {
+    cerr << " Error in getGaussPointsQuad() ... ngp = " << ngp << endl;
+  }
+
+  gp1.resize(ngp);
+  gp2.resize(ngp);
+  gws.resize(ngp);
+
+  vector<double> gpoints1, gweights1;
+  getGaussPoints1D(nn, gpoints1, gweights1);
+
+  int ind=0, ii, jj;
+  for(jj=0; jj<nn; jj++)
+  {
+    for(ii=0; ii<nn; ii++)
+    {
+      gp1[ind] = gpoints1[ii];
+      gp2[ind] = gpoints1[jj];
+      gws[ind] = gweights1[jj]*gweights1[ii];
+      ind++;
+    }
+  }
+
+  return;
+}
+
+
+
+
 
 void getGaussPointsHex(int ngp, vector<double>& gp1, vector<double>& gp2, vector<double>& gp3, vector<double>& gws)
 {
-  ngp = pow(ngp,1.0/3.0);
+  int  nn=0;
+
+  if(ngp == 1)        nn = 1;
+  else if(ngp == 8)   nn = 2;
+  else if(ngp == 27)  nn = 3;
+  else if(ngp == 64)  nn = 4;
+  else
+  {
+    cerr << " Error in getGaussPointsHex ... ngp = " << ngp << endl;
+  }
 
   gp1.resize(ngp);
   gp2.resize(ngp);
@@ -231,17 +279,14 @@ void getGaussPointsHex(int ngp, vector<double>& gp1, vector<double>& gp2, vector
   gws.resize(ngp);
 
   vector<double> gpoints1, gweights1;
+  getGaussPoints1D(nn, gpoints1, gweights1);
 
-  getGaussPoints1D(ngp, gpoints1, gweights1);
-
-  int ii, jj, kk, ind;
-  
-  ind=0;
-  for(kk=0; kk<ngp; kk++)
+  int ind=0, ii, jj, kk;
+  for(kk=0; kk<nn; kk++)
   {
-    for(jj=0; jj<ngp; jj++)
+    for(jj=0; jj<nn; jj++)
     {
-      for(ii=0; ii<ngp; ii++)
+      for(ii=0; ii<nn; ii++)
       {
         gp1[ind] = gpoints1[ii];
         gp2[ind] = gpoints1[jj];
@@ -258,43 +303,143 @@ void getGaussPointsHex(int ngp, vector<double>& gp1, vector<double>& gp2, vector
 
 
 
-void getGaussPointsQuad(int ngp, vector<double>& gp1, vector<double>& gp2, vector<double>& gws)
-{
-  //assert(ngp>0);
-  
-  gp1.resize(ngp);
-  gp2.resize(ngp);
-  gws.resize(ngp);
-  
-  int  nn=sqrt(ngp), ii, jj, kk;
-  
-  vector<double> gpoints1, gweights1;
-  vector<double> gpoints2, gweights2;
-  
-  getGaussPoints1D(nn, gpoints1, gweights1);
-  getGaussPoints1D(nn, gpoints2, gweights2);
-  
-  kk=0;
-  for(jj=0; jj<nn; jj++)
-  {
-    for(ii=0; ii<nn; ii++)
-    {
-      gp1[kk] = gpoints1[ii];  gp2[kk] = gpoints2[jj];  gws[kk] = gweights2[jj]*gweights1[ii];
-      kk++;
-    }
-  }
 
+void getGaussPointsTriangle(int ngp, vector<double>& gps1, vector<double>& gps2, vector<double>& gws)
+{
+  // weights are normalized to calculate the exact area of the triangle
+  // i.e. each weight is divided by 2.0
+
+  double r1d3 = 1.0/3.0, a1, fact=0.5;
+
+  gps1.resize(ngp);
+  gps2.resize(ngp);
+  gws.resize(ngp);
+
+  switch(ngp)
+  {
+     case 1:  // 1 Point quadrature rule
+
+            gps1[0] = r1d3;        gps2[0] = r1d3;        gws[0] = fact*1.0;
+
+            break;
+
+     case 3:  //3 Point quadrature rule
+
+            a1 = 1.0/3.0;
+
+            //gps1[0] = 0.5;        gps2[0] = 0.0;        gws[0] = fact*a1;
+            //gps1[1] = 0.5;        gps2[1] = 0.5;        gws[1] = fact*a1;
+            //gps1[2] = 0.0;        gps2[2] = 0.5;        gws[2] = fact*a1;
+
+            gps1[0] = 1.0/6.0;        gps2[0] = 1.0/6.0;        gws[0] = fact*a1;
+            gps1[1] = 1.0/6.0;        gps2[1] = 4.0/6.0;        gws[1] = fact*a1;
+            gps1[2] = 4.0/6.0;        gps2[2] = 1.0/6.0;        gws[2] = fact*a1;
+
+            break;
+
+     case 4:  //4 Point quadrature rule
+
+            a1 = 25.0/48.0;
+
+            gps1[0] = r1d3;       gps2[0] = r1d3;       gws[0] = fact*(-27.0/48.0);
+            gps1[1] = 0.6;        gps2[1] = 0.2;        gws[1] = fact*a1;
+            gps1[2] = 0.2;        gps2[2] = 0.6;        gws[2] = fact*a1;
+            gps1[3] = 0.2;        gps2[3] = 0.2;        gws[3] = fact*a1;
+
+            break;
+
+     case 6:  //6 Point quadrature rule
+
+          gps1[0] = 0.10810301816807022736;    gps2[0] = 0.44594849091596488632;    gws[0] = fact*0.22338158967801146570;
+          gps1[1] = 0.44594849091596488632;    gps2[1] = 0.10810301816807022736;    gws[1] = fact*0.22338158967801146570;
+          gps1[2] = 0.44594849091596488632;    gps2[2] = 0.44594849091596488632;    gws[2] = fact*0.22338158967801146570;
+          gps1[3] = 0.81684757298045851308;    gps2[3] = 0.09157621350977074346;    gws[3] = fact*0.10995174365532186764;
+          gps1[4] = 0.09157621350977074346;    gps2[4] = 0.81684757298045851308;    gws[4] = fact*0.10995174365532186764;
+          gps1[5] = 0.09157621350977074346;    gps2[5] = 0.09157621350977074346;    gws[5] = fact*0.10995174365532186764;
+
+            break;
+
+     case 7:  //7 Point quadrature rule
+
+          gps1[0] = r1d3;                      gps2[0] = r1d3;                      gws[0] = fact*0.225;
+          gps1[1] = 0.79742698535308732240;    gps2[1] = 0.10128650732345633880;    gws[1] = fact*0.12593918054482715260;
+          gps1[2] = 0.10128650732345633880;    gps2[2] = 0.79742698535308732240;    gws[2] = fact*0.12593918054482715260;
+          gps1[3] = 0.10128650732345633880;    gps2[3] = 0.10128650732345633880;    gws[3] = fact*0.12593918054482715260;
+          gps1[4] = 0.05971587178976982045;    gps2[4] = 0.47014206410511508977;    gws[4] = fact*0.13239415278850618074;
+          gps1[5] = 0.47014206410511508977;    gps2[5] = 0.05971587178976982045;    gws[5] = fact*0.13239415278850618074;
+          gps1[6] = 0.47014206410511508977;    gps2[6] = 0.47014206410511508977;    gws[6] = fact*0.13239415278850618074;
+
+            break;
+
+     case 12:  //12 Point quadrature rule
+
+          gps1[0]  = 0.87382197101699554332;   gps2[0]  = 0.06308901449150222834;   gws[0]  = fact*0.050844906370206816921;
+          gps1[1]  = 0.06308901449150222834;   gps2[1]  = 0.87382197101699554332;   gws[1]  = fact*0.050844906370206816921;
+          gps1[2]  = 0.06308901449150222834;   gps2[2]  = 0.06308901449150222834;   gws[2]  = fact*0.050844906370206816921;
+          gps1[3]  = 0.50142650965817915742;   gps2[3]  = 0.24928674517091042129;   gws[3]  = fact*0.116786275726379366030;
+          gps1[4]  = 0.24928674517091042129;   gps2[4]  = 0.50142650965817915742;   gws[4]  = fact*0.116786275726379366030;
+          gps1[5]  = 0.24928674517091042129;   gps2[5]  = 0.24928674517091042129;   gws[5]  = fact*0.116786275726379366030;
+          gps1[6]  = 0.05314504984481694735;   gps2[6]  = 0.31035245103378440542;   gws[6]  = fact*0.082851075618373575194;
+          gps1[7]  = 0.31035245103378440542;   gps2[7]  = 0.05314504984481694735;   gws[7]  = fact*0.082851075618373575194;
+          gps1[8]  = 0.05314504984481694735;   gps2[8]  = 0.63650249912139864723;   gws[8]  = fact*0.082851075618373575194;
+          gps1[9]  = 0.31035245103378440542;   gps2[9]  = 0.63650249912139864723;   gws[9]  = fact*0.082851075618373575194;
+          gps1[10] = 0.63650249912139864723;   gps2[10] = 0.05314504984481694735;   gws[10] = fact*0.082851075618373575194;
+          gps1[11] = 0.63650249912139864723;   gps2[11] = 0.31035245103378440542;   gws[11] = fact*0.082851075618373575194;
+
+            break;
+
+     case 13:  // 13 point quadrature rule
+
+          gps1[0]  = 0.33333333333333;   gps2[0]  =  0.33333333333333;   gws[0]  = fact*-0.14957004446768;
+          gps1[1]  = 0.26034596607904;   gps2[1]  =  0.26034596607904;   gws[1]  = fact* 0.17561525743321;
+          gps1[2]  = 0.26034596607904;   gps2[2]  =  0.47930806784192;   gws[2]  = fact* 0.17561525743321;
+          gps1[3]  = 0.47930806784192;   gps2[3]  =  0.26034596607904;   gws[3]  = fact* 0.17561525743321;
+          gps1[4]  = 0.06513010290222;   gps2[4]  =  0.06513010290222;   gws[4]  = fact* 0.05334723560884;
+          gps1[5]  = 0.06513010290222;   gps2[5]  =  0.86973979419557;   gws[5]  = fact* 0.05334723560884;
+          gps1[6]  = 0.86973979419557;   gps2[6]  =  0.06513010290222;   gws[6]  = fact* 0.05334723560884;
+          gps1[7]  = 0.31286549600487;   gps2[7]  =  0.63844418856981;   gws[7]  = fact* 0.07711376089026;
+          gps1[8]  = 0.63844418856981;   gps2[8]  =  0.04869031542532;   gws[8]  = fact* 0.07711376089026;
+          gps1[9]  = 0.04869031542532;   gps2[9]  =  0.31286549600487;   gws[9]  = fact* 0.07711376089026;
+          gps1[10] = 0.63844418856981;   gps2[10] =  0.31286549600487;   gws[10] = fact* 0.07711376089026;
+          gps1[11] = 0.31286549600487;   gps2[11] =  0.04869031542532;   gws[11] = fact* 0.07711376089026;
+          gps1[12] = 0.04869031542532;   gps2[12] =  0.63844418856981;   gws[12] = fact* 0.07711376089026;
+
+            break;
+
+     case 16:  // 16 point quadrature rule
+
+          gps1[0]  = 0.33333333333333;   gps2[0]  =  0.33333333333333;   gws[0]  = fact* 0.14431560767779;
+          gps1[1]  = 0.45929258829272;   gps2[1]  =  0.45929258829272;   gws[1]  = fact* 0.09509163426728;
+          gps1[2]  = 0.45929258829272;   gps2[2]  =  0.08141482341455;   gws[2]  = fact* 0.09509163426728;
+          gps1[3]  = 0.08141482341455;   gps2[3]  =  0.45929258829272;   gws[3]  = fact* 0.09509163426728;
+          gps1[4]  = 0.17056930775176;   gps2[4]  =  0.17056930775176;   gws[4]  = fact* 0.10321737053472;
+          gps1[5]  = 0.17056930775176;   gps2[5]  =  0.65886138449648;   gws[5]  = fact* 0.10321737053472;
+          gps1[6]  = 0.65886138449648;   gps2[6]  =  0.17056930775176;   gws[6]  = fact* 0.10321737053472;
+          gps1[7]  = 0.05054722831703;   gps2[7]  =  0.05054722831703;   gws[7]  = fact* 0.03245849762320;
+          gps1[8]  = 0.05054722831703;   gps2[8]  =  0.89890554336594;   gws[8]  = fact* 0.03245849762320;
+          gps1[9]  = 0.89890554336594;   gps2[9]  =  0.05054722831703;   gws[9]  = fact* 0.03245849762320;
+          gps1[10] = 0.26311282963464;   gps2[10] =  0.72849239295540;   gws[10] = fact* 0.02723031417443;
+          gps1[11] = 0.72849239295540;   gps2[11] =  0.00839477740996;   gws[11] = fact* 0.02723031417443;
+          gps1[12] = 0.00839477740996;   gps2[12] =  0.26311282963464;   gws[12] = fact* 0.02723031417443;
+          gps1[13] = 0.72849239295540;   gps2[13] =  0.26311282963464;   gws[13] = fact* 0.02723031417443;
+          gps1[14] = 0.26311282963464;   gps2[14] =  0.00839477740996;   gws[14] = fact* 0.02723031417443;
+          gps1[15] = 0.00839477740996;   gps2[15] =  0.72849239295540;   gws[15] = fact* 0.02723031417443;
+
+            break;
+
+     default:
+            cerr << " invalid value of 'ngp' in getGaussPointsTriangle ! " << endl;
+            break;
+
+  }
   return;
 }
 
 
 
 
-
 void getGaussPointsTet(int ngp, vector<double>& gps1, vector<double>& gps2, vector<double>& gps3, vector<double>& gws)
 {
-  char fct[] = "getGaussPointsTet";
-
   double  fact=1.0/6.0;
 
   gps1.resize(ngp);
@@ -486,150 +631,14 @@ void getGaussPointsTet(int ngp, vector<double>& gps1, vector<double>& gps2, vect
         break;
 
      default:
-            cerr << " getGaussPointsTet() .... invalid value of 'ngp' ! " << endl;
-            break;
+        cerr << " invalid value of 'ngp' in getGaussPointsTet() ! " << endl;
+        break;
 
   }
 
   return;
 }
 
-
-
-
-
-void getGaussPointsTriangle(int ngp, vector<double>& gps1, vector<double>& gps2, vector<double>& gws)
-{
-  // weights are normalized to calculate the exact area of the triangle
-  // i.e. each weight is divided by 2.0
-
-  char fct[] = "getGaussPointsTriangle";
-
-  double r1d3 = 1.0/3.0, a1, fact=0.5;
-
-  gps1.resize(ngp);
-  gps2.resize(ngp);
-  gws.resize(ngp);
-
-  switch(ngp)
-  {
-     case 1:  // 1 Point quadrature rule
-
-            gps1[0] = r1d3;        gps2[0] = r1d3;        gws[0] = fact*1.0;
-
-            break;
-
-     case 3:  //3 Point quadrature rule
-
-            a1 = 1.0/3.0;
-
-            //gps1[0] = 0.5;        gps2[0] = 0.0;        gws[0] = fact*a1;
-            //gps1[1] = 0.5;        gps2[1] = 0.5;        gws[1] = fact*a1;
-            //gps1[2] = 0.0;        gps2[2] = 0.5;        gws[2] = fact*a1;
-
-            gps1[0] = 1.0/6.0;        gps2[0] = 1.0/6.0;        gws[0] = fact*a1;
-            gps1[1] = 1.0/6.0;        gps2[1] = 4.0/6.0;        gws[1] = fact*a1;
-            gps1[2] = 4.0/6.0;        gps2[2] = 1.0/6.0;        gws[2] = fact*a1;
-
-            break;
-
-     case 4:  //4 Point quadrature rule
-
-            a1 = 25.0/48.0;
-
-            gps1[0] = r1d3;       gps2[0] = r1d3;       gws[0] = fact*(-27.0/48.0);
-            gps1[1] = 0.6;        gps2[1] = 0.2;        gws[1] = fact*a1;
-            gps1[2] = 0.2;        gps2[2] = 0.6;        gws[2] = fact*a1;
-            gps1[3] = 0.2;        gps2[3] = 0.2;        gws[3] = fact*a1;
-
-            break;
-
-     case 6:  //6 Point quadrature rule
-
-          gps1[0] = 0.10810301816807022736;    gps2[0] = 0.44594849091596488632;    gws[0] = fact*0.22338158967801146570;
-          gps1[1] = 0.44594849091596488632;    gps2[1] = 0.10810301816807022736;    gws[1] = fact*0.22338158967801146570;
-          gps1[2] = 0.44594849091596488632;    gps2[2] = 0.44594849091596488632;    gws[2] = fact*0.22338158967801146570;
-          gps1[3] = 0.81684757298045851308;    gps2[3] = 0.09157621350977074346;    gws[3] = fact*0.10995174365532186764;
-          gps1[4] = 0.09157621350977074346;    gps2[4] = 0.81684757298045851308;    gws[4] = fact*0.10995174365532186764;
-          gps1[5] = 0.09157621350977074346;    gps2[5] = 0.09157621350977074346;    gws[5] = fact*0.10995174365532186764;
-
-            break;
-
-     case 7:  //7 Point quadrature rule
-
-          gps1[0] = r1d3;                      gps2[0] = r1d3;                      gws[0] = fact*0.225;
-          gps1[1] = 0.79742698535308732240;    gps2[1] = 0.10128650732345633880;    gws[1] = fact*0.12593918054482715260;
-          gps1[2] = 0.10128650732345633880;    gps2[2] = 0.79742698535308732240;    gws[2] = fact*0.12593918054482715260;
-          gps1[3] = 0.10128650732345633880;    gps2[3] = 0.10128650732345633880;    gws[3] = fact*0.12593918054482715260;
-          gps1[4] = 0.05971587178976982045;    gps2[4] = 0.47014206410511508977;    gws[4] = fact*0.13239415278850618074;
-          gps1[5] = 0.47014206410511508977;    gps2[5] = 0.05971587178976982045;    gws[5] = fact*0.13239415278850618074;
-          gps1[6] = 0.47014206410511508977;    gps2[6] = 0.47014206410511508977;    gws[6] = fact*0.13239415278850618074;
-
-            break;
-
-     case 12:  //12 Point quadrature rule
-
-          gps1[0]  = 0.87382197101699554332;   gps2[0]  = 0.06308901449150222834;   gws[0]  = fact*0.050844906370206816921;
-          gps1[1]  = 0.06308901449150222834;   gps2[1]  = 0.87382197101699554332;   gws[1]  = fact*0.050844906370206816921;
-          gps1[2]  = 0.06308901449150222834;   gps2[2]  = 0.06308901449150222834;   gws[2]  = fact*0.050844906370206816921;
-          gps1[3]  = 0.50142650965817915742;   gps2[3]  = 0.24928674517091042129;   gws[3]  = fact*0.116786275726379366030;
-          gps1[4]  = 0.24928674517091042129;   gps2[4]  = 0.50142650965817915742;   gws[4]  = fact*0.116786275726379366030;
-          gps1[5]  = 0.24928674517091042129;   gps2[5]  = 0.24928674517091042129;   gws[5]  = fact*0.116786275726379366030;
-          gps1[6]  = 0.05314504984481694735;   gps2[6]  = 0.31035245103378440542;   gws[6]  = fact*0.082851075618373575194;
-          gps1[7]  = 0.31035245103378440542;   gps2[7]  = 0.05314504984481694735;   gws[7]  = fact*0.082851075618373575194;
-          gps1[8]  = 0.05314504984481694735;   gps2[8]  = 0.63650249912139864723;   gws[8]  = fact*0.082851075618373575194;
-          gps1[9]  = 0.31035245103378440542;   gps2[9]  = 0.63650249912139864723;   gws[9]  = fact*0.082851075618373575194;
-          gps1[10] = 0.63650249912139864723;   gps2[10] = 0.05314504984481694735;   gws[10] = fact*0.082851075618373575194;
-          gps1[11] = 0.63650249912139864723;   gps2[11] = 0.31035245103378440542;   gws[11] = fact*0.082851075618373575194;
-
-            break;
-
-     case 13:  // 13 point quadrature rule
-
-          gps1[0]  = 0.33333333333333;   gps2[0]  =  0.33333333333333;   gws[0]  = fact*-0.14957004446768;
-          gps1[1]  = 0.26034596607904;   gps2[1]  =  0.26034596607904;   gws[1]  = fact* 0.17561525743321;
-          gps1[2]  = 0.26034596607904;   gps2[2]  =  0.47930806784192;   gws[2]  = fact* 0.17561525743321;
-          gps1[3]  = 0.47930806784192;   gps2[3]  =  0.26034596607904;   gws[3]  = fact* 0.17561525743321;
-          gps1[4]  = 0.06513010290222;   gps2[4]  =  0.06513010290222;   gws[4]  = fact* 0.05334723560884;
-          gps1[5]  = 0.06513010290222;   gps2[5]  =  0.86973979419557;   gws[5]  = fact* 0.05334723560884;
-          gps1[6]  = 0.86973979419557;   gps2[6]  =  0.06513010290222;   gws[6]  = fact* 0.05334723560884;
-          gps1[7]  = 0.31286549600487;   gps2[7]  =  0.63844418856981;   gws[7]  = fact* 0.07711376089026;
-          gps1[8]  = 0.63844418856981;   gps2[8]  =  0.04869031542532;   gws[8]  = fact* 0.07711376089026;
-          gps1[9]  = 0.04869031542532;   gps2[9]  =  0.31286549600487;   gws[9]  = fact* 0.07711376089026;
-          gps1[10] = 0.63844418856981;   gps2[10] =  0.31286549600487;   gws[10] = fact* 0.07711376089026;
-          gps1[11] = 0.31286549600487;   gps2[11] =  0.04869031542532;   gws[11] = fact* 0.07711376089026;
-          gps1[12] = 0.04869031542532;   gps2[12] =  0.63844418856981;   gws[12] = fact* 0.07711376089026;
-
-            break;
-
-     case 16:  // 16 point quadrature rule
-
-          gps1[0]  = 0.33333333333333;   gps2[0]  =  0.33333333333333;   gws[0]  = fact* 0.14431560767779;
-          gps1[1]  = 0.45929258829272;   gps2[1]  =  0.45929258829272;   gws[1]  = fact* 0.09509163426728;
-          gps1[2]  = 0.45929258829272;   gps2[2]  =  0.08141482341455;   gws[2]  = fact* 0.09509163426728;
-          gps1[3]  = 0.08141482341455;   gps2[3]  =  0.45929258829272;   gws[3]  = fact* 0.09509163426728;
-          gps1[4]  = 0.17056930775176;   gps2[4]  =  0.17056930775176;   gws[4]  = fact* 0.10321737053472;
-          gps1[5]  = 0.17056930775176;   gps2[5]  =  0.65886138449648;   gws[5]  = fact* 0.10321737053472;
-          gps1[6]  = 0.65886138449648;   gps2[6]  =  0.17056930775176;   gws[6]  = fact* 0.10321737053472;
-          gps1[7]  = 0.05054722831703;   gps2[7]  =  0.05054722831703;   gws[7]  = fact* 0.03245849762320;
-          gps1[8]  = 0.05054722831703;   gps2[8]  =  0.89890554336594;   gws[8]  = fact* 0.03245849762320;
-          gps1[9]  = 0.89890554336594;   gps2[9]  =  0.05054722831703;   gws[9]  = fact* 0.03245849762320;
-          gps1[10] = 0.26311282963464;   gps2[10] =  0.72849239295540;   gws[10] = fact* 0.02723031417443;
-          gps1[11] = 0.72849239295540;   gps2[11] =  0.00839477740996;   gws[11] = fact* 0.02723031417443;
-          gps1[12] = 0.00839477740996;   gps2[12] =  0.26311282963464;   gws[12] = fact* 0.02723031417443;
-          gps1[13] = 0.72849239295540;   gps2[13] =  0.26311282963464;   gws[13] = fact* 0.02723031417443;
-          gps1[14] = 0.26311282963464;   gps2[14] =  0.00839477740996;   gws[14] = fact* 0.02723031417443;
-          gps1[15] = 0.00839477740996;   gps2[15] =  0.72849239295540;   gws[15] = fact* 0.02723031417443;
-
-            break;
-
-     default:
-            cerr << " invalid value of 'ngp' ! " << endl;
-            break;
-
-  }
-  return;
-}
 
 
 

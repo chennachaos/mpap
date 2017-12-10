@@ -13,13 +13,13 @@ class SolverPardisoEigen: public SolverEigen
 
     ~SolverPardisoEigen();
 
-    void   *PT[64];
+    int   PT[64], IPARM[64];
+    int   phase, error, SOLVER, MTYPE, MAXFCT, MNUM, NRHS, MSGLVL;
 
-    double  DPARM[64], *array, ddum;
+    double DPARM[64], ddum, *array;
 
     vector<int>  csr, col, perm;
 
-    int   phase, error, SOLVER, MTYPE, MAXFCT, MNUM, NRHS, MSGLVL, IPARM[64];
 
     virtual int initialise(int p1 = 0, int p2 = 0, int p3 = 0);
 
@@ -29,8 +29,7 @@ class SolverPardisoEigen: public SolverEigen
 
     virtual int factoriseAndSolve();
 
-    virtual void free();
-
+    virtual int free();
 };
 
 

@@ -23,7 +23,7 @@ ImmersedRigidSolid::ImmersedRigidSolid(int dd)
   DIM = dd;
 
   ndofRigidbody = 3*(DIM-1);
-  
+
   matM.resize(ndofRigidbody, ndofRigidbody);
   matM.setZero();
   matC = matM;
@@ -38,10 +38,10 @@ ImmersedRigidSolid::ImmersedRigidSolid(int dd)
 
   preLoad.resize(ndofRigidbody, 0.0);
   initForcePred.resize(ndofRigidbody, 0.0);
-  
+
   PRESC_MOTION = false;
   //PRESC_MOTION = true;
-  
+
   PrescMotionTimeFuncs.resize(ndofRigidbody, -1);
 }
 
@@ -506,7 +506,7 @@ void  ImmersedRigidSolid::updatePointPositions2D()
     myPoint  geom, param, rOrig, rNew, vNew, dCentNew, dCentCur, vCentNew, vCentCur;
     myPoint  centroidNew, centroidCur;
     MatrixXd  RotNew(3, 3), RotCur(3, 3);
-    
+
     geom.setZero();
     param.setZero();
     rOrig.setZero();
@@ -666,7 +666,7 @@ void  ImmersedRigidSolid::updatePointPositions2D()
 
       tNew = mpapTime.cur;
       tCur = tNew - (1.0-af)*mpapTime.dt;
-      
+
       /*
       N = 50.0;
 
@@ -681,7 +681,7 @@ void  ImmersedRigidSolid::updatePointPositions2D()
       RPMS = RPS/1000.0; // Rotations per millisecond
 
       double  tOne = abs(1.0/RPMS); // time per one rotation in milliseconds
-      
+
       //cout << " tOne = " << tOne << endl;
 
       wn  = -2.0*PI*RPMS; // radians per millisecond

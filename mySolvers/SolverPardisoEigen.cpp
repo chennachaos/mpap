@@ -8,10 +8,6 @@
 #include "ComputerTime.h"
 #include "util.h"
 
-//#include "petscksp.h"
-//#include "petscmat.h"
-//#include "petscsys.h"
-
 /*
 // boost library 
 #include <config.hpp>
@@ -65,7 +61,7 @@ SolverPardisoEigen::~SolverPardisoEigen()
 
 int SolverPardisoEigen::initialise(int numProc, int matrixType, int nr)
 {
-  char fct[] = "SolverPardisoEigen::initialise";
+  char fct[] = "SolverPARDISO::initialise";
 
   nRow = nCol = nr;
 
@@ -120,7 +116,7 @@ int SolverPardisoEigen::initialise(int numProc, int matrixType, int nr)
   //IPARM[1] = 2;
 
   IPARM[2] = max(1,numProc);  // number of processors (no default value available)
-  
+/*
   tmp = getenv("OMP_NUM_THREADS");
 
   if (tmp != NULL) 
@@ -129,10 +125,9 @@ int SolverPardisoEigen::initialise(int numProc, int matrixType, int nr)
     if (idum != IPARM[2]) prgError(1,fct,"set environment variable OMP_NUM_THREADS to numProc!");
   }
   else prgError(2,fct,"set environment variable OMP_NUM_THREADS!");
-
+*/
 
   pardisoinit_(PT, &MTYPE, &SOLVER, IPARM, DPARM, &error);
-
 
   if (error != 0)
   {
@@ -142,7 +137,7 @@ int SolverPardisoEigen::initialise(int numProc, int matrixType, int nr)
   }
 
   int  *c1, *c2, ii;
-  
+
   csr.resize(nRow+1);
   col.resize(mtx.nonZeros());
 
@@ -158,14 +153,11 @@ int SolverPardisoEigen::initialise(int numProc, int matrixType, int nr)
 
   array = mtx.valuePtr();
 
-  //cout << " hhhhhhhhhhhhhhhhh " << endl;
-
   perm.resize(nRow);
 
   pardiso_(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
            &nRow, array, &csr[0], &col[0], &perm[0], &NRHS,
            IPARM, &MSGLVL, &ddum, &ddum, &error, DPARM);
-
 
   if (error != 0)
   {
@@ -187,13 +179,9 @@ int SolverPardisoEigen::initialise(int numProc, int matrixType, int nr)
 
 
 
-
-
 int SolverPardisoEigen::factorise()
 {
   char fct[] = "SolverPARDISO::factorise";
-  
-  //cout << " SolverPARDISO::factorise " << endl;
 
   if (currentStatus != ASSEMBLY_OK) 
     { prgWarning(1,fct,"assemble matrix first!"); return 1; }
@@ -223,8 +211,6 @@ int SolverPardisoEigen::factorise()
 int SolverPardisoEigen::solve()
 { 
   char fct[] = "SolverPARDISO::solve";
-
-  //cout << " SolverPARDISO::solve " << endl;
 
   if (currentStatus != FACTORISE_OK)
     { prgWarning(1,fct,"factorise matrix first!"); return 1; }
@@ -263,7 +249,14 @@ int SolverPardisoEigen::factoriseAndSolve()
   pardiso_(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
            &nRow, array, &csr[0], &col[0], &perm[0], &NRHS,
            IPARM, &MSGLVL, &rhsVec[0], &soln[0], &error, DPARM);
-  
+
+  printf("Peak memory [kB] phase 1       = %d \n", IPARM[14]);
+  printf("Permanent integer memory [kb]. = %d \n", IPARM[15]);
+  printf("Peak real memory [kB]          = %d \n", IPARM[16]);
+  printf("Number of nonzeros in LU.      = %d \n", IPARM[17]);
+  printf("Gflops for LU factorization.   = %d \n", IPARM[18]);
+
+
   solverTime.total             -= solverTime.factoriseAndSolve;
   solverTime.factoriseAndSolve += computerTime.stop(fct);
   solverTime.total             += solverTime.factoriseAndSolve;
@@ -275,7 +268,7 @@ int SolverPardisoEigen::factoriseAndSolve()
 
 
 
-void SolverPardisoEigen::free()
+int SolverPardisoEigen::free()
 {
   phase = -1; error = 0;
 
@@ -287,10 +280,8 @@ void SolverPardisoEigen::free()
 
   currentStatus = EMPTY;
 
-  return;
+  return 0;
 }
-    
-
 
 
 

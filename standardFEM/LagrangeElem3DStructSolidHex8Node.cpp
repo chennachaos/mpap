@@ -28,7 +28,6 @@ LagrangeElem3DStructSolidHex8Node::LagrangeElem3DStructSolidHex8Node()
   nlbf   = 8;
   ndof   = 3;
   nsize  = nlbf*ndof;
-
 }
 
 LagrangeElem3DStructSolidHex8Node::~LagrangeElem3DStructSolidHex8Node()
@@ -41,28 +40,6 @@ void LagrangeElem3DStructSolidHex8Node::prepareElemData()
 {
   LagrangeElement::prepareElemData();
 
-  int ii, jj;
-
-  ndim   = 3;
-  degree = 1;
-  npElem = 8;
-  nlbf   = 8;
-  ndof   = 3;
-  nsize  = nlbf*ndof;
-
-
-  // set the element property variables
-
-  elmDat = &(SolnData->ElemProp[elmType].data[0]);
-  matDat = &(SolnData->MatlProp[matType].data[0]);
-
-  finiteInt  = (int) elmDat[2] ;
-  matId      = SolnData->MatlProp[matType].id + 1;
-  finite     = (finiteInt >= 1) ;
-
-  //Klocal.resize(nsize, nsize);
-  //Flocal.resize(nsize);
-  
   return;
 }
 
@@ -84,10 +61,8 @@ int LagrangeElem3DStructSolidHex8Node::calcLoadVector()
 
 int LagrangeElem3DStructSolidHex8Node::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal, bool firstIter)
 {
-//   char fct[] = "LagrangeElem3DStructSolidHex8Node::calcStiffnessAndResidual";
-//   computerTime.go(fct);
   double  F[9], detF=0.0, F33, fact, fact1, fact2, dvol, dvol0;
-  double  Jac, dt, totvol=0.0, JacY, JacTemp;
+  double  Jac, totvol=0.0;
   double  bb1, bb2, bb3, bb4, bb5, cc1, cc2, cc3, cc4, cc5;
 
   VectorXd  N(nlbf), dN_dx(nlbf), dN_dy(nlbf), dN_dz(nlbf);
@@ -95,32 +70,22 @@ int LagrangeElem3DStructSolidHex8Node::calcStiffnessAndResidual(MatrixXd& Klocal
 
   double  stre[6], cc[6][6], bc[3][6], param[3], force[3], bforce[3], sig[3], acceCur[3];
 
-  int   err,  isw,  count,  count1, index, ll = 0, ii, jj, kk, gp1, gp2, gp3;
+  int   err,  isw,  count,  count1, index, ll = 0, ii, jj, kk, gp;
   int   TI, TIp1, TIp2, TJ, TJp1, TJp2;
   int   ind1, ind2;
-  
-  double  BULK = matDat[0] ;
-  double  mu   = matDat[1] ;
+
   double  finiteFact = finite ? 1.0 : 0.0 ;
 
   double rho0 = elmDat[5] ;
-  bforce[0]  = 0.0;
-  bforce[1]  = 0.0;
-  bforce[2]  = 0.0;
-
+  double rho  = rho0;
   bforce[0]  = elmDat[6]*timeFunction[0].prop ;
   bforce[1]  = elmDat[7]*timeFunction[0].prop ;
-  bforce[2]  = elmDat[7]*timeFunction[0].prop ;
+  bforce[2]  = elmDat[8]*timeFunction[0].prop ;
 
+  double  dt = mpapTime.dt;
   double  af = SolnData->td(2);
   double  acceFact1 = SolnData->td(5);
   double  acceFact2 = acceFact1;
-
-  //cout << " acceFact2 = " << acceFact2 << endl;
-
-  //printf(" %14.12f \t %14.12f \t %14.12f \t %14.12f \n ", BULK, mu, bforce[0], bforce[1]);
-  //printf(" %14.12f \t %14.12f \t %14.12f \t %14.12f \n ", rho, af, d1, aa);
-  //printf(" %5d \t %5d \t %5d \t %5d \n ", nodeNums[0], nodeNums[1], nodeNums[2], nodeNums[3]);
 
   double xNode[8], yNode[8], zNode[8], xx, yy, zz;
 
@@ -131,60 +96,39 @@ int LagrangeElem3DStructSolidHex8Node::calcStiffnessAndResidual(MatrixXd& Klocal
     zNode[ii] = GeomData->NodePosOrig[nodeNums[ii]][2];
   }
 
-  totvol = (xNode[1]-xNode[0])*(yNode[2]-yNode[0])*(zNode[5]-zNode[0]);
+  //totvol = (xNode[1]-xNode[0])*(yNode[2]-yNode[0])*(zNode[5]-zNode[0]);
   //cout << " totvol = " << totvol << endl;
 
   //printf(" %14.12f \t %14.12f \t %14.12f \t %14.12f \n ", xNode[0], xNode[1], xNode[2], xNode[3]);
   //printf(" %14.12f \t %14.12f \t %14.12f \t %14.12f \n\n\n ", yNode[0], yNode[1], yNode[2], yNode[3]);
 
-    if(Klocal.rows() != nsize)
-    {
-      Klocal.resize(nsize, nsize);
-      Flocal.resize(nsize);
-    }
-    Klocal.setZero();
-    Flocal.setZero();
+  if(Klocal.rows() != nsize)
+  {
+    Klocal.resize(nsize, nsize);
+    Flocal.resize(nsize);
+  }
+  Klocal.setZero();
+  Flocal.setZero();
   Mlocal.setZero();
 
+  vector<double>  gausspoints1, gausspoints2, gausspoints3, gaussweights;
+
+  getGaussPointsHex(nGP, gausspoints1, gausspoints2, gausspoints3, gaussweights);
+
+
   count = 1;   ll = 0;   err = 0;   isw = 3;
-  dt = mpapTime.dt;
-
-  //cout << " finite = " << finite << endl;
-
-  nGP = (int) elmDat[0] ;
-
-  vector<double>  gausspoints, gaussweights;
-
-  getGaussPoints1D(nGP, gausspoints, gaussweights);
-
-
   totvol = 0.0;
-  for(gp3=0;gp3<nGP;gp3++)
+  for(gp=0; gp<nGP; gp++)
   {
-    param[2] = gausspoints[gp3];
-  for(gp2=0;gp2<nGP;gp2++)
-  {
-    param[1] = gausspoints[gp2];
+      param[2] = gausspoints3[gp];
+      param[1] = gausspoints2[gp];
+      param[0] = gausspoints1[gp];
 
-    JacY = gaussweights[gp3] * gaussweights[gp2];
+      GeomData->computeBasisFunctions3D(0, 2, degree, param, nodeNums, &N(0), &dN_dx(0), &dN_dy(0), &dN_dz(0), Jac);
 
-  for(gp1=0;gp1<nGP;gp1++)
-  {
-        param[0] = gausspoints[gp1];
-
-        GeomData->computeBasisFunctions3D(0, 2, degree, param, nodeNums, &N(0), &dN_dx(0), &dN_dy(0), &dN_dz(0), Jac);
-
-        JacTemp = JacY * gaussweights[gp1];
-
-        dvol0 = Jac * JacTemp;
+        dvol0 = Jac * gaussweights[gp];
         dvol = dvol0;
         totvol += dvol;
-
-        //cout << " Jac  = " << Jac << endl;
-        //cout << " dvol = " << dvol << endl;
-
-        //for(ii=0; ii<nlbf; ii++)
-          //cout << N[ii] << '\t' << dN_dx[ii] << '\t' << dN_dy[ii] << endl;
 
         //GeomData->computeDeformationGradient(1, nodeNums, &dN_dx(0), &dN_dy(0), F, detF);
 
@@ -204,14 +148,15 @@ int LagrangeElem3DStructSolidHex8Node::calcStiffnessAndResidual(MatrixXd& Klocal
         acceCur[1] = computeValueDotDotCur(1, N);
         acceCur[2] = computeValueDotDotCur(2, N);
 
-        detF = F[0]*(F[4]*F[8] - F[5]*F[7]) - F[3]*(F[1]*F[8] - F[2]*F[7]) + F[6]*(F[1]*F[5] - F[2]*F[4]);
+        detF = F[0]*(F[4]*F[8]-F[5]*F[7]) - F[3]*(F[1]*F[8]-F[2]*F[7]) + F[6]*(F[1]*F[5]-F[2]*F[4]);
 
         if(detF < 0.0)   return 1;
 
         if(finite)
         {
           GeomData->computeBasisFunctions3D(1, 2, degree, param, nodeNums, &N(0), &dN_dx(0), &dN_dy(0), &dN_dz(0), Jac);
-          dvol = Jac * JacTemp;
+
+          dvol = Jac * gaussweights[gp];
         }
 
         //printf(" %14.12f \t %14.12f \t %14.12f \n ", F[0], F[1], F[2]);
@@ -246,9 +191,9 @@ int LagrangeElem3DStructSolidHex8Node::calcStiffnessAndResidual(MatrixXd& Klocal
 
           for(kk=0;kk<6;kk++)
           {
-            bc[0][kk] = (bb1 * cc[0][kk] + bb2 * cc[3][kk] + bb3 * cc[5][kk]);
-            bc[1][kk] = (bb1 * cc[3][kk] + bb2 * cc[1][kk] + bb3 * cc[4][kk]);
-            bc[2][kk] = (bb1 * cc[5][kk] + bb2 * cc[4][kk] + bb3 * cc[2][kk]);
+            bc[0][kk] = bb1*cc[0][kk] + bb2*cc[3][kk] + bb3*cc[5][kk];
+            bc[1][kk] = bb1*cc[3][kk] + bb2*cc[1][kk] + bb3*cc[4][kk];
+            bc[2][kk] = bb1*cc[5][kk] + bb2*cc[4][kk] + bb3*cc[2][kk];
           }
 
           TI   = ndof*ii;
@@ -296,10 +241,8 @@ int LagrangeElem3DStructSolidHex8Node::calcStiffnessAndResidual(MatrixXd& Klocal
               Klocal(TIp2, TJp2)  +=  af*(bc[2][2] * cc3 + bc[2][4] * cc2 + bc[2][5] * cc1) ;
           }
         }
-  }//gp1
-  }//gp2
-  }//gp3
-  
+  }//gp
+
   //cout << " totvol = " << totvol << endl;
   //printf("\n\n\n");
   //  printMatrix(Klocal);  printf("\n\n\n");  printVector(Flocal);
@@ -367,6 +310,7 @@ void LagrangeElem3DStructSolidHex8Node::toPostprocess(int vartype, int varindex,
 
 void  LagrangeElem3DStructSolidHex8Node::computeEnergy(int index1, int index2, VectorXd& energy)
 {
+  cerr << " 'LagrangeElem3DStructSolidHex8Node::computeEnergy' is not complete. Need to correct it..."  << endl;
   // compute total energy for structural dynamic problems
   ///////////////////////////////////////////////////////////
 

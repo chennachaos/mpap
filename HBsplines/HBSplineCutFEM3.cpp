@@ -68,7 +68,7 @@ void HBSplineCutFEM::timeUpdate()
 
 void HBSplineCutFEM::updateIterStep()
 {
-  //PetscPrintf(MPI_COMM_WORLD, "   HBSplineCutFEM::updateIterStep() ... STARTED \n\n");
+  PetscPrintf(MPI_COMM_WORLD, "   HBSplineCutFEM::updateIterStep() ... STARTED \n\n");
 
   int kk, bb, ee;
 
@@ -93,7 +93,7 @@ void HBSplineCutFEM::updateIterStep()
     //cout << " AAAAAAAAAAA " << bb << endl;
   }
 
-  //cout << " IB_MOVED = " << IB_MOVED << endl;
+  //cout << " IB_MOVED = " << IB_MOVED << '\t' << slv_type << endl;
   //cout << " kkkkkkkkkkk " << endl;
   if(GRID_CHANGED || IB_MOVED)
   {
@@ -178,7 +178,7 @@ void HBSplineCutFEM::updateIterStep()
         solverPetsc->checkIO = true;
   }
 
-  //PetscPrintf(MPI_COMM_WORLD, "   HBSplineCutFEM::updateIterStep() ... FINISHED \n\n");
+  PetscPrintf(MPI_COMM_WORLD, "   HBSplineCutFEM::updateIterStep() ... FINISHED \n\n");
 
   return;
 }
@@ -302,30 +302,30 @@ int  HBSplineCutFEM::setCoveringUncovering3D()
     node* ndTemp;
 
 
-        for(aa=0; aa<ImmersedBodyObjects[bb]->GeomData.NodePosNew.size(); aa++)
+    for(aa=0; aa<ImmersedBodyObjects[bb]->GeomData.NodePosNew.size(); aa++)
+    {
+        geom    = ImmersedBodyObjects[bb]->GeomData.NodePosNew[aa];
+
+        vel[0]  = ImmersedBodyObjects[bb]->GeomData.specValNew[aa][0];
+        vel[1]  = ImmersedBodyObjects[bb]->GeomData.specValNew[aa][1];
+        vel[2]  = ImmersedBodyObjects[bb]->GeomData.specValNew[aa][2];
+
+        //printf(" %12.6f,  %12.6f \n\n", geom[0], geom[1]);
+        //printf(" %12.6f,  %12.6f \n", vel[0], vel[1]);
+
+        //cout << " uuuuuuuuuuu " << endl;
+
+        ndTemp = elems[findCellNumber(geom)];
+
+        if( ndTemp->getDomainNumber() > 0 )
         {
-          geom    = ImmersedBodyObjects[bb]->GeomData.NodePosNew[aa];
-
-          vel[0]  = ImmersedBodyObjects[bb]->GeomData.specValNew[aa][0];
-          vel[1]  = ImmersedBodyObjects[bb]->GeomData.specValNew[aa][1];
-          vel[2]  = ImmersedBodyObjects[bb]->GeomData.specValNew[aa][2];
-
-          //printf(" %12.6f,  %12.6f \n\n", geom[0], geom[1]);
-          //printf(" %12.6f,  %12.6f \n", vel[0], vel[1]);
-
-          //cout << " uuuuuuuuuuu " << endl;
-
-          ndTemp = elems[findCellNumber(geom)];
-
-          if( ndTemp->getDomainNumber() > 0 )
-          {
             geometryToParametric(geom, param);
 
             knotBegin = ndTemp->getKnotBegin();
             knotIncr  = ndTemp->getKnotIncrement();
             bfTemp    = ndTemp->GlobalBasisFuncs;
 
-            GeomData.computeBasisFunctions2D(knotBegin, knotIncr, param, NN);
+            GeomData.computeBasisFunctions3D(knotBegin, knotIncr, param, NN);
 
             if(ndTemp->getParent() == NULL)
             {
@@ -346,10 +346,10 @@ int  HBSplineCutFEM::setCoveringUncovering3D()
                 }
               }
             }
-          }
         }
+    }
 
-  return  1;
+    return  1;
 }
 
 
@@ -388,9 +388,7 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
     double  tend = MPI_Wtime();
 
-    //PetscPrintf(MPI_COMM_WORLD, " preparing cut elements took %d  milliseconds \n", std::chrono::duration_cast<std::chrono::milliseconds>(tend - tstart).count());
     PetscPrintf(MPI_COMM_WORLD, " preparing cut elements took %f  milliseconds \n", (tend-tstart)*1000);
-
 
     setCoveringUncovering();
 
@@ -446,7 +444,7 @@ int  HBSplineCutFEM::prepareMatrixPattern()
       {
         node_map_new_to_old[ii] = ii;
         node_map_old_to_new[ii] = ii;
-        
+
         for(jj=0; jj<ndof; jj++)
         {
           dof_map_new_to_old[kk] = kk;
@@ -501,8 +499,6 @@ int  HBSplineCutFEM::prepareMatrixPattern()
           //vwgtElem[ee] = elems[fluidElementIds[ee]]->getComputationalEffort();
           vwgtElem[ee] = elems[fluidElementIds[ee]]->getNumberOfQuadraturePoints();
         }
-
-        //cout << " npElem_total = " << npElem_total << endl;
 
         ierr  = PetscMalloc1(npElem_total,  &eind); CHKERRQ(ierr);
 
@@ -919,10 +915,10 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
     GRID_CHANGED = IB_MOVED = false;
 
-    ierr  = PetscFree(d_nnz); CHKERRQ(ierr);
-    ierr  = PetscFree(o_nnz); CHKERRQ(ierr);
+    ierr  = PetscFree(d_nnz);   CHKERRQ(ierr);
+    ierr  = PetscFree(o_nnz);   CHKERRQ(ierr);
     ierr  = PetscFree(colTemp); CHKERRQ(ierr);
-    ierr  = PetscFree(arrayD); CHKERRQ(ierr);
+    ierr  = PetscFree(arrayD);  CHKERRQ(ierr);
 
     tend = MPI_Wtime();
 
@@ -934,7 +930,7 @@ int  HBSplineCutFEM::prepareMatrixPattern()
     //
     //////////////////////////////////////////////
     tstart = MPI_Wtime();
-    
+
     for(ee=0; ee<cutCellIds.size(); ee++)
     {
       nd1 = elems[cutCellIds[ee]];
@@ -983,7 +979,7 @@ int  HBSplineCutFEM::prepareMatrixPattern()
       {
         // matrix pattern for coupling terms
         //////////////////////////////////////////////////////////////////
-        
+
         nlb = ImmersedBodyObjects[bb]->ImmIntgElems[0]->pointNums.size();
 
         Nb.resize(nlb);

@@ -18,7 +18,7 @@ extern List<TimeFunction> timeFunction;
 SolutionData::SolutionData()
 {
   td.resize(100);
-  
+
   STAGGERED = true;
 
   stagParams.resize(10);
@@ -45,9 +45,9 @@ void SolutionData::SetStaggeredParams(vector<double>&  vecTemp)
   assert(vecTemp.size() >= 3);
 
   stagParams = vecTemp;
-  
+
   STAGGERED = (stagParams[0] == 0);
-  
+
   return;
 }
 
@@ -86,9 +86,9 @@ void SolutionData::initialise(int s1, int s2, int s3, int s4)
     var1Prev3   = var1;
     var1Prev4   = var1;
     var1Cur     = var1;
-    
+
     var1Extrap     = var1;
-    
+
     var1Dot     = var1;
     var1DotPrev = var1;
     var1DotCur  = var1;
@@ -112,15 +112,15 @@ void SolutionData::initialise(int s1, int s2, int s3, int s4)
     forcePrev3    = var1;
     forcePrev4    = var1;
     forcePrev5    = var1;
-    
+
     forcePred     = var1;
     forceCur      = var1;
     forceTemp     = var1;
     forceTempPrev = var1;
     rhsVec        = var1;
-    
+
     reac =  var1;
-    
+
     dDot = var1;
     dDotPrev = var1;
 
@@ -197,14 +197,14 @@ void  SolutionData::timeUpdate()
   var2Prev = var2;
   var3Prev = var3;
   var4Prev = var4;
-  
+
   var1Extrap = var1Prev;
   //var1Extrap = 2.0*var1Prev - var1Prev2;
   //var1Extrap = 3.0*var1Prev - 3.0*var1Prev2 + var1Prev3;
 
   var1DotPrev = var1Dot;
   var1DotDotPrev = var1DotDot;
-  
+
   dDotPrev = dDot;
 
   var2DotPrev = var2Dot;
@@ -233,10 +233,10 @@ void  SolutionData::timeUpdate()
     //cout << " mpapTime.prev  = " << mpapTime.prev << endl;
     //cout << " mpapTime.prev2 = " << mpapTime.prev2 << endl;
     //cout << " knp1 = " << knp1 << endl;
-    
-    VectorXd  tempForce(force.rows());
-    
-    tempForce.setZero();
+
+    // Creating vectors inside if conditions to dynamic memory allocations which keep growing
+    //VectorXd  tempForce(force.rows());
+    //tempForce.setZero();
 
     //if( var1[0] < 1.0e-10 )
     //if( (var1[0] <= 1.0e-10) || (var1[0] >= 1.55) )
@@ -258,7 +258,7 @@ void  SolutionData::timeUpdate()
       case 1:
         q1 =  1.0;  q2 = 0.0;  q3 =  0.0;  q4 =  0.0;
         break;
-        
+
       case 2:
         //q1 =  2.0;  q2 = -1.0;  q3 =  0.0;  q4 =  0.0;
         //q1 =  1.5;  q2 = -0.5;  q3 =  0.0;  q4 =  0.0;
@@ -266,18 +266,18 @@ void  SolutionData::timeUpdate()
         //q1 = 1.0+knp1; q2 = -knp1;  q3 =  0.0;  q4 =  0.0;
         q1 = 1.0+z; q2 = -z;  q3 =  0.0;  q4 =  0.0;
         break;
-      
+
       case 3:
         //q1 =  3.0;  q2 = -3.0;  q3 =  1.0;  q4 =  0.0;
         q1 =  2.0+z;  q2 = -1.0-2.0*z;  q3 =  z;  q4 =  0.0;
         //q1 =  2.5;  q2 = -2.0;  q3 =  0.5;  q4 =  0.0;
         break;
-      
+
       case 4:
         q1 =  4.0;  q2 = -6.0;  q3 =  4.0;  q4 = -1.0;
         //q1 =  104.0/35.0;  q2 = -114.0/35.0;  q3 =  56.0/35.0;  q4 = -11.0/35.0;
         break;
-        
+
       default:
         cout << " unknown value for 'predType' " << endl;
         break;
@@ -344,7 +344,7 @@ void SolutionData::interpolateForce()
 void SolutionData::updateIterStep()
 {
   char fct[] = "SolutionData::updateIterStep";
-  
+
   if( PHYSICS_TYPE == PHYSICS_TYPE_SOLID )
   {
     //if(STAGGERED)

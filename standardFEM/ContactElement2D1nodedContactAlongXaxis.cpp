@@ -1,5 +1,5 @@
 
-#include "ContactElement2D1nodedContactWithXaxis.h"
+#include "ContactElement2D1nodedContactAlongXaxis.h"
 #include "BasisFunctionsLagrange.h"
 #include "GeomDataLagrange.h"
 #include "SolutionData.h"
@@ -8,7 +8,7 @@
 using namespace std;
 
 
-ContactElement2D1nodedContactWithXaxis::ContactElement2D1nodedContactWithXaxis()
+ContactElement2D1nodedContactAlongXaxis::ContactElement2D1nodedContactAlongXaxis()
 {
   ndof   = 1;
   ndim   = 2;
@@ -18,18 +18,18 @@ ContactElement2D1nodedContactWithXaxis::ContactElement2D1nodedContactWithXaxis()
 }
 
 
-ContactElement2D1nodedContactWithXaxis::~ContactElement2D1nodedContactWithXaxis()
+ContactElement2D1nodedContactAlongXaxis::~ContactElement2D1nodedContactAlongXaxis()
 {
 }
 
 
-void ContactElement2D1nodedContactWithXaxis::prepareElemData()
+void ContactElement2D1nodedContactAlongXaxis::prepareElemData()
 {
   return;
 }
 
 
-int ContactElement2D1nodedContactWithXaxis::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal, bool firstIter)
+int ContactElement2D1nodedContactAlongXaxis::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal, bool firstIter)
 {
     if(Klocal.rows() != nsize)
     {
@@ -40,20 +40,19 @@ int ContactElement2D1nodedContactWithXaxis::calcStiffnessAndResidual(MatrixXd& K
     Flocal.setZero();
 
 
-    int ii, jj, ind;
-    double  Yorig, disp, lamn;
-    double  y1, y2, fact, tol=1.e-12, gn, af, cn=1.0, g0, d1;
+    double  tol=1.e-12, cn=1.0;
 
-    Yorig =  GeomData->NodePosOrig[nodeNums[0]][1];
-    disp  =  SolnData->var1Cur[nodeNums[0]*2+1];
-    lamn  =  SolnData->var1Cur[GeomData->assy4r[forAssyVec[1]]];
+    double  Xorig =  GeomData->NodePosOrig[nodeNums[0]][0];
+    double  disp  =  SolnData->var1Cur[nodeNums[0]*2+0];
+    double  lamn  =  SolnData->var1Cur[GeomData->assy4r[forAssyVec[1]]];
 
-    gn = - disp; // gn is penetration variable
+    double  gn = 0.0-disp; // gn is penetration variable
 
     //cout << " displacement = " << disp << '\t' << lamn << endl;
 
-    af = SolnData->td(2);
-    d1 = SolnData->td(5);
+    double  af = SolnData->td(2);
+    double  d1 = SolnData->td(5);
+
 
     if( (lamn + cn*gn) > tol)
     {
@@ -71,19 +70,19 @@ int ContactElement2D1nodedContactWithXaxis::calcStiffnessAndResidual(MatrixXd& K
 
     //printMatrix(Klocal);
 
-  return 1;
+    return 1;
 }
 
 
 
 
 /*
-void ContactElement2D1nodedContactWithXaxis::assembleMatrixAndVector(int start, SparseMatrixXd& mtx, double* rhs)
+void ContactElement2D1nodedContactAlongXaxis::assembleMatrixAndVector(int start, SparseMatrixXd& mtx, double* rhs)
 {
   int ii, jj, r;
-  
+
   //cout << " start " << start << endl;
-  
+
   for(ii=0;ii<size;ii++)
   {
     r = start+ii;

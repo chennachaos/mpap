@@ -29,8 +29,9 @@ LagrangeElem3DBbarFbar::LagrangeElem3DBbarFbar()
   nlbf   = 8;
   ndof   = 3;
   nsize  = nlbf*ndof;
-
 }
+
+
 
 LagrangeElem3DBbarFbar::~LagrangeElem3DBbarFbar()
 {
@@ -42,26 +43,9 @@ void LagrangeElem3DBbarFbar::prepareElemData()
 {
   LagrangeElement::prepareElemData();
 
-  int ii, jj;
-
-  ndim   = 3;
-  degree = 1;
-  npElem = 8;
-  nlbf   = 8;
-  ndof   = 3;
-  nsize  = nlbf*ndof;
-
-  // set the element property variables
-
-  elmDat = &(SolnData->ElemProp[elmType].data[0]);
-  matDat = &(SolnData->MatlProp[matType].data[0]);
-
-  finiteInt  = (int) elmDat[2] ;
-  matId      = SolnData->MatlProp[matType].id + 1;
-  finite     = (finiteInt >= 1) ;
-
   return;
 }
+
 
 void LagrangeElem3DBbarFbar::prepareElemData2()
 {
@@ -84,35 +68,25 @@ int LagrangeElem3DBbarFbar::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd&
 
 int LagrangeElem3DBbarFbar::calcStiffnessAndResidualSS(MatrixXd& Klocal, VectorXd& Flocal)
 {
-//   char fct[] = "LagrangeElem3DBbarFbar::calcStiffnessAndResidual";
-//   computerTime.go(fct);
-
   double  F[9], Fc[9], detF, detFc, trFc, fact, fact1, fact2, fact3, dvol, dvol0;
-  double  Jac, dt, totvol=0.0, JacY;
+  double  Jac, totvol=0.0;
   double  bb1, bb2, bb3, bb4, bb5, cc1, cc2, cc3, cc4, cc5;
 
   VectorXd  N(nlbf), dN_dx(nlbf), dN_dy(nlbf), dN_dz(nlbf);
 
   double  stre[6], cc[6][6], param[3], force[3], bforce[3], sig[3], acceCur[3];
 
-  int   err,  isw,  count,  count1, index, ll = 0, ii, jj, kk, gp1, gp2, gp3;
+  int   err,  isw,  count,  count1, index, ll = 0, ii, jj, kk, gp;
   int   TI, TIp1, TIp2, TJ, TJp1, TJp2;
   int   ind1, ind2;
-  
-  double  BULK = matDat[0] ;
-  double  mu   = matDat[1] ;
-  double  finiteFact = finite ? 1.0 : 0.0 ;
 
   double rho0 = elmDat[5] ;
-  bforce[0]  = 0.0;
-  bforce[1]  = 0.0;
-  bforce[2]  = 0.0;
-
-  //bforce[0]  = elmDat[6]*timeFunction[0].prop ;
-  //bforce[1]  = elmDat[7]*timeFunction[0].prop ;
-  //bforce[2]  = elmDat[7]*timeFunction[0].prop ;
-
-  double  af = SolnData->td(2);
+  double rho  = rho0 ;
+  bforce[0]   = elmDat[6]*timeFunction[0].prop ;
+  bforce[1]   = elmDat[7]*timeFunction[0].prop ;
+  bforce[2]   = elmDat[8]*timeFunction[0].prop ;
+  double  dt  = mpapTime.dt;
+  double  af  = SolnData->td(2);
   double  acceFact1 = SolnData->td(5);
   double  acceFact2 = acceFact1;
 
@@ -127,13 +101,13 @@ int LagrangeElem3DBbarFbar::calcStiffnessAndResidualSS(MatrixXd& Klocal, VectorX
 
   //  compute determinant tr(F) in element centre 
 
-  vector<double>  gausspoints, gaussweights;
+  vector<double>  gausspoints1, gausspoints2, gausspoints3, gaussweights;
 
-  getGaussPoints1D(1, gausspoints, gaussweights);
+  getGaussPoints1D(1, gausspoints1, gaussweights);
 
-  param[0] = gausspoints[0];
-  param[1] = gausspoints[0];
-  param[2] = gausspoints[0];
+  param[0] = gausspoints1[0];
+  param[1] = gausspoints1[0];
+  param[2] = gausspoints1[0];
 
   GeomData->computeBasisFunctions3D(0, 2, degree, param, nodeNums, &N(0), &dN_dx(0), &dN_dy(0), &dN_dz(0), Jac);
 
@@ -150,8 +124,7 @@ int LagrangeElem3DBbarFbar::calcStiffnessAndResidualSS(MatrixXd& Klocal, VectorX
   Fc[8] = computeValueCur(2, dN_dz) + 1.0;
 
   trFc  = Fc[0] + Fc[4] + Fc[8];
-  detFc = Fc[0]*(Fc[4]*Fc[8] - Fc[5]*Fc[7]) - Fc[3]*(Fc[1]*Fc[8] - Fc[2]*Fc[7]) + Fc[6]*(Fc[1]*Fc[5] - Fc[2]*Fc[4]);
-
+  detFc = Fc[0]*(Fc[4]*Fc[8]-Fc[5]*Fc[7]) - Fc[3]*(Fc[1]*Fc[8]-Fc[2]*Fc[7]) + Fc[6]*(Fc[1]*Fc[5]-Fc[2]*Fc[4]);
 
   VectorXd   Wmat1(nlbf), Wmat2(nlbf), Wmat3(nlbf);
   for(jj=0;jj<nlbf;jj++)
@@ -163,12 +136,7 @@ int LagrangeElem3DBbarFbar::calcStiffnessAndResidualSS(MatrixXd& Klocal, VectorX
 
   MatrixXd  Dmat(6,6), Bbar1(3,6), Bbar2(6,3), Ktemp(3,3), bc(3,6);
 
-  count = 1;   ll = 0;   err = 0;   isw = 3;
-  dt = mpapTime.dt;
-
-  int nGP = (int) elmDat[0] ;
-
-  getGaussPoints1D(nGP, gausspoints, gaussweights);
+  getGaussPointsHex(nGP, gausspoints1, gausspoints2, gausspoints3, gaussweights);
 
   if(Klocal.rows() != nsize)
   {
@@ -180,25 +148,17 @@ int LagrangeElem3DBbarFbar::calcStiffnessAndResidualSS(MatrixXd& Klocal, VectorX
 
   //cout << " AAAAAAAAAAAAAAA " << endl;
 
+  count = 1;   ll = 0;   err = 0;   isw = 3;
   totvol = 0.0;
-  for(gp3=0;gp3<nGP;gp3++)
+  for(gp=0; gp<nGP; gp++)
   {
-    param[2] = gausspoints[gp3];
-  for(gp2=0;gp2<nGP;gp2++)
-  {
-    param[1] = gausspoints[gp2];
-
-    JacY = gaussweights[gp3] * gaussweights[gp2];
-
-  for(gp1=0;gp1<nGP;gp1++)
-  {
-        param[0] = gausspoints[gp1];
+      param[2] = gausspoints3[gp];
+      param[1] = gausspoints2[gp];
+      param[0] = gausspoints1[gp];
 
         GeomData->computeBasisFunctions3D(0, 2, degree, param, nodeNums, &N(0), &dN_dx(0), &dN_dy(0), &dN_dz(0), Jac);
 
-        fact = JacY * gaussweights[gp1];
-
-        dvol0 = Jac * fact;
+        dvol0 = Jac * gaussweights[gp];
         dvol = dvol0;
         totvol += dvol;
 
@@ -220,7 +180,7 @@ int LagrangeElem3DBbarFbar::calcStiffnessAndResidualSS(MatrixXd& Klocal, VectorX
         acceCur[1] = computeValueDotDotCur(1, N);
         acceCur[2] = computeValueDotDotCur(2, N);
 
-        detF = F[0]*(F[4]*F[8] - F[5]*F[7]) - F[3]*(F[1]*F[8] - F[2]*F[7]) + F[6]*(F[1]*F[5] - F[2]*F[4]);
+        detF = F[0]*(F[4]*F[8]-F[5]*F[7]) - F[3]*(F[1]*F[8]-F[2]*F[7]) + F[6]*(F[1]*F[5]-F[2]*F[4]);
 
         if(detF < 0.0)   return 1;
 
@@ -345,7 +305,6 @@ int LagrangeElem3DBbarFbar::calcStiffnessAndResidualSS(MatrixXd& Klocal, VectorX
             acceFact2 = acceFact1*cc4*rho0;
 
             fact  = bb4*acceFact2;
-            fact += af*(sig[0]*cc1 + sig[1]*cc2 + sig[2]*cc3)*finiteFact;
 
             Klocal(TI,   TJ)    +=  fact;
             Klocal(TIp1, TJp1)  +=  fact;
@@ -353,22 +312,20 @@ int LagrangeElem3DBbarFbar::calcStiffnessAndResidualSS(MatrixXd& Klocal, VectorX
 
             Ktemp = (af*bc)*Bbar2;
 
-            Klocal(TI,TJ)     += Ktemp(0,0) ;
-            Klocal(TI,TJp1)   += Ktemp(0,1) ;
-            Klocal(TI,TJp2)   += Ktemp(0,2) ;
+            Klocal(TI,   TJ)    += Ktemp(0,0) ;
+            Klocal(TI,   TJp1)  += Ktemp(0,1) ;
+            Klocal(TI,   TJp2)  += Ktemp(0,2) ;
 
-            Klocal(TIp1,TJ)   += Ktemp(1,0) ;
-            Klocal(TIp1,TJp1) += Ktemp(1,1) ;
-            Klocal(TIp1,TJp2) += Ktemp(1,2) ;
+            Klocal(TIp1, TJ)    += Ktemp(1,0) ;
+            Klocal(TIp1, TJp1)  += Ktemp(1,1) ;
+            Klocal(TIp1, TJp2)  += Ktemp(1,2) ;
 
-            Klocal(TIp2,TJ)   += Ktemp(2,0) ;
-            Klocal(TIp2,TJp1) += Ktemp(2,1) ;
-            Klocal(TIp2,TJp2) += Ktemp(2,2) ;
+            Klocal(TIp2, TJ)    += Ktemp(2,0) ;
+            Klocal(TIp2, TJp1)  += Ktemp(2,1) ;
+            Klocal(TIp2, TJp2)  += Ktemp(2,2) ;
           }
         }
-  }//gp1
-  }//gp2
-  }//gp3
+  }//gp
 
   return 0;
 }
@@ -378,11 +335,8 @@ int LagrangeElem3DBbarFbar::calcStiffnessAndResidualSS(MatrixXd& Klocal, VectorX
 
 int LagrangeElem3DBbarFbar::calcStiffnessAndResidualFS(MatrixXd& Klocal, VectorXd& Flocal)
 {
-//   char fct[] = "LagrangeElem3DBbarFbar::calcStiffnessAndResidual";
-//   computerTime.go(fct);
-
   double  F[9], Fc[9], detF, detFc, trFc, fact, fact1, fact2, fact3, dvol, dvol0;
-  double  Jac, dt, totvol=0.0, JacY, r1d3 = 1.0/3.0, r2d3=2.0/3.0;
+  double  Jac, totvol=0.0, JacY, r1d3 = 1.0/3.0, r2d3=2.0/3.0;
   double  bb1, bb2, bb3, bb4, bb5, cc1, cc2, cc3, cc4, cc5;
 
   VectorXd  N(nlbf), dN_dx(nlbf), dN_dy(nlbf), dN_dz(nlbf);
@@ -390,24 +344,17 @@ int LagrangeElem3DBbarFbar::calcStiffnessAndResidualFS(MatrixXd& Klocal, VectorX
   double  stre[6], cc[6][6], bc[3][6], param[3];
   double  force[3], bforce[3], sig[3], acceCur[3], cch[6];
 
-  int   err,  isw,  count,  count1, index, ll, ii, jj, kk, gp1, gp2, gp3;
+  int   err,  isw,  count,  count1, index, ll, ii, jj, kk, gp;
   int   TI, TIp1, TIp2, TJ, TJp1, TJp2;
   int   ind1, ind2;
-  
-  double  BULK = matDat[0] ;
-  double  mu   = matDat[1] ;
-  double  finiteFact = finite ? 1.0 : 0.0 ;
 
   double rho0 = elmDat[5] ;
-  bforce[0]  = 0.0;
-  bforce[1]  = 0.0;
-  bforce[2]  = 0.0;
-
-  //bforce[0]  = elmDat[6]*timeFunction[0].prop ;
-  //bforce[1]  = elmDat[7]*timeFunction[0].prop ;
-  //bforce[2]  = elmDat[7]*timeFunction[0].prop ;
-
-  double  af = SolnData->td(2);
+  double rho  = rho0 ;
+  bforce[0]   = elmDat[6]*timeFunction[0].prop ;
+  bforce[1]   = elmDat[7]*timeFunction[0].prop ;
+  bforce[2]   = elmDat[8]*timeFunction[0].prop ;
+  double  dt  = mpapTime.dt;
+  double  af  = SolnData->td(2);
   double  acceFact1 = SolnData->td(5);
   double  acceFact2 = acceFact1;
 
@@ -421,18 +368,17 @@ int LagrangeElem3DBbarFbar::calcStiffnessAndResidualFS(MatrixXd& Klocal, VectorX
     zNode[ii] = GeomData->NodePosOrig[nodeNums[ii]][2];
   }
 
-  totvol = (xNode[1]-xNode[0])*(yNode[2]-yNode[0])*(zNode[5]-zNode[0]);
+  //totvol = (xNode[1]-xNode[0])*(yNode[2]-yNode[0])*(zNode[5]-zNode[0]);
 
+  //  compute deformation gradient at the element center
 
-  //  compute determinant tr(F) in element centre 
+  vector<double>  gausspoints1, gausspoints2, gausspoints3, gaussweights;
 
-  vector<double>  gausspoints, gaussweights;
+  getGaussPoints1D(1, gausspoints1, gaussweights);
 
-  getGaussPoints1D(1, gausspoints, gaussweights);
-
-  param[0] = gausspoints[0];
-  param[1] = gausspoints[0];
-  param[2] = gausspoints[0];
+  param[0] = gausspoints1[0];
+  param[1] = gausspoints1[0];
+  param[2] = gausspoints1[0];
 
   GeomData->computeBasisFunctions3D(0, 2, degree, param, nodeNums, &N(0), &dN_dx(0), &dN_dy(0), &dN_dz(0), Jac);
 
@@ -463,13 +409,7 @@ int LagrangeElem3DBbarFbar::calcStiffnessAndResidualFS(MatrixXd& Klocal, VectorX
   }
 
   //MatrixXd  Dmat(6,6), Bbar1(3,6), Bbar2(6,3), Ktemp(3,3);
-
-  count = 1;   ll = 0;   err = 0;   isw = 3;
-  dt = mpapTime.dt;
-
-  int nGP = (int) elmDat[0] ;
-
-  getGaussPoints1D(nGP, gausspoints, gaussweights);
+  getGaussPointsHex(nGP, gausspoints1, gausspoints2, gausspoints3, gaussweights);
 
   if(Klocal.rows() != nsize)
   {
@@ -479,30 +419,22 @@ int LagrangeElem3DBbarFbar::calcStiffnessAndResidualFS(MatrixXd& Klocal, VectorX
   Klocal.setZero();
   Flocal.setZero();
 
+
+  count = 1;   ll = 0;   err = 0;   isw = 3;
   totvol = 0.0;
-  for(gp3=0;gp3<nGP;gp3++)
+  for(gp=0; gp<nGP; gp++)
   {
-    param[2] = gausspoints[gp3];
-  for(gp2=0;gp2<nGP;gp2++)
-  {
-    param[1] = gausspoints[gp2];
-
-    JacY = gaussweights[gp3] * gaussweights[gp2];
-
-  for(gp1=0;gp1<nGP;gp1++)
-  {
-        param[0] = gausspoints[gp1];
+      param[2] = gausspoints3[gp];
+      param[1] = gausspoints2[gp];
+      param[0] = gausspoints1[gp];
 
         GeomData->computeBasisFunctions3D(0, 2, degree, param, nodeNums, &N(0), &dN_dx(0), &dN_dy(0), &dN_dz(0), Jac);
 
-        fact = JacY * gaussweights[gp1];
-
-        dvol0 = Jac * fact;
+        dvol0 = Jac*gaussweights[gp];
         dvol = dvol0;
         totvol += dvol;
 
         //GeomData->computeDeformationGradient(1, nodeNums, &dN_dx(0), &dN_dy(0), F, detF);
-
 
         F[0] = computeValueCur(0, dN_dx) + 1.0;
         F[3] = computeValueCur(0, dN_dy);
@@ -549,16 +481,14 @@ int LagrangeElem3DBbarFbar::calcStiffnessAndResidualFS(MatrixXd& Klocal, VectorX
         if(err !=0)    return 1;
 
         if(finite)
+        {
           GeomData->computeBasisFunctions3D(1, 2, degree, param, nodeNums, &N(0), &dN_dx(0), &dN_dy(0), &dN_dz(0), Jac);
+
+          dvol = Jac*gaussweights[gp];
+        }
 
         for(ii=0;ii<6;ii++)
         {
-          //stre[ii] *= dvol;
-          //for(jj=0;jj<6;jj++)
-          //{
-            //cc[ii][jj] *= dvol;
-            //Dmat(ii,jj) = cc[ii][jj] ;
-          //}
           cch[ii]  =  r1d3 * (cc[ii][0] + cc[ii][1] + cc[ii][2]);
         }
 
@@ -588,9 +518,9 @@ int LagrangeElem3DBbarFbar::calcStiffnessAndResidualFS(MatrixXd& Klocal, VectorX
 
           for(kk=0;kk<6;kk++)
           {
-            bc[0][kk] = (bb1 * cc[0][kk] + bb2 * cc[3][kk] + bb3 * cc[5][kk]);
-            bc[1][kk] = (bb1 * cc[3][kk] + bb2 * cc[1][kk] + bb3 * cc[4][kk]);
-            bc[2][kk] = (bb1 * cc[5][kk] + bb2 * cc[4][kk] + bb3 * cc[2][kk]);
+            bc[0][kk] = bb1*cc[0][kk] + bb2*cc[3][kk] + bb3*cc[5][kk];
+            bc[1][kk] = bb1*cc[3][kk] + bb2*cc[1][kk] + bb3*cc[4][kk];
+            bc[2][kk] = bb1*cc[5][kk] + bb2*cc[4][kk] + bb3*cc[2][kk];
           }
 
           sig[0] = bb1*stre[0] + bb2*stre[3] + bb3*stre[5] ;
@@ -621,7 +551,7 @@ int LagrangeElem3DBbarFbar::calcStiffnessAndResidualFS(MatrixXd& Klocal, VectorX
             acceFact2 = acceFact1*cc4*rho0;
 
             fact  = bb5*acceFact2;
-            fact += af*(sig[0]*cc1 + sig[1]*cc2 + sig[2]*cc3)*finiteFact;
+            fact += af*(sig[0]*cc1 + sig[1]*cc2 + sig[2]*cc3);
 
             Klocal(TI,   TJ)    +=  fact;
             Klocal(TIp1, TJp1)  +=  fact;
@@ -657,9 +587,7 @@ int LagrangeElem3DBbarFbar::calcStiffnessAndResidualFS(MatrixXd& Klocal, VectorX
 
           }
         }
-  }//gp1
-  }//gp2
-  }//gp3
+  }//gp
 
   return 0;
 }
@@ -729,55 +657,45 @@ void LagrangeElem3DBbarFbar::toPostprocess(int vartype, int varindex, int type, 
 
 void  LagrangeElem3DBbarFbar::computeEnergy(int index1, int index2, VectorXd& energy)
 {
+  cerr << " 'LagrangeElem3DBbarFbar::computeEnergy' is not complete. Need to correct it..."  << endl;
+
   // compute total energy for structural dynamic problems
   ///////////////////////////////////////////////////////////
 
   //elmDat = &(SolnData->ElemProp.data[0]);
   //matDat = &(SolidSolnData->MatlProp.data[0]);
 
-  double  F[4], detF=0.0, F33, fact, dvol, dvol0, Jac, dt, JacMult;
-  double  posi[2], disp[2], velo[2];
-  double  stress[4], strain[4], cc[4][4], param[2], bforce[2];
+  double  F[9], detF=0.0, F33, fact, dvol, dvol0, Jac, JacMult;
+  double  posi[3], disp[3], velo[3];
+  double  stress[6], strain[6], cc[6][6], param[3], bforce[3];
 
   VectorXd  N(nlbf), dN_dx(nlbf), dN_dy(nlbf);
 
-  int   err,  isw,  count,  count1, index, ll = 0, ii, jj, gp1, gp2, TI, TIp1, TJ, TJp1;
-  int   ind1, ind2, kk;
-  
-  double  rho  = elmDat[5] ;
+  int   err,  isw,  count,  count1, index, ll = 0, ii, jj, kk, gp;
+  int   TI, TIp1, TIp2, TJ, TJp1, TJp2;
+  int   ind1, ind2;
 
-  count = 1;   ll = 0;   err = 0;   isw = 3;
-  dt = mpapTime.dt;
+  double  rho0  = elmDat[5] ;
+  double  rho   = rho0 ;
+  double  dt    = mpapTime.dt;
 
-  //cout << " finite = " << finite << endl;
+  vector<double>  gausspoints1, gausspoints2, gausspoints3, gaussweights;
 
-  nGP = (int) elmDat[0] ;
-
-  vector<double>  gausspoints1, gaussweights1;
-
-  getGaussPoints1D(nGP, gausspoints1, gaussweights1);
+  getGaussPointsHex(nGP, gausspoints1, gausspoints2, gausspoints3, gaussweights);
 
   energy.setZero();
 
-  for(gp2=0;gp2<nGP;gp2++)
+  count = 1;   ll = 0;   err = 0;   isw = 3;
+  for(gp=0; gp<nGP; gp++)
   {
-    JacMult = gaussweights1[gp2] * thick;
-
-    param[1] = gausspoints1[gp2];
-
-  for(gp1=0;gp1<nGP;gp1++)
-  {
-        param[0] = gausspoints1[gp1];
+      param[2] = gausspoints3[gp];
+      param[1] = gausspoints2[gp];
+      param[0] = gausspoints1[gp];
 
         GeomData->computeBasisFunctions2D(0, 2, degree, param, nodeNums, &N(0), &dN_dx(0), &dN_dy(0), Jac);
 
-        fact = gaussweights1[gp1] * JacMult;
-
-        dvol0 = Jac * fact;
-        dvol = dvol0;
-
-        //if(axsy)
-          //dvol *= 2.0*PI*yy;
+        dvol0 = Jac*gaussweights[gp];
+        dvol  = dvol0;
 
         //GeomData->computeDeformationGradient(1, nodeNums, &dN_dx(0), &dN_dy(0), F, detF);
 
@@ -807,7 +725,7 @@ void  LagrangeElem3DBbarFbar::computeEnergy(int index1, int index2, VectorXd& en
         }
         else if(sss == 2)    // plane strain
           F33 = 1.0;
-        
+
         //printf(" %14.12f \t %14.12f \t %14.12f \t %14.12f \n ", F[0], F[1], F[2], F[3]);
 
         matlib2d_(matDat, F, &F33, stress, cc[0], &(intVar1[ll]), &(intVar2[ll]), &dt, &matId, &nivGP, &finiteInt, &sss, &isw, &err, &count, NULL);
@@ -829,9 +747,7 @@ void  LagrangeElem3DBbarFbar::computeEnergy(int index1, int index2, VectorXd& en
         // kinetic energy
         energy[0] += (0.5*dvol0*rho*(velo[0]*velo[0]+velo[1]*velo[1]));
         energy[1] += (0.5*dvol*(strain[0]*stress[0]+strain[1]*stress[1]+strain[2]*stress[2]+strain[3]*stress[3]));
-
-  }//gp1
-  }//gp2
+  }//gp
 
   printf("\n\n");
 

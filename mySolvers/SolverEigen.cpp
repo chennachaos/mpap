@@ -122,10 +122,9 @@ void SolverEigen::zeroMtx()
 
 
 
-void SolverEigen::free()
+int SolverEigen::free()
 {
-
-  return;
+  return 0;
 }
 
 

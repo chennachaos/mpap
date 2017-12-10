@@ -179,6 +179,12 @@ int TreeNode<3>::prepareCutCell(vector<double>& cutFEMparams)
   
   if( (int) cutFEMparams[0] == 2 ) // adaptive integration
   {
+    if(adapIntegNode != NULL)
+    {
+      delete  adapIntegNode;
+      adapIntegNode = NULL;
+    }
+
     return GeomData->doIntersect3D(bbox, false, cornerInOut, ptOut, domNums) ;
   }
   else // subtriangulation

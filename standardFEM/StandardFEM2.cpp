@@ -25,7 +25,7 @@ void StandardFEM::setSolver(int slv, int *parm, bool cIO)
     //solver = NULL;
 
     Eigen::initParallel();
-    
+
     int numProc=1;
 
     switch(slv)
@@ -162,24 +162,24 @@ int StandardFEM::prepareMatrixPattern()
       nElem_local = nElem;
 
       totalDOF = nNode*ndof;
-      
+
       row_start = 0;
       row_end   = totalDOF-1;
-      
+
       ndofs_local = totalDOF;
-      
+
       node_map_new_to_old.resize(nNode, 0);
       node_map_old_to_new.resize(nNode, 0);
-      
+
       dof_map_new_to_old.resize(totalDOF, 0);
       dof_map_old_to_new.resize(totalDOF, 0);
-      
+
       kk=0;
       for(ii=0; ii<nNode; ii++)
       {
         node_map_new_to_old[ii] = ii;
         node_map_old_to_new[ii] = ii;
-        
+
         for(jj=0; jj<ndof; jj++)
         {
           dof_map_new_to_old[kk] = kk;
@@ -576,7 +576,7 @@ int StandardFEM::prepareMatrixPattern()
     //set<int>::iterator it;
 
     forAssyMat.resize(totalDOF);
-    
+
     for(ee=0;ee<nElem;ee++)
     {
       tt = &(LM[ee][0]);
@@ -888,7 +888,7 @@ int StandardFEM::calcStiffnessAndResidual(int printRes, bool zeroMtx, bool zeroR
     //double fact1=1.0;
     double fact1 = timeFunction[0].prop;
     
-    SolnData.var1 = fact1*SolnData.var1applied;
+//    SolnData.var1 = fact1*SolnData.var1applied;
 
     /*
     int ii, jj, nn, dof, aa, ind;

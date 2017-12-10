@@ -22,12 +22,10 @@ using namespace std;
 
 
 
-
-
 HBSplineCutFEM::HBSplineCutFEM()
 {
   CUTCELL_INTEGRATION_TYPE = 1;
-  
+
   slnTemp.resize(3);
   slnTemp.setZero();
 
@@ -110,7 +108,7 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
   char tmp[30];
 
   int nw, i, j, k, n, nn, ii, bb;
-  
+
   double fact;
 
   MyStringList   sTmp;
@@ -286,7 +284,7 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
                 DirichletBCs[i].resize(lvdTmp[i].n);
                 if(lvdTmp[i].n < 1)
                    prgError(2, fct, "invalid number of 'dirichlet boundary conditions' !");
-                
+
                 for(j=0;j<lvdTmp[i].n;j++)
                   DirichletBCs[i][j] = lvdTmp[i][j];
             }
@@ -305,7 +303,7 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
                 NeumannBCs[i].resize(lvdTmp[i].n);
                 if(lvdTmp[i].n < 1)
                    prgError(2, fct, "invalid number of 'neumann boundary conditions' !");
-                
+
                 for(j=0;j<lvdTmp[i].n;j++)
                   NeumannBCs[i][j] = lvdTmp[i][j];
             }
@@ -324,7 +322,7 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
                 pointBCs[i].resize(lvdTmp[i].n);
                 if(lvdTmp[i].n < 1)
                    prgError(2, fct, "invalid number of 'point boundary conditions' !");
-                
+
                 for(j=0;j<lvdTmp[i].n;j++)
                   pointBCs[i][j] = lvdTmp[i][j];
             }
@@ -481,7 +479,7 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
                 vecvecDbl[i].resize(lvdTmp[i].n-1);
                 if(lvdTmp[i].n < 1)
                    prgError(2, fct, "invalid number of 'immersed points' !");
-                
+
                 for(j=0;j<lvdTmp[i].n-1;j++)
                   vecvecDbl[i][j] = lvdTmp[i][j+1];
             }
@@ -612,7 +610,7 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
                 vecvecInt[i].resize(lviTmp[i].n);
                 if(lviTmp[i].n < 1)
                    prgError(2, fct, "invalid number of 'rigid body prescribed motion' !");
-                
+
                 for(j=0;j<lviTmp[i].n;j++)
                   vecvecInt[i][j] = lviTmp[i][j];
             }
@@ -667,7 +665,7 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
                 vecvecDbl[i].resize(lvdTmp[i].n);
                 if(lvdTmp[i].n < 1)
                    prgError(2, fct, "invalid number of 'rigid body motion limits' !");
-                
+
                 for(j=0;j<lvdTmp[i].n;j++)
                   vecvecDbl[i][j] = lvdTmp[i][j];
             }
@@ -693,7 +691,7 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
                 vecvecInt[i].resize(lviTmp[i].n-1);
                 if(lviTmp[i].n < 1)
                    prgError(2, fct, "invalid number of 'solid elements' !");
-                
+
                 for(j=1;j<lviTmp[i].n;j++)
                   vecvecInt[i][j-1] = lviTmp[i][j] - 1;
             }
@@ -719,7 +717,7 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
                 vecvecDbl[i].resize(lvdTmp[i].n);
                 if(lvdTmp[i].n < 1)
                    prgError(2, fct, "invalid number of 'immersed point boundary condition' !");
-                
+
                 for(j=0;j<lvdTmp[i].n;j++)
                   vecvecDbl[i][j] = lvdTmp[i][j];
             }
@@ -747,7 +745,7 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
                 vecvecInt[i].resize(lviTmp[i].n);
                 if(lviTmp[i].n < 1)
                    prgError(2, fct, "invalid number of 'immersed body output' !");
-                
+
                 for(j=0;j<lviTmp[i].n;j++)
                   vecvecInt[i][j] = lviTmp[i][j];
             }
@@ -772,7 +770,7 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
                 contElemData[i].resize(lviTmp[i].n);
                 if(lviTmp[i].n < 1)
                    prgError(2, fct, "invalid number of 'contact elements' !");
-                
+
                 for(j=0;j<lviTmp[i].n;j++)
                   contElemData[i][j] = lviTmp[i][j];
             }
@@ -858,16 +856,15 @@ void HBSplineCutFEM::prepareInputData()
 
   //for(int bb=0; bb<numDomains; bb++)
     //domainInclYesNo[bb] = 0;
-  
+
   //domainInclYesNo[0] = 1;
 
   //GeomData.domainInclYesNo = domainInclYesNo;
 
-
   if(nImmSolids > 0)
   {
     GeomData.cutFEMparams = cutFEMparams;
-    
+
     CUTCELL_INTEGRATION_TYPE = cutFEMparams[0];
 
     double minVal[]={0.0, 0.0, 0.0}, maxVal[]={0.0, 0.0, 0.0};
@@ -907,10 +904,10 @@ void HBSplineCutFEM::prepareInputData()
     AABB  bbTemp;
 
     ee = nelem[0]*nelem[1]*nelem[2];
-    
+
     if(MAX_LEVEL > 0)
       ee *= 2;
-    
+
     double  bounds[6],  ptTemp[8][3];
 
     bounds[0] = computeGeometry(0, 0.0);
@@ -935,7 +932,7 @@ void HBSplineCutFEM::prepareInputData()
       nd = elems[activeElements[ee]];
 
       bbTemp = nd->getAABB();
-      
+
       //cout <<  " ee = " << ee << '\t' << activeElements[ee] << endl;
 
       ptTemp[0][0] = bbTemp.minBB[0];    ptTemp[0][1] = bbTemp.minBB[1];    ptTemp[0][2] = bbTemp.minBB[2];

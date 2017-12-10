@@ -13,16 +13,16 @@ class SolverPardisoPetsc: public SolverPetsc
 
     ~SolverPardisoPetsc();
 
-    void   *PT[64];
+    int   PT[64], IPARM[64];
+    int   phase, error, SOLVER, MTYPE, MAXFCT, MNUM, NRHS, MSGLVL;
 
-    double DPARM[64], *val, ddum;
-    vector<double>  solnX;
+    double DPARM[64], ddum;
+
+    vector<double>  rhsTemp, solnTemp;
 
     PetscInt   *csr, *col, *perm;
 
     PetscScalar *array;
-
-    int    phase, error, SOLVER, MTYPE, MAXFCT, MNUM, NRHS, MSGLVL, IPARM[64];
 
     virtual int initialise(int p1 = 0, int p2 = 0, int p3 = 0);
 

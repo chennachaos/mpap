@@ -4,7 +4,7 @@
 #include "MpapTime.h"
 #include "TimeFunction.h"
 #include "ImmersedIntegrationElement.h"
-#include "../mySolvers/SolverPetsc.h"
+#include "SolverPetsc.h"
 #include "QuadratureUtil.h"
 
 
@@ -73,7 +73,7 @@ void ImmersedFlexibleSolid::setSolver(int slv, int *parm, bool cIO)
     }
 
     solverOK = true;
-    
+
     if(solver != NULL)
       solver->checkIO = cIO;
 
@@ -131,7 +131,7 @@ void ImmersedFlexibleSolid::prepareMatrixPattern()
     GeomData.node_map_old_to_new = node_map_old_to_new;
 
     //cout << " nelem and  ndof " << nElem << '\t' << ndof << '\t' << npElem << endl;
-    //cout << " ImmersedFlexibleSolid.... nNode and  ndof " << nNode << '\t' << ndof << endl;
+    cout << " ImmersedFlexibleSolid.... nNode and  ndof " << nNode << '\t' << ndof << endl;
 
     totalDOF = 0;
     for(ii=0;ii<nNode;ii++)
@@ -139,14 +139,15 @@ void ImmersedFlexibleSolid::prepareMatrixPattern()
       for(jj=0;jj<ndof;jj++)
       {
         //cout << ii << '\t' << jj << '\t' << NodeType[ii][jj] << endl;
-        if(NodeType[ii][jj] == (int) -7777)
-        {
+//         if(NodeType[ii][jj] == (int) -7777)
+//         {
           ID[ii][jj] = totalDOF++;
 
           assy4r.push_back(ii*ndof + jj);
-        }
+//         }
       }
     }
+    cout << " totalDOF = " << totalDOF << endl;
 
     // adjust assy4r array to account for the constraints
 
@@ -166,20 +167,28 @@ void ImmersedFlexibleSolid::prepareMatrixPattern()
 
       pp = elems[ee]->getElmTypeNameNum();
 
-      if( pp == 33 )
+      //cout << " ee = " << ee << '\t' << pp << endl;
+
+      if( (pp == 33) || (pp == 35) ) // contact element along X axis
+      {
+        jj = ndof_temp1 + 0;
+        ID[ii][jj] = totalDOF++;
+      }
+
+      if( (pp == 34) || (pp == 36) ) // contact element along Y axis
       {
         jj = ndof_temp1 + 1;
         ID[ii][jj] = totalDOF++;
       }
 
-      if( pp == 34 )
+      if( pp == 37 )  // contact element along Z axis
       {
-        jj = ndof_temp1 + 0;
+        jj = ndof_temp1 + 2;
         ID[ii][jj] = totalDOF++;
       }
     }
 
-    //cout << " totalDOF " << totalDOF << endl;
+    cout << " totalDOF " << totalDOF << endl;
     //assy4r.resize(totalDOF);
 
 
@@ -194,7 +203,16 @@ void ImmersedFlexibleSolid::prepareMatrixPattern()
 
       pp = elems[ee]->getElmTypeNameNum();
 
-      if( pp == 33 ) // constaint element with rigid X-axis
+      if( pp == 33 ) // contact element along X-axis, 2D
+      {
+        LM[ee].resize(2);  // to account for the Lagrange multiplier
+
+        kk = IEN[ee][0];
+
+        LM[ee][0] = ID[kk][0];
+        LM[ee][1] = ID[kk][2];
+      }
+      else if( pp == 34 ) // contact element along Y-axis, 2D
       {
         LM[ee].resize(2);  // to account for the Lagrange multiplier
 
@@ -203,14 +221,32 @@ void ImmersedFlexibleSolid::prepareMatrixPattern()
         LM[ee][0] = ID[kk][1];
         LM[ee][1] = ID[kk][3];
       }
-      else if( pp == 34 ) // constaint element with rigid Y-axis
+      else if( pp == 35 ) // contact element along X-axis, 3D
       {
         LM[ee].resize(2);  // to account for the Lagrange multiplier
 
         kk = IEN[ee][0];
 
         LM[ee][0] = ID[kk][0];
-        LM[ee][1] = ID[kk][2];
+        LM[ee][1] = ID[kk][3];
+      }
+      else if( pp == 36 ) // contact element along Y-axis, 3D
+      {
+        LM[ee].resize(2);  // to account for the Lagrange multiplier
+
+        kk = IEN[ee][0];
+
+        LM[ee][0] = ID[kk][1];
+        LM[ee][1] = ID[kk][4];
+      }
+      else if( pp == 37 ) // contact element along Z-axis, 3D
+      {
+        LM[ee].resize(2);  // to account for the Lagrange multiplier
+
+        kk = IEN[ee][0];
+
+        LM[ee][0] = ID[kk][2];
+        LM[ee][1] = ID[kk][5];
       }
       else // standard elements
       {
@@ -287,7 +323,7 @@ void ImmersedFlexibleSolid::prepareMatrixPattern()
     set<int>::iterator it;
 
     forAssyMat.resize(totalDOF);
-    
+
     for(ee=0;ee<nElem;ee++)
     {
        tt = &(LM[ee][0]);
@@ -460,14 +496,12 @@ int ImmersedFlexibleSolid::calcStiffnessAndResidual(int printRes, bool zeroMtx, 
 
     //printf("\n rhsVec norm = %12.6E \n", solver->rhsVec.norm());
 
-    //applyBoundaryConditions(0, 0, solver->mtx, &(solver->rhsVec(0)));
+    applyBoundaryConditions(0, 0, solver->mtx, &(solver->rhsVec(0)));
 
     applyExternalForces();
 
     // rhs due to external forces
     //rhsVec += rhsVec2;
-
-    //solver->rhsVec(totalDOF-2) += 0.5;
 
     //cout << " rhsVec " << endl;        printVector(&(rhsVec[0]), totalDOF);
 
@@ -489,9 +523,9 @@ int ImmersedFlexibleSolid::calcStiffnessAndResidual(int printRes, bool zeroMtx, 
 
 
 int ImmersedFlexibleSolid::applyBoundaryConditions(int start1, int start2, SparseMatrixXd& globalK, double* rhs)
-{   
+{
     int  ii=0, jj=0, nn=0, dof=0, aa=0, ind=0;
-    double  specVal=0.0, PENALTY=1.0e8;
+    double  specVal=0.0, PENALTY=1.0e4;
     double  af = SolnData.td(2);
 
     for(aa=0;aa<DirichletBCs.size();aa++)
@@ -818,7 +852,7 @@ int ImmersedFlexibleSolid::assembleGlobalMatrixAndVectorCutFEM(int start1, int s
 
 
 int ImmersedFlexibleSolid::applyBoundaryConditions(int start1, int start2, Mat mtxTemp, Vec rhsTemp)
-{   
+{
     int  ii=0, jj=0, nn=0, dof=0, aa=0, ind=0;
     double  specVal=0.0, PENALTY=1.0e8, stiff=0.0, res=0.0;
 

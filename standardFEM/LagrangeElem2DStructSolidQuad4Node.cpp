@@ -1,6 +1,5 @@
 
 #include "LagrangeElem2DStructSolidQuad4Node.h"
-
 #include "Debug.h"
 #include "MpapTime.h"
 #include "ComputerTime.h"
@@ -22,10 +21,14 @@ LagrangeElem2DStructSolidQuad4Node::LagrangeElem2DStructSolidQuad4Node()
 {
   if (debug) cout << " constructor LagrangeElem2DStructSolidQuad4Node\n\n";
 
+  ndim   = 2;
   degree = 1;
   npElem = 4;
+  nlbf   = 4;
   ndof   = 2;
+  nsize  = npElem*ndof;
 }
+
 
 LagrangeElem2DStructSolidQuad4Node::~LagrangeElem2DStructSolidQuad4Node()
 {
@@ -58,8 +61,8 @@ int LagrangeElem2DStructSolidQuad4Node::calcLoadVector()
 
 int LagrangeElem2DStructSolidQuad4Node::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd& Flocal, bool firstIter)
 {
-    double  F[4], detF=0.0, F33, fact, fact1, fact2, dvol, dvol0;
-    double  Jac, bb1, bb2, bb3;
+    double  F[4], detF, F33, fact, dvol, dvol0;
+    double  Jac, bb1, bb2, bb3, cc1, cc2, cc3;
 
     VectorXd  N(nlbf), dN_dx(nlbf), dN_dy(nlbf);
     VectorXd  dispC(nsize), velC(nsize), accC(nsize);
@@ -69,10 +72,7 @@ int LagrangeElem2DStructSolidQuad4Node::calcStiffnessAndResidual(MatrixXd& Kloca
 
     int   err,  isw,  count,  count1, index, ll = 0, ii, jj, gp, TI, TIp1, TJ, TJp1;
     int   ind1, ind2, kk;
-  
-    //double  BULK = matDat[0] ;
-    //double  mu   = matDat[1] ;
-    //double  lamb = BULK - 2.0*mu/3.0;
+
     double rho = elmDat[5] ;
     bforce[0]  = elmDat[6]*timeFunction[0].prop ;
     bforce[1]  = elmDat[7]*timeFunction[0].prop ;
@@ -118,13 +118,11 @@ int LagrangeElem2DStructSolidQuad4Node::calcStiffnessAndResidual(MatrixXd& Kloca
     Flocal.setZero();
     Mlocal.setZero();
 
-
-    count = 1;   ll = 0;   err = 0;   isw = 3;
-
     vector<double>  gausspoints1, gausspoints2, gaussweights;
 
     getGaussPointsQuad(nGP, gausspoints1, gausspoints2, gaussweights);
 
+    count = 1;   ll = 0;   err = 0;   isw = 3;
     for(gp=0; gp<nGP; gp++)
     {
         param[0] = gausspoints1[gp];
@@ -132,12 +130,12 @@ int LagrangeElem2DStructSolidQuad4Node::calcStiffnessAndResidual(MatrixXd& Kloca
 
         GeomData->computeBasisFunctions2D(0, 2, degree, param, nodeNums, &N(0), &dN_dx(0), &dN_dy(0), Jac);
 
-        xx = yy= 0.0;
-        for(ii=0;ii<nlbf;ii++)
-        {
-          xx += N[ii]*xNode[ii];
-          yy += N[ii]*yNode[ii];
-        }
+//         xx = yy= 0.0;
+//         for(ii=0;ii<nlbf;ii++)
+//         {
+//           xx += N[ii]*xNode[ii];
+//           yy += N[ii]*yNode[ii];
+//         }
 
         //for(ii=0; ii<nlbf; ii++)
           //cout << N[ii] << '\t' << dN_dx[ii] << '\t' << dN_dy[ii] << endl;
@@ -177,7 +175,7 @@ int LagrangeElem2DStructSolidQuad4Node::calcStiffnessAndResidual(MatrixXd& Kloca
         }
         else if(sss == 2)    // plane strain
           F33 = 1.0;
-        
+
         //printf(" %14.12f \t %14.12f \t %14.12f \t %14.12f \n ", F[0], F[1], F[2], F[3]);
 
         matlib2d_(matDat, F, &F33, stre, cc[0], &(intVar1[ll]), &(intVar2[ll]), &dt, &matId, &nivGP, &finiteInt, &sss, &isw, &err, &count, NULL);
@@ -199,15 +197,14 @@ int LagrangeElem2DStructSolidQuad4Node::calcStiffnessAndResidual(MatrixXd& Kloca
 
         if(err !=0)    return 1;
 
-        if(finite)
-          dvol *= F33;
+        if(finite)  dvol *= F33;
 
-        for(ii=0;ii<4;ii++)
-        {
-          stre[ii] *= dvol;
-          for(jj=0;jj<4;jj++)
-            cc[ii][jj] *= dvol;
-        }
+//         for(ii=0;ii<4;ii++)
+//         {
+//           stre[ii] *= dvol;
+//           for(jj=0;jj<4;jj++)
+//             cc[ii][jj] *= dvol;
+//         }
 
         //==============================================
         // CALCULATE TANGENT STIFFNESS
@@ -217,10 +214,9 @@ int LagrangeElem2DStructSolidQuad4Node::calcStiffnessAndResidual(MatrixXd& Kloca
 
         for(ii=0;ii<nlbf;ii++)
         {
-          bb1 = dN_dx[ii];
-          bb2 = dN_dy[ii];
-
-          bb3 = N[ii]*dvol0*rho;
+          bb1 = dvol*dN_dx[ii];
+          bb2 = dvol*dN_dy[ii];
+          bb3 = dvol0*(N[ii]*rho);
 
           bc[0][0] = bb1 * cc[0][0] + bb2 * cc[3][0];
           bc[0][1] = bb1 * cc[0][1] + bb2 * cc[3][1];
@@ -238,19 +234,19 @@ int LagrangeElem2DStructSolidQuad4Node::calcStiffnessAndResidual(MatrixXd& Kloca
 
           for(jj=0; jj<nlbf; jj++)
           {
-              bb1 = af*dN_dx[jj];
-              bb2 = af*dN_dy[jj];
+              cc1 = af*dN_dx[jj];
+              cc2 = af*dN_dy[jj];
 
               TJ   = 2*jj;
               TJp1 = TJ+1;
 
-              Klocal(TI,TJ)     +=  (bc[0][0] * bb1 + bc[0][2] * bb2) ;
-              Klocal(TI,TJp1)   +=  (bc[0][1] * bb2 + bc[0][2] * bb1) ;
-              Klocal(TIp1,TJ)   +=  (bc[1][0] * bb1 + bc[1][2] * bb2) ;
-              Klocal(TIp1,TJp1) +=  (bc[1][1] * bb2 + bc[1][2] * bb1) ;
-              
-              Mlocal(TI,  TJ)   +=  bb3*N[jj];
-              Mlocal(TIp1,TJp1) +=  bb3*N[jj];
+              Klocal(TI,   TJ)    +=  (bc[0][0] * cc1 + bc[0][2] * cc2) ;
+              Klocal(TI,   TJp1)  +=  (bc[0][1] * cc2 + bc[0][2] * cc1) ;
+              Klocal(TIp1, TJ)    +=  (bc[1][0] * cc1 + bc[1][2] * cc2) ;
+              Klocal(TIp1, TJp1)  +=  (bc[1][1] * cc2 + bc[1][2] * cc1) ;
+
+              Mlocal(TI,   TJ)    +=  bb3*N[jj];
+              Mlocal(TIp1, TJp1)  +=  bb3*N[jj];
           }
         }
 
@@ -258,10 +254,10 @@ int LagrangeElem2DStructSolidQuad4Node::calcStiffnessAndResidual(MatrixXd& Kloca
 
         if(finite)
         {
-          for(ii=0;ii<nlbf;ii++)
+          for(ii=0; ii<nlbf; ii++)
           {
-              fact1 = dN_dx[ii] * stre[0] + dN_dy[ii] * stre[3] ;
-              fact2 = dN_dx[ii] * stre[3] + dN_dy[ii] * stre[1] ;
+              bb1 = dvol*(dN_dx[ii]*stre[0] + dN_dy[ii]*stre[3]);
+              bb2 = dvol*(dN_dx[ii]*stre[3] + dN_dy[ii]*stre[1]);
 
               TI   = 2*ii;
               TIp1 = TI+1;
@@ -271,7 +267,7 @@ int LagrangeElem2DStructSolidQuad4Node::calcStiffnessAndResidual(MatrixXd& Kloca
                 TJ   = 2*jj;
                 TJp1 = TJ+1;
 
-                fact = af*(fact1 * dN_dx[jj] + fact2 * dN_dy[jj] );
+                fact = af*(bb1*dN_dx[jj] + bb2*dN_dy[jj] );
 
                 Klocal(TI,TJ)     += fact ;
                 Klocal(TIp1,TJp1) += fact ;

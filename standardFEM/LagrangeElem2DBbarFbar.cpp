@@ -23,10 +23,14 @@ LagrangeElem2DBbarFbar::LagrangeElem2DBbarFbar()
 {
   if (debug) cout << " constructor LagrangeElem2DBbarFbar\n\n";
 
+  ndim   = 2;
   degree = 1;
   npElem = 4;
+  nlbf   = 4;
   ndof   = 2;
+  nsize  = npElem*ndof;
 }
+
 
 LagrangeElem2DBbarFbar::~LagrangeElem2DBbarFbar()
 {
@@ -37,9 +41,10 @@ LagrangeElem2DBbarFbar::~LagrangeElem2DBbarFbar()
 void LagrangeElem2DBbarFbar::prepareElemData()
 {
   LagrangeElement::prepareElemData();
-  
+
   return;
 }
+
 
 void LagrangeElem2DBbarFbar::prepareElemData2()
 {
@@ -63,7 +68,7 @@ int LagrangeElem2DBbarFbar::calcStiffnessAndResidual(MatrixXd& Klocal, VectorXd&
 int LagrangeElem2DBbarFbar::calcStiffnessAndResidualSS(MatrixXd& Klocal, VectorXd& Flocal)
 {
     double F[4], Fc[4], detFc, detF=0.0, F33, fact, fact1, fact2, dvol, dvol0;
-    double Jac, bb1, bb2, bb3;
+    double Jac, bb1, bb2, bb3, cc1, cc2, cc3;
 
     VectorXd  N(nlbf), dN_dx(nlbf), dN_dy(nlbf);
     VectorXd  dispC(nsize), velC(nsize), accC(nsize);
@@ -114,11 +119,10 @@ int LagrangeElem2DBbarFbar::calcStiffnessAndResidualSS(MatrixXd& Klocal, VectorX
 
     //MatrixXd  Idev(4,4);
     //double  r1d3 = 1.0/3.0, r2d3 = 2.0*r1d3;
-    //Idev[0][0] =  r2d3;     Idev[0][1] = -r1d3;	 Idev[0][2] = -r1d3;    Idev[0][3] = 0.0;
-    //Idev[1][0] = -r1d3;	   Idev[1][1] =  r2d3;	 Idev[1][2] = -r1d3;    Idev[1][3] = 0.0;
-    //Idev[2][0] = -r1d3; 	   Idev[2][1] = -r1d3;	 Idev[2][2] =  r2d3;    Idev[2][3] = 0.0;
-    //Idev[3][0] =  0.0;      Idev[3][1] =  0.0;    Idev[3][2] =  0.0;	Idev[3][3] = 1.0;
-
+    //Idev[0][0] =  r2d3;     Idev[0][1] = -r1d3;  Idev[0][2] = -r1d3;    Idev[0][3] = 0.0;
+    //Idev[1][0] = -r1d3;     Idev[1][1] =  r2d3;  Idev[1][2] = -r1d3;    Idev[1][3] = 0.0;
+    //Idev[2][0] = -r1d3;     Idev[2][1] = -r1d3;  Idev[2][2] =  r2d3;    Idev[2][3] = 0.0;
+    //Idev[3][0] =  0.0;      Idev[3][1] =  0.0;   Idev[3][2] =  0.0;     Idev[3][3] = 1.0;
 
     //  compute determinant tr(F) in element centre 
 
@@ -144,24 +148,20 @@ int LagrangeElem2DBbarFbar::calcStiffnessAndResidualSS(MatrixXd& Klocal, VectorX
       Wmat2(jj) = dN_dy[jj] ;
     }
 
-    double rho = elmDat[5] ;
-    bforce[0]  = elmDat[6]*timeFunction[0].prop ;
-    bforce[1]  = elmDat[7]*timeFunction[0].prop ;
-
-    count = 1;   ll = 0;   err = 0;   isw = 3;
-   
+    double rho0 = elmDat[5] ;
+    double rho  = rho0;
+    bforce[0]   = elmDat[6]*timeFunction[0].prop ;
+    bforce[1]   = elmDat[7]*timeFunction[0].prop ;
 
     getGaussPointsQuad(nGP, gausspoints1, gausspoints2, gaussweights);
 
+    count = 1;   ll = 0;   err = 0;   isw = 3;
     for(gp=0; gp<nGP; gp++)
     {
         param[0] = gausspoints1[gp];
         param[1] = gausspoints2[gp];
 
         GeomData->computeBasisFunctions2D(0, 2, degree, param, nodeNums, &N(0), &dN_dx(0), &dN_dy(0), Jac);
-        
-        //for(ii=0; ii<nlbf; ii++)
-          //cout << N[ii] << '\t' << dN_dx[ii] << '\t' << dN_dy[ii] << endl;
 
         fact  = gaussweights[gp] * thick;
         dvol0 = Jac * fact;
@@ -178,7 +178,7 @@ int LagrangeElem2DBbarFbar::calcStiffnessAndResidualSS(MatrixXd& Klocal, VectorX
 
         //cout << dvol << '\t' << F[0] << '\t' << F[1] << '\t' << F[2] << '\t' << F[3] << endl;
 
-        //if(detF < 0.0)   return 1;
+        if(detF < 0.0)   return 1;
 
         // ADJUST F33 fOR 2D PROBLEMS BASED ON THE ASSUMPTIONS OF PLANE STRESS/PLANE STRAIN/AXISYMMETRIC
 
@@ -265,21 +265,21 @@ int LagrangeElem2DBbarFbar::calcStiffnessAndResidualSS(MatrixXd& Klocal, VectorX
 
           for(jj=0; jj<nlbf; jj++)
           {
-            bb1 = dN_dx[jj];
-            bb2 = dN_dy[jj];
+            cc1 = dN_dx[jj];
+            cc2 = dN_dy[jj];
 
-            fact1 = (Wmat1(jj) - bb1)/3.0;
-            fact2 = (Wmat2(jj) - bb2)/3.0;
+            fact1 = (Wmat1(jj) - cc1)/3.0;
+            fact2 = (Wmat2(jj) - cc2)/3.0;
 
-            Bbar[0][0] = bb1+fact1;
+            Bbar[0][0] = cc1+fact1;
             Bbar[1][0] = fact1;
             Bbar[2][0] = fact1;
-            Bbar[3][0] = bb2;
+            Bbar[3][0] = cc2;
 
             Bbar[0][1] = fact2;
-            Bbar[1][1] = bb2+fact2;
+            Bbar[1][1] = cc2+fact2;
             Bbar[2][1] = fact2;
-            Bbar[3][1] = bb1;
+            Bbar[3][1] = cc1;
 
             TJ   = 2*jj;
             TJp1 = TJ+1;
@@ -294,14 +294,14 @@ int LagrangeElem2DBbarFbar::calcStiffnessAndResidualSS(MatrixXd& Klocal, VectorX
           }
         }
     }//gp
-  
+
     //printMatrix(Klocal);
     //if(elenum == 10)
       //printMatrix(Klocal);  printf("\n\n\n");  printMatrix(Mlocal);  printf("\n\n\n"); printVector(Flocal);
 
     Klocal +=  d1*Mlocal;
     Flocal -=  Mlocal*accC;
-  
+
     //Klocal /= aa;
     //cout << '\t' << " Total Volume for element # " << elenum << " is = " << totvol << endl; cout << endl;
 
@@ -313,21 +313,23 @@ int LagrangeElem2DBbarFbar::calcStiffnessAndResidualSS(MatrixXd& Klocal, VectorX
 
 int LagrangeElem2DBbarFbar::calcStiffnessAndResidualFS(MatrixXd& Klocal, VectorXd& Flocal)
 {
-    double F[4], Fc[4], detF=0.0, F33, fact, fact1, fact2, dvol, dvol0, Jac, bb1, bb2, bb3;
+    double  F[4], Fc[4], detF=0.0, F33, fact, fact1, fact2, dvol, dvol0, Jac;
+    double  bb1, bb2, bb3, cc1, cc2, cc3;
 
     VectorXd  N(nlbf), dN_dx(nlbf), dN_dy(nlbf);
     VectorXd  dispC(nsize), velC(nsize), accC(nsize);
     MatrixXd  Mlocal(nsize, nsize);
 
-    double  stre[4], cc[4][4], cc1[4][4], bc[2][4], param[2], cch[4], bforce[2];
+    double  stre[4], cc[4][4], cc0[4][4], bc[2][4], param[2], cch[4], bforce[2];
     double  detFc, trFc;
     VectorXd  Wmat1(nlbf), Wmat2(nlbf);
 
     int  ind1, ind2, kk, err, isw, count, count1, index, ll = 0, ii, jj, gp, TI, TIp1, TJ, TJp1;
 
-    double rho = elmDat[5] ;
-    bforce[0]  = elmDat[6]*timeFunction[0].prop ;
-    bforce[1]  = elmDat[7]*timeFunction[0].prop ;
+    double rho0 = elmDat[5] ;
+    double rho  = rho0;
+    bforce[0]   = elmDat[6]*timeFunction[0].prop ;
+    bforce[1]   = elmDat[7]*timeFunction[0].prop ;
 
     double af = SolnData->td(2);
     double d1 = SolnData->td(5);
@@ -365,7 +367,6 @@ int LagrangeElem2DBbarFbar::calcStiffnessAndResidualFS(MatrixXd& Klocal, VectorX
     Flocal.setZero();
     Mlocal.setZero();
 
-    
     //  compute determinant detF (tr(F)) in element center
     //
     vector<double>  gausspoints1, gausspoints2, gaussweights;
@@ -396,10 +397,10 @@ int LagrangeElem2DBbarFbar::calcStiffnessAndResidualFS(MatrixXd& Klocal, VectorX
       Wmat2(jj) = dN_dy[jj] ;
     }
 
-    count = 1;   ll = 0;   err = 0;   isw = 3;
 
     getGaussPointsQuad(nGP, gausspoints1, gausspoints2, gaussweights);
 
+    count = 1;   ll = 0;   err = 0;   isw = 3;
     for(gp=0; gp<nGP; gp++)
     {
         param[0] = gausspoints1[gp];
@@ -466,7 +467,7 @@ int LagrangeElem2DBbarFbar::calcStiffnessAndResidualFS(MatrixXd& Klocal, VectorX
             F[3] = F[3] + fact ;
         }
 
-        matlib2d_(matDat, F, &F33, stre, cc1[0], &(intVar1[ll]), &(intVar2[ll]), &dt, &matId, &nivGP, &finiteInt, &sss, &isw, &err, &count, NULL);
+        matlib2d_(matDat, F, &F33, stre, cc0[0], &(intVar1[ll]), &(intVar2[ll]), &dt, &matId, &nivGP, &finiteInt, &sss, &isw, &err, &count, NULL);
         count++;
         ll += nivGP;
 
@@ -480,7 +481,7 @@ int LagrangeElem2DBbarFbar::calcStiffnessAndResidualFS(MatrixXd& Klocal, VectorX
         {
           for(jj=0;jj<4;jj++)
           {
-            cc[ii][jj] = cc1[ii][jj] ;
+            cc[ii][jj] = cc0[ii][jj] ;
           }
         }
 
@@ -495,7 +496,6 @@ int LagrangeElem2DBbarFbar::calcStiffnessAndResidualFS(MatrixXd& Klocal, VectorX
         cc[2][3] = cc1[3][3];
         cc[3][2] = cc1[3][3];
         */
-
 
         if(finite)
           dvol *= F33;
@@ -558,30 +558,29 @@ int LagrangeElem2DBbarFbar::calcStiffnessAndResidualFS(MatrixXd& Klocal, VectorX
 
           for(jj=0; jj<nlbf; jj++)
           {
-              bb1 = dN_dx[jj];
-              bb2 = dN_dy[jj];
+              cc1 = dN_dx[jj];
+              cc2 = dN_dy[jj];
 
               TJ   = 2*jj;
               TJp1 = TJ+1;
 
-              Klocal(TI,TJ)     +=  af*(bc[0][0] * bb1 + bc[0][2] * bb2) ;
-              Klocal(TI,TJp1)   +=  af*(bc[0][1] * bb2 + bc[0][2] * bb1) ;
-              Klocal(TIp1,TJ)   +=  af*(bc[1][0] * bb1 + bc[1][2] * bb2) ;
-              Klocal(TIp1,TJp1) +=  af*(bc[1][1] * bb2 + bc[1][2] * bb1) ;
+              Klocal(TI,   TJ)   +=  af*(bc[0][0] * cc1 + bc[0][2] * cc2) ;
+              Klocal(TI,   TJp1) +=  af*(bc[0][1] * cc2 + bc[0][2] * cc1) ;
+              Klocal(TIp1, TJ)   +=  af*(bc[1][0] * cc1 + bc[1][2] * cc2) ;
+              Klocal(TIp1, TJp1) +=  af*(bc[1][1] * cc2 + bc[1][2] * cc1) ;
 
               //Klocal(TI,TJ)     +=  ( fact1 * (Wmat1(jj)-bb1) );
               //Klocal(TI,TJp1)   +=  ( fact1 * (Wmat2(jj)-bb2) );
               //Klocal(TIp1,TJ)   +=  ( fact2 * (Wmat1(jj)-bb1) );
               //Klocal(TIp1,TJp1) +=  ( fact2 * (Wmat2(jj)-bb2) );
 
-              Klocal(TI,TJ)     +=  af*( fact1 * Wmat1(jj) );
-              Klocal(TI,TJp1)   +=  af*( fact1 * Wmat2(jj) );
-              Klocal(TIp1,TJ)   +=  af*( fact2 * Wmat1(jj) );
-              Klocal(TIp1,TJp1) +=  af*( fact2 * Wmat2(jj) );
+              Klocal(TI,   TJ)   +=  af*( fact1 * Wmat1(jj) );
+              Klocal(TI,   TJp1) +=  af*( fact1 * Wmat2(jj) );
+              Klocal(TIp1, TJ)   +=  af*( fact2 * Wmat1(jj) );
+              Klocal(TIp1, TJp1) +=  af*( fact2 * Wmat2(jj) );
 
-              Mlocal(TI,  TJ)   +=  bb3*N[jj];
-              Mlocal(TIp1,TJp1) +=  bb3*N[jj];
-
+              Mlocal(TI,   TJ)   +=  bb3*N[jj];
+              Mlocal(TIp1, TJp1) +=  bb3*N[jj];
           }
         }
 
@@ -591,8 +590,8 @@ int LagrangeElem2DBbarFbar::calcStiffnessAndResidualFS(MatrixXd& Klocal, VectorX
         {
           for(ii=0; ii<nlbf; ii++)
           {
-              fact1 = dN_dx[ii] * stre[0] + dN_dy[ii] * stre[3] ;
-              fact2 = dN_dx[ii] * stre[3] + dN_dy[ii] * stre[1] ;
+              fact1 = dN_dx[ii]*stre[0] + dN_dy[ii]*stre[3] ;
+              fact2 = dN_dx[ii]*stre[3] + dN_dy[ii]*stre[1] ;
 
               TI   = 2*ii;
               TIp1 = TI+1;
@@ -602,10 +601,10 @@ int LagrangeElem2DBbarFbar::calcStiffnessAndResidualFS(MatrixXd& Klocal, VectorX
                 TJ   = 2*jj;
                 TJp1 = TJ+1;
 
-                fact = af*(fact1 * dN_dx[jj] + fact2 * dN_dy[jj]);
+                fact = af*(fact1*dN_dx[jj] + fact2*dN_dy[jj]);
 
-                Klocal(TI,TJ)     += fact ;
-                Klocal(TIp1,TJp1) += fact ;
+                Klocal(TI,   TJ)   += fact ;
+                Klocal(TIp1, TJp1) += fact ;
               }
           }
         } // if(finite)
@@ -613,7 +612,7 @@ int LagrangeElem2DBbarFbar::calcStiffnessAndResidualFS(MatrixXd& Klocal, VectorX
 
     Klocal +=  d1*Mlocal;
     Flocal -=  Mlocal*accC;
-  
+
     //Klocal /= aa;
 
     /*

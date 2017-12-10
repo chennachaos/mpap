@@ -19,9 +19,9 @@ void HB_BasisFuns(int p, double start, double incr, double u, double* N)
   int  r, j(p + 1);
 
   double temp, saved;
-  
+
   std::vector<double>  left(j), right(j);
-  
+
   N[0] = 1.0 ;
   for(j=1;j<=p;j++)
   {
@@ -91,7 +91,7 @@ void HB_DersBasisFuns(int p, double start, double incr, double u, int n, double*
   {
     s1=0; s2=1; // alternate rows in array a
     a[0][0] = 1.0 ;
-    
+
     // Compute the kth derivative
     for(k=1;k<=n;k++)
     {
@@ -120,7 +120,7 @@ void HB_DersBasisFuns(int p, double start, double incr, double u, int n, double*
         a[s2][j] = (a[s1][j]-a[s1][j-1])/ndu[pk+1][rk+j];
         d += a[s2][j] * ndu[rk+j][pk];
       }
-      
+
       if(r<=pk)
       {
         a[s2][k] = -a[s1][k-1]/ndu[pk+1][r] ;

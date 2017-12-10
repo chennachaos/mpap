@@ -38,7 +38,7 @@ SolverMA41Eigen::SolverMA41Eigen()
 SolverMA41Eigen::~SolverMA41Eigen()
 {
   free();
-	
+
   if (ROWSCA != NULL) delete [] ROWSCA;
   if (COLSCA != NULL) delete [] COLSCA;
   if (IS     != NULL) delete [] IS;
@@ -291,7 +291,7 @@ int SolverMA41Eigen::factoriseAndSolve()
 
 
 
-void SolverMA41Eigen::free()
+int SolverMA41Eigen::free()
 {
   if (numSCA > 10) 
   {  
@@ -304,10 +304,6 @@ void SolverMA41Eigen::free()
   //mtx.free();
 
   currentStatus = EMPTY;
-  
-  return;
+
+  return 0;
 }
-    
-
-
-

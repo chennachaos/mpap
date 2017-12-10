@@ -54,7 +54,7 @@ ImmersedSolid::~ImmersedSolid()
 
   if(solver != NULL)
     delete solver;
-  
+
   --count;
 }
 
@@ -65,7 +65,7 @@ void ImmersedSolid::setTimeParam()
   //SolnData.setTimeIncrementType(4);
 
   SolnData.setTimeParam();
-  
+
   return;
 }
 
@@ -81,7 +81,7 @@ void ImmersedSolid::timeUpdate()
   //filecount++;
 
   fluidAccePrev = fluidAcce;
-  
+
   SolnData.timeUpdate();
 
   if(STAGGERED)
@@ -216,7 +216,7 @@ void ImmersedSolid::setImmersedElemActiveFlag(vector<int>& datatemp)
 void  ImmersedSolid::computeCentroid(int index)
 {
     centroid.setZero();
-  
+
     switch(index)
     {
       case 0: // original configuration
@@ -313,8 +313,6 @@ void  ImmersedSolid::computeAABB(int index)
           {
             val = GeomData.NodePosCur[aa][ii];
 
-            //cout << aa << '\t' << ii << '\t' << val << endl;
-
             if( val < bbox.minBB[ii]  )
               bbox.minBB[ii] = val ;
 
@@ -327,7 +325,7 @@ void  ImmersedSolid::computeAABB(int index)
     }
 
     //bbox.printSelf();
-  
+
     for(ii=0; ii<ImmersedFaces.size(); ii++)
       ImmersedFaces[ii]->computeAABB();
 
@@ -346,9 +344,7 @@ void  ImmersedSolid::computeTotalForce()
 
       for(int aa=0;aa<ImmIntgElems.size();aa++)
       {
-        //cout << " aa " << aa << endl;
         ImmIntgElems[aa]->integrateForceAndMoment(totalForce, centroid);
-        //printVector(vectemp);
       }
     }
 
@@ -372,9 +368,9 @@ void ImmersedSolid::initialise_solid_state()
 {
     SolnData.var1 = SolnData.var1Prev + mpapTime.dt*SolnData.var1DotPrev ;
     SolnData.var1Dot = SolnData.var1DotPrev;
-  
+
     updateIterStep();
-  
+
     SolnData.var1PrevIter = SolnData.var1;
 
     return;

@@ -13,7 +13,7 @@ class SolverMA41Eigen: public SolverEigen
   public:
 
     SolverMA41Eigen();
-    
+
     ~SolverMA41Eigen();
 
     vector<int>  row, col;
@@ -24,15 +24,15 @@ class SolverMA41Eigen: public SolverEigen
     int    *IS, ICNTL[20], INFO[20], KEEP[50], numSCA, MAXIS, N, NE;
 
     virtual int initialise(int p1 = 0, int p2 = 0, int p3 = 0);
-   
+
     virtual int factorise();
 
     virtual int solve();
 
     virtual int factoriseAndSolve();
 
-    virtual void free();
-    
+    virtual int free();
+
   private:
 
 };

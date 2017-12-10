@@ -1423,7 +1423,6 @@ void  HBSplineCutFEM::computeTotalForce2D(int bb)
     geom.setZero();
 
     node* ndTemp;
-
     ImmersedIntegrationElement  *lme;
     myPoly*  poly;
 
@@ -1506,8 +1505,8 @@ void  HBSplineCutFEM::computeTotalForce2D(int bb)
               trac[0] += PENALTY*(velSpec[0]-vel[0]);
               trac[1] += PENALTY*(velSpec[1]-vel[1]);
 
-              trac[0] += (stagParams[3]*rho)*acceFluid[0];
-              trac[1] += (stagParams[3]*rho)*acceFluid[1];
+              //trac[0] += (stagParams[3]*rho)*acceFluid[0];
+              //trac[1] += (stagParams[3]*rho)*acceFluid[1];
 
               //trac[0] += stagParams[3]*rho*(acceFluid[0] - acceSpec[0]);
               //trac[1] += stagParams[3]*rho*(acceFluid[1] - acceSpec[1]);
@@ -1555,7 +1554,13 @@ void  HBSplineCutFEM::computeTotalForce2D(int bb)
 
     ImmersedBodyObjects[bb]->fluidAcce = stagParams[4]*fluidAcceOnSolid;
 
-  return;
+    fluidAcceOnSolid.resize(0);
+
+    ndTemp = nullptr;
+    lme    = nullptr;
+    poly   = nullptr;
+
+    return;
 }
 
 

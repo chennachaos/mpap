@@ -1623,12 +1623,13 @@ void TreeNode<3>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
                   fact = (16.0)*(1.0/(y1-y0)/(y1-y0))*(1.0/(z1-z0)/(z1-z0));
                   //fact = 10000.0/324.0;
                   //specVal = DirichletData[aa][2]*fact*(y1-geom[1])*(geom[1]-y0)*(z1-geom[2])*(geom[2]-z0);  // plate Wall
-                  
-                  //specVal = DirichletData[aa][2]*16.0*(6.0/y1/y1)*(y1-yy)*(yy-y0);
-                  //specVal = 16.0*DirichletData[aa][2]*geom[1]*geom[2]*(H-geom[1])*(H-geom[2])/pow(H,4.0);
 
-                  y0 = 0.0;    y1 = 0.41;  z0 = 0.0;    z1 = 0.41; // Turek beam
+                  y0 = 0.0;    y1 = 0.41;  z0 = 0.0;    z1 = 0.41; // Turek cylinder
                   specVal = DirichletData[aa][2]*(6.0/y1/y1)*(y1-geom[1])*(geom[1]-y0)*(6.0/z1/z1)*(z1-geom[2])*(geom[2]-z0);
+
+                  //y0 = 0.0;    y1 = 0.41;  z0 = -0.35;    z1 = 0.35; // Turek beam 3D
+                  //fact = (4.0/(y1-y0)/(y1-y0))*(4.0/(z1-z0)/(z1-z0));
+                  //specVal = DirichletData[aa][2]*fact*(y1-geom[1])*(geom[1]-y0)*(z1-geom[2])*(geom[2]-z0);
                 }
               }
               //

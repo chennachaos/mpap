@@ -50,12 +50,12 @@ SolverPardisoPetsc::~SolverPardisoPetsc()
 
 
 
-
 int SolverPardisoPetsc::initialise(int numProc, int matrixType, int nrow1)
 {
   nRow = nCol = nrow1;
 
-  solnX.resize(nRow);
+  rhsTemp.resize(nRow, 0.0);
+  solnTemp.resize(nRow, 0.0);
 
   char fct[] = "SolverPardisoPetsc::initialise";
 
@@ -91,7 +91,8 @@ int SolverPardisoPetsc::initialise(int numProc, int matrixType, int nrow1)
   IPARM[0] = 0;     // PARADISO will set IPARM to default values
 
   IPARM[2] = max(1,numProc);  // number of processors (no default value available)
-  
+
+/*
   tmp = getenv("OMP_NUM_THREADS");
 
   if (tmp != NULL) 
@@ -100,8 +101,7 @@ int SolverPardisoPetsc::initialise(int numProc, int matrixType, int nrow1)
     if (idum != IPARM[2]) prgError(1,fct,"set environment variable OMP_NUM_THREADS to numProc!");
   }
   else prgError(2,fct,"set environment variable OMP_NUM_THREADS!");
-
-  //cout << " qqqqqqqqqqq " << endl;
+*/
 
   pardisoinit_(PT, &MTYPE, &SOLVER, IPARM, DPARM, &error);
 
@@ -116,8 +116,6 @@ int SolverPardisoPetsc::initialise(int numProc, int matrixType, int nrow1)
 
   ierr = MatAssemblyBegin(mtx,MAT_FINAL_ASSEMBLY);//CHKERRQ(ierr);
   ierr = MatAssemblyEnd(mtx,MAT_FINAL_ASSEMBLY);//CHKERRQ(ierr);
-  
-  //cout << " ppppppppppp " << endl;
 
   PetscBool flag;
 
@@ -130,16 +128,14 @@ int SolverPardisoPetsc::initialise(int numProc, int matrixType, int nrow1)
            &nRow, array, csr, col, &idum, &NRHS,
            IPARM, &MSGLVL, &ddum, &ddum, &error, DPARM);
 
-  //cout << " llllllllll " << endl;
-
   if (error != 0)
   {
     COUT << "PARDISO ERROR = " << error << "\n\n";
     prgError(4,fct,"symbolic factorisation failed.");
   }
 
-  //IPARM[5] = 1; // overwrite RHS with solution
-  IPARM[5] = 0; // do not overwrite RHS with solution
+  IPARM[5] = 1; // overwrite RHS with solution
+  //IPARM[5] = 0; // do not overwrite RHS with solution
   IPARM[7] = 1; // max number of iterative refinement steps
 
   currentStatus = INIT_OK;
@@ -170,7 +166,7 @@ int SolverPardisoPetsc::factorise()
 
   currentStatus = FACTORISE_OK;
 
-  return 1;
+  return 0;
 }
 
 
@@ -211,7 +207,7 @@ int  SolverPardisoPetsc::solve()
   solverTime.solve += computerTime.stop(fct);
   solverTime.total += solverTime.solve;
 
-  return 1;
+  return 0;
 }
 
 
@@ -230,7 +226,7 @@ int  SolverPardisoPetsc::factoriseAndSolve()
 
   ierr = MatAssemblyBegin(mtx,MAT_FINAL_ASSEMBLY);//CHKERRQ(ierr);
   ierr = MatAssemblyEnd(mtx,MAT_FINAL_ASSEMBLY);//CHKERRQ(ierr);
-  
+
   //MatView(mtx, PETSC_VIEWER_STDOUT_WORLD);
 
   VecAssemblyBegin(rhsVec);
@@ -238,25 +234,44 @@ int  SolverPardisoPetsc::factoriseAndSolve()
 
   computerTime.go(fct);
 
-  PetscScalar *arrayRhs, *arraySoln;
-
+  PetscScalar *arrayRhs;
   VecGetArray(rhsVec, &arrayRhs);
-  VecGetArray(soln, &arraySoln);
+
+  int ii=0;
+  for(ii=0; ii<nRow; ii++)
+  {
+    rhsTemp[ii] = arrayRhs[ii];
+    solnTemp[ii] = 0.0;
+  }
+
+  VecRestoreArray(rhsVec, &arrayRhs);
 
   pardiso_(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
            &nRow, array, csr, col, perm, &NRHS,
-           IPARM, &MSGLVL, arrayRhs, arraySoln, &error, DPARM);
+           IPARM, &MSGLVL, &rhsTemp[0], &solnTemp[0], &error, DPARM);
+
+  VecZeroEntries(soln);
+  for(ii=0; ii<nRow; ii++)
+  {
+    ierr = VecSetValue(soln, ii, solnTemp[ii], ADD_VALUES);
+  }
+
+  VecAssemblyBegin(soln);
+  VecAssemblyEnd(soln);
+
+  printf("Peak memory [kB] phase 1       = %d \n", IPARM[14]);
+  printf("Permanent integer memory [kb]. = %d \n", IPARM[15]);
+  printf("Peak real memory [kB]          = %d \n", IPARM[16]);
+  printf("Number of nonzeros in LU.      = %d \n", IPARM[17]);
+  printf("Gflops for LU factorization.   = %d \n", IPARM[18]);
 
   solverTime.total             -= solverTime.factoriseAndSolve;
   solverTime.factoriseAndSolve += computerTime.stop(fct);
   solverTime.total             += solverTime.factoriseAndSolve;
 
-  VecRestoreArray(rhsVec, &arrayRhs);
-  VecRestoreArray(soln, &arraySoln);
-
   currentStatus = FACTORISE_OK;
 
-  return 1;
+  return 0;
 }
 
 
@@ -287,7 +302,7 @@ int SolverPardisoPetsc::free()
 
   currentStatus = EMPTY;
 
-  return 1;
+  return 0;
 }
 
 

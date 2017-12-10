@@ -29,22 +29,21 @@ class SolverEigen
     double normPrev, normCur, normRef; // norm of solution error
 
     myIncompleteLUT<double>  precond;
-    
+
     ////////////////////////////
     //
     // member functions
     //
     ///////////////////////////
-    
 
     SolverEigen();
 
     virtual ~SolverEigen();
 
     virtual int initialise(int p1 = 0, int p2 = 0, int p3 = 0);
-    
+
     int setSolverAndParameters();
-    
+
     void setAlgorithmType(int tt)
     {  algoType = tt; return; }
 
@@ -52,7 +51,7 @@ class SolverEigen
 
     virtual void zeroMtx();
 
-    virtual void free();
+    virtual int free();
 
     virtual void printInfo();
 
@@ -63,7 +62,7 @@ class SolverEigen
     virtual int assembleMatrixAndVector(vector<int>& row, vector<int>& col, MatrixXd& Klocal, VectorXd& Flocal);
 
     virtual int assembleMatrixAndVector(int r1, int c1, vector<int>& row, vector<int>& col, MatrixXd& Klocal, VectorXd& Flocal);
-    
+
     virtual int assembleMatrixAndVector(int r1, int c1, vector<int>& row, MatrixXd& Klocal, VectorXd& Flocal);
 
     virtual int assembleMatrixAndVectorCutFEM(int r1, int c1, vector<int>& tempVec, vector<int>& forAssy, MatrixXd& Klocal, VectorXd& Flocal);
@@ -81,28 +80,28 @@ class SolverEigen
     virtual int solve();
 
     virtual int factoriseAndSolve();
-    
+
     void setupMatricesAndVectors();
-    
+
     void solverSchurCG();
-    
+
     void solverSchurGMRES();
-    
+
     void solverSchurBiCGSTAB();
-    
+
     void solverUzawaType1();
-    
+
     void solverUzawaType2();
-    
+
     int  myBiCGSTAB();
-    
+
     void resetPrecondFlag()
     {
       update_precond = 1;
     }
-    
+
     void  updatePreconditioner();
-    
+
     void  computeConditionNumber();
 
 };

@@ -49,8 +49,11 @@ class PropertyItem;
                                     "MindlinPlateElement", \
                                     "KirchhoffPlateElement", \
                                     "LagrangeElem3DShellQuad4Node", \
-                                    "ContactElement2D1nodedContactWithXaxis", \
-                                    "ContactElement2D1nodedContactWithYaxis",NULL}
+                                    "ContactElement2D1nodedContactAlongXaxis", \
+                                    "ContactElement2D1nodedContactAlongYaxis", \
+                                    "ContactElement3D1nodedContactAlongXaxis", \
+                                    "ContactElement3D1nodedContactAlongYaxis", \
+                                    "ContactElement3D1nodedContactAlongZaxis",NULL}
 
 
 class StandardFEM: public Domain

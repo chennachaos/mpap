@@ -242,16 +242,19 @@ int SolverPetsc::solve()
   KSPConvergedReason reason;
   KSPGetConvergedReason(ksp, &reason);
 
+  PetscInt its;
+  ierr = KSPGetIterationNumber(ksp, &its); CHKERRQ(ierr);
+
   if(reason<0)
   {
-    PetscPrintf(MPI_COMM_WORLD, "Divergence.\n");
+    PetscPrintf(MPI_COMM_WORLD, "\n Divergence... %d iterations. \n\n", its);
+    return 1;
   }
-  else
+  else
   {
-    PetscInt its;
-    ierr = KSPGetIterationNumber(ksp, &its); CHKERRQ(ierr);
     PetscPrintf(MPI_COMM_WORLD, "\n Convergence in %d iterations.\n\n", its);
   }
+
 
   //ierr = KSPView(ksp,PETSC_VIEWER_STDOUT_WORLD);//CHKERRQ(ierr);
   //VecView(soln, PETSC_VIEWER_STDOUT_WORLD);

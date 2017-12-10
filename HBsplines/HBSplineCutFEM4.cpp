@@ -168,7 +168,7 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
         ee = findCellNumber(geom);
 
         geometryToParametric(geom, param);
-        
+
         myData.param = param;
         myData.geom  = geom;
 
@@ -272,14 +272,15 @@ int HBSplineCutFEM::factoriseSolveAndUpdate()
 
   //VecView(solverPetsc->rhsVec, PETSC_VIEWER_STDOUT_WORLD);
 
-  solverPetsc->factoriseAndSolve();
+  if( solverPetsc->factoriseAndSolve() )
+    return 1;
 
   //VecView(solver2->soln, PETSC_VIEWER_STDOUT_WORLD);
 
   /////////////////////////////////////////////////////////////////////////////
   // get the solution vector onto all the processors
   /////////////////////////////////////////////////////////////////////////////
-  
+
   Vec            vec_SEQ;
   VecScatter     ctx;
   PetscScalar *arrayTemp;
@@ -330,7 +331,6 @@ int HBSplineCutFEM::factoriseSolveAndUpdate()
   double tend = MPI_Wtime();
   PetscPrintf(MPI_COMM_WORLD, " HBSplineCutFEM::factoriseSolveAndUpdate() took %f  milliseconds \n", (tend-tstart)*1000);
 
-
   return 0;
 }
 
@@ -349,7 +349,7 @@ void HBSplineCutFEM::computeElementErrors(int index)
     node  *nd;
 
     totalError = 0.0;
-    
+
     if(index < 4) // L2 or H1 norm based errors
     {
        for(ee=0; ee<activeElements.size(); ee++)
@@ -362,7 +362,7 @@ void HBSplineCutFEM::computeElementErrors(int index)
             domTemp = nd->getDomainNumber() ;
             //if(domTemp == 1)
             //{
-              
+
               //cout << ee << '\t' << elems[ee]->getError() << endl;
               totalError +=  nd->calcError(index, domTemp);
             //}
@@ -382,7 +382,7 @@ void HBSplineCutFEM::computeElementErrors(int index)
        }
        totalError /= count;
     }
-    
+
     if(index < 3)
       printf(" \n\n \t L2 Error = %12.6E \n\n " , totalError);
     else

@@ -16,15 +16,15 @@ myLine::~myLine()
 void  myLine::computeAABB()
 {
   //bbox.initialize();
-  
+
   bbox.minBB[0] = min(ptList[0][0], ptList[1][0]);
   bbox.maxBB[0] = max(ptList[0][0], ptList[1][0]);
 
   bbox.minBB[1] = min(ptList[0][1], ptList[1][1]);
   bbox.maxBB[1] = max(ptList[0][1], ptList[1][1]);
-  
+
   return;
-}  
+}
 
 
 
@@ -57,9 +57,9 @@ int  myLine::IntersectWithRay(Ray& ray1, vector<myPoint>& ptOut)
 double myLine::distanceFromPoint(myPoint& pt)
 {
   myPoint p1 = ptList[0] - ptList[1];
-  
+
   p1.normalize();
-  
+
   return ( p1[0]*(ptList[0][1]-pt[1]) - p1[1]*(ptList[0][0]-pt[0]) );
 }
 
@@ -109,12 +109,12 @@ int myLine::IntersectWithLine(myLine& lnTemp, vector<myPoint>& ptOut)
     // check if they are not collinear
     if( (perp2D(d1, w) != 0.0) || (perp2D(d2, w) != 0.0) )
       return 0;
-    
+
     // parallel and collinear line segments
     // get the overlap, if any
-  
+
     myPoint  w2 = ptList[1] - lnTemp.ptList[0];
-  
+
     //r1 = d2[0]*lnTemp.ptList[0][0] + d2[1]*lnTemp.ptList[0][1] ;
 
     //t1 = (w[0]*lnTemp.ptList[0][0] + w[1]*lnTemp.ptList[0][1] )/r1;
@@ -133,7 +133,7 @@ int myLine::IntersectWithLine(myLine& lnTemp, vector<myPoint>& ptOut)
 
     if( t2 < llim || t1 > ulim) // disjoint line segments
       return 0;
-    
+
     if( t1 < llim )
       ptOut.push_back(lnTemp.ptList[0]);
 
@@ -221,11 +221,11 @@ int  myLine::computeBasisFunctions(myPoint& param, myPoint& geom, VectorXd&  Nb,
     {
       geom[0] +=  (ptList[ii][0] * Nb[ii]);
       geom[1] +=  (ptList[ii][1] * Nb[ii]);
-      
+
       dx +=  (ptList[ii][0] * dN1[ii]);
       dy +=  (ptList[ii][1] * dN1[ii]);
     }
-    
+
     Jac = sqrt(dx*dx+dy*dy);
 
     //double  du_dx = 1.0/Jac ;
@@ -238,15 +238,5 @@ int  myLine::computeBasisFunctions(myPoint& param, myPoint& geom, VectorXd&  Nb,
 }
 
 
-
 }
-
-
-
-
-
-
-
-
-
 

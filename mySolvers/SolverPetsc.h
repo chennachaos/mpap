@@ -21,7 +21,7 @@ class SolverPetsc
     PC   pc; // preconditioner context
 
     PetscInt nRow, nCol, nnz;
-    
+
     MatInfo info;
 
     int currentStatus;
@@ -29,11 +29,11 @@ class SolverPetsc
     bool  checkIO;
 
     PetscReal norm; // norm of solution error
-    
+
     PetscErrorCode ierr;
 
     PetscMPIInt size;
-    
+
     PetscViewer    viewer_matx, viewer_vect;
 
     ////////////////////////////
@@ -41,14 +41,13 @@ class SolverPetsc
     // member functions
     //
     ///////////////////////////
-    
 
     SolverPetsc();
 
     virtual ~SolverPetsc();
 
     virtual int initialise(int p1 = 0, int p2 = 0, int p3 = 0);
-    
+
     int setSolverAndParameters();
 
     virtual bool isChildOfSolverSparse(void) { return false; }
@@ -84,9 +83,9 @@ class SolverPetsc
     virtual int solve();
 
     virtual int factoriseAndSolve();
-    
+
     int  solveSerial(SparseMatrixXd& matEigen, VectorXd& rhsPetsc, VectorXd& solnPetsc);
-    
+
     int  solveParallel(SparseMatrixXd& matEigen, VectorXd& rhsPetsc, VectorXd& solnPetsc);
 
 };

@@ -1,18 +1,15 @@
 
 #include "LagrangeElement.h"
-
 #include "Debug.h"
 #include "PropertyTypeEnum.h"
 #include "MpapTime.h"
 #include "TimeFunction.h"
-
 #include "BasisFunctionsLagrange.h"
 #include "GeomDataLagrange.h"
 #include "SolutionData.h"
 #include "Functions.h"
 #include "QuadratureUtil.h"
 #include "FunctionsMaterial.h"
-
 #include "KimMoinFlow.h"
 
 extern MpapTime           mpapTime;
@@ -86,13 +83,9 @@ void LagrangeElement::prepareElemData()
     matDat = &(SolnData->MatlProp[matType].data[0]);
 
     nGP         = (int) elmDat[0] ;
-
     finiteInt   = (int) elmDat[2] ;
     sss         = (int) elmDat[3] ;
     thick       = elmDat[4] ;
-    //bforce[0] = elmDat[5] ;
-    //bforce[1] = elmDat[6] ;
-    //rho0      = elmDat[7] ;
     matId       = SolnData->MatlProp[matType].id + 1;
     finite      = (finiteInt >= 1) ;
     axsy        = (sss == 3);
@@ -460,7 +453,7 @@ int  LagrangeElement::applyDirichletBCs(MatrixXd& Klocal, VectorXd& Flocal)
         if( bb != -1 )
         {
           Flocal(jj) -= Klocal(jj, ii) * fact;
-		    }
+        }
       }
     }
   }
@@ -776,7 +769,7 @@ int  LagrangeElement::calcError(int index)
 
     // computing error for Navier-Stokes
     ///////////////////////////////////////////////////////////
-    
+
     //Stokes2DEx1  analy;
     //Stokes2DEx2  analy;
 
@@ -801,8 +794,6 @@ int  LagrangeElement::calcError(int index)
     double  param[2], geom[2];
 
     elemError = 0.0;
-    
-
 
  if(index < 3) // L2 norm in x-velocity (index=0), y-velocity (index=1) and pressure (index=2)
  {
@@ -826,7 +817,7 @@ int  LagrangeElement::calcError(int index)
           val -= computeValue(index, N);
 
           //printf(" computed, exact and difference \t %12.8f \t %12.8f \t %12.8f  \t %12.8f   \t %12.8f \n", vx, vx2, vy, vy2, diff);
-          
+
           elemError += ( (val*val) * dvol );
     }//gp1
     }//gp2
@@ -869,7 +860,7 @@ int  LagrangeElement::calcError(int index)
           val = v[0]*v[0]+v[1]*v[1] + F(0,0)*F(0,0)+F(0,1)*F(0,1)+F(1,0)*F(1,0)+F(1,1)*F(1,1);
 
           //printf(" computed, exact and difference \t %12.8f \t %12.8f \t %12.8f \n", dx, dy, diff);
-        
+
           elemError += ( val * dvol );
     }//gp1
     }//gp2
@@ -896,7 +887,7 @@ void  LagrangeElement::computeMomentum(int index1, int index2, VectorXd& momentu
 
   int   err,  isw,  count,  count1, index, ll = 0, ii, jj, gp1, gp2;
   int   ind1, ind2, kk, DIM=2;
-  
+
   double  rho  = elmDat[5] ;
 
   count = 1;   ll = 0;   err = 0;   isw = 3;
@@ -973,16 +964,3 @@ void  LagrangeElement::computeMomentum(int index1, int index2, VectorXd& momentu
   return;
 }
 
-  
-  
-  
-  
-
-  
-  
-  
-  
-  
-  
-  
-  

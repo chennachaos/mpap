@@ -782,7 +782,7 @@ void GeomDataHBSplines::computeBasisFunctions2D(const myPoint& start, const myPo
     HB_DersBasisFuns(degree[1], start[1], incr[1], param[1], 1, ders2);
 
     double  fact3, fact4;
-    
+
     count = 0;
     for(jj=0; jj<=degree[1]; jj++)
     {

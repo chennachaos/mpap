@@ -1,17 +1,17 @@
-#ifndef incl_ContactElement2D1nodedContactWithYaxis_h
-#define incl_ContactElement2D1nodedContactWithYaxis_h
+#ifndef incl_ContactElement2D1nodedContactAlongYaxis_h
+#define incl_ContactElement2D1nodedContactAlongYaxis_h
 
 #include "LagrangeElement.h"
 
 
 
-class ContactElement2D1nodedContactWithYaxis: public LagrangeElement
+class ContactElement2D1nodedContactAlongYaxis: public LagrangeElement
 {
     public:
 
-        ContactElement2D1nodedContactWithYaxis();
+        ContactElement2D1nodedContactAlongYaxis();
 
-        ~ContactElement2D1nodedContactWithYaxis();
+        ~ContactElement2D1nodedContactAlongYaxis();
 
         virtual int getElmTypeNameNum()
         {

@@ -28,7 +28,7 @@ void ImmersedSolid::adjustBoundaryPoints(double* minVal, double* maxVal)
     for(ii=0; ii<GeomData.NodePosOrig.size(); ii++)
     {
       pt1 = GeomData.NodePosOrig[ii];
-      
+
       for(jj=0; jj<DIM; jj++)
       {
         if( abs(pt1[jj]-minVal[jj]) < tol1 )
@@ -273,7 +273,7 @@ void  ImmersedSolid::setImmersedFaces()
     //////////////////
     // CGAL
     //////////////////
-    
+
     myPoly* poly;
     myPoint  pt1, pt2, pt3, pt4, normal;
     int ii=0, jj=0, kk=0;
@@ -319,7 +319,7 @@ void  ImmersedSolid::setImmersedFaces()
         lineVTK->GetPointIds()->SetId(1, ImmIntgElems[ii]->pointNums[1]);
 
         polyList->InsertNextCell(lineVTK);
-      
+
         uGridVTK2->InsertNextCell(lineVTK->GetCellType(), lineVTK->GetPointIds());
 
         //vertexVTK2->GetPointIds()->SetId(0, ii);
@@ -520,7 +520,6 @@ void ImmersedSolid::updateImmersedFaces()
 
       pointsCGAL.push_back(CGAL_Point(pt1[0], pt1[1], pt1[2]));
     }
-  
 
     int  nodesPerFace = ImmIntgElems[0]->pointNums.size(); // assumed that all the faces are of same type - triangle or quadrilateral
 

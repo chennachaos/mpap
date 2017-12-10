@@ -471,8 +471,8 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
           knotEnd   = ndTemp->getKnotEnd();
           knotIncr  = ndTemp->getKnotIncrement();
 
-          //if( !(ndTemp->isCutElement()) )
-          if( ndTemp->getDomainNumber() < 10 )
+          if( !(ndTemp->isCutElement()) )
+          //if( ndTemp->getDomainNumber() < 10 )
           {
             //if( ndTemp->getDomainNumber() == 0 )
             //{
@@ -609,9 +609,11 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
         knotEnd   = ndTemp->getKnotEnd();
         knotIncr  = ndTemp->getKnotIncrement();
 
-        if( ndTemp->getDomainNumber() == 0 )
+        if( !(ndTemp->isCutElement()) )
         //if( ndTemp->getDomainNumber() <= 10 )
         {
+          if( ndTemp->getDomainNumber() == 0 )
+          {
             fact = knotIncr[0]/resln[0];
             create_vector(knotBegin[0], knotEnd[0], fact, uu);
 
@@ -673,11 +675,10 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
             uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
             cellDataVTK->InsertNextValue(0);
             cellDataVTK2->InsertNextValue(ndTemp->getSubdomainId());
-
-            //cout << " ooooooooooooo " << endl;
+          }
         } //if( !nd->isCutElement() )
-        //else // the element is cutCell
-        if( ndTemp->getDomainNumber() == -1 )
+        else // the element is cutCell
+        //if( ndTemp->getDomainNumber() == -1 )
         {
           vtkSmartPointer<vtkTriangle> triaVTK =  vtkSmartPointer<vtkTriangle>::New();
 
@@ -688,7 +689,7 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
             poly = ndTemp->subTrias[ii];
 
             if( poly->getDomainNumber() == 0 )
-	          {
+            {
               for(kk=0; kk<3; kk++)
               {
                 geom = poly->GetPoint(kk);

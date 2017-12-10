@@ -10,8 +10,7 @@
 #include "typedefs.h"
 
 
-extern MpapTime           mpapTime;
-
+extern  MpapTime  mpapTime;
 
 
 
@@ -45,7 +44,8 @@ void  HBSplineCutFEM::applyInterfaceTerms2D()
       for(ii=0; ii<DIM; ii++)
         nlf *= (degree[ii]+1);
 
-      double  fact=0.0, fact1=0.0, fact2=0.0, dvol=0.0, PENALTY=0.0, detJ=0.0;
+      double  fact=0.0, fact1=0.0, fact2=0.0, dvol=0.0, detJ=0.0;
+      double  PENALTY1=0.0, PENALTY2=0.0;
       double  pres=0.0, presPrev=0.0, x0=0.0, y0=0.0, x1=0.0, y1=0.0, rad=0.0;
       double  bb1=0.0, bb2=0.0, NitscheFact=0.0, c1=0.0, hx=0.0, hy=0.0;
       double  Ta[6], Tb[6], FlowRate=6.545*0.5;
@@ -74,7 +74,7 @@ void  HBSplineCutFEM::applyInterfaceTerms2D()
       start1 = fluidDOF;
       for(bb=0;bb<ImmersedBodyObjects.size();bb++)
       {
-        PENALTY     = ImmersedBodyObjects[bb]->getPenaltyParameter();
+        PENALTY1    = ImmersedBodyObjects[bb]->getPenaltyParameter();
         isNitsche   = ImmersedBodyObjects[bb]->getNitscheFlag();
         NitscheFact = ImmersedBodyObjects[bb]->getNitscheFact();
 
@@ -115,7 +115,7 @@ void  HBSplineCutFEM::applyInterfaceTerms2D()
               // the normal from the surface of the immersed body should be away from the fluid
               // the default behaviour is assumed to be that 
               // the immersed polygon is oriented clockwise
-              
+
               poly->computeNormal(geom, normal);
 
               //printf("normal     ... %12.6f \t %12.6f \t %12.6f \n", normal[0], normal[1], normal[2]);
@@ -139,11 +139,11 @@ void  HBSplineCutFEM::applyInterfaceTerms2D()
                 {
                   //cout << " elnum = " << elnum << endl;
                   //printVector(nd2->domNums);
-                
+
                   if( abs(geom[1]-bbTemp.minBB[1]) < 1.0e-8 ) // bottom edge
                   {
                     nd3 = nd2->getNeighbour(EAST);
-                  
+
                     if( (nd3->domNums.size() == 1) && (nd3->domNums[0] != 0) )
                     {
                       nd4 = nd2->getNeighbour(SOUTH);
@@ -158,7 +158,7 @@ void  HBSplineCutFEM::applyInterfaceTerms2D()
                   else if( abs(geom[1]-bbTemp.maxBB[1]) < 1.0e-8 ) // top edge
                   {
                     nd3 = nd2->getNeighbour(EAST);
-                  
+
                     if( (nd3->domNums.size() == 1) && (nd3->domNums[0] != 0) )
                     {
                       nd4 = nd2->getNeighbour(NORTH);
@@ -187,6 +187,11 @@ void  HBSplineCutFEM::applyInterfaceTerms2D()
                 //
 
                 geometryToParametric(geom, param);
+
+                PENALTY2 = PENALTY1;
+                // to avoid singularities at the corners
+                //if( nd->isBackBoundary() )
+                  //PENALTY2 = PENALTY1*10000.0;
 
                 nr = nd->forAssyVec.size();
 
@@ -250,7 +255,7 @@ void  HBSplineCutFEM::applyInterfaceTerms2D()
                   TIp2 = TI+2;
 
                   bb1 = N[ii] * dvol;
-                  bb2 = bb1 * PENALTY;
+                  bb2 = bb1 * PENALTY2;
 
                   Ta[0] = (dvol*mu)*( dN_dx[ii]*normal[0] + dN_dy[ii]*normal[1] );
                   Ta[1] = 0.0;
@@ -306,7 +311,7 @@ void  HBSplineCutFEM::applyInterfaceTerms2D()
                   // stabilisation terms
                   F1(TI)   += (bb2*vel[0]);
                   F1(TIp1) += (bb2*vel[1]);
-                  
+
                   // Nitsche terms
 
                   F1(TI)   += (bb1*trac[0]);
@@ -603,7 +608,7 @@ void  HBSplineCutFEM::applyInterfaceTerms3D()
                 ///////////////////////////////////
                 // compute the stresses and tractions
                 ///////////////////////////////////
-              
+
                 //nd->computeVelocityAndStressCur(param, vel1, stress1);
 
                 stress(0,0) = ndTemp->computeValueCur(0, dN_dx);
@@ -814,7 +819,7 @@ void  HBSplineCutFEM::applyGhostPenalty2D()
     // where, diameter of a cut element is taken to be the diagonal of that element
 
     ii = elems[cutCellIds[0]]->getLevel();
-    
+
     for(ee=0; ee<cutCellIds.size(); ee++)
     {
       ii = max( ii, elems[cutCellIds[ee]]->getLevel() );
@@ -914,7 +919,7 @@ void  HBSplineCutFEM::applyGhostPenalty2D()
               normal2 = -normal1;
 
               JacMultLoc = nd1->getJacBoundary(side);
-        
+
               for(gp2=0;gp2<boundaryGPs2.size();gp2++)
               {
                   param[1] = 0.5 * (knotIncr1[1] * boundaryGPs2[gp2] + knotSum1[1]);

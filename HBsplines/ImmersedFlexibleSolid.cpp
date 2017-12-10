@@ -134,7 +134,7 @@ void  ImmersedFlexibleSolid::setSolidElements(vector<vector<int> >& elemConn)
       prepareMatlProp();
 
     int   ee=0, ii=0, jj=0, kk=0, ind=0;
-    bool  nContX=false, nContY=false;
+    bool  nContX=false, nContY=false, nContZ=false;
 
     //cout << " nelem and  ndof " << nElem << '\t' << ndof << '\t' << npElem << endl;
     //cout << " SolnData.ElemProp[0].id = " << SolnData.ElemProp[0].id << endl;
@@ -148,15 +148,34 @@ void  ImmersedFlexibleSolid::setSolidElements(vector<vector<int> >& elemConn)
     nElem_Constraint = 0;
     for(ee=0;ee<nElem;ee++)
     {
+      // contact element along X axis, 2D
       if(SolnData.ElemProp[elemConn[ee][0]].id == 33)
       {
         nContX = true;
         nElem_Constraint++;
       }
-
+      // contact element along Y axis, 2D
       if(SolnData.ElemProp[elemConn[ee][0]].id == 34)
       {
         nContY = true;
+        nElem_Constraint++;
+      }
+      // contact element along X axis, 3D
+      if(SolnData.ElemProp[elemConn[ee][0]].id == 35)
+      {
+        nContX = true;
+        nElem_Constraint++;
+      }
+      // contact element along Y axis, 3D
+      if(SolnData.ElemProp[elemConn[ee][0]].id == 36)
+      {
+        nContY = true;
+        nElem_Constraint++;
+      }
+      // contact element along Z axis, 3D
+      if(SolnData.ElemProp[elemConn[ee][0]].id == 37)
+      {
+        nContZ = true;
         nElem_Constraint++;
       }
 
@@ -184,10 +203,11 @@ void  ImmersedFlexibleSolid::setSolidElements(vector<vector<int> >& elemConn)
     int ndof_temp1 = ndof;
     int ndof_temp2 = ndof_temp1;
 
-    //PetscPrintf(MPI_COMM_WORLD, "\n    nContX = %5d ...\n", nContX);
-    //PetscPrintf(MPI_COMM_WORLD, "\n    nContY = %5d ...\n", nContY);
+    PetscPrintf(MPI_COMM_WORLD, "\n    nContX = %5d ...\n", nContX);
+    PetscPrintf(MPI_COMM_WORLD, "\n    nContY = %5d ...\n", nContY);
+    PetscPrintf(MPI_COMM_WORLD, "\n    nContZ = %5d ...\n", nContZ);
 
-    if(nContX || nContY)
+    if(nContX || nContY || nContZ)
     {
       ndof_temp2 += DIM;
     }
@@ -218,14 +238,15 @@ void  ImmersedFlexibleSolid::setSolidElements(vector<vector<int> >& elemConn)
     //
     ///////////////////////////////////////////////////////////////////
 
-    //cout << " nElem_Constraint =  " << nElem_Constraint << endl;
+    //cout << " totalDOF =  " << totalDOF << endl;
+    cout << " nElem_Constraint =  " << nElem_Constraint << endl;
 
     totalDOF = nNode*ndof;
     totalDOF += nElem_Constraint;
 
     SolnData.initialise(totalDOF, 0, 0, 0);
     SolnData.setPhysicsTypetoSolid();
-    
+
     fluidAcce.resize(totalDOF);
     fluidAcce.setZero();
     fluidAccePrev = fluidAcce;
@@ -306,7 +327,7 @@ void  ImmersedFlexibleSolid::setNodeType(vector<vector<int> >& datatemp)
         NodeType[val][jj-1] = datatemp[ii][jj];
     }
   }
-  
+
   return;
 }
 */
@@ -314,13 +335,13 @@ void  ImmersedFlexibleSolid::setNodeType(vector<vector<int> >& datatemp)
 
 
 void  ImmersedFlexibleSolid::setBoundaryConditions(vector<vector<double> >& datatemp)
-{  
+{
     int ii=0, jj=0, val=0;
-  
+
     DirichletBCs = datatemp;
 
     //cout << " DirichletBCs.size() = " << DirichletBCs.size() << endl;
-  
+
     for(ii=0;ii<datatemp.size();ii++)
     {
       //cout << datatemp[ii][0] << '\t' << datatemp[ii][1] << endl;
@@ -595,7 +616,7 @@ void ImmersedFlexibleSolid::postProcess(int index)
 
           uGridVTK->InsertNextCell(tetraVTK->GetCellType(), tetraVTK->GetPointIds());
         }
-        else
+        else if(elems[ee]->nodeNums.size() == 8) // hex
         {
           hexVTK->GetPointIds()->SetId(0, elems[ee]->nodeNums[0]);
           hexVTK->GetPointIds()->SetId(1, elems[ee]->nodeNums[1]);
@@ -608,6 +629,10 @@ void ImmersedFlexibleSolid::postProcess(int index)
           hexVTK->GetPointIds()->SetId(7, elems[ee]->nodeNums[6]);
 
           uGridVTK->InsertNextCell(hexVTK->GetCellType(), hexVTK->GetPointIds());
+        }
+        else
+        {
+           int dummy;
         }
       }
     }

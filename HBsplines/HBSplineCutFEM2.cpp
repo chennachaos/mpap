@@ -75,7 +75,7 @@ void  HBSplineCutFEM::prepareCutElements()
       }
       return;
     }
-  
+
     cutCellIds.clear();
     fluidElementIds.clear();
 
@@ -86,7 +86,7 @@ void  HBSplineCutFEM::prepareCutElements()
     }
 
     //cout << " immersed objects updated " << endl;
-  
+
     //GeomData.domainFixedYesNo[0] = 0;
     //GeomData.domainFixedYesNo[1] = 0;
 
@@ -315,13 +315,12 @@ void  HBSplineCutFEM::prepareCutElements()
               ndTemp = elems[findCellNumber(geom)];
 
               ndTemp->domNums.push_back(bb+1);
-              
+
             }//for(gp=0...
           } // if( lme->isActive() )
         }//for(aa=0...
       }//for(bb=0;...
-      
-      
+
       // remove duplicate immsered solid numbers from 'domNums' of cut cells
       //
 
@@ -468,7 +467,7 @@ void  HBSplineCutFEM::prepareCutElementsSubTrias2D()
     nd1 = elems[activeElements[ee]];
 
     bbTemp = nd1->getAABB();
-    
+
     ptOut.clear();
 
     domTemp = 0;
@@ -508,7 +507,7 @@ void  HBSplineCutFEM::prepareCutElementsSubTrias2D()
       //cout << " AAAAAAAAA " << endl;
 
       vector<myPoint>  ptVec;
-      
+
       //cout << " Number of intersection points = " << ptOut.size() << endl;
 
       for(ii=0; ii<ptOut.size(); ii++)
@@ -565,18 +564,18 @@ void  HBSplineCutFEM::prepareCutElementsSubTrias2D()
         }
 
         vecTemp.push_back(dd);
-        
+
         poly->SetDomainNumber(dd);
 
         nd1->subTrias.push_back(poly);
       } //  for(cellId2=0; cellId2<polyDataLoc2->GetNumberOfCells(); cellId2++)
-      
+
       if( std::equal(vecTemp.begin()+1, vecTemp.end(), vecTemp.begin()) )
       {
         //nd1->SetDomainNumber(vecTemp[0]);
         nd1->clearSubtriangulation();
       }
-      
+
       // once the subtriangulation is generated 
       // find the Gausspoints for the triangles which lie 
       // in the domain #0 (fluid domain)
@@ -802,7 +801,7 @@ void  HBSplineCutFEM::prepareCutElements3D()
       for(ii=0; ii<ImmersedBodyObjects[0]->polyData->GetNumberOfPoints(); ii++)
       {
         ImmersedBodyObjects[0]->polyData->GetPoint(ii, &(ptNew[0]) );
-        
+
         if( selectEnclosedPointsCell->IsInsideSurface( ptNew[0], ptNew[1], ptNew[2] ) )
         {
           //cout << ptNew[0] << '\t' << ptNew[1] << '\t' << ptNew[2] << endl;
@@ -851,7 +850,7 @@ void  HBSplineCutFEM::prepareCutElements3D()
       myPoint  pt1, pt2, pt3, pt4;
 
       //cout << " Number of tetras = " << uGridLoc->GetNumberOfCells() << endl;
-      
+
       for(cellId2=0; cellId2<uGridLoc->GetNumberOfCells(); cellId2++)
       {
         cellVTK2 = uGridLoc->GetCell(cellId2);
@@ -875,12 +874,12 @@ void  HBSplineCutFEM::prepareCutElements3D()
         //cout << pt1.norm() << '\t' << dd << endl;
 
         vecTemp.push_back(dd);
-        
+
         poly->SetDomainNumber(dd);
 
         nd1->subTrias.push_back(poly);
       } //  for(cellId2=0; cellId2<polyDataLoc2->GetNumberOfCells(); cellId2++)
-      
+
       //if( std::equal(vecTemp.begin()+1, vecTemp.end(), vecTemp.begin()) )
       //{
         //nd1->SetDomainNumber(vecTemp[0]);
@@ -1015,7 +1014,7 @@ void  HBSplineCutFEM::prepareCutElementsSubTrias3D()
       vtkSmartPointer<vtkUnstructuredGrid> uGridLoc =  vtkSmartPointer<vtkUnstructuredGrid>::New();
 
       vector<myPoint>  ptVec;
-      
+
       //cout << " Number of intersection points = " << ptOut.size() << endl;
 
       for(ii=0; ii<ptOut.size(); ii++)
@@ -1028,7 +1027,7 @@ void  HBSplineCutFEM::prepareCutElementsSubTrias3D()
           pointsLoc->InsertNextPoint( ptNew[0], ptNew[1], ptNew[2] );
         }
       }
-      
+
       //cout << " Number of intersection points = " << ptVec.size() << endl;
       //cout << " performing Delaunay in 3D " << endl;
 
@@ -1079,7 +1078,7 @@ void  HBSplineCutFEM::prepareCutElementsSubTrias3D()
         }
 
         vecTemp.push_back(domTemp);
-        
+
         poly->SetDomainNumber(domTemp);
 
         nd1->subTrias.push_back(poly);
@@ -1147,7 +1146,7 @@ void  HBSplineCutFEM::prepareCutElementsSubTrias3D()
         }
 
         vecTemp.push_back(domTemp);
-        
+
         poly->SetDomainNumber(domTemp);
 
         ndTemp->subTrias.push_back(poly);
@@ -1176,7 +1175,7 @@ void  HBSplineCutFEM::prepareCutElementsSubTrias3D()
       std::ofstream oFileT("output",std::ios::out);
       // writing file output;
       oFileT << T;
-      
+
       //cout << " Number of points = " << ptVec.size() << '\t' << T.number_of_vertices() << endl;
       //cout << " Number of tets = " << T.number_of_cells() << endl;
 
@@ -1188,7 +1187,7 @@ void  HBSplineCutFEM::prepareCutElementsSubTrias3D()
 
         //cout << T.tetrahedron(cit) << endl;
         //cout << T.tetrahedron(cit).vertex(0) << endl;
-        
+
         //for(jj=0; jj<4; jj++) 
           //cout << jj << '\t' << cit->vertex(jj)->info() << '\t' << endl;
 
@@ -1209,7 +1208,7 @@ void  HBSplineCutFEM::prepareCutElementsSubTrias3D()
         }
 
         vecTemp.push_back(domTemp);
-        
+
         poly->SetDomainNumber(domTemp);
 
         ndTemp->subTrias.push_back(poly);
