@@ -49,7 +49,7 @@ enum  {BC_ENFORCE_TYPE_LAGRANGE=0, BC_ENFORCE_TYPE_PENALTY};
 class ImmersedSolid
 {
     public:
-    
+
         static  int  count;
 
         int  id, DIM, type, localStiffnessError, filecount, iterCount, tis, ndof, solverOK ;

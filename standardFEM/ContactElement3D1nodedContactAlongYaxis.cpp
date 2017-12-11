@@ -57,10 +57,10 @@ int ContactElement3D1nodedContactAlongYaxis::calcStiffnessAndResidual(MatrixXd& 
     if( (lamn + cn*gn) > tol)
     {
       //cout << " displacement = " << disp << '\t' << lamn << endl;
-      Klocal(0,1) += af;
-      Klocal(1,0) += af;
+      Klocal(0,1) -= af;
+      Klocal(1,0) -= af;
 
-      Flocal(0)   -= lamn;
+      Flocal(0)   += lamn;
       Flocal(1)   -= gn;  // residual: contact force
     }
     else

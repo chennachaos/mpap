@@ -61,11 +61,11 @@ class StandardFEM: public Domain
     //private:
 
     public:
-    
+
         PhysicsType  PHYSICS_TYPE;
         SolverType   SOLVER_TYPE;
 
-        int  DIM, ndof, lumpType, filecount, numProc;
+        int  DIM, ndof, lumpType, filecount, numProc, nElem_Constraint;
         int  nNode, nElem, npElem, IterNum, iterCount, totalDOF, fluidDOF, velDOF, presDOF;
 
         double  PENALTY_NUM, rNormPrev, rNorm,  ctimFactSolvUpdt, ctimCalcStiffRes, totalError, rhoInfty;

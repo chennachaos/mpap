@@ -147,7 +147,10 @@ int StandardFEM::prepareMatrixPattern()
     int  r, c, r1, c1, count=0, count1=0, count2=0, iii, e, ind, nsize;
     int *tt, *tt1, *tt2,  val1, val2, n1, n2, a, b, ll, pp, nnz;
     int  nRow, nCol, ind1, ind2;
-    int  ee, ii, jj, kk, e1, e2;
+    int  ee, ii, jj, kk, e1, e2, ndof_temp1=0;
+
+    ndof = elems[0]->getNdofPerNode();
+    ndof_temp1 = ndof;
 
     ConditionalOStream  pcout(std::cout,  (this_mpi_proc == 0) );
 
@@ -420,25 +423,9 @@ int StandardFEM::prepareMatrixPattern()
     // prepare the matrix pattern
     /////////////////////////////////////////////////////////////
 
-    IEN.resize(nElem);
-
     for(ee=0;ee<nElem;ee++)
     {
-      for(ii=0;ii<npElem;ii++)
-        IEN[ee].push_back(elems[ee]->nodeNums[ii]);
-    }
-
-    NodeType.resize(nNode);
-    ID.resize(nNode);
-    for(ii=0;ii<nNode;ii++)
-    {
-      NodeType[ii].resize(ndof);
-      ID[ii].resize(ndof);
-      for(jj=0;jj<ndof;jj++)
-      {
-        NodeType[ii][jj] = false;
-        ID[ii][jj] = -1;
-      }
+      IEN[ee] = elems[ee]->nodeNums;
     }
 
     for(ii=0;ii<DirichletBCs.size();ii++)
@@ -456,22 +443,30 @@ int StandardFEM::prepareMatrixPattern()
 
     //cout << " BBBBBBBBBBBBBBBBB " << endl;
 
-    soln.resize(nNode*ndof);
-    soln.setZero();
-
-    solnInit = soln;
-    reac  =  soln;
-
-
     totalDOF = 0;
-    for(ii=0;ii<nNode;ii++)
+    for(ii=0; ii<nNode; ii++)
     {
-      for(jj=0;jj<ndof;jj++)
+      for(jj=0; jj<ndof; jj++)
       {
         if(!NodeType[ii][jj])
+        {
           ID[ii][jj] = totalDOF++;
+          assy4r.push_back(ii*ndof + jj);
+        }
       }
     }
+
+    cout << " totalDOF = " << totalDOF << endl;
+
+    // adjust assy4r array to account for the constraints
+
+    ind = nNode*ndof_temp1;
+    for(ii=0; ii<nElem_Constraint; ii++)
+    {
+      assy4r.push_back(ind+ii);
+    }
+
+    GeomData.assy4r = assy4r;
 
     cout << " totalDOF " << totalDOF << endl;
     cout << " nElem    " << nElem << endl;
@@ -479,49 +474,115 @@ int StandardFEM::prepareMatrixPattern()
     cout << " npElem   " << npElem << endl;
     cout << " ndof     " << ndof << endl;
 
-    LM.resize(nElem);
+    // adjust ID array to account for the constraints
 
+    for(ee=0; ee<nElem; ee++)
+    {
+      ii = elems[ee]->nodeNums[0];
+
+      pp = elems[ee]->getElmTypeNameNum();
+
+      //cout << " ee = " << ee << '\t' << pp << endl;
+
+      if( (pp == 33) || (pp == 35) ) // contact element along X axis
+      {
+        jj = ndof_temp1 + 0;
+        ID[ii][jj] = totalDOF++;
+      }
+
+      if( (pp == 34) || (pp == 36) ) // contact element along Y axis
+      {
+        jj = ndof_temp1 + 1;
+        ID[ii][jj] = totalDOF++;
+      }
+
+      if( pp == 37 )  // contact element along Z axis
+      {
+        jj = ndof_temp1 + 2;
+        ID[ii][jj] = totalDOF++;
+      }
+    }
+
+    cout << " totalDOF " << totalDOF << endl;
+
+
+    LM.resize(nElem);
     for(ee=0;ee<nElem;ee++)
     {
       npElem = IEN[ee].size();
+      npElem     = elems[ee]->getNodesPerElement();
+      ndof_temp1 = elems[ee]->getNdofPerNode();
+      ind        = ndof_temp1*npElem;
 
       //printVector(IEN[ee]);
 
-      ind = ndof*npElem;
-      LM[ee].resize(ind);
+      pp = elems[ee]->getElmTypeNameNum();
 
-      for(ii=0;ii<npElem;ii++)
+      if( pp == 33 ) // contact element along X-axis, 2D
       {
-        ind = ndof*ii;
+        LM[ee].resize(2);  // to account for the Lagrange multiplier
 
-        //itint = find(GlobalPointNumbers.begin(), GlobalPointNumbers.end(), IEN[ee][ii]);
-        //kk = distance(GlobalPointNumbers.begin(), itint);
-        //IEN2[ee][ii] = kk;
-        kk = IEN[ee][ii];
+        kk = IEN[ee][0];
 
-        for(jj=0;jj<ndof;jj++)
+        LM[ee][0] = ID[kk][0];
+        LM[ee][1] = ID[kk][2];
+      }
+      else if( pp == 34 ) // contact element along Y-axis, 2D
+      {
+        LM[ee].resize(2);  // to account for the Lagrange multiplier
+
+        kk = IEN[ee][0];
+
+        LM[ee][0] = ID[kk][1];
+        LM[ee][1] = ID[kk][3];
+      }
+      else if( pp == 35 ) // contact element along X-axis, 3D
+      {
+        LM[ee].resize(2);  // to account for the Lagrange multiplier
+
+        kk = IEN[ee][0];
+
+        LM[ee][0] = ID[kk][0];
+        LM[ee][1] = ID[kk][3];
+      }
+      else if( pp == 36 ) // contact element along Y-axis, 3D
+      {
+        LM[ee].resize(2);  // to account for the Lagrange multiplier
+
+        kk = IEN[ee][0];
+
+        LM[ee][0] = ID[kk][1];
+        LM[ee][1] = ID[kk][4];
+      }
+      else if( pp == 37 ) // contact element along Z-axis, 3D
+      {
+        LM[ee].resize(2);  // to account for the Lagrange multiplier
+
+        kk = IEN[ee][0];
+
+        LM[ee][0] = ID[kk][2];
+        LM[ee][1] = ID[kk][5];
+      }
+      else // standard elements
+      {
+        LM[ee].resize(ind);
+        for(ii=0;ii<npElem;ii++)
         {
-          //cout << ee << '\t' << ii << '\t' << jj << '\t' << ind << '\t' << ID[kk][jj] << endl;
-          //cout << ee << '\t' << ii << '\t' << jj << '\t' << ind << '\t' << LM[ee][ind+jj] << '\t' << ID[IEN[ee][ii]][jj] << endl;
-          LM[ee][ind+jj] = ID[kk][jj];
-          //cout << " IIIIIIIII " << endl;
+          ind = ndof_temp1*ii;
+
+          kk = IEN[ee][ii];
+
+          for(jj=0;jj<ndof_temp1;jj++)
+          {
+            //cout << ee << '\t' << ii << '\t' << jj << '\t' << ind << '\t' << ID[kk][jj] << endl;
+            //cout << ee << '\t' << ii << '\t' << jj << '\t' << ind << '\t' << LM[ee][ind+jj] << '\t' << ID[IEN[ee][ii]][jj] << endl;
+            LM[ee][ind+jj] = ID[kk][jj];
+            //cout << " IIIIIIIII " << endl;
+          }
         }
       }
     }
 
-    assy4r.resize(totalDOF);
-
-    count = 0;
-    for(ii=0;ii<nNode;ii++)
-    {
-      for(jj=0;jj<ndof;jj++)
-      {
-        //cout << ii << '\t' << jj << '\t' << ID[ii][jj] << endl;
-        if( ID[ii][jj] != -1)
-          assy4r[count++] = ii*ndof + jj;
-      }
-    }
-    //cout << " totalDOF " << totalDOF << endl;
     for(ee=0;ee<nElem;ee++)
     {
       //elems[ee]->nodeNums   = IEN2[ee];
@@ -782,10 +843,10 @@ int StandardFEM::solveStep(int niter)
 
       updateIterStep();
     }
-    
+
     if( !converged() )
       return 0;
-  
+
   return 1;
 }
 
@@ -804,7 +865,7 @@ int StandardFEM::calcStiffnessAndResidual(int printRes, bool zeroMtx, bool zeroR
       //COUT << "You need to select a solver first!\n\n";
       //return 1;
     //}
-  
+
     //cout << " firstIter = " << firstIter << endl;
 
     if(firstIter)
@@ -878,7 +939,7 @@ int StandardFEM::calcStiffnessAndResidual(int printRes, bool zeroMtx, bool zeroR
     //applyBoundaryConditions();
 
     applyExternalForces();
-   
+
     //cout << solver->mtx << endl;
     //cout << " rhsVec " << endl;        printVector(&(rhsVec[0]), totalDOF);
     //printf("\n rhsVec norm = %12.6E \n", solver->rhsVec.norm());
@@ -887,7 +948,7 @@ int StandardFEM::calcStiffnessAndResidual(int printRes, bool zeroMtx, bool zeroR
   {
     //double fact1=1.0;
     double fact1 = timeFunction[0].prop;
-    
+
 //    SolnData.var1 = fact1*SolnData.var1applied;
 
     /*
@@ -927,8 +988,7 @@ int StandardFEM::calcStiffnessAndResidual(int printRes, bool zeroMtx, bool zeroR
       solverEigen->currentStatus = ASSEMBLY_OK;
     }
 
-    //if(printRes > 1)
-       COUT << "StandardFEM"; printf("  %11.4e\n",rNorm);
+    COUT << "StandardFEM"; printf("  %11.4e\n",rNorm);
 
     //ctimCalcStiffRes += computerTime.stop(fct);
 
@@ -964,7 +1024,7 @@ int StandardFEM::factoriseSolveAndUpdate()
     /////////////////////////////////////////////////////////////////////////////
     // get the solution vector onto all the processors
     /////////////////////////////////////////////////////////////////////////////
-  
+
     Vec            vec_SEQ;
     VecScatter     ctx;
     PetscScalar *arrayTemp;
@@ -997,7 +1057,7 @@ int StandardFEM::factoriseSolveAndUpdate()
     //cout << " Eigen Solver " << endl;
     solverEigen->factoriseAndSolve();
 
-    //printVector(solver->soln); printf("\n\n\n");
+    //printVector(solverEigen->soln); printf("\n\n\n");
 
     // update solution vector
     for(int kk=0;kk<totalDOF;kk++)
@@ -1253,10 +1313,8 @@ void  StandardFEM::computeElementErrors(int index)
       cout << " Compute element errors not defined for thie index value " << endl;
     }
     //printf(" \n\n \t totalError = %12.6E \n\n " , totalError);
-    
+
     return;
 }
-
-
 
 

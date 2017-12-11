@@ -1498,7 +1498,7 @@ int TreeNode<3>::computeGaussPointsAdapIntegrationBoundary(int side, int refLev1
     // parametric domain to integration master-quadrilateral domain
 
     nGauss = BoundaryQuadrature[side].gausspoints.size();
-    
+
     for(gp=0; gp<nGauss; gp++)
     {
       for(ii=0; ii<3; ii++)
@@ -1615,7 +1615,7 @@ void TreeNode<3>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
 
               specVal = DirichletData[aa][2];
 
-              //
+              /*
               if(side == 0 )
               {
                 if(dir == 0)
@@ -1632,7 +1632,7 @@ void TreeNode<3>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
                   //specVal = DirichletData[aa][2]*fact*(y1-geom[1])*(geom[1]-y0)*(z1-geom[2])*(geom[2]-z0);
                 }
               }
-              //
+              */
 
               specVal *= timeFunction[0].prop;
 

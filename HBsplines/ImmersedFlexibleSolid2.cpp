@@ -134,17 +134,17 @@ void ImmersedFlexibleSolid::prepareMatrixPattern()
     cout << " ImmersedFlexibleSolid.... nNode and  ndof " << nNode << '\t' << ndof << endl;
 
     totalDOF = 0;
-    for(ii=0;ii<nNode;ii++)
+    for(ii=0; ii<nNode; ii++)
     {
-      for(jj=0;jj<ndof;jj++)
+      for(jj=0; jj<ndof; jj++)
       {
         //cout << ii << '\t' << jj << '\t' << NodeType[ii][jj] << endl;
-//         if(NodeType[ii][jj] == (int) -7777)
-//         {
+        if(NodeType[ii][jj] == (int) -7777)
+        {
           ID[ii][jj] = totalDOF++;
 
           assy4r.push_back(ii*ndof + jj);
-//         }
+        }
       }
     }
     cout << " totalDOF = " << totalDOF << endl;
@@ -189,7 +189,6 @@ void ImmersedFlexibleSolid::prepareMatrixPattern()
     }
 
     cout << " totalDOF " << totalDOF << endl;
-    //assy4r.resize(totalDOF);
 
 
     for(ee=0; ee<nElem; ee++)
@@ -266,7 +265,7 @@ void ImmersedFlexibleSolid::prepareMatrixPattern()
           }
         }
       }
-      //cout << " ee = " << ee << endl;    
+      //cout << " ee = " << ee << endl;
     }
 
     //cout << " totalDOF " << totalDOF << endl;
@@ -437,8 +436,7 @@ void ImmersedFlexibleSolid::solveTimeStep()
     {
       calcStiffnessAndResidual(1, 1, 1);
 
-      printf("\t %5d \t %12.6E\n", ii, rNorm);
-      //printf("\t %5d \t %5d \t %12.6E\n", ii, firstIter, rNorm);
+      printf("\t ImmersedFlexibleSolid:   %5d \t %12.6E \n", ii, rNorm);
 
       if(converged())
         break;
@@ -496,12 +494,9 @@ int ImmersedFlexibleSolid::calcStiffnessAndResidual(int printRes, bool zeroMtx, 
 
     //printf("\n rhsVec norm = %12.6E \n", solver->rhsVec.norm());
 
-    applyBoundaryConditions(0, 0, solver->mtx, &(solver->rhsVec(0)));
+    //applyBoundaryConditions(0, 0, solver->mtx, &(solver->rhsVec(0)));
 
     applyExternalForces();
-
-    // rhs due to external forces
-    //rhsVec += rhsVec2;
 
     //cout << " rhsVec " << endl;        printVector(&(rhsVec[0]), totalDOF);
 
@@ -512,7 +507,7 @@ int ImmersedFlexibleSolid::calcStiffnessAndResidual(int printRes, bool zeroMtx, 
     rNormPrev = rNorm;
     rNorm     = solver->rhsVec.norm();
 
-    if (printRes > 1) { COUT << "ImmersedFlexibleSolid"; printf("  %11.4e\n",rNorm);}
+    //printf(" ImmersedFlexibleSolid:  %11.4e \n", rNorm);
 
     solver->currentStatus = ASSEMBLY_OK;
 

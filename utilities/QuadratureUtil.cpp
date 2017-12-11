@@ -1,5 +1,4 @@
 #include "QuadratureUtil.h"
-
 #include <iostream>
 #include <math.h>
 #include <assert.h>
@@ -225,10 +224,16 @@ void getGaussPointsQuad(int ngp, vector<double>& gp1, vector<double>& gp2, vecto
 {
   int  nn=0;
 
-  if(ngp == 1)       nn = 1;
-  else if(ngp == 4)  nn = 2;
-  else if(ngp == 9)  nn = 3;
-  else if(ngp == 16) nn = 4;
+       if(ngp == 1)   nn = 1;
+  else if(ngp == 4)   nn = 2;
+  else if(ngp == 9)   nn = 3;
+  else if(ngp == 16)  nn = 4;
+  else if(ngp == 25)  nn = 5;
+  else if(ngp == 36)  nn = 6;
+  else if(ngp == 49)  nn = 7;
+  else if(ngp == 64)  nn = 8;
+  else if(ngp == 81)  nn = 9;
+  else if(ngp == 100) nn = 10;
   else
   {
     cerr << " Error in getGaussPointsQuad() ... ngp = " << ngp << endl;
@@ -264,10 +269,16 @@ void getGaussPointsHex(int ngp, vector<double>& gp1, vector<double>& gp2, vector
 {
   int  nn=0;
 
-  if(ngp == 1)        nn = 1;
-  else if(ngp == 8)   nn = 2;
-  else if(ngp == 27)  nn = 3;
-  else if(ngp == 64)  nn = 4;
+       if(ngp == 1)    nn = 1;
+  else if(ngp == 8)    nn = 2;
+  else if(ngp == 27)   nn = 3;
+  else if(ngp == 64)   nn = 4;
+  else if(ngp == 125)  nn = 5;
+  else if(ngp == 216)  nn = 6;
+  else if(ngp == 343)  nn = 7;
+  else if(ngp == 512)  nn = 8;
+  else if(ngp == 729)  nn = 9;
+  else if(ngp == 1000) nn = 10;
   else
   {
     cerr << " Error in getGaussPointsHex ... ngp = " << ngp << endl;

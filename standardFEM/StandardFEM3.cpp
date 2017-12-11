@@ -237,10 +237,9 @@ void  StandardFEM::postProcess(int vartype, int vardir, int nCol, bool umnxflag,
         //vec[1] = SolnData.var1DotCur[kk+1];
       }
 
-      cout << " AAAAAAAAAAA " << endl;
-      if(elems[0]->nodeNums.size() == 3)
+      for(ee=0;ee<nElem;ee++)
       {
-        for(ee=0;ee<nElem;ee++)
+        if(elems[ee]->nodeNums.size() == 3)
         {
           for(ll=0;ll<3;ll++)
             triaVTK->GetPointIds()->SetId(ll, elems[ee]->nodeNums[ll]);
@@ -249,10 +248,7 @@ void  StandardFEM::postProcess(int vartype, int vardir, int nCol, bool umnxflag,
 
           procIdVTK->InsertTuple1(ee, elems[ee]->getSubdomainId());
         }
-      }
-      else
-      {
-        for(ee=0;ee<nElem;ee++)
+        else if(elems[ee]->nodeNums.size() == 4)
         {
           quadVTK->GetPointIds()->SetId(0, elems[ee]->nodeNums[0]);
           quadVTK->GetPointIds()->SetId(1, elems[ee]->nodeNums[1]);
@@ -260,8 +256,12 @@ void  StandardFEM::postProcess(int vartype, int vardir, int nCol, bool umnxflag,
           quadVTK->GetPointIds()->SetId(3, elems[ee]->nodeNums[2]);
 
           uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
-          
+
           procIdVTK->InsertTuple1(ee, elems[ee]->getSubdomainId());
+        }
+        else
+        {
+          //cerr << " Wrong element type ... " << endl;
         }
       }
     }
@@ -312,9 +312,9 @@ void  StandardFEM::postProcess(int vartype, int vardir, int nCol, bool umnxflag,
         }
       }
 
-      if(elems[0]->nodeNums.size() == 4) // tet
+      for(ee=0;ee<nElem;ee++)
       {
-        for(ee=0;ee<nElem;ee++)
+        if(elems[ee]->nodeNums.size() == 4) // tet
         {
           for(ll=0;ll<4;ll++)
             tetraVTK->GetPointIds()->SetId(ll, elems[ee]->nodeNums[ll]);
@@ -323,10 +323,7 @@ void  StandardFEM::postProcess(int vartype, int vardir, int nCol, bool umnxflag,
 
           procIdVTK->InsertTuple1(ee, elems[ee]->getSubdomainId());
         }
-      }
-      else
-      {
-        for(ee=0;ee<nElem;ee++)
+        else if(elems[ee]->nodeNums.size() == 8) // hex
         {
           hexVTK->GetPointIds()->SetId(0, elems[ee]->nodeNums[0]);
           hexVTK->GetPointIds()->SetId(1, elems[ee]->nodeNums[1]);
@@ -339,8 +336,11 @@ void  StandardFEM::postProcess(int vartype, int vardir, int nCol, bool umnxflag,
           hexVTK->GetPointIds()->SetId(7, elems[ee]->nodeNums[6]);
 
           uGridVTK->InsertNextCell(hexVTK->GetCellType(), hexVTK->GetPointIds());
-        
+
           procIdVTK->InsertTuple1(ee, elems[ee]->getSubdomainId());
+        }
+        else
+        {
         }
       }
     }
@@ -514,7 +514,7 @@ else
           hexVTK->GetPointIds()->SetId(7, SolnData.node_map_new_to_old[elems[ee]->nodeNums[6]]);
 
           uGridVTK->InsertNextCell(hexVTK->GetCellType(), hexVTK->GetPointIds());
-        
+
           procIdVTK->InsertTuple1(ee, elems[ee]->getSubdomainId());
         }
       }
@@ -542,7 +542,7 @@ else
     //VTKfilename = files.Ofile.asCharArray();
 
     sprintf(fname,"%s%s%06d%s", files.Ofile.asCharArray(),"-",filecount, ".vtu");
-    
+
     //cout << VTKfilename << endl;
     //sprintf(fname,"%s%s%06d%s", VTKfilename, "-", filecount, ".vtu");
 

@@ -36,7 +36,7 @@ StandardFEM::StandardFEM()
     geom.resize(3);
     param.resize(3);
     normal.resize(3);
-    
+
     PENALTY_NUM = 1.0;
 
     ndof = nElem = 0;
@@ -109,12 +109,10 @@ StandardFEM::~StandardFEM()
     delete [] elems;
     elems = NULL;
   }
-  
+
   if(solverEigen != NULL)
     delete solverEigen;
   solverEigen = NULL;
-  
-  //cout << " llllllllll " << endl;
 
   if(solverPetsc != NULL)
     delete solverPetsc;
@@ -237,7 +235,7 @@ void  StandardFEM::readInputData(std::ifstream &Ifile, MyString &line)
                 nodeForcesData[i].resize(lvdTmp[i].n);
                 if(lvdTmp[i].n < 1)
                    prgError(2, fct, "invalid number of 'nodal forces' !");
-                
+
                 for(j=0;j<lvdTmp[i].n;j++)
                   nodeForcesData[i][j] = lvdTmp[i][j];
              }
@@ -256,7 +254,7 @@ void  StandardFEM::readInputData(std::ifstream &Ifile, MyString &line)
                 OutputData[i].resize(lvdTmp[i].n);
                 if(lvdTmp[i].n < 1)
                    prgError(2, fct, "invalid number of 'nodal data output' !");
-                
+
                 for(j=0;j<lvdTmp[i].n;j++)
                   OutputData[i][j] = lvdTmp[i][j];
              }
@@ -305,7 +303,7 @@ void StandardFEM::readInput(ifstream& fname)
     cout << " nodes " << endl;
 
     readInputData(fname, line);
-    
+
     ///////////////////////////////////////////////////
     ///////////////////////////////////////////////////
 
@@ -313,49 +311,49 @@ void StandardFEM::readInput(ifstream& fname)
     line = "elements";
 
     readInputData(fname, line);
-    
+
     ///////////////////////////////////////////////////
     ///////////////////////////////////////////////////
 
     line = "prescribed boundary conditions";
 
     readInputData(fname, line);
-    
+
     ///////////////////////////////////////////////////
     ///////////////////////////////////////////////////
 
     line = "nodal forces";
 
     readInputData(fname, line);
-    
+
     ///////////////////////////////////////////////////
     ///////////////////////////////////////////////////
 
     line = "nodal data output";
 
     readInputData(fname, line);
-    
+
     ///////////////////////////////////////////////////
     ///////////////////////////////////////////////////
 
     line = "element type";
-    
+
     readInputData(fname, line);
-    
+
     ///////////////////////////////////////////////////
     ///////////////////////////////////////////////////
 
     line = "material type";
 
     readInputData(fname, line);
-    
+
     ///////////////////////////////////////////////////
     ///////////////////////////////////////////////////
 
     line = "control";
 
     readInputData(fname, line);
-    
+
     ///////////////////////////////////////////////////
     ///////////////////////////////////////////////////
 
@@ -373,7 +371,7 @@ void StandardFEM::readNodes(ifstream& fname)
     line = "nodes";
 
     readInputData(fname, line);
-    
+
     for(int ii=0; ii<nodePosData.size(); ii++)
       cout << ii << '\t' << nodePosData[ii][0] << '\t' << nodePosData[ii][1] << endl;
 
@@ -387,7 +385,7 @@ void  StandardFEM::readElementConnectivity(ifstream& fname)
     line = "elements";
 
     readInputData(fname, line);
-    
+
     ///////////////////////////////////////////////////
     ///////////////////////////////////////////////////
 
@@ -400,7 +398,7 @@ void  StandardFEM::readElementProps(ifstream& fname)
     MyString  line;
 
     line = "element type";
-    
+
     readInputData(fname, line);
 
     return;
@@ -414,8 +412,8 @@ void  StandardFEM::readMaterialProps(ifstream& fname)
     line = "material type";
 
     readInputData(fname, line);
-    
-  return;
+
+    return;
 }
 
 
@@ -475,6 +473,7 @@ void StandardFEM::prepareInputData()
     //printf("\n     StandardFEM::prepareInputData()  .... STARTED ...\n");
 
     int ii, jj, kk, ee, aa, bb, cc, ind, count, gp, r;
+    bool  nContX=false, nContY=false, nContZ=false;
 
     // go and inherit from ancestors
     Domain::prepareInputData();
@@ -512,10 +511,45 @@ void StandardFEM::prepareInputData()
 
     cout << " nNode and nElem " << nNode << '\t' << nElem << '\t' << SolnData.ElemProp[elemConn[0][0]].id << endl;
 
+    IEN.resize(nElem);
+    LM.resize(nElem);
+
     elems = new LagrangeElement* [nElem];
 
+    nElem_Constraint = 0;
     for(ee=0;ee<nElem;ee++)
     {
+      // contact element along X axis, 2D
+      if(SolnData.ElemProp[elemConn[ee][0]].id == 33)
+      {
+        nContX = true;
+        nElem_Constraint++;
+      }
+      // contact element along Y axis, 2D
+      if(SolnData.ElemProp[elemConn[ee][0]].id == 34)
+      {
+        nContY = true;
+        nElem_Constraint++;
+      }
+      // contact element along X axis, 3D
+      if(SolnData.ElemProp[elemConn[ee][0]].id == 35)
+      {
+        nContX = true;
+        nElem_Constraint++;
+      }
+      // contact element along Y axis, 3D
+      if(SolnData.ElemProp[elemConn[ee][0]].id == 36)
+      {
+        nContY = true;
+        nElem_Constraint++;
+      }
+      // contact element along Z axis, 3D
+      if(SolnData.ElemProp[elemConn[ee][0]].id == 37)
+      {
+        nContZ = true;
+        nElem_Constraint++;
+      }
+
       elems[ee] = NewLagrangeElement(SolnData.ElemProp[elemConn[ee][0]].id);
 
       elems[ee]->elmType  =  elemConn[ee][0];
@@ -528,10 +562,36 @@ void StandardFEM::prepareInputData()
 
       elems[ee]->nodeNums = vecTemp;
 
+      IEN[ee] = vecTemp;
+
       elems[ee]->SolnData = &(SolnData);
       elems[ee]->GeomData = &(GeomData);
       //elems[ee]->prepareElemData();
     }
+
+    ndof = elems[0]->getNdofPerNode();
+
+    int ndof_temp1 = ndof;
+    int ndof_temp2 = ndof_temp1;
+
+    PetscPrintf(MPI_COMM_WORLD, "\n    nContX = %5d ...\n", nContX);
+    PetscPrintf(MPI_COMM_WORLD, "\n    nContY = %5d ...\n", nContY);
+    PetscPrintf(MPI_COMM_WORLD, "\n    nContZ = %5d ...\n", nContZ);
+
+    if(nContX || nContY || nContZ)
+    {
+      ndof_temp2 += DIM;
+    }
+
+    NodeType.resize(nNode);
+    ID.resize(nNode);
+
+    for(ii=0;ii<nNode;ii++)
+    {
+      NodeType[ii].resize(ndof_temp1, false);
+      ID[ii].resize(ndof_temp2, -1);
+    }
+
 
     //npElem = elems[0]->nodeNums.size() ;
     //cout << " AAAAAAAAAAAAAAAAA " << npElem << endl;
@@ -566,7 +626,20 @@ void StandardFEM::prepareInputData()
 
     SolnData.setTimeIncrementType(tis);
     SolnData.setSpectralRadius(rhoInfty);
-    SolnData.initialise(nNode*ndof, 0, 0, 0);
+
+    //cout << " totalDOF =  " << totalDOF << endl;
+    cout << " nElem_Constraint =  " << nElem_Constraint << endl;
+
+    totalDOF = nNode*ndof;
+    totalDOF += nElem_Constraint;
+
+    SolnData.initialise(totalDOF, 0, 0, 0);
+
+    soln.resize(totalDOF);
+    soln.setZero();
+
+    solnInit = soln;
+    reac  =  soln;
 
     vector<int>  solidElems, fluidElems;
     //1 2 3 4 7 8 9 10  15 18 19 20 21 
@@ -637,7 +710,7 @@ void StandardFEM::prepareInteractions(void)
     char fct[] = "StandardFEM::prepareInteractions";
 
     printf("     NOTHING to be done here ...\n");
-    
+
     printf("     StandardFEM::prepareInteractions()  .... FINISHED ...\n\n");
 
     return;
@@ -691,9 +764,9 @@ void  StandardFEM::computeGeometry(const myPoint& param, myPoint& geom)
 void StandardFEM::assignBoundaryConditions()
 {
 
-}  
-  
-  
+}
+
+
 
 bool StandardFEM::converged()
 {
@@ -800,8 +873,6 @@ void StandardFEM::setInitialConditions()
 
 
 
-
-
 void StandardFEM::setTimeParam()
 {
   SolnData.setTimeParam();
@@ -895,8 +966,6 @@ void StandardFEM::updateIterStep()
   {
     int  ii, ind, bb;
 
-    //cout << GeomData.NodePosNew.size() << '\t' << ndof << '\t' << DIM << '\t' << SolnData.var1.rows() << endl;
-
     for(bb=0;bb<nNode;bb++)
     {
       for(ii=0;ii<DIM;ii++)
@@ -948,7 +1017,7 @@ void StandardFEM::writeNodalData()
 {
     int ii, jj, bb, ee, type, nn1, nn2=0, dof;
     double val, fact=1.0;
-    
+
     for(ee=0; ee<OutputData.size(); ee++)
     {
       type  = (int) (OutputData[ee][0]);

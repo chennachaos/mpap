@@ -73,9 +73,10 @@ int LagrangeElem2DStructSolidQuad4Node::calcStiffnessAndResidual(MatrixXd& Kloca
     int   err,  isw,  count,  count1, index, ll = 0, ii, jj, gp, TI, TIp1, TJ, TJp1;
     int   ind1, ind2, kk;
 
-    double rho = elmDat[5] ;
-    bforce[0]  = elmDat[6]*timeFunction[0].prop ;
-    bforce[1]  = elmDat[7]*timeFunction[0].prop ;
+    double rho  = elmDat[5] ;
+    double rho0 = rho ;
+    bforce[0]   = elmDat[6]*timeFunction[0].prop ;
+    bforce[1]   = elmDat[7]*timeFunction[0].prop ;
     double af = SolnData->td(2);
     double d1 = SolnData->td(5);
     double acceFact = SolnData->td(10);
@@ -130,6 +131,10 @@ int LagrangeElem2DStructSolidQuad4Node::calcStiffnessAndResidual(MatrixXd& Kloca
 
         GeomData->computeBasisFunctions2D(0, 2, degree, param, nodeNums, &N(0), &dN_dx(0), &dN_dy(0), Jac);
 
+        dvol0 = gaussweights[gp]*(thick*Jac);
+        dvol  = dvol0;
+
+
 //         xx = yy= 0.0;
 //         for(ii=0;ii<nlbf;ii++)
 //         {
@@ -139,10 +144,6 @@ int LagrangeElem2DStructSolidQuad4Node::calcStiffnessAndResidual(MatrixXd& Kloca
 
         //for(ii=0; ii<nlbf; ii++)
           //cout << N[ii] << '\t' << dN_dx[ii] << '\t' << dN_dy[ii] << endl;
-
-        fact  = gaussweights[gp] * thick;
-        dvol0 = Jac * fact;
-        dvol  = dvol0;
 
         if(axsy)
           dvol *= 2.0*PI*yy;
@@ -161,7 +162,7 @@ int LagrangeElem2DStructSolidQuad4Node::calcStiffnessAndResidual(MatrixXd& Kloca
         if(finite)
         {
           GeomData->computeBasisFunctions2D(1, 2, degree, param, nodeNums, &N(0), &dN_dx(0), &dN_dy(0), Jac);
-          dvol = Jac * fact;
+          dvol = gaussweights[gp]*(thick*Jac);
         }
 
         // ADJUST F33 fOR 2D PROBLEMS BASED ON THE ASSUMPTIONS OF PLANE STRESS/PLANE STRAIN/AXISYMMETRIC
@@ -211,6 +212,9 @@ int LagrangeElem2DStructSolidQuad4Node::calcStiffnessAndResidual(MatrixXd& Kloca
         //==============================================
 
         //   part 1. -- material part (not necessarily symmetric!!)
+
+        bforce[0] *= rho0;
+        bforce[1] *= rho0;
 
         for(ii=0;ii<nlbf;ii++)
         {
