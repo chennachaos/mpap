@@ -7,15 +7,17 @@
 #include "FunctionsEssGrp.h"
 #include "petscmat.h"
 #include "Files.h"
-
+#include "DomainTree.h"
 
 extern Files files;
 
+extern DomainTree domain;
 
 
 int main(int argc, char **argv)
 {
     PetscInitialize(NULL, NULL, "petsc_options.dat", NULL);
+    PetscMemorySetGetMaximumUsage();
 
     if(argc < 3)
     {
@@ -85,6 +87,10 @@ int main(int argc, char **argv)
 
       return 1;
     }
+
+    // deallocate Petsc Objects
+    for(int i=0; i<domain.ndom; i++)
+      domain(i).deallocatePetscObjects(); 
 
     PetscFinalize(); //CHKERRQ(ierr);
 

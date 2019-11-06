@@ -1090,8 +1090,6 @@ void  HBSplineCutFEM::postProcessAdapIntegration3D(int vartype, int vardir, int 
     NodeOrientation  neighbour_map1[] = {EAST, NORTH, FRONT, WEST, WEST, WEST, EAST, SOUTH};
     NodeOrientation  neighbour_map2[] = {RIGHT, LEFT};
 
-    double tstart = MPI_Wtime();
-
     node* ndTemp;
 
 
@@ -1330,9 +1328,6 @@ void  HBSplineCutFEM::postProcessAdapIntegration3D(int vartype, int vardir, int 
 
       //cout << " jjjjjjjjjjjjjjjjjj " << endl;
   }
-
-  double tend = MPI_Wtime(); 
-  PetscPrintf(MPI_COMM_WORLD, "HBSplineCutFEM::postProcessAdapIntegration3D() took %f millisecond(s) \n ", (tend-tstart)*1000);
 
   return;
 }

@@ -139,11 +139,6 @@ void  HBSplineCutFEM::prepareCutElements()
         if( nd1->isCutElement() )
         {
           cutCellIds.push_back(activeElements[ee]);
-
-          //if(cutFEMparams[0] == 1)
-            //nd1->computeGaussPointsSubTrias(cutFEMparams[2], false);
-          //else
-            //nd1->computeGaussPointsAdapIntegration(cutFEMparams[3], cutFEMparams[4], false, true);
         }
       }
 
@@ -447,7 +442,6 @@ void  HBSplineCutFEM::prepareCutElementsSubTrias1D()
 {
   return;
 }
-
 
 
 

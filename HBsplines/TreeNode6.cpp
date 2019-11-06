@@ -6,7 +6,6 @@
 #include "TimeFunction.h"
 #include "SolutionData.h"
 #include "myDataIntegrateCutFEM.h"
-
 #include "BasisFunctionsBSpline.h"
 
 extern MpapTime mpapTime;
@@ -14,17 +13,20 @@ extern List<TimeFunction> timeFunction;
 
 MatrixXd  Iden = MatrixXd::Identity(4, 4);
 
+
 template<>
 void TreeNode<3>::unRefine()
 {
   return;
 }
 
+
 template<>
 double TreeNode<3>::calcError(int ind, int domainCur)
 {
   return 0.0;
 }
+
 
 template<>
 double TreeNode<3>::computeTotalBodyForce(int, int)
@@ -45,7 +47,7 @@ template<>
 void TreeNode<3>::MatrixToMapResult(int ind1, int ind2, SparseMatrixXd& globalK)
 {
     int ii, jj, gp1, gp2, gp3;
-   
+
     double  JacZ, JacY, dvol;
 
     MatrixXd  Kl(totnlbf2, totnlbf2);
@@ -63,7 +65,7 @@ void TreeNode<3>::MatrixToMapResult(int ind1, int ind2, SparseMatrixXd& globalK)
     {
        param[1]  = 0.5*(knotIncr[1] * GeomData->gausspoints2[gp2] + knotSum[1]);
        JacY = GeomData->gaussweights2[gp2] * JacZ;
-       
+
     for(gp1=0;gp1<GeomData->getNGP(0);gp1++)
     {
        param[0]   = 0.5*(knotIncr[0] * GeomData->gausspoints1[gp1] + knotSum[0]);
@@ -81,9 +83,6 @@ void TreeNode<3>::MatrixToMapResult(int ind1, int ind2, SparseMatrixXd& globalK)
     }
     }
 
-    //printMatrix(Kl);
-    //cout << " AAAAAAAAAA " << endl;
-
     for(ii=0;ii<totnlbf2;ii++)
     {
       for(jj=0;jj<totnlbf2;jj++)
@@ -99,7 +98,7 @@ template<>
 void TreeNode<3>::RhsToMapResult(int ind1, int ind2, double* rhs)
 {
     int ii, jj, gp1, gp2, gp3;
-   
+
     double  JacY, JacZ, dvol, val;
     myPoint param;
 
@@ -116,7 +115,7 @@ void TreeNode<3>::RhsToMapResult(int ind1, int ind2, double* rhs)
     {
        param[1]  = 0.5*(knotIncr[1] * GeomData->gausspoints2[gp2] + knotSum[1]);
        JacY = GeomData->gaussweights2[gp2] * JacZ;
-       
+
     for(gp1=0;gp1<GeomData->getNGP(0);gp1++)
     {
        param[0]   = 0.5*(knotIncr[0] * GeomData->gausspoints1[gp1] + knotSum[0]);
@@ -136,12 +135,12 @@ void TreeNode<3>::RhsToMapResult(int ind1, int ind2, double* rhs)
             dN_dx = SubDivMat*dNN_dx;
             dN_dy = SubDivMat*dNN_dy;
           }
-          
+
           val  = computeValue(1, dN_dx);
           val -= computeValue(0, dN_dy);
-          
+
           val *= dvol;
-          
+
           Fl += ((N*val));
     }
     }
@@ -180,19 +179,13 @@ void TreeNode<3>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
     {
        param[1]  = 0.5*(knotIncr[1] * GeomData->gausspoints2[gp2] + knotSum[1]);
        JacY = GeomData->gaussweights2[gp2] * JacZ;
-       
+
     for(gp1=0;gp1<GeomData->getNGP(0);gp1++)
     {
        param[0]   = 0.5*(knotIncr[0] * GeomData->gausspoints1[gp1] + knotSum[0]);
        dvol = GeomData->gaussweights1[gp1] * JacY;
 
        GeomData->computeBasisFunctions3D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy, dNN_dz);
-
-       //printf(" %5d \t %5d \t %5d n", gp3, gp2, gp1);
-       //printf(" \t %14.8f \t %14.8f \t %14.8f \t %14.8f\n", uu, vv, fact, dvol0);
-       //printf("BasisFuns \n");
-       //for(ii=0;ii<totnlbf;ii++)
-       //printf(" \t %12.6f  \t %12.6f  \t %12.6f \n ", N(ii), dN_dx(ii), dN_dy(ii));
 
           if(parent == NULL)
           {
@@ -822,23 +815,18 @@ template<>
 void TreeNode<3>::applyBoundaryConditionsAtApoint(myDataIntegrateCutFEM& myData)
 {
     int ii, jj, TI, nU;
-   
+
     double  fact, af;
     VectorXd  NN(totnlbf), N;
 
     af = SolnData->td(2);
 
     GeomData->computeBasisFunctions3D(knotBegin, knotIncr, myData.param, NN);
-    
+
     if(parent == NULL)
       N = NN;
     else
       N = SubDivMat*NN;
-
-    //printf("\t param %6d \t %6d \t %12.8f \t %12.8f \t %12.8f \n", id, id, param[0], param[1], param[2]);
-    //printf("\n\n");
-    //printVector(N);
-    //printf("\n\n");
 
   //for(int dd=0;dd<3;dd++)
   //{
@@ -1072,8 +1060,6 @@ void TreeNode<3>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
 
         normal = GeomData->boundaryNormals[side];
 
-        cout << " normal ..." << normal[0] << '\t' << normal[1] << '\t' << normal[2] << endl;
-
         GeomData->setBoundaryGPs3D(side, boundaryGPs1, boundaryGWs1, boundaryGPs2, boundaryGWs2, boundaryGPs3, boundaryGWs3);
 
         JacMultLoc = TreeNode<3>::getJacBoundary(side);
@@ -1109,7 +1095,6 @@ void TreeNode<3>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
               dN_dy = SubDivMat*dNN_dy;
               dN_dz = SubDivMat*dNN_dz;
             }
-            //cout << " iiiiiiii" << endl;
 
               for(ii=0;ii<totnlbf2;ii++)
               {

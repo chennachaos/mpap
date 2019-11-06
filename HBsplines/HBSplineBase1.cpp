@@ -73,6 +73,7 @@ HBSplineBase::HBSplineBase()
     //cout << "  HBSplineBase::HBSplineBase() ... constructor " << endl;
 
     MPI_Comm_size(MPI_COMM_WORLD, &n_mpi_procs);
+
     MPI_Comm_rank(MPI_COMM_WORLD, &this_mpi_proc);
 
 
@@ -144,6 +145,8 @@ HBSplineBase::HBSplineBase()
 
 HBSplineBase::~HBSplineBase()
 {
+  //cout << "  HBSplineBase ... destructor " << endl;
+
   if(root != NULL)
     root = NULL;
 
@@ -180,10 +183,8 @@ HBSplineBase::~HBSplineBase()
   }
   contactElementObjects.clear(); // Purge the contents so no one tries to delete them again
 
+  //cout << "  HBSplineBase ... destructor " << endl;
 }
-
-
-
 
 
 

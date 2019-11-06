@@ -27,6 +27,8 @@ void HBSplineCutFEM::plotGeom(int val1, bool flag2, int col, bool PLOT_KNOT_LINE
 
     PetscPrintf(MPI_COMM_WORLD, "     HBSplineCutFEM: plotgeometry ...\n\n");
 
+    double tstart = MPI_Wtime();
+
     //writerUGridVTK->Reset();
 
     uGridVTK->Reset();
@@ -99,7 +101,7 @@ void HBSplineCutFEM::plotGeom(int val1, bool flag2, int col, bool PLOT_KNOT_LINE
 
     // write parallel vtu master (pvtu) file
 
-    char fnameMaster[50];
+    char fnameMaster[500];
 
     sprintf(fnameMaster,"%s%s", files.Ofile.asCharArray(),"-geom.pvtu");
 
@@ -119,7 +121,7 @@ void HBSplineCutFEM::plotGeom(int val1, bool flag2, int col, bool PLOT_KNOT_LINE
     MPI_Barrier(MPI_COMM_WORLD);
 
     // write individual vtu files
-    char fnameLocal[50];
+    char fnameLocal[500];
 
     sprintf(fnameLocal,"%s%s%d%s", files.Ofile.asCharArray(),"-geom_",this_mpi_proc,".vtu");
 
@@ -137,6 +139,9 @@ void HBSplineCutFEM::plotGeom(int val1, bool flag2, int col, bool PLOT_KNOT_LINE
     //plotGaussPointsElement();
     //plotGaussPointsDirichletBoundary();
     //plotGaussPointsNeumannBoundary();
+
+    double tend = MPI_Wtime();
+    PetscPrintf(MPI_COMM_WORLD, "\n HBSplineCutFEM::plotGeom() took %f millisecond(s) \n ", (tend-tstart)*1000);
 
     return;
 }
@@ -338,6 +343,8 @@ void  HBSplineCutFEM::postProcessFlow(int vartype, int vardir, int nCol, bool um
     //if(this_mpi_proc != 0)
       //return;
 
+    double tstart = MPI_Wtime();
+
     uGridVTK->Reset();
     pointsVTK->Reset();
 
@@ -388,7 +395,7 @@ void  HBSplineCutFEM::postProcessFlow(int vartype, int vardir, int nCol, bool um
 
     // write parallel vtu master (pvtu) file
 
-    char fnameMaster[100];
+    char fnameMaster[500];
 
     sprintf(fnameMaster,"%s%s%06d%s", files.Ofile.asCharArray(),"-",filecount,".pvtu");
 
@@ -409,7 +416,7 @@ void  HBSplineCutFEM::postProcessFlow(int vartype, int vardir, int nCol, bool um
 
     // write individual vtu files
 
-    char fnameLocal[100];
+    char fnameLocal[500];
 
     sprintf(fnameLocal,"%s%s%06d%s%d%s", files.Ofile.asCharArray(),"-",filecount,"_",this_mpi_proc,".vtu");
 
@@ -427,6 +434,9 @@ void  HBSplineCutFEM::postProcessFlow(int vartype, int vardir, int nCol, bool um
     {
       ImmersedBodyObjects[bb]->postProcess(filecount);
     }
+
+    double tend = MPI_Wtime(); 
+    PetscPrintf(MPI_COMM_WORLD, "HBSplineCutFEM::postProcessFlow() took %f millisecond(s) \n ", (tend-tstart)*1000);
 
     return;
 }
@@ -785,8 +795,6 @@ void  HBSplineCutFEM::postProcessSubTrias3D(int vartype, int vardir, int nCol, b
 
     vtkIdType pt[50], cellId;
 
-    double tstart = MPI_Wtime();
-
     if(ndf == 1)
     {
       index = 0;
@@ -1089,9 +1097,6 @@ void  HBSplineCutFEM::postProcessSubTrias3D(int vartype, int vardir, int nCol, b
 
       uGridVTK->GetCellData()->SetScalars(cellDataVTK2);
     }
-
-  double tend = MPI_Wtime(); 
-  PetscPrintf(MPI_COMM_WORLD, "\n HBSplineCutFEM::postProcessAdapIntegration3D() took %f millisecond(s) \n ", (tend-tstart)*1000);
 
   return;
 }

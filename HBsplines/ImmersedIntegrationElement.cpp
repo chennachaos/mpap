@@ -11,7 +11,7 @@ ImmersedIntegrationElement::ImmersedIntegrationElement()
 {
   id = itemcount++;
   DIM = 2;
-  
+
   IS_ACTIVE = true;
 }
 
@@ -30,20 +30,20 @@ void ImmersedIntegrationElement::prepareElemData()
 void ImmersedIntegrationElement::initialiseDOFvalues()
 {
   int  ii, jj, ind1;
-  
+
   ind1 = pointNums.size();
   elemNums.resize(ind1);
-  
+
   //cout << " ind1 " << ind1 << '\t' << DIM << endl;
 
   //printVector(posIndices);
-  
+
   for(ii=0;ii<ind1;ii++)
   {
     for(jj=0;jj<DIM;jj++)
       posIndices.push_back(pointNums[ii]*DIM+jj);
   }
-  
+
   //printVector(posIndices);
 
   nGP = ind1;

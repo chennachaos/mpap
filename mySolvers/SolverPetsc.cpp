@@ -15,7 +15,9 @@ SolverPetsc::SolverPetsc()
 {
   if(debug) cout << " SolverPetsc constructor\n\n";
 
-  KSPCreate(PETSC_COMM_WORLD, &ksp);
+  FREED = false;
+
+  //KSPCreate(PETSC_COMM_WORLD, &ksp);
 
   //MatCreate(PETSC_COMM_WORLD, &mtx);
   //VecCreate(PETSC_COMM_WORLD, &soln);
@@ -31,6 +33,27 @@ SolverPetsc::~SolverPetsc()
   //PetscPrintf(MPI_COMM_WORLD, "SolverPetsc::~SolverPetsc() \n");
   //cout << "SolverPetsc::~SolverPetsc() " << endl;
   //free();
+/*
+  ierr = VecDestroy(&soln);
+  //cout << " ierr = " << ierr << endl;
+  ierr = VecDestroy(&solnPrev);
+  //cout << " ierr = " << ierr << endl;
+  ierr = VecDestroy(&rhsVec);
+  //cout << " ierr = " << ierr << endl;
+  ierr = VecDestroy(&reac);
+  //cout << " ierr = " << ierr << endl;
+  ierr = MatDestroy(&mtx);
+  //cout << " ierr = " << ierr << endl;
+  //ierr = KSPGetPC(ksp,&pc);
+  //cout << " ierr = " << ierr << endl;
+  //ierr = PCDestroy(&pc);
+  //cout << " ierr = " << ierr << endl;
+  ierr = PCReset(pc);
+  //cout << " ierr = " << ierr << endl;
+  ierr = KSPDestroy(&ksp);
+  //ierr = KSPReset(ksp);CHKERRQ(ierr);
+  //cout << " ierr = " << ierr << endl;
+*/
   //PetscPrintf(MPI_COMM_WORLD, "SolverPetsc::~SolverPetsc() \n");
   //cout << "SolverPetsc::~SolverPetsc() " << endl;
 }
@@ -49,7 +72,7 @@ int SolverPetsc::setSolverAndParameters()
     // set the KSP 
     ///////////////////////////////////////////////
 
-    //ierr = KSPCreate(PETSC_COMM_WORLD, &ksp);CHKERRQ(ierr);
+    ierr = KSPCreate(PETSC_COMM_WORLD, &ksp);CHKERRQ(ierr);
 
     ierr = KSPSetOperators(ksp, mtx, mtx);CHKERRQ(ierr);
 
@@ -103,10 +126,10 @@ int SolverPetsc::zeroMtx()
 
 int SolverPetsc::free()
 {
-  //PetscPrintf(MPI_COMM_WORLD, "SolverPetsc::free() \n");
+  //if(FREED) return 1;
 
-  //ierr = KSPReset(ksp);CHKERRQ(ierr);
-  //cout << " ierr = " << ierr << endl;
+  PetscPrintf(MPI_COMM_WORLD, "SolverPetsc::free() \n");
+
   ierr = VecDestroy(&soln);CHKERRQ(ierr);
   //cout << " ierr = " << ierr << endl;
   ierr = VecDestroy(&solnPrev);CHKERRQ(ierr);
@@ -123,12 +146,14 @@ int SolverPetsc::free()
   //cout << " ierr = " << ierr << endl;
   ierr = PCReset(pc);CHKERRQ(ierr);
   //cout << " ierr = " << ierr << endl;
-  //ierr = KSPDestroy(&ksp);CHKERRQ(ierr);
+  ierr = KSPDestroy(&ksp);CHKERRQ(ierr);
   ierr = KSPReset(ksp);CHKERRQ(ierr);
   //cout << " ierr = " << ierr << endl;
 
-  //PetscPrintf(MPI_COMM_WORLD, "SolverPetsc::free() \n");
-  
+  FREED = true;
+
+  PetscPrintf(MPI_COMM_WORLD, "SolverPetsc::free() \n");
+
   return 1;
 }
 
@@ -198,6 +223,8 @@ int SolverPetsc::factorise()
 
 int SolverPetsc::solve()
 {
+  //PetscPrintf(MPI_COMM_WORLD, "  SolverPetsc::solve() ...  \n\n");
+
   char fct[] = "SolverPetsc::solve";
 
   //time_t tstart, tend; 
@@ -225,7 +252,7 @@ int SolverPetsc::solve()
 
   //PetscPrintf(MPI_COMM_WORLD, "  SolverPetsc::solve() ... soln Assembly ...  \n\n");
 
-  VecZeroEntries(soln);
+  ierr = VecZeroEntries(soln); CHKERRQ(ierr);
 
   //PetscPrintf(MPI_COMM_WORLD, "  SolverPetsc::solve() ... vec zero ...  \n\n");
 
@@ -242,15 +269,17 @@ int SolverPetsc::solve()
   KSPConvergedReason reason;
   KSPGetConvergedReason(ksp, &reason);
 
-  PetscInt its;
-  ierr = KSPGetIterationNumber(ksp, &its); CHKERRQ(ierr);
+  PetscInt its;
+
+  ierr = KSPGetIterationNumber(ksp, &its); CHKERRQ(ierr);
 
   if(reason<0)
   {
     PetscPrintf(MPI_COMM_WORLD, "\n Divergence... %d iterations. \n\n", its);
+    exit(1);
     return 1;
   }
-  else
+  else
   {
     PetscPrintf(MPI_COMM_WORLD, "\n Convergence in %d iterations.\n\n", its);
   }
@@ -469,7 +498,6 @@ int SolverPetsc::assembleVector(int start, int c1, vector<int>& vec1, VectorXd& 
 
   return 0;
 }
-
 
 
 

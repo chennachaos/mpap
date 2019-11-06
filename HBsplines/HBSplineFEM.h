@@ -112,6 +112,8 @@ class HBSplineFEM: public HBSplineBase
         virtual  void  computeTotalBodyForce(int );
 
         //virtual  int  solveFluidProblem();
+
+        virtual  int  deallocatePetscObjects();
 };
 
 

@@ -434,8 +434,11 @@ void SetTimeParametersSolid(int tis, double rho, double dt, VectorXd& td)
             // td[10] is the multiplication when converting from
             // displacement based formulation to velocity based formulation
             // It is set to ONE for static problem
+            td[10] = 1.0;
 
-            td[10] = 1.0; 
+            // for displacement-based formulation
+            td[10] = 0.0;
+
 
       break;
 

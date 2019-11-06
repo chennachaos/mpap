@@ -378,6 +378,31 @@ class  PoissonEx3 : public Function
 };
 
 
+class  PoissonEx4 : public Function
+{
+  public:
+    PoissonEx4() {}
+
+    virtual ~PoissonEx4() {}
+
+    virtual double  computeValue(int dir, double xx=0.0, double yy=0.0, double zz=0.0)
+    {
+      return  (100.0*xx*xx*(xx-1.0)*(xx-1.0)*yy*yy*(yy-1.0)*(yy-1.0));
+    }
+    virtual  double  computeForce(int dir, double xx=0.0, double yy=0.0, double zz=0.0)
+    {
+      return  (-100.0*((12.0*xx*xx-12.0*xx+2.0)*(yy*yy*(yy-1.0)*(yy-1.0))+(xx*xx*(xx-1.0)*(xx-1.0))*(12.0*yy*yy-12.0*yy+2.0)));
+    }
+    virtual  void computeDerivatives(double xx, double yy, double* dv)
+    {
+      dv[0] = 200.0*xx*(xx-1.0)*(2.0*xx-1.0)*yy*yy*(yy-1.0)*(yy-1.0);
+      dv[1] = 200.0*xx*xx*(xx-1.0)*(xx-1.0)*yy*(yy-1.0)*(2.0*yy-1.0);
+
+      return ;
+    }
+};
+
+
 
 class  PoissonInterfaceEx1 : public Function
 {

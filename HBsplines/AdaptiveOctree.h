@@ -65,14 +65,14 @@ class AdaptiveOctree
         vector<int>  vertexInOut;
 
         AdaptiveOctree();
-        
+
         AdaptiveOctree(int lev=0);
-        
+
         ~AdaptiveOctree();
-        
+
         int  getLevel()
         {  return level; }
-           
+
         void setLevel(int lev)
         {  level = lev; }
 
@@ -81,7 +81,7 @@ class AdaptiveOctree
 
         int getID()
         {  return id;}
-        
+
         int getDimension()
         {  return DIM;}
 
@@ -120,19 +120,19 @@ class AdaptiveOctree
 
         int getNumberOfNeighbours()
         {  return NUM_NEIGHBOURS; }
-        
+
         void setNeighbour(int ind, AdaptiveOctree_PTR node1)
         {
            assert(ind < pow(2,DIM));
            neighbours[ind] = node1;
         }
-        
+
         AdaptiveOctree_PTR  getNeighbour(int ind) 
         {  return neighbours[ind]; }
 
         AdaptiveOctree_PTR  getChild(int ind)
         {  return child[ind];	}
-        
+
         static int  getCount()
         { return nodecount; }
 
@@ -196,11 +196,11 @@ class AdaptiveOctree
         {  return (domNums.size() > 1); }
 
         bool  within(myPoint& pt);
-        
+
         void  subDivide(int lev);
 
         void  plotSelf();
-        
+
         void  printSelf();
 
         void  prepareData();
@@ -210,7 +210,7 @@ class AdaptiveOctree
         void  computeGaussPoints2Dfor3D(int, int, int, int, GaussQuadrature&  quadTemp);
 
         void  computeGaussPointsForMerging(int, int, int, int, GaussQuadrature&  quadTemp);
-        
+
         void  computeGaussPointsForMerging2Dfor3D(int, int, int, int, GaussQuadrature&  quadTemp);
 
         void  mergeGaussPoints(int, int, int, int&, myPoint&, double&);
@@ -366,7 +366,7 @@ void AdaptiveOctree<DIM>::prepareData()
                 bbox.maxBB[0] = coord3 ;
                 bbox.maxBB[1] = GeomData->computeCoord(1, knotEnd[0]) ;
                 bbox.maxBB[2] = GeomData->computeCoord(2, knotEnd[1]) ;
-                
+
                 JacMultElem /= GeomData->getJacobian(0);
 
         break;
@@ -381,7 +381,7 @@ void AdaptiveOctree<DIM>::prepareData()
                 bbox.maxBB[0] = GeomData->computeCoord(0, knotEnd[0]) ;
                 bbox.maxBB[1] = coord3 ;
                 bbox.maxBB[2] = GeomData->computeCoord(2, knotEnd[1]) ;
-                
+
                 JacMultElem /= GeomData->getJacobian(1);
 
         break;
@@ -396,7 +396,7 @@ void AdaptiveOctree<DIM>::prepareData()
                 bbox.maxBB[0] = GeomData->computeCoord(0, knotEnd[0]) ;
                 bbox.maxBB[1] = GeomData->computeCoord(1, knotEnd[1]) ;
                 bbox.maxBB[2] = coord3 ;
-                
+
                 JacMultElem /= GeomData->getJacobian(2);
 
         break;

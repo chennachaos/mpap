@@ -82,6 +82,7 @@ int LagrangeElem2DStructSolidQuad4Node::calcStiffnessAndResidual(MatrixXd& Kloca
     double acceFact = SolnData->td(10);
     double dt = mpapTime.dt;
 
+    //cout << "timeFunction[0].prop=" << timeFunction[0].prop << endl;
     //printf(" %14.12f \t %14.12f \t %14.12f \t %14.12f \n ", BULK, mu, bforce[0], bforce[1]);
     //printf(" %14.12f \t %14.12f \t %14.12f \t %14.12f \n ", rho, af, d1, aa);
     //printf(" %5d \t %5d \t %5d \t %5d \n ", nodeNums[0], nodeNums[1], nodeNums[2], nodeNums[3]);
@@ -142,6 +143,7 @@ int LagrangeElem2DStructSolidQuad4Node::calcStiffnessAndResidual(MatrixXd& Kloca
 //           yy += N[ii]*yNode[ii];
 //         }
 
+
         //for(ii=0; ii<nlbf; ii++)
           //cout << N[ii] << '\t' << dN_dx[ii] << '\t' << dN_dy[ii] << endl;
 
@@ -195,6 +197,7 @@ int LagrangeElem2DStructSolidQuad4Node::calcStiffnessAndResidual(MatrixXd& Kloca
         //printf("   %14.12f \t %14.12f \t %14.12f \t %14.12f \n ", cc[2][0], cc[2][1], cc[2][2], cc[2][3]);
         //printf("   %14.12f \t %14.12f \t %14.12f \t %14.12f \n\n ", cc[3][0], cc[3][1], cc[3][2], cc[3][3]);
         //printf("  dvol =  %14.12f \n\n ", dvol);
+        //printf(" %14.12f \t %14.12f \n ", bforce[0], bforce[1]);
 
         if(err !=0)    return 1;
 
@@ -282,23 +285,24 @@ int LagrangeElem2DStructSolidQuad4Node::calcStiffnessAndResidual(MatrixXd& Kloca
 
     /*
     int vec[]={0,1,2,3,6,7,4,5};
-  
+
     MatrixXd  K2(nsize, nsize);
     for(ii=0; ii<nsize; ii++)
     {
       for(jj=0; jj<nsize; jj++)
         K2(ii,jj) = Klocal(vec[ii], vec[jj]);
     }
-  
+
     printMatrix(Klocal);
     printf("\n\n\n");
     printMatrix(K2);
-  
-    //printMatrix(Klocal);  printf("\n\n\n");  printVector(Flocal);
     */
 
     Klocal +=  d1*Mlocal;
     Flocal -=  Mlocal*accC;
+
+    //printMatrix(Klocal);  printf("\n\n\n");  printVector(Flocal);
+    //printf("\n\n\n");  printVector(accC);
 
     return 0;
 }

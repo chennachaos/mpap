@@ -68,7 +68,21 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
 {
     assert( SOLVER_TYPE == SOLVER_TYPE_PETSC );
 
-    PetscPrintf(MPI_COMM_WORLD, "     HBSplineCutFEM: generating coefficient Matrices ...\n\n");
+    //PetscPrintf(MPI_COMM_WORLD, "     HBSplineCutFEM: generating coefficient Matrices ...\n\n");
+
+  PetscLogDouble mem1, mem2, mem3, mem4;
+
+  //the current resident set size (memory used) for the program.
+  ierr = PetscMemoryGetCurrentUsage(&mem1);   //CHKERRQ(ierr);
+  //the maximum resident set size (memory used) for the program.
+  ierr = PetscMemoryGetMaximumUsage(&mem2);   //CHKERRQ(ierr);
+  //the current amount of memory used that was PetscMalloc()ed
+  ierr = PetscMallocGetCurrentUsage(&mem3);   //CHKERRQ(ierr);
+  //the maximum amount of memory used that was PetscMalloc()ed at any time during this run.
+  ierr = PetscMallocGetMaximumUsage(&mem4);   //CHKERRQ(ierr);
+
+  //PetscPrintf(MPI_COMM_WORLD, " Petsc memory allocation details ... %12.8f \t %12.8f \t%12.8f \t%12.8f \n\n", mem1, mem2, mem3, mem4);
+
 
     int  ii=0, ee=0, nr=0, nc=0, dd=0, start=0, pp=0;
     int  dof=0, dir=0, domTemp=0, bb=0, kk=0;
@@ -246,7 +260,7 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
     }
 
     double tend = MPI_Wtime();
-    PetscPrintf(MPI_COMM_WORLD, " HBSplineCutFEM::calcStiffnessAndResidual() took %f  milliseconds \n", (tend-tstart)*1000);
+    //PetscPrintf(MPI_COMM_WORLD, " HBSplineCutFEM::calcStiffnessAndResidual() took %f  milliseconds \n", (tend-tstart)*1000);
 
     iterCount++;
 
@@ -285,20 +299,23 @@ int HBSplineCutFEM::factoriseSolveAndUpdate()
   VecScatter     ctx;
   PetscScalar *arrayTemp;
 
-  VecScatterCreateToAll(solverPetsc->soln, &ctx, &vec_SEQ);
-  VecScatterBegin(ctx, solverPetsc->soln, vec_SEQ, INSERT_VALUES, SCATTER_FORWARD);
-  VecScatterEnd(ctx, solverPetsc->soln, vec_SEQ, INSERT_VALUES, SCATTER_FORWARD);
-  VecScatterDestroy(&ctx);
-
-  VecGetArray(vec_SEQ, &arrayTemp);
+  if(n_mpi_procs > 1)
+  {
+    VecScatterCreateToAll(solverPetsc->soln, &ctx, &vec_SEQ);
+    VecScatterBegin(ctx, solverPetsc->soln, vec_SEQ, INSERT_VALUES, SCATTER_FORWARD);
+    VecScatterEnd(ctx, solverPetsc->soln, vec_SEQ, INSERT_VALUES, SCATTER_FORWARD);
+    VecGetArray(vec_SEQ, &arrayTemp);
+  }
+  else
+  {
+    VecGetArray(solverPetsc->soln, &arrayTemp);
+  }
 
   // update solution vector
 
   kk=0;
   for(ii=0; ii<nNode; ii++)
   {
-    //cout << ii << '\t' << node_map_old_to_new[ii] << '\t' << node_map_new_to_old[ii] << endl;
-    //jj = node_map_old_to_new[ii]*ndof;
     jj = ii*ndof;
     for(dd=0; dd<ndof; dd++)
       soln[kk++] = arrayTemp[jj+dd];
@@ -323,13 +340,21 @@ int HBSplineCutFEM::factoriseSolveAndUpdate()
       }
     }
 
-  VecRestoreArray(vec_SEQ, &arrayTemp);
-
+  if(n_mpi_procs > 1)
+  {
+    VecRestoreArray(vec_SEQ, &arrayTemp);
+    VecScatterDestroy(&ctx);
+    VecDestroy(&vec_SEQ);
+  }
+  else
+  {
+    VecRestoreArray(solverPetsc->soln, &arrayTemp);
+  }
   //printVector(SolnData.var1);
   //printf("\n\n\n");
 
   double tend = MPI_Wtime();
-  PetscPrintf(MPI_COMM_WORLD, " HBSplineCutFEM::factoriseSolveAndUpdate() took %f  milliseconds \n", (tend-tstart)*1000);
+  //PetscPrintf(MPI_COMM_WORLD, " HBSplineCutFEM::factoriseSolveAndUpdate() took %f  milliseconds \n", (tend-tstart)*1000);
 
   return 0;
 }

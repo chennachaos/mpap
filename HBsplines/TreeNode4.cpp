@@ -684,7 +684,7 @@ void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
     //////////////////////////////////////////////////
 
     int ii, jj, gp1, gp2, TI, TIp1, TIp2, count, TJ, TJp1, TJp2;
-   
+
     double  Jac, dvol, fact, b1, b2, b3, b4, b5, b6, b7, b8;
     double  pres, Da, Db, af, am, d1, c1, muTaf, rad, urdr, urdr2, acceFact;
 
@@ -707,7 +707,7 @@ void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
     {
        param[1]  = 0.5*(knotIncr[1] * GeomData->gausspoints2[gp2] + knotSum[1]);
        Jac = GeomData->gaussweights2[gp2] * JacMultElem;
-       
+
        for(gp1=0;gp1<GeomData->getNGP(0);gp1++)
        {
           param[0]   = 0.5*(knotIncr[0] * GeomData->gausspoints1[gp1] + knotSum[0]);
@@ -751,7 +751,7 @@ void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
 
           velDot(0) = computeValueDotCur(0, N);
           velDot(1) = computeValueDotCur(1, N);
-          
+
           // this is pseudo-stress
           stress = mu*grad;
           stress(0,0) -= pres;
@@ -806,7 +806,7 @@ void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
 
                // diffusion term
                fact += ( b5*dN_dx(jj)+b6*dN_dy(jj) );
-               
+
                Klocal(TI,   TJ)   += fact;
                Klocal(TIp1, TJp1) += fact;
 
@@ -856,7 +856,7 @@ void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
           }
     }//gp1
     }//gp2
-    
+
     return;
 }
 */

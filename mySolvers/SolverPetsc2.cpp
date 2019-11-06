@@ -16,7 +16,7 @@ int SolverPetsc::solveSerial(SparseMatrixXd& matEigen, VectorXd& rhsEigen, Vecto
 {
     nRow = matEigen.rows();
     nCol = nRow;
-   
+
     cout << " nRow = " << nRow << endl;
 
     time_t tstart, tend; 
@@ -86,13 +86,13 @@ int SolverPetsc::solveSerial(SparseMatrixXd& matEigen, VectorXd& rhsEigen, Vecto
     //MatCreateSeqAIJ(PETSC_COMM_WORLD, nRow, nRow, ii, NULL, &mtx);
 
     //ierr = MatSetFromOptions(mtx);CHKERRQ(ierr);
-    
+
     cout << " AAAAAAAAAA " << endl;
     //cout << matEigen << endl;
     cout << " AAAAAAAAAA " << endl;
 
     MatZeroEntries(mtx);
-    
+
     matEigen.makeCompressed();
 
     for(int k=0; k<matEigen.outerSize(); ++k)
@@ -102,7 +102,7 @@ int SolverPetsc::solveSerial(SparseMatrixXd& matEigen, VectorXd& rhsEigen, Vecto
         ii = it.row();
         jj = it.col();
         data = it.value();
-        
+
         //cout << it.row() << '\t' << it.col() << '\t' << it.value() << endl;
         //cout << ii << '\t' << jj << '\t' << data << endl;
 
@@ -115,7 +115,7 @@ int SolverPetsc::solveSerial(SparseMatrixXd& matEigen, VectorXd& rhsEigen, Vecto
     ierr = MatAssemblyEnd(mtx,MAT_FINAL_ASSEMBLY);//CHKERRQ(ierr);
 
     cout << " Creating and setting Petsc matrix DONE " << endl;
-    
+
     //VecSetValues(rhsVec, nRow, rhsEigen(ii), INSERT_VALUES);
 
     //VecSet(rhsVec, zero);
@@ -236,7 +236,7 @@ int SolverPetsc::solveSerial(SparseMatrixXd& matEigen, VectorXd& rhsEigen, Vecto
       //solnEigen[ii] =  soln[ii] ;
 
     tend = time(0); 
-  
+
     cout << "SolverPetsc::solve()  took "<< difftime(tend, tstart) <<" second(s)."<< endl;
 
     //solverTime.total -= solverTime.solve;
@@ -254,7 +254,7 @@ int SolverPetsc::solveParallel(SparseMatrixXd& matEigen, VectorXd& rhsEigen, Vec
 {
     nRow = matEigen.rows();
     nCol = nRow;
-   
+
     cout << " nRow = " << nRow << endl;
 
     time_t tstart, tend; 
@@ -320,13 +320,13 @@ int SolverPetsc::solveParallel(SparseMatrixXd& matEigen, VectorXd& rhsEigen, Vec
     //ierr = MatSetFromOptions(mtx);CHKERRQ(ierr);
 
     ierr = MatMPIAIJSetPreallocation(mtx,5,PETSC_NULL,5,PETSC_NULL);CHKERRQ(ierr);
-    
+
     cout << " AAAAAAAAAA " << endl;
     //cout << matEigen << endl;
     cout << " AAAAAAAAAA " << endl;
 
     MatZeroEntries(mtx);
-    
+
     matEigen.makeCompressed();
 
     for(int k=0; k<matEigen.outerSize(); ++k)
@@ -336,7 +336,7 @@ int SolverPetsc::solveParallel(SparseMatrixXd& matEigen, VectorXd& rhsEigen, Vec
         ii = it.row();
         jj = it.col();
         data = it.value();
-        
+
         //cout << it.row() << '\t' << it.col() << '\t' << it.value() << endl;
         //cout << ii << '\t' << jj << '\t' << data << endl;
 
@@ -349,7 +349,7 @@ int SolverPetsc::solveParallel(SparseMatrixXd& matEigen, VectorXd& rhsEigen, Vec
     ierr = MatAssemblyEnd(mtx,MAT_FINAL_ASSEMBLY);//CHKERRQ(ierr);
 
     cout << " Creating and setting Petsc matrix DONE " << endl;
-    
+
     //VecSetValues(rhsVec, nRow, rhsEigen(ii), INSERT_VALUES);
 
     //VecSet(rhsVec, zero);
@@ -470,7 +470,7 @@ int SolverPetsc::solveParallel(SparseMatrixXd& matEigen, VectorXd& rhsEigen, Vec
       //solnEigen[ii] =  soln[ii] ;
 
     tend = time(0); 
-  
+
     cout << "SolverPetsc::solve()  took "<< difftime(tend, tstart) <<" second(s)."<< endl;
 
     //solverTime.total -= solverTime.solve;

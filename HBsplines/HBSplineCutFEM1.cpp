@@ -40,7 +40,12 @@ HBSplineCutFEM::HBSplineCutFEM()
   stagParams[3] = 0;
   stagParams[4] = 0;
 
-    // add new type
+  // temporary arrays for assembling Petsc sparse matrix
+  int ii=5000;
+  PetscMalloc1(ii,  &colTemp);
+  PetscMalloc1(ii,  &arrayTemp);
+
+  // add new type
 
   DomainType *hbsplinecutfem = domain.newType(HBSPLINECUTFEM, ROOTDOMAIN);
 
@@ -88,14 +93,33 @@ HBSplineCutFEM::HBSplineCutFEM()
 }
 
 
+
 HBSplineCutFEM::~HBSplineCutFEM()
 {
+  //cout << "  HBSplineCutFEM ... destructor " << endl;
+
   //std::for_each(elems.begin(), elems.end(), delete_pointed_to<elems>);
   //elems.erase(elems.begin(), elems.end());
   //cout << " elems.size() " << elems.size() << endl;
 
+  PetscFree(colTemp);
+  PetscFree(arrayTemp);
+
+  //cout << "  HBSplineCutFEM ... destructor " << endl;
 }
 
+
+
+int  HBSplineCutFEM::deallocatePetscObjects()
+{
+  if(solverPetsc != NULL)
+    solverPetsc->free();
+
+  //if(GRID_CHANGED || IB_MOVED)
+    //solverPetsc->free();
+
+  return 1;
+}
 
 
 

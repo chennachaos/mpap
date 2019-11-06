@@ -11,13 +11,17 @@
 template<>
 int TreeNode<1>::prepareCutCell(vector<double>& cutFEMparams)
 {
+  // clear the previous subtriangulation/adaptive integration
+  clearSubtriangulation();
+
+
   double  x0 = GeomData->computeCoord(0, knotBegin[0]);
   double  x1 = GeomData->computeCoord(0, knotEnd[0]);
   double  xif=0.5;
 
   bool f0 = ( x0 <= xif );
   bool f1 = ( x1 <= xif );
-  
+
   if( f0 == f1 )
   {
     if(f0)
@@ -29,7 +33,7 @@ int TreeNode<1>::prepareCutCell(vector<double>& cutFEMparams)
   {
     domNums[0] = -1;
   }
-  
+
   return 1;
 }
 
@@ -40,52 +44,41 @@ int TreeNode<1>::prepareCutCell(vector<double>& cutFEMparams)
 template<>
 int TreeNode<2>::prepareCutCell(vector<double>& cutFEMparams)
 {
+  // clear the previous subtriangulation/adaptive integration
+  clearSubtriangulation();
+
+
   int  ee=0, bb=0, ii=0, jj=0, domTemp=0;
+  int  id, kk, dd;
+  vtkIdType pt[20];
+  myPoint  ptNew;
+  vector<int>  cornerInOut(4), vecTemp;
+  vector<myPoint>  ptVec, ptOut;
 
-  vector<myPoint>  ptOut;
-  vector<int>  cornerInOut(4);
 
-  //cout << " cell id = " << id << endl;
-  
   if( (int) cutFEMparams[0] == 2 ) // adaptive integration
   {
     GeomData->doIntersect2D(bbox, false, cornerInOut, ptOut, domNums) ;
-    ptOut.clear();
   }
   else  // subtriangulation
   {
     GeomData->doIntersect2D(bbox, true, cornerInOut, ptOut, domNums) ;
 
-    //printVector(domNums);
-
     if(domNums.size() > 1)
     {
       if( ptOut.size() == 0 )
+      {
+        cerr << " TreeNode<2>::prepareCutCell() ... Subtriangulation error! " << endl;
+        exit(1);
         return -1;
-
-      // remove the old subtriangulation
-
-      clearSubtriangulation();
+      }
 
       // find all the intersection points
-
-      int dd;
-      vtkIdType pt[20], ii, id, kk;
-      double  ptTemp[3];
-      myPoint  ptNew;
-      std::vector<int>::iterator itInt;
-      vector<int>  vecTemp;
 
       vtkSmartPointer<vtkPoints>       pointsLoc    =  vtkSmartPointer<vtkPoints>::New();
       vtkSmartPointer<vtkPolyData>     polyDataLoc  =  vtkSmartPointer<vtkPolyData>::New();
       vtkSmartPointer<vtkPolyData>     polyDataLoc2 =  vtkSmartPointer<vtkPolyData>::New();
       vtkSmartPointer<vtkDelaunay2D>   delaunay     =  vtkSmartPointer<vtkDelaunay2D>::New();
-
-      //cout << " AAAAAAAAA " << endl;
-
-      vector<myPoint>  ptVec;
-
-      //cout << " Number of intersection points = " << ptOut.size() << endl;
 
       for(ii=0; ii<ptOut.size(); ii++)
       {
@@ -99,10 +92,6 @@ int TreeNode<2>::prepareCutCell(vector<double>& cutFEMparams)
         }
       }
 
-      //cout << " domTemp = " << activeElements[ee] << '\t' << domTemp << '\t' << ptOut.size() << '\t' << ptVec.size() <<  endl;
-
-      //cout << " AAAAAAAAA " << endl;
-      
       // generate subtriangulation using Delauny procedure in VTK library
 
       polyDataLoc->SetPoints(pointsLoc);
@@ -125,7 +114,7 @@ int TreeNode<2>::prepareCutCell(vector<double>& cutFEMparams)
       vtkIdType  cellId2;
       vtkCell  *cellVTK2;
       myPoint  pt1, pt2, pt3, pt4;
-      
+
       if( polyDataLoc2->GetNumberOfCells() == 0 )
         return -2;
 
@@ -143,15 +132,16 @@ int TreeNode<2>::prepareCutCell(vector<double>& cutFEMparams)
 
         dd = GeomData->within(pt4) ;
 
-        //cout << cellId2 << '\t' << dd << endl;
-
         vecTemp.push_back(dd);
-        
+
         poly->SetDomainNumber(dd);
 
         subTrias.push_back(poly);
       } //  for(cellId2=0; cellId2<polyDataLoc2->GetNumberOfCells(); cellId2++)
-      
+
+      // if all the subtriangles are inside the same solid, 
+      // then there is no need for subtriangulation
+      // Hence, the subtriangulation is deleted
       if( std::equal(vecTemp.begin()+1, vecTemp.end(), vecTemp.begin()) )
       {
         domNums.clear();
@@ -159,12 +149,14 @@ int TreeNode<2>::prepareCutCell(vector<double>& cutFEMparams)
 
         clearSubtriangulation();
       }
-      
+
       // once the subtriangulation is generated 
       // find the Gausspoints for the triangles which lie 
       // in the domain #0 (fluid domain)
     }
   } //else
+
+  //ptOut.clear();
 
   return 1;
 }
@@ -174,17 +166,15 @@ int TreeNode<2>::prepareCutCell(vector<double>& cutFEMparams)
 template<>
 int TreeNode<3>::prepareCutCell(vector<double>& cutFEMparams)
 {
+  // clear the previous subtriangulation/adaptive integration
+  clearSubtriangulation();
+
+
   vector<myPoint>  ptOut;
   vector<int>  cornerInOut(8);
-  
+
   if( (int) cutFEMparams[0] == 2 ) // adaptive integration
   {
-    if(adapIntegNode != NULL)
-    {
-      delete  adapIntegNode;
-      adapIntegNode = NULL;
-    }
-
     return GeomData->doIntersect3D(bbox, false, cornerInOut, ptOut, domNums) ;
   }
   else // subtriangulation
@@ -194,6 +184,8 @@ int TreeNode<3>::prepareCutCell(vector<double>& cutFEMparams)
 
   return 0;
 }
+
+
 
 
 template<>
@@ -218,7 +210,7 @@ int TreeNode<2>::computeGaussPointsSubTrias(int nGP, int inclFlag, int flag1, in
     return -1;
   }
 
-  int  ii=0, nc=0, gp=0, domTemp=0;
+  int  ii=0, nc=0, gp=0, domTemp=0, aa=0, side=0;
   double  area11=0.0, area12=0.0, area21=0.0, area22=0.0, area1=0.0, area2=0.0, temp=0.0;
   myPoint  param, geom, ptTemp;
 
@@ -228,7 +220,7 @@ int TreeNode<2>::computeGaussPointsSubTrias(int nGP, int inclFlag, int flag1, in
   vector<double>  gwsLoc;
 
   Quadrature.reset();
-  
+
   if(inclFlag)
   {
     //QuadratureDomNums.clear();
@@ -236,11 +228,9 @@ int TreeNode<2>::computeGaussPointsSubTrias(int nGP, int inclFlag, int flag1, in
     for(vector<myPoly*>::iterator poly = subTrias.begin() ; poly != subTrias.end(); ++poly)
     {
       (*poly)->getGaussPointsCUTFEM(nGP, gpsLoc, gwsLoc );
-      
+
       domTemp = (*poly)->getDomainNumber() ; 
       //area2 = (*poly)->volume();
-      
-      //cout << area << '\t' << area2 << '\t' << area/area2 << endl;
 
         //if( area2 > 0.001*area )
         //{
@@ -272,10 +262,9 @@ int TreeNode<2>::computeGaussPointsSubTrias(int nGP, int inclFlag, int flag1, in
       if( (*poly)->getDomainNumber() == 0 )
       {
         (*poly)->getGaussPointsCUTFEM(nGP, gpsLoc, gwsLoc );
-      
+
         //area2 = (*poly)->volume();
-      
-        //cout << area << '\t' << area2 << '\t' << area/area2 << endl;
+        //cout << " area2 = " << area2 << endl;
 
         //if( area2 > 0.001*area )
         //{
@@ -307,10 +296,7 @@ int TreeNode<2>::computeGaussPointsSubTrias(int nGP, int inclFlag, int flag1, in
 
   if( isBoundary() )
   {
-    //cout << " boundary element " << endl;
-
     BoundaryQuadrature.resize(4);
-    int aa, side;
 
     for(side=0; side<4; side++)
       BoundaryQuadrature[side].reset();
@@ -331,12 +317,11 @@ int TreeNode<2>::computeGaussPointsSubTrias(int nGP, int inclFlag, int flag1, in
       for(aa=0;aa<NeumannData.size();aa++)
       {
         side  = (int) (NeumannData[aa][0] - 1);
-        
+
         if( BoundaryQuadrature[side].gausspoints.size() == 0 )
           TreeNode<2>::computeGaussPointsAdapIntegrationBoundary(side, 0, 0, inclFlag, flag2);
       }
     }
-    //cout << " boundary element " << endl;
   }
 
   return 1;
@@ -353,7 +338,7 @@ int TreeNode<3>::computeGaussPointsSubTrias(int nGP, int refLev2, int inclFlag, 
 
   if(domNums.size() == 1)
     return 1;
-  
+
   if( subTrias.size() == 0 )
   {
     cout << " Error in TreeNode<3>::computeGaussPointsSubTrias  " << endl;
@@ -361,8 +346,8 @@ int TreeNode<3>::computeGaussPointsSubTrias(int nGP, int refLev2, int inclFlag, 
   }
 
   //cout << " AAAAAAAAAA " << endl;
-  
-  int  ii=0, nc=0, gp=0;
+
+  int  ii=0, nc=0, gp=0, aa=0, side=0;
   double area11=0.0, area12=0.0, area21=0.0, area22=0.0, area1=0.0, area2=0.0, temp=0.0;
   myPoint  ptTemp, param;
 
@@ -378,9 +363,9 @@ int TreeNode<3>::computeGaussPointsSubTrias(int nGP, int refLev2, int inclFlag, 
     if( (*poly)->getDomainNumber() == 0 )
     {
       (*poly)->getGaussPointsCUTFEM(nGP, gpsLoc, gwsLoc );
-      
+
       area2 = (*poly)->volume();
-      
+
       //cout << area << '\t' << area2 << '\t' << area/area2 << endl;
 
         //if( area2 > 0.001*area )
@@ -410,7 +395,6 @@ int TreeNode<3>::computeGaussPointsSubTrias(int nGP, int refLev2, int inclFlag, 
   if( isBoundary() )
   {
     BoundaryQuadrature.resize(6);
-    int aa, side;
 
     for(side=0; side<6; side++)
       BoundaryQuadrature[side].reset();
@@ -431,7 +415,7 @@ int TreeNode<3>::computeGaussPointsSubTrias(int nGP, int refLev2, int inclFlag, 
       for(aa=0;aa<NeumannData.size();aa++)
       {
         side  = (int) (NeumannData[aa][0] - 1);
-        
+
         if( BoundaryQuadrature[side].gausspoints.size() == 0 )
           TreeNode<3>::computeGaussPointsAdapIntegrationBoundary(side, 0, 0, inclFlag, flag2);
       }
@@ -466,6 +450,8 @@ int TreeNode<2>::computeGaussPointsAdapIntegration(int refLev1, int refLev2, int
   //if(refLev1 == 0)
     //return;
 
+  // if the element is inside only one domain then 
+  // there is no need to compute quadrature points using cutfem approach
   if(domNums.size() == 1)
     return 1;
 
@@ -496,16 +482,16 @@ int TreeNode<2>::computeGaussPointsAdapIntegration(int refLev1, int refLev2, int
   //}
 
   // parametric domain to integration master-quadrilateral domain
-  int  ii, gp;
+  int  ii=0, gp=0, aa=0, side=0;
   for(gp=0; gp<Quadrature.gausspoints.size(); gp++)
   {
     for(ii=0; ii<2; ii++)
       Quadrature.gausspoints[gp][ii] = (2.0*Quadrature.gausspoints[gp][ii] - knotSum[ii])/knotIncr[ii];
   }
 
+  myPoint  param, geom;
   if(inclFlag)
   {
-    myPoint  param, geom;
     //QuadratureDomNums.clear();
     for(gp=0; gp<Quadrature.gausspoints.size(); gp++)
     {
@@ -522,7 +508,6 @@ int TreeNode<2>::computeGaussPointsAdapIntegration(int refLev1, int refLev2, int
   if( isBoundary() )
   {
     BoundaryQuadrature.resize(4);
-    int aa, side;
 
     for(side=0; side<4; side++)
       BoundaryQuadrature[side].reset();
@@ -543,14 +528,12 @@ int TreeNode<2>::computeGaussPointsAdapIntegration(int refLev1, int refLev2, int
       for(aa=0;aa<NeumannData.size();aa++)
       {
         side  = (int) (NeumannData[aa][0] - 1);
-        
+
         if( BoundaryQuadrature[side].gausspoints.size() == 0 )
           TreeNode<2>::computeGaussPointsAdapIntegrationBoundary(side, refLev1, refLev2, inclFlag, flag2);
       }
     }
   }
-
-  //cout << id << '\t' << Quadrature.gausspoints.size() << endl;
 
   return 1;
 }
@@ -568,7 +551,6 @@ int TreeNode<3>::computeGaussPointsAdapIntegration(int refLev1, int refLev2, int
 
   if(domNums.size() == 1)
     return 1;
-
 
   if(adapIntegNode != NULL)
     delete  adapIntegNode;
@@ -598,16 +580,16 @@ int TreeNode<3>::computeGaussPointsAdapIntegration(int refLev1, int refLev2, int
 
 
   // parametric domain to integration master-quadrilateral domain
-  int  ii=0, gp=0;
+  int  ii=0, gp=0, aa=0, side=0;
   for(gp=0; gp<Quadrature.gausspoints.size(); gp++)
   {
     for(ii=0; ii<3; ii++)
       Quadrature.gausspoints[gp][ii] = (2.0*Quadrature.gausspoints[gp][ii] - knotSum[ii])/knotIncr[ii];
   }
 
+  myPoint  param, geom;
   if(inclFlag)
   {
-    myPoint  param, geom;
     //QuadratureDomNums.clear();
     for(gp=0; gp<Quadrature.gausspoints.size(); gp++)
     {
@@ -627,7 +609,6 @@ int TreeNode<3>::computeGaussPointsAdapIntegration(int refLev1, int refLev2, int
   if( isBoundary() )
   {
     BoundaryQuadrature.resize(6);
-    int aa=0, side=0;
 
     for(side=0; side<6; side++)
       BoundaryQuadrature[side].reset();
@@ -662,6 +643,7 @@ int TreeNode<3>::computeGaussPointsAdapIntegration(int refLev1, int refLev2, int
 }
 
 
+
 template<>
 int TreeNode<1>::checkCutCellValidityAdapIntegration()
 {
@@ -675,22 +657,18 @@ int TreeNode<2>::checkCutCellValidityAdapIntegration()
 {
   if(domNums.size() == 1)
     return 1;
-  
+
   vector<int>  vectmp(4);
   double  vv[2], uu[2];
-  
+
   uu[0] = knotBegin[0] + 0.25*( knotEnd[0] - knotBegin[0]);
   uu[1] = knotBegin[0] + 0.75*( knotEnd[0] - knotBegin[0]);
 
   vv[0] = knotBegin[1] + 0.25*( knotEnd[1] - knotBegin[1]);
   vv[1] = knotBegin[1] + 0.75*( knotEnd[1] - knotBegin[1]);
 
-  //cout << " AAAAAAAAAA " << endl;
-
-  //cout << " AAAAAAAAAA .... " << val << endl;
-
   myPoint  param, geom;
-  
+
   param[1] = vv[0];  param[0] = uu[0];
 
   GeomData->computeCoord(param, geom);

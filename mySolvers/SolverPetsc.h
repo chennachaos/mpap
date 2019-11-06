@@ -26,7 +26,7 @@ class SolverPetsc
 
     int currentStatus;
 
-    bool  checkIO;
+    bool  checkIO, FREED;
 
     PetscReal norm; // norm of solution error
 

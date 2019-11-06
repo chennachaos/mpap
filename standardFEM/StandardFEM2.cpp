@@ -1032,7 +1032,6 @@ int StandardFEM::factoriseSolveAndUpdate()
     VecScatterCreateToAll(solverPetsc->soln, &ctx, &vec_SEQ);
     VecScatterBegin(ctx, solverPetsc->soln, vec_SEQ, INSERT_VALUES, SCATTER_FORWARD);
     VecScatterEnd(ctx, solverPetsc->soln, vec_SEQ, INSERT_VALUES, SCATTER_FORWARD);
-    VecScatterDestroy(&ctx);
 
     VecGetArray(vec_SEQ, &arrayTemp);
 
@@ -1047,6 +1046,9 @@ int StandardFEM::factoriseSolveAndUpdate()
     }
 
     VecRestoreArray(vec_SEQ, &arrayTemp);
+
+    VecScatterDestroy(&ctx);
+    VecDestroy(&vec_SEQ);
   }
   else
   {

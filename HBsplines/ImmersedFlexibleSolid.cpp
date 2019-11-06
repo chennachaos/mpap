@@ -643,7 +643,7 @@ void ImmersedFlexibleSolid::postProcess(int index)
     uGridVTK->GetPointData()->AddArray(vecVTK3);
     uGridVTK->GetPointData()->AddArray(vecVTK4);
 
-    char fname[50];
+    char fname[500];
 
     sprintf(fname,"%s%s%02d%s%06d%s", files.Ofile.asCharArray(),"-FB",id,"-", index, ".vtu");
 

@@ -68,7 +68,7 @@ int ContactElement2D1nodedContactAlongXaxis::calcStiffnessAndResidual(MatrixXd& 
       Flocal(1)   -= lamn;
     }
 
-    //printMatrix(Klocal);
+    //printMatrix(Klocal);  printf("\n\n\n");  printVector(Flocal);
 
     return 1;
 }

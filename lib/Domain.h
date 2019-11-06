@@ -27,17 +27,17 @@ class Domain: public ListItem
     int ndm, ndf, tis;
 
     double tol, *s, *p, *xl, *ul, td[TD_DIM], ctimSinceLastCall;
-    
+
     bool  solverOK, firstIter; 
-    
+
     virtual void readInputData(std::ifstream &, MyString &);
 
     virtual void prepareInputData(void);
 
     virtual void prepareInteractions(void);
-    
+
     // declare all member functions of all derived domains
-    
+
     virtual void prepareInputData2(void)
       { cout << "  'prepareInputData2' is not available for this domain type!\n\n"; return; }
 
@@ -59,37 +59,37 @@ class Domain: public ListItem
 
     virtual void plotMesh(bool, bool)
       { cout << "  'plotMesh' is not available for this domain type!\n\n"; return; }
-	
+
     virtual void paintElemGrp(int,bool defFlg = false)
       { cout << "  'paintElemGrp' is not available for this domain type!\n\n"; return; }
-	
+
     virtual void plotNodes(int, int, bool defFlg = false)
       { cout << "  'plotNodes' is not available for this domain type!\n\n"; return; }
-	
+
     virtual void plotElemNum(bool defFlg = false)
       { cout << "  'plotElemNum' is not available for this domain type!\n\n"; return; }
-	
+
     virtual void plotBoun(bool defFlg = false)
       { cout << "  'plotBoun' is not available for this domain type!\n\n"; return; }
-	
+
     virtual void plotFixed(bool defFlg = false)
       { cout << "  'plotFixed' is not available for this domain type!\n\n"; return; }
-	
+
     virtual void plotLoad(double, bool defFlg = false)
       { cout << "  'plotLoad' is not available for this domain type!\n\n"; return; }
-	
+
     virtual void plotReac(double, bool defFlg = false)
       { cout << "  'plotReac' is not available for this domain type!\n\n"; return; }
-	
+
     virtual void printInfo(void)
       { cout << "  'printInfo' is not available for this domain type!\n\n"; return; }
-    
+
     virtual void setSolver(int, int *parm = NULL, bool cIO = false)
       { cout << "  'setSolver' is not available for this domain type!\n\n"; return; }
 
     virtual int  factoriseSolveAndUpdate(void)
       { cout << "  'factoriseSolveAndUpdate' is not available for this domain type!\n\n"; 
-	return -1; }
+      return -1; }
 
     virtual void updateIterStep(void)
       { cout << "  'updateIterStep' is not available for this domain type!\n\n"; return; }
@@ -102,28 +102,28 @@ class Domain: public ListItem
 
     virtual bool converged(void)
       { cout << "  'converged' is not available for this domain type!\n\n"; return false; }
-   
+
     virtual bool diverging(double)
       { cout << "  'diverging' is not available for this domain type!\n\n"; return false; }
-   
+
     virtual void addForces(void)
       { cout << "  'addForces' is not available for this domain type!\n\n"; return; }
-    
+
     virtual void printNodalData(int)
       { cout << "  'printNodalData' is not available for this domain type!\n\n"; return; }
-    
+
     virtual void contourPlot(int, int, int, bool, double&, double&, bool)
       { cout << "  'contourPlot' is not available for this domain type!\n\n"; return; }
-    
+
     virtual void projectToNodes(MyString&, int, int)
       { cout << "  'projectToNodes' is not available for this domain type!\n\n"; return; }
-    
+
     virtual void writeNodalData(void)
       { cout << "  'writeNodalData' is not available for this domain type!\n\n"; return; }
-    
+
     virtual void plotGaussPoints(int,bool defFlg = false)
       { cout << "  'plotGaussPoints' is not available for this domain type!\n\n"; return; }
-	
+
     virtual void plotU1D(int)
       { cout << "  'plotU1D' is not available for this domain type!\n\n"; return; }
 
@@ -142,11 +142,11 @@ class Domain: public ListItem
     virtual void globalDiffStiffTest(double,int,int,bool)
       { cout << "  'globalDiffStiffTest' is not available for this domain type!\n\n";
         return; }
-	
+
     virtual void eliminateDiffTest(double,double,double,int,int,bool)
       { cout << "  'eliminateDiffTest' is not available for this domain type!\n\n";
         return; }
-	
+
     virtual void updateUDepIncrements(void)
       { cout << "  'updateDependentDisplacements' is not available for this domain type!\n\n";
         return; }
@@ -159,13 +159,13 @@ class Domain: public ListItem
 
     virtual void reset(void)
       { cout << "  'reset' is not available for this domain type!\n\n"; return; }
-	
+
     virtual bool isALE(bool flag = false)
       { cout << "  'isALE' is not available for this domain type!\n\n"; return false; }
 
     virtual void plotInterfaceNodes(int, int, int, bool defFlg = false)
       { cout << "  'plotInterfaceNodes' is not available for this domain type!\n\n"; return; }
-	
+
     virtual int  updateMesh(int, bool printRes = true)
       { cout << "  'updateMesh' is not available for this domain type!\n\n"; return -1; }
 
@@ -274,20 +274,16 @@ class Domain: public ListItem
 //------Wulf's stuff under development--------------------------------------------------------------
 
 
-
-	  
     virtual void strainToBoundaryDisplacement(double *)
       { cout << "  'strainToBoundaryDisplacement' is not available for this domain type!\n\n";
-	return; }
-	
+        return; }
+
     virtual void getStressFromReactions(double *)
       { cout << "  'getStressFromReactions' is not available for this domain type!\n\n"; return; }
 
 
-
-	
 //-----Deniz's stuff--------------------------------------------------------------------------------
-	
+
     virtual void microMirror(int)
       { cout << "  'microMirror' is not available for this domain type!\n\n"; return ; }
 
@@ -308,13 +304,13 @@ class Domain: public ListItem
 
     virtual int microSolve2D(double*, double*, double*, double*, bool)
       { cout << "  'microSolve2D' is not available for this domain type!\n\n"; return -1; }
-    
+
     virtual int microSolve3D(double*, double*, double*, double*, bool)
       { cout << "  'microSolve3D' is not available for this domain type!\n\n"; return -1; }
 
     virtual void applyBoundaryDisplacement(double *, bool, bool)
       { cout << "  'strainToBoundaryDisplacement' is not available for this domain type!\n\n";
-	return; }
+        return; }
 
     virtual void updatevariables(void)
       { cout << "  'updatevariables' is not available for this domain type!\n\n"; return ; }
@@ -333,9 +329,9 @@ class Domain: public ListItem
 
 //-----Chenna's stuff-------------------------------------------------------------------------------
 
+    virtual int deallocatePetscObjects()
+      { cout << "  'deallocatePetsc' is not available for this domain type!\n\n"; return -1; }
 
-
-	
 };
 
 

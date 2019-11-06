@@ -63,7 +63,7 @@ double  myTria::volumeFromGaussPoints(int nGP)
 {
   // compute area of the quadrilateral using numerical integration
   // with Guass points
-  
+
   vector<double>  gps1(nGP), gps2(nGP), gws(nGP);
 
   getGaussPointsTriangle(nGP, gps1, gps2, gws);
@@ -72,7 +72,7 @@ double  myTria::volumeFromGaussPoints(int nGP)
   double  Jac, detinv, xx, yy, dvol;
   double  N[3], dN_du[2][3];
   double  B[2][2], Binv[2][2];
-  
+
   dvol = 0.0;
   for(gp=0; gp<nGP; gp++)
   {
@@ -90,8 +90,8 @@ double  myTria::volumeFromGaussPoints(int nGP)
           B[1][1] +=  (yy * dN_du[1][ii]) ;
       }
 
-      Jac = B[0][0]*B[1][1] - B[0][1]*B[1][0];
-  
+      Jac = abs(B[0][0]*B[1][1] - B[0][1]*B[1][0]);
+
       //detinv = 1.0/Jac ;
 
       //Binv[0][0] =  B[1][1] * detinv;
@@ -147,7 +147,7 @@ void myTria::getGaussPointsCUTFEM(int nGP, vector<point3d>& gps, vector<double>&
           B[1][1] +=  (yy * dN_du[1][ii]) ;
       }
 
-      Jac = B[0][0]*B[1][1] - B[0][1]*B[1][0];
+      Jac = abs(B[0][0]*B[1][1] - B[0][1]*B[1][0]);
 
       gps[gp][0] = x0;
       gps[gp][1] = y0;

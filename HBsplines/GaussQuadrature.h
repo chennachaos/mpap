@@ -28,11 +28,11 @@ class GaussQuadrature
       ~GaussQuadrature() {}
 
       void SetGaussPoints(int nn);
-      
+
       void reset()
       {
-        gausspoints.erase(gausspoints.begin(), gausspoints.begin()+gausspoints.size() );
-        gaussweights.erase(gaussweights.begin(), gaussweights.begin()+gaussweights.size() );
+        //gausspoints.erase(gausspoints.begin(), gausspoints.begin()+gausspoints.size() );
+        //gaussweights.erase(gaussweights.begin(), gaussweights.begin()+gaussweights.size() );
 
         gausspoints.clear();
         gaussweights.clear();

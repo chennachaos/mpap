@@ -91,8 +91,6 @@ void  HBSplineCutFEM::applyInterfaceTerms2D()
           lme = ImmersedBodyObjects[bb]->ImmIntgElems[aa];
           poly = ImmersedBodyObjects[bb]->ImmersedFaces[aa];
 
-          //cout << bb << '\t' << aa << '\t' << lme->isActive() << endl;
-
           val1 = lme->pointNums.size();
           tt1  =  &(lme->pointNums[0]);
 
@@ -126,20 +124,15 @@ void  HBSplineCutFEM::applyInterfaceTerms2D()
 
               nd2 = elems[elnum];
 
-              if( nd2->getSubdomainId() == this_mpi_proc )
+              if( (nd2->getSubdomainId() == this_mpi_proc) && (nd2->isCutElement() || nd2->domNums[0] == 0) )
               {
                 bbTemp = nd2->getAABB();
                 hx = bbTemp.maxBB[0]-bbTemp.minBB[0];
                 hy = bbTemp.maxBB[1]-bbTemp.minBB[1];
 
-                //bbTemp.printSelf();
-
-                //
+                // only if the element is fluid or cutcell
                 if( (nd2->domNums.size() == 1) && (nd2->domNums[0] != 0) )
                 {
-                  //cout << " elnum = " << elnum << endl;
-                  //printVector(nd2->domNums);
-
                   if( abs(geom[1]-bbTemp.minBB[1]) < 1.0e-8 ) // bottom edge
                   {
                     nd3 = nd2->getNeighbour(EAST);
@@ -562,7 +555,7 @@ void  HBSplineCutFEM::applyInterfaceTerms3D()
 
               ndTemp = elems[findCellNumber(geom)];
 
-              if( ndTemp->getSubdomainId() == this_mpi_proc )
+              if( (ndTemp->getSubdomainId() == this_mpi_proc) && (ndTemp->isCutElement() || ndTemp->domNums[0] == 0) )
               {
                 geometryToParametric(geom, param);
 

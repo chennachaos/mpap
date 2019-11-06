@@ -193,7 +193,6 @@ void ImmersedFlexibleSolid::prepareMatrixPattern()
 
     for(ee=0; ee<nElem; ee++)
     {
-      //cout << " ee = " << ee << endl;
       npElem     = elems[ee]->getNodesPerElement();
       ndof_temp1 = elems[ee]->getNdofPerNode();
       ind        = ndof_temp1*npElem;
@@ -258,14 +257,10 @@ void ImmersedFlexibleSolid::prepareMatrixPattern()
 
           for(jj=0;jj<ndof_temp1;jj++)
           {
-            //cout << ee << '\t' << ii << '\t' << jj << '\t' << ind << '\t' << ID[kk][jj] << endl;
-            //cout << ee << '\t' << ii << '\t' << jj << '\t' << ind << '\t' << LM[ee][ind+jj] << '\t' << ID[IEN[ee][ii]][jj] << endl;
             LM[ee][ind+jj] = ID[kk][jj];
-            //cout << " IIIIIIIII " << endl;
           }
         }
       }
-      //cout << " ee = " << ee << endl;
     }
 
     //cout << " totalDOF " << totalDOF << endl;

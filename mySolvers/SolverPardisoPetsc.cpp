@@ -134,8 +134,8 @@ int SolverPardisoPetsc::initialise(int numProc, int matrixType, int nrow1)
     prgError(4,fct,"symbolic factorisation failed.");
   }
 
-  IPARM[5] = 1; // overwrite RHS with solution
-  //IPARM[5] = 0; // do not overwrite RHS with solution
+  //IPARM[5] = 1; // overwrite RHS with solution
+  IPARM[5] = 0; // do not overwrite RHS with solution
   IPARM[7] = 1; // max number of iterative refinement steps
 
   currentStatus = INIT_OK;
@@ -253,17 +253,18 @@ int  SolverPardisoPetsc::factoriseAndSolve()
   VecZeroEntries(soln);
   for(ii=0; ii<nRow; ii++)
   {
+    //cout << ii << '\t' << rhsTemp[ii] << '\t' << solnTemp[ii] << endl;
     ierr = VecSetValue(soln, ii, solnTemp[ii], ADD_VALUES);
   }
 
   VecAssemblyBegin(soln);
   VecAssemblyEnd(soln);
 
-  printf("Peak memory [kB] phase 1       = %d \n", IPARM[14]);
-  printf("Permanent integer memory [kb]. = %d \n", IPARM[15]);
-  printf("Peak real memory [kB]          = %d \n", IPARM[16]);
-  printf("Number of nonzeros in LU.      = %d \n", IPARM[17]);
-  printf("Gflops for LU factorization.   = %d \n", IPARM[18]);
+  //printf("Peak memory [kB] phase 1       = %d \n", IPARM[14]);
+  //printf("Permanent integer memory [kb]. = %d \n", IPARM[15]);
+  //printf("Peak real memory [kB]          = %d \n", IPARM[16]);
+  //printf("Number of nonzeros in LU.      = %d \n", IPARM[17]);
+  //printf("Gflops for LU factorization.   = %d \n", IPARM[18]);
 
   solverTime.total             -= solverTime.factoriseAndSolve;
   solverTime.factoriseAndSolve += computerTime.stop(fct);

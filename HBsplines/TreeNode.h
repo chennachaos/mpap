@@ -36,13 +36,13 @@ class TreeNode
         NodeOrientation  orientation;
 
         double  *elmDat, JacMultElem;
-        
+
         AABB  bbox;
-        
+
         myPoint  knotBegin, knotEnd, knotIncr, knotSum;
 
         bool FuncFlag, GHOST_FLAG, ACTIVE_FLAG, PROCESSED;
-    
+
         TreeNode_PTR  *child, parent;//, *neighbours;
 
         TreeNode_PTR  neighbours[2*DIM];
@@ -104,10 +104,10 @@ class TreeNode
         { return ndof; }
 
         double  getJacMultElement()
-	      { return JacMultElem; }
+        { return JacMultElem; }
 
         double  getVolume();
-        
+
         double  getVolumeGaussPoints(int domTemp);
 
         void  setSubdomainId(int sid)
@@ -126,31 +126,31 @@ class TreeNode
           LocalBasisFuncs.resize(totnlbf);
           LocalBasisFuncs.assign(totnlbf, -1);
         }
-        
+
         void setParent(TreeNode_PTR  parent1)
         {  parent = parent1; }
-        
+
         TreeNode_PTR  getParent()
         {  return parent; }
-        
+
         int getNumberOfChildren()
         {  return NUM_CHILDREN; }
 
         int getNumberOfNeighbours()
         {  return NUM_NEIGHBOURS; }
-        
+
         void setNeighbour(int ind, TreeNode_PTR node1)
         {
            assert(ind < pow(2,DIM));
            neighbours[ind] = node1;
         }
-        
+
         TreeNode_PTR  getNeighbour(int ind) 
         {  return neighbours[ind]; }
 
         TreeNode_PTR  getChild(int ind)
         {  return child[ind];	}
-        
+
         static int  getCount()
         { return nodecount; }
 
@@ -208,19 +208,19 @@ class TreeNode
 
         bool isGhost()
         {  return GHOST_FLAG; }
-        
+
         void setGhostOn()
         {
           GHOST_FLAG  = true;
           ACTIVE_FLAG = false;
         }
-        
+
         void setGhostOff()
         {  GHOST_FLAG = false;	}
-        
+
         void activate()
         {  ACTIVE_FLAG = true;	}
-        
+
         void deactivate()
         {  ACTIVE_FLAG = false; }
 
@@ -265,17 +265,17 @@ class TreeNode
         }
 
         bool  pointLiesInside(const myPoint& pt);
-        
+
         void  subDivide();
-        
+
         void  unRefine();
 
         void  plotSelf();
-        
+
         void  printSelf();
 
         bool  isBoundary();
-        
+
         bool  isLeftBoundary();
         bool  isRightBoundary();
         bool  isTopBoundary();
@@ -302,7 +302,7 @@ class TreeNode
         int  clearSubtriangulation();
 
         void  initialiseDOFvalues();
-        
+
         void  checkPartitionOfUnity();
 
         void  setInitialProfile();
@@ -338,7 +338,7 @@ class TreeNode
         int  calcLoadVector(int ind1=0, int ind2=0, double inp1=0.0, double inp2=0.0);
 
         double  calcError(int, int domainCur=0);
-        
+
         double  computeTotalBodyForce(int, int);
         double  computeValue(int dir, VectorXd& NN);
         double  computeValuePrev(int dir, VectorXd& NN);
@@ -385,9 +385,9 @@ TreeNode<DIM>::TreeNode():level(0), NUM_CHILDREN(0), GHOST_FLAG(false), ACTIVE_F
     child = NULL;
     parent = NULL;
     adapIntegNode = NULL;
-    
+
     orientation = ENUM_PARENT;
-    
+
     NUM_NEIGHBOURS = 2*DIM;
 
     //neighbours = new TreeNode_PTR[NUM_NEIGHBOURS];
@@ -473,7 +473,7 @@ int  TreeNode<DIM>::resetAdaptiveIntegrationNode()
     delete adapIntegNode;
 
   adapIntegNode = NULL;
-  
+
   return 1;
 }
 
@@ -593,7 +593,7 @@ template<int DIM>
 void TreeNode<DIM>::assembleMatrixAndVector(int index, Mat mtx, double* rhs)
 {
   PetscErrorCode ierr;
-    
+
   int nn=0, ii, jj;
 
   //ierr = MatSetValues(mtx,nsize2,&forAssyVec[0],nsize2,&forAssyVec[0],&(Klocal(0,0)),ADD_VALUES);
@@ -795,11 +795,20 @@ double TreeNode<DIM>::computeVorticity(VectorXd& NN)
 template<int DIM>
 int TreeNode<DIM>::clearSubtriangulation()
 {
-  for(vector<myPoly*>::iterator pObj = subTrias.begin(); pObj != subTrias.end(); ++pObj)
+  if(adapIntegNode != NULL)
   {
-    delete *pObj; // Note that this is deleting what pObj points to, which is a pointer
+      delete  adapIntegNode;
+      adapIntegNode = NULL;
   }
-  subTrias.clear(); // Purge the contents so no one tries to delete them again
+
+  if( subTrias.size() > 0 )
+  {
+    for(vector<myPoly*>::iterator pObj = subTrias.begin(); pObj != subTrias.end(); ++pObj)
+    {
+      delete *pObj; // Note that this is deleting what pObj points to, which is a pointer
+    }
+    subTrias.clear(); // Purge the contents so no one tries to delete them again
+  }
 
   return 1;
 }

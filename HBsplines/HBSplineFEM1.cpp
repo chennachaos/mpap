@@ -85,6 +85,16 @@ HBSplineFEM::~HBSplineFEM()
 
 }
 
+int  HBSplineFEM::deallocatePetscObjects()
+{
+  if(solverPetsc != NULL)
+    solverPetsc->free();
+
+  //if(GRID_CHANGED || IB_MOVED)
+    //solverPetsc->free();
+
+  return 1;
+}
 
 
 

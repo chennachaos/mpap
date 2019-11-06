@@ -18,7 +18,7 @@ class AdaptiveBinarytree
     //typedef Matrix<double, DIM, 1>  knotPoint;
 
     private:
-    
+
         static int  nodecount, MAX_LEVEL;
 
         int  level, id, NUM_CHILDREN, NUM_NEIGHBOURS;
@@ -43,14 +43,14 @@ class AdaptiveBinarytree
         GaussQuadrature  Quadrature;
 
         AdaptiveBinarytree();
-        
+
         AdaptiveBinarytree(int lev=0);
-        
+
         ~AdaptiveBinarytree();
-        
+
         int  getLevel()
         {  return level; }
-           
+
         void setLevel(int lev)
         {  level = lev; }
 
@@ -285,7 +285,7 @@ AdaptiveBinarytree<DIM>::~AdaptiveBinarytree()
     //delete parent;
     parent = NULL;
   //}
-  //Quadrature.reset();
+  Quadrature.reset();
 //
 }
 

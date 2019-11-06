@@ -47,8 +47,12 @@ class HBSplineBase: public Domain
 
         PetscInt  nElem, nNode, nElem_local, nNode_local;
         PetscInt  n_mpi_procs, this_mpi_proc;
+        PetscInt  bfs_start, bfs_end, bfs_local;
         PetscInt  row_start, row_end, ndofs_local;
         PetscInt  elem_start, elem_end;
+
+        PetscInt  *colTemp;
+        PetscScalar  *arrayTemp;
 
         PetscErrorCode ierr;
 
@@ -76,11 +80,8 @@ class HBSplineBase: public Domain
         //std::vector<std::unique_ptr<node> > elems;
         //vector< std::tr1::shared_ptr<node> > elems;
 
-        vector<int>  node_map_new_to_old;
-        vector<int>  node_map_old_to_new;
-
-        vector<int>  dof_map_new_to_old;
-        vector<int>  dof_map_old_to_new;
+        vector<int>  node_map_new_to_old, node_map_old_to_new;
+        vector<int>  dof_map_new_to_old, dof_map_old_to_new;
 
         MyString   anlySolnType;
 
@@ -139,7 +140,7 @@ class HBSplineBase: public Domain
 
         int  getMaxLevel()
         {  return MAX_LEVEL;  }
-           
+
         bool isLeaf(int nodenum)
         {  return false;      }
 
@@ -438,6 +439,8 @@ class HBSplineBase: public Domain
         virtual  int  fsi_monolithic_fixedpoint_forcePred(int max_iter, double tol_local);
 
         virtual  int  fsi_monolithic_fixedpoint_dispPred(int max_iter, double tol_local);
+
+        //virtual  int  deallocatePetscObjects();
 
 };
 

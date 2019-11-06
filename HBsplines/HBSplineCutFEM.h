@@ -73,6 +73,8 @@ class HBSplineCutFEM: public HBSplineBase
 
         VectorXd  slnTemp,  slnTempPrev, slnTempPrev2, slnTempCur;
 
+        vector<set<int> >  DDconnLoc;
+
     public:
 
         HBSplineCutFEM();
@@ -184,6 +186,8 @@ class HBSplineCutFEM: public HBSplineBase
         void  computeGaussPointsAdapIntegration3D();
 
         //virtual  int  solveFluidProblem();
+
+        virtual  int  deallocatePetscObjects();
 
 };
 
