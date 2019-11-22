@@ -1,0 +1,101 @@
+cmake_minimum_required(VERSION 2.6)
+project(igampap)
+
+enable_language(CXX Fortran)
+
+##################################
+# project directories
+##################################
+
+
+#PROJECT_BINARY_DIR
+#PROJECT_SOURCE_DIR
+
+##################################
+# compiler options
+##################################
+
+# C++ compiler
+
+set(CMAKE_CXX_COMPILER "/usr/bin/gcc")
+
+if(CXX_COMPILER_NAME MATCHES "icc*")
+    message ("Using INTEL C++ compiler")
+    set(COPT "-O3 -Wall -DSELF_CHECK -DUNIX")
+endif()
+
+if(CXX_COMPILER_NAME MATCHES "gcc*")
+    message ("Using GNU C++ compiler")
+    set(COPT "-std=c++11 -O3 -w -funroll-loops -ftree-vectorize -ftree-vectorizer-verbose=1  -Wno-write-strings -Wno-uninitialized -Wno-deprecated  -Wno-format -Wno-ignored-attributes -fpermissive -frounding-math")
+endif()
+
+set(COPT "-std=c++11 -O3 -D BIT64  -Wno-uninitialized -Wno-sign-compare -Wno-write-strings  -Wno-deprecated  -Wno-unused  -Wno-format -Wno-narrowing  -Wno-ignored-attributes -Wno-reorder  -Wreturn-type -D_DOMAIN2D -fopenmp  -fpermissive -frounding-math")
+
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COPT}")
+
+
+##################################
+# include directories
+##################################
+include_directories(
+src/chenna 
+src/HBsplines 
+src/lib 
+src/myGeom 
+src/mySolvers 
+src/standardFEM 
+src/utilities 
+/home/chenna/Documents/myCode/mpap/eigen-devel 
+/home/chenna/Documents/myCode/mpap/eigen-devel/unsupported 
+/usr/include/vtk-6.3
+/usr/include/openmpi 
+/usr/include/petsc 
+/usr/include/x86_64-linux-gnu/CGAL
+/usr/include/superlu 
+/usr/include/boost)
+
+
+
+##################################
+# lib directories
+##################################
+link_directories(
+/usr/lib/gcc/x86_64-linux-gnu/7
+/usr/lib/x86_64-linux-gnu
+/usr/lib/libblas
+/usr/lib/lapack 
+/opt/petsc-3.6.4/arch-linux2-c-debug/lib 
+/usr/lib 
+/home/chenna/Documents/myCode/mpap/lib  
+/usr/lib/x86_64-linux-gnu  
+/usr/x86_64-linux-gnu/lib
+)
+
+
+
+##################################
+# source files
+##################################
+
+
+file(GLOB sources1 src/*/*h)
+file(GLOB sources2 src/*/*cpp)
+file(GLOB sources3 src/*/*for)
+
+##################################
+##################################
+
+add_executable(mpap  src/program/main.cpp ${sources1} ${sources2} ${sources3})
+
+set(VTKLIB62 "vtkCommonCore-6.3 vtkIOCore-6.3  vtkIOGeometry-6.3  vtkIOXML-6.3  vtkIOImage-6.3  vtkIOExport-6.3   vtkRenderingCore-6.3  vtkFiltersCore-6.3  vtkFiltersGeneral-6.3   vtkFiltersModeling-6.3  vtkFiltersSources-6.3  vtkRenderingAnnotation-6.3  vtkRenderingVolume-6.3  vtkRenderingVolumeOpenGL-6.3  vtkRenderingFreeTypeOpenGL-6.3  vtkInteractionStyle-6.3  vtkCommonExecutionModel-6.3  vtkCommonDataModel-6.3  vtkFiltersExtraction-6.3")
+
+
+target_link_libraries(mpap stdc++  gmp  mpfr  stdc++ gfortran gomp pthread m  blas  lapack  metis parmetis  petsc  mpi  mpi_cxx  superlu  pardiso600-GNU720-X86-64  boost_thread boost_system  CGAL CGAL_Core CGAL_ImageIO vtkCommonCore-6.3  vtkIOCore-6.3  vtkIOGeometry-6.3  vtkIOXML-6.3  vtkIOImage-6.3  vtkIOExport-6.3   vtkRenderingCore-6.3  vtkFiltersCore-6.3  vtkFiltersGeneral-6.3   vtkFiltersModeling-6.3  vtkFiltersSources-6.3  vtkRenderingAnnotation-6.3  vtkRenderingVolume-6.3  vtkRenderingVolumeOpenGL-6.3  vtkInteractionStyle-6.3  vtkCommonExecutionModel-6.3  vtkCommonDataModel-6.3  vtkFiltersExtraction-6.3  vtkRenderingFreeType-6.3  vtkRenderingOpenGL-6.3  vtkIOParallel-6.3  vtkIOParallelXML-6.3)
+
+#target_link_libraries(igampap stdc++  gmp  mpfr  "${VTKLIB62}"  boost_thread boost_system  CGAL  CGAL_Core  CGAL_ImageIO m)
+
+install(TARGETS mpap RUNTIME DESTINATION /home/chenna/Documents/myCode/mpap/bin)
+
+
+
