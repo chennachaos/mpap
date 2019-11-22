@@ -1133,7 +1133,7 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
 
 
-//
+/*
 template<>
 void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
 {
@@ -1505,11 +1505,11 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
     return;
 }
+*/
+
+
+
 //
-
-
-
-/*
 template<>
 void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
 {
@@ -1886,7 +1886,7 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
     return;
 }
-*/
+//
 
 
 
