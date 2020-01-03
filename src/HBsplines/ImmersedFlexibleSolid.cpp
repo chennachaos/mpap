@@ -773,6 +773,7 @@ void ImmersedFlexibleSolid::updateForce(double* data)
     int  ii=0, jj=0, ind1=0, ind2=0;
 
     SolnData.forceTemp.setZero();
+    totalForce.setZero();
 
     for(ii=0;ii<nNode;ii++)
     {
@@ -781,7 +782,10 @@ void ImmersedFlexibleSolid::updateForce(double* data)
 
       // second-order based formulation
       for(jj=0;jj<DIM;jj++)
+      {
         SolnData.forceTemp[ind1+jj] = -data[ind2+jj];
+        totalForce[jj] -= data[ind2+jj];
+      }
     }
 
     //printf("\n\n");    printVector(SolnData.forceTemp);

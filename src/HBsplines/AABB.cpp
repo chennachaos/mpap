@@ -22,7 +22,7 @@ bool AABB::doIntersect(AABB&  bb)
   {
     return  false;
   }
-*/ 
+*/
 
   return  true;
 }

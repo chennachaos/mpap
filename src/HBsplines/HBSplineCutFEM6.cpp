@@ -1540,8 +1540,8 @@ void  HBSplineCutFEM::computeTotalForce2D(int bb)
                   totalForce[kk]   += (Nb[ii]*trac[0]);
                   totalForce[kk+1] += (Nb[ii]*trac[1]);
 
-                  fluidAcceOnSolid[kk]   += (Nb[ii]*fact)*acceFluid[0];
-                  fluidAcceOnSolid[kk+1] += (Nb[ii]*fact)*acceFluid[1];
+                  //fluidAcceOnSolid[kk]   += (Nb[ii]*fact)*acceFluid[0];
+                  //fluidAcceOnSolid[kk+1] += (Nb[ii]*fact)*acceFluid[1];
 
                   //fluidAcceOnSolid[kk]   += (Nb[ii]*fact)*(acceFluid[0] - acceSpec[0]);
                   //fluidAcceOnSolid[kk+1] += (Nb[ii]*fact)*(acceFluid[1] - acceSpec[1]);
@@ -1552,7 +1552,8 @@ void  HBSplineCutFEM::computeTotalForce2D(int bb)
       } // if( lme->isActive() )
     }//for(aa=0...
 
-    ImmersedBodyObjects[bb]->fluidAcce = stagParams[4]*fluidAcceOnSolid;
+    //ImmersedBodyObjects[bb]->fluidAcce = stagParams[4]*fluidAcceOnSolid;
+    ImmersedBodyObjects[bb]->fluidAcce.setZero();
 
     fluidAcceOnSolid.resize(0);
 

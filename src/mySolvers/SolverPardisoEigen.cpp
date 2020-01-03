@@ -250,11 +250,11 @@ int SolverPardisoEigen::factoriseAndSolve()
            &nRow, array, &csr[0], &col[0], &perm[0], &NRHS,
            IPARM, &MSGLVL, &rhsVec[0], &soln[0], &error, DPARM);
 
-  printf("Peak memory [kB] phase 1       = %d \n", IPARM[14]);
-  printf("Permanent integer memory [kb]. = %d \n", IPARM[15]);
-  printf("Peak real memory [kB]          = %d \n", IPARM[16]);
-  printf("Number of nonzeros in LU.      = %d \n", IPARM[17]);
-  printf("Gflops for LU factorization.   = %d \n", IPARM[18]);
+  //printf("Peak memory [kB] phase 1       = %d \n", IPARM[14]);
+  //printf("Permanent integer memory [kb]. = %d \n", IPARM[15]);
+  //printf("Peak real memory [kB]          = %d \n", IPARM[16]);
+  //printf("Number of nonzeros in LU.      = %d \n", IPARM[17]);
+  //printf("Gflops for LU factorization.   = %d \n", IPARM[18]);
 
 
   solverTime.total             -= solverTime.factoriseAndSolve;

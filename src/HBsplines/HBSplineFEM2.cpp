@@ -507,7 +507,7 @@ void  HBSplineFEM::applyInterfaceTerms2D()
             {
               xx[ii] = lme->GeomDataLag->NodePosCur[lme->pointNums[ii]][0];
               yy[ii] = lme->GeomDataLag->NodePosCur[lme->pointNums[ii]][1];
-              
+
               specValx[ii] = lme->GeomDataLag->specValCur[lme->pointNums[ii]][0];
               specValy[ii] = lme->GeomDataLag->specValCur[lme->pointNums[ii]][1];
             }
@@ -533,7 +533,7 @@ void  HBSplineFEM::applyInterfaceTerms2D()
               {
                 geom[0]     += Nb[ii] * xx[ii];
                 geom[1]     += Nb[ii] * yy[ii];
-                
+
                 vel2[0]     += Nb[ii] * specValx[ii];
                 vel2[1]     += Nb[ii] * specValy[ii];
 
@@ -642,20 +642,20 @@ void  HBSplineFEM::applyInterfaceTerms2D()
               for(ii=0;ii<ind2;ii++)
               {
                 c = nd->forAssyVec[ii];
-                
+
                 solverEigen->rhsVec[c] += Flocal(ii) ;
               }
 
               for(ii=0;ii<ind1;ii++)
               {
                 r = fluidDOF + lme->posIndices[ii];
-                
+
                 solverEigen->rhsVec[r] += Flocal2(ii);
 
                 for(jj=0;jj<ind2;jj++)
                 {
                   c = nd->forAssyVec[jj];
-                  
+
                   fact = Khorz(ii, jj);
 
                   solverEigen->mtx.coeffRef(r, c) += fact;
@@ -669,7 +669,7 @@ void  HBSplineFEM::applyInterfaceTerms2D()
         else
         {
           myDataIntegrateCutFEM  myData;
-          
+
           PENALTY = ImmersedBodyObjects[bb]->getPenaltyParameter();
 
           for(aa=0;aa<ImmersedBodyObjects[bb]->ImmIntgElems.size();aa++)

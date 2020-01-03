@@ -10,12 +10,12 @@
 int  HBSplineFEM::prepareMatrixPattern()
 {
     char fct[] = "HBSplineFEM::prepareMatrixPattern";
-    
+
     //cout << " HBSplineFEM::prepareMatrixPattern() " << endl;
     //cout << " GRID_CHANGED " << GRID_CHANGED << endl;
     //cout << " IB_MOVED " << IB_MOVED << endl;
     //cout << " STAGGERED " << STAGGERED << endl;
-    
+
     //cout << " velDOF   = " << velDOF << endl;
     //cout << " fluidDOF = " << fluidDOF << endl;
     //cout << " IBDOF    = " << IBDOF << endl;
@@ -163,15 +163,14 @@ int  HBSplineFEM::prepareMatrixPattern()
     for(ii=0;ii<DDconn.size();ii++)
     {
       for(jj=0;jj<DDconn[ii].size();jj++)
-        //solver->mtx.coeffRef(ii, DDconn[ii][jj]) = 0.0;
         tripletList.push_back(T(ii, DDconn[ii][jj], 0.0));
     }
     //cout << " BBBBBBBBBBBBBBB " << endl;
 
     //cout << " DDconnE.size()   = " ;
-    //cout <<  DDconnE.size() << endl;
+    //cout <<   DDconnE.size() << endl;
     //cout << " DDconnEt.size()  = " ;
-    //cout <<  DDconnEt.size() << endl;
+    //cout <<   DDconnEt.size() << endl;
     //cout << " BBBBBBBBBBBBBBB " << endl;
 
     for(ii=0;ii<DDconnE.size();ii++)
@@ -180,8 +179,6 @@ int  HBSplineFEM::prepareMatrixPattern()
       for(jj=0;jj<DDconnE[ii].size();jj++)
       {
         c = DDconnE[ii][jj];
-        //solver->mtx.coeffRef(r, c) = 0.0;
-        //solver->mtx.coeffRef(c, r) = 0.0;
 
         tripletList.push_back(T(r, c, 0.0));
         tripletList.push_back(T(c, r, 0.0));
@@ -198,8 +195,6 @@ int  HBSplineFEM::prepareMatrixPattern()
       for(jj=0;jj<DDconnH[ii].size();jj++)
       {
         c = fluidDOF + DDconnH[ii][jj];
-        //solver->mtx.coeffRef(r, c) = 0.0;
-        //solver->mtx.coeffRef(c, r) = 0.0;
 
         tripletList.push_back(T(r, c, 0.0));
         tripletList.push_back(T(c, r, 0.0));
@@ -214,7 +209,6 @@ int  HBSplineFEM::prepareMatrixPattern()
       for(jj=0;jj<DDconnG[ii].size();jj++)
       {
         c = count + DDconnG[ii][jj];
-        //solver->mtx.coeffRef(r, c) = 0.0;
 
         tripletList.push_back(T(r, c, 0.0));
       }
@@ -430,7 +424,7 @@ void HBSplineFEM::prepareMatrixPatternLagrangeMultipliers()
 
           val1 =  lme->posIndices.size();
           tt1  =  &(lme->posIndices[0]);
-          
+
           for(ee=0;ee<lme->elemNums.size();ee++)
           {
             val2 =  elems[lme->elemNums[ee]]->forAssyVec.size();

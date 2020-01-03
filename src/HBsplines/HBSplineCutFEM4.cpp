@@ -249,7 +249,7 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
       exit(0);
     }
 
-    PetscPrintf(MPI_COMM_WORLD, "  %5d \t %11.4e\n", iterCount, rNorm);
+    PetscPrintf(MPI_COMM_WORLD, "HBSplineCutFEM-- %d \t %11.4e\n", iterCount, rNorm);
 
     if(IB_MOVED)
     {
@@ -260,7 +260,7 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
     }
 
     double tend = MPI_Wtime();
-    //PetscPrintf(MPI_COMM_WORLD, " HBSplineCutFEM::calcStiffnessAndResidual() took %f  milliseconds \n", (tend-tstart)*1000);
+    PetscPrintf(MPI_COMM_WORLD, " HBSplineCutFEM::calcStiffnessAndResidual() took %f  milliseconds \n", (tend-tstart)*1000);
 
     iterCount++;
 

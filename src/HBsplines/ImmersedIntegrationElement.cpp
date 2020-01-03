@@ -287,11 +287,11 @@ void ImmersedIntegrationElement::computeKhorzKvertRigid(MatrixXd& Kh, MatrixXd& 
   for(gp=0;gp<gausspoints.size();gp++)
   {
     computeLagrangeBFsLine2D(nlb-1, gausspoints[gp], &xx[0], &yy[0], &N[0], &dN[0], detJ);
-      
+
     //cout << " detJ " << detJ << '\t' << gaussweights[gp] << endl;
 
     dvol  = gaussweights[gp] * detJ;
-    
+
     dvol1 = dvol;
 
     xc = yc = 0.0;

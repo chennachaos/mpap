@@ -21,7 +21,7 @@ void HBSplineFEM::setInitialConditions()
     double* tmp;
 
     solverEigen->zeroMtx();
-
+/*
     for(int ii=0;ii<activeElements.size();ii++)
     {
        //cout << ii << '\t' << omp_get_thread_num() << '\t' << omp_get_num_threads() << '\t' << omp_get_max_threads() << endl;
@@ -43,12 +43,12 @@ void HBSplineFEM::setInitialConditions()
     solverEigen->currentStatus = ASSEMBLY_OK;
 
     factoriseSolveAndUpdate();
-
+*/
     //
     int resln1[3]; resln1[0] = resln1[1] = 5;
 
     //postProcess2D(1, 1, 10, 1, 0.0, 1.0, resln1);
-    postProcess1D(1, 1, 10, 1, 0.0, 1.0, resln1);
+    //postProcess1D(1, 1, 10, 1, 0.0, 1.0, resln1);
     //
 
     //printVector(solver->soln);
@@ -293,7 +293,7 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
 
 int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool zeroRes)
 {
-    cout << "     HBSplineFEM: generating coefficient Matrices ...\n\n";
+    //cout << "     HBSplineFEM: generating coefficient Matrices ...\n\n";
 
     char fct[] = "HBSplineFEM::calcStiffnessAndResidual";
     computerTime.go(fct);
@@ -401,7 +401,7 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
     //printf("\n\n\n CI value = %14.10f \n\n\n", pow(eig_vals.maxCoeff(),1.0/3.0) );
     //printf("\n %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% \n");
 
-    //
+    /*
     if(pointBCs.size() > 0)
     {
       double  spec_val, PENALTY;
@@ -443,7 +443,7 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
         solverEigen->assembleMatrixAndVector(velDOF, 0, nd->forAssyVec, Klocal, Flocal);
       }
     }
-    //
+    */
     //cout << " rhsVec " << endl;        printVector(&(solver->rhsVec(0)), totalDOF);
 
     //applyBoundaryConditions();
@@ -452,7 +452,7 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
     tend = time(0); 
     //cout << "HBSplineFEM::calcStiffnessAndResidual()  took "<< difftime(tend, tstart) <<" second(s)."<< endl;
 
-    printf("\n rhsVec norm = %12.6E \n", solverEigen->rhsVec.norm());
+    //printf("\n rhsVec norm = %12.6E \n", solverEigen->rhsVec.norm());
 
     ////////////////////////////////////////////////////////
     //
@@ -474,7 +474,7 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
     //printData(1, 1);
     //printData(3, 1);
     //cout << " rhsVec " << endl;        printVector(&(solver->rhsVec(0)), totalDOF);
-    printf("\n rhsVec norm = %12.6E \n", solverEigen->rhsVec.norm());
+    //printf("\n rhsVec norm = %12.6E \n", solverEigen->rhsVec.norm());
 
     //cout << " rhsVec " << endl;
    //for(int ii=fluidDOF-10;ii<totalDOF;ii++)
@@ -519,7 +519,7 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
     rNorm     = solverEigen->rhsVec.norm();
     //IterNum   = (iterCount == 1);
     iterCount++;
-    
+
     SolnData.firstIter = firstIter;
 
     if(IBDOF > 0)
@@ -532,7 +532,7 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
       }
     }
 
-    printf(" %5d \t %11.4e\n", iterCount, rNorm);
+    printf(" HBSplineFEM:: %5d \t %11.4e\n", iterCount-1, rNorm);
     //COUT << domain.name(this); printf("  %11.4e\n",rNorm);
 
     //if(IterNum)
@@ -585,7 +585,7 @@ int HBSplineFEM::factoriseSolveAndUpdate()
 
   //cout << " rhsVec " << endl;        printVector(&(solverEigen->rhsVec(0)), totalDOF);
   //cout << " rhsVec " << endl;
-  //for(int ii=fluidDOF-10;ii<totalDOF;ii++)
+  //for(int ii=fluidDOF-20;ii<totalDOF;ii++)
     //printf("%5d \t %12.8f \n", ii, solverEigen->rhsVec(ii));
 
   tstart = time(0);

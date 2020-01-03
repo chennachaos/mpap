@@ -115,7 +115,7 @@ void ImmersedSolid::reset()
 
 bool ImmersedSolid::converged()
 {
-  tol=1.0e-6;
+  tol=1.0e-4;
 
   if (rNorm < tol && localStiffnessError == 0)
   {
@@ -171,6 +171,7 @@ void  ImmersedSolid::setImmersedIntegrationElements(vector<vector<int> >& datate
         ind = datatemp[ii][1+jj] ;
         lme->pointNums.push_back(ind);
       }
+      //printVector(lme->pointNums);
 
       lme->initialiseDOFvalues();
 

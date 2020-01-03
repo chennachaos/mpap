@@ -849,6 +849,8 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
     //cout << " bfs sizes " << this_mpi_proc << '\t' << bfs_start << '\t' << bfs_end << '\t' << bfs_local << endl;
     //cout << " dof sizes " << this_mpi_proc << '\t' << row_start << '\t' << row_end << '\t' << ndofs_local << endl;
+    PetscPrintf(MPI_COMM_WORLD, " rank = %d  \t row_start = %d  \t row_end = %d  \t ndofs_local = %d  \n", this_mpi_proc,  row_start,  row_end,  ndofs_local);
+
 
     kk=0;
     nnz_max_row = 0;

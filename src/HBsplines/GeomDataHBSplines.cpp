@@ -58,7 +58,7 @@ void GeomDataHBSplines::build()
     }
 
     //cout << " Jacobian[0] " << Jacobian[0] << '\t' << Jacobian[1] << '\t' << Jacobian[2] << '\t'<< Jfull << endl;
-    //cout << " totalNGP " << nGP[0] << '\t' << nGP[1] << '\t' << totalNGP << endl;
+    cout << " totalNGP " << nGP[0] << '\t' << nGP[1] << '\t' << totalNGP << endl;
 
     // compute subdivision coefficient matrices
 

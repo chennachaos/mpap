@@ -347,24 +347,24 @@ void SolutionData::updateIterStep()
 
   if( PHYSICS_TYPE == PHYSICS_TYPE_SOLID )
   {
-    //if(STAGGERED)
-    //{
+    if(STAGGERED)
+    {
       // displacement as the primary variable
       //cout << "  SOLID SOLID SOLID " << endl;
 
       var1Dot     = td[10]*var1 + td[11]*var1Prev + td[12]*var1DotPrev + td[13]*var1DotDotPrev + td[14]*dDotPrev;
       var1DotDot  = td[15]*var1 + td[16]*var1Prev + td[17]*var1DotPrev + td[18]*var1DotDotPrev + td[19]*dDotPrev;
       dDot        = td[20]*var1 + td[21]*var1Prev + td[22]*var1DotPrev + td[23]*var1DotDotPrev + td[24]*dDotPrev;
-    //}
-    //else
-    //{
+    }
+    else
+    {
       // velocity as the primary variable
 
-      //var1       = td[40]*var1Dot + td[41]*var1Prev + td[42]*var1DotPrev + td[43]*var1DotDotPrev + td[44]*dDotPrev;
-      //var1DotDot = td[45]*var1Dot + td[46]*var1Prev + td[47]*var1DotPrev + td[48]*var1DotDotPrev + td[49]*dDotPrev;
+      var1       = td[40]*var1Dot + td[41]*var1Prev + td[42]*var1DotPrev + td[43]*var1DotDotPrev + td[44]*dDotPrev;
+      var1DotDot = td[45]*var1Dot + td[46]*var1Prev + td[47]*var1DotPrev + td[48]*var1DotDotPrev + td[49]*dDotPrev;
       //// ddot_{n+1} for modified state-space formulation
-      //dDot       = td[50]*var1Dot + td[51]*var1Prev + td[52]*var1DotPrev + td[53]*var1DotDotPrev + td[54]*dDotPrev;
-    //}
+      dDot       = td[50]*var1Dot + td[51]*var1Prev + td[52]*var1DotPrev + td[53]*var1DotDotPrev + td[54]*dDotPrev;
+    }
 
     // compute Current values
 
