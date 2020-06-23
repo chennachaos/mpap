@@ -386,9 +386,9 @@ void ImmersedRigidSolid::prepareMatrixPattern()
   else
   {
     int  ii, jj, kk, ll, ind;
-  
+
     //int size_temp = ndofRigidbody;
-    
+
     // increase system size for contacts with Lagrange multipliers
     // contacts for limiting rigid-solid motion
     // two contacts for each DOF
@@ -415,13 +415,13 @@ void ImmersedRigidSolid::prepareMatrixPattern()
       }
     }
 
-    //cout << " ndofRigidbody     " << ndofRigidbody << endl;
-    //cout << " totalDOF " << totalDOF << endl;
-    //cout << " assy4r " << endl;
-    //printVector(assy4r);
+    cout << " ndofRigidbody     " << ndofRigidbody << endl;
+    cout << " totalDOF " << totalDOF << endl;
+    cout << " assy4r " << endl;
+    printVector(assy4r);
 
     bool pp1=0;
-    //pp1=1;
+    pp1=1;
     if(pp1)
     {
       printf("   dof to dof connectivity ...:  \n\n");
@@ -525,23 +525,23 @@ void  ImmersedRigidSolid::updatePointPositions2D()
     if(totalDOF > 0)
     {
       // values at t_{n+af}
-      //dCentCur[0] = SolnData.var1Cur[0];
-      //dCentCur[1] = SolnData.var1Cur[1];
-      //thetaCur    = SolnData.var1Cur[2];
+      dCentCur[0] = SolnData.var1Cur[0];
+      dCentCur[1] = SolnData.var1Cur[1];
+      thetaCur    = SolnData.var1Cur[2];
 
-      //vCentCur[0] = SolnData.var1DotCur[0];
-      //vCentCur[1] = SolnData.var1DotCur[1];
-      //omegaCur    = SolnData.var1DotCur[2];
+      vCentCur[0] = SolnData.var1DotCur[0];
+      vCentCur[1] = SolnData.var1DotCur[1];
+      omegaCur    = SolnData.var1DotCur[2];
 
-      dCentCur[0] = 0.0;
-      dCentCur[1] = SolnData.var1Cur[0];
-      dCentCur[2] = 0.0;
-      thetaCur    = 0.0;
+      //dCentCur[0] = 0.0;
+      //dCentCur[1] = SolnData.var1Cur[0];
+      //dCentCur[2] = 0.0;
+      //thetaCur    = 0.0;
 
-      vCentCur[0] = 0.0;
-      vCentCur[1] = SolnData.var1DotCur[0];
-      vCentCur[2] = 0.0;
-      omegaCur    = 0.0;
+      //vCentCur[0] = 0.0;
+      //vCentCur[1] = SolnData.var1DotCur[0];
+      //vCentCur[2] = 0.0;
+      //omegaCur    = 0.0;
 
       //dCentCur[0] = 0.0;
       //dCentCur[1] = 0.0;
@@ -558,23 +558,23 @@ void  ImmersedRigidSolid::updatePointPositions2D()
       RotCur(1,0) =  st; RotCur(1,1) = ct;
 
       // values at t_{n+1}
-      //dCentNew[0] = SolnData.var1[0];
-      //dCentNew[1] = SolnData.var1[1];
-      //thetaNew    = SolnData.var1[2];
+      dCentNew[0] = SolnData.var1[0];
+      dCentNew[1] = SolnData.var1[1];
+      thetaNew    = SolnData.var1[2];
 
-      //vCentNew[0] = SolnData.var1Dot[0];
-      //vCentNew[1] = SolnData.var1Dot[1];
-      //omegaNew    = SolnData.var1Dot[2];
+      vCentNew[0] = SolnData.var1Dot[0];
+      vCentNew[1] = SolnData.var1Dot[1];
+      omegaNew    = SolnData.var1Dot[2];
 
-      dCentNew[0] = 0.0;
-      dCentNew[1] = SolnData.var1[0];
-      dCentNew[2] = 0.0;
-      thetaNew    = 0.0;
+      //dCentNew[0] = 0.0;
+      //dCentNew[1] = SolnData.var1[0];
+      //dCentNew[2] = 0.0;
+      //thetaNew    = 0.0;
 
-      vCentNew[0] = 0.0;
-      vCentNew[1] = SolnData.var1Dot[0];
-      vCentNew[2] = 0.0;
-      omegaNew    = 0.0;
+      //vCentNew[0] = 0.0;
+      //vCentNew[1] = SolnData.var1Dot[0];
+      //vCentNew[2] = 0.0;
+      //omegaNew    = 0.0;
 
       //dCentNew[0] = 0.0;
       //dCentNew[1] = 0.0;
@@ -1032,13 +1032,13 @@ void ImmersedRigidSolid::updateForce()
 
   //cout << totalForce[0] << '\t' << totalForce[1] << endl;
 
-  //SolnData.forceTemp[0] = totalForce[0];  // Fx
-  //SolnData.forceTemp[1] = totalForce[1];  // Fy
-  //SolnData.forceTemp[2] = totalMoment[2]; // Mz
+  SolnData.forceTemp[0] = totalForce[0];  // Fx
+  SolnData.forceTemp[1] = totalForce[1];  // Fy
+  SolnData.forceTemp[2] = totalForce[5];  // Mz
 
-  SolnData.forceTemp[0] = totalForce[1];  // Fy
-  SolnData.forceTemp[1] = 0.0;  // lamba - contact
-  SolnData.forceTemp[2] = 0.0;
+  //SolnData.forceTemp[0] = totalForce[1];                   // Fy
+  //SolnData.forceTemp[1] = 0.0;                             // lamba - contact
+  //SolnData.forceTemp[2] = 0.0;
 
   SolnData.interpolateForce();
 
@@ -1074,14 +1074,14 @@ void ImmersedRigidSolid::updateForce(double* data)
 
   //PetscPrintf(MPI_COMM_WORLD, "   Forces for solid %5d =  %12.6f \t %12.6f \t %12.6f \n\n", id, totalForce[0], totalForce[1], totalForce[2]);
 
-  //SolnData.forceTemp[0] = totalForce[0];  // Fx
-  //SolnData.forceTemp[1] = totalForce[1];  // Fy
-  //SolnData.forceTemp[2] = totalMoment[2]; // Mz
+  SolnData.forceTemp[0] = totalForce[0];  // Fx
+  SolnData.forceTemp[1] = totalForce[1];  // Fy
+  SolnData.forceTemp[2] = totalForce[2];  // Mz
 
-  SolnData.forceTemp[0] = totalForce[1];  // Fy
+  //SolnData.forceTemp[0] = totalForce[1];                   // Fy
   //SolnData.forceTemp[0] = totalForce[2];  // Mz
-  SolnData.forceTemp[1] = 0.0;  // lamba - contact
-  SolnData.forceTemp[2] = 0.0;
+  //SolnData.forceTemp[1] = 0.0;                             // lamba - contact
+  //SolnData.forceTemp[2] = 0.0;
 
   SolnData.interpolateForce();
 
@@ -1094,12 +1094,12 @@ void ImmersedRigidSolid::updateForce(double* data)
 
 void ImmersedRigidSolid::updateDisplacement(double* data)
 {
-  // update solution vector     
+  // update solution vector
   for(int ii=0;ii<totalDOF;ii++)
   {
-    //SolnData.var1Dot[assy4r[ii]] = data[ii];
-    SolnData.var1Dot[ii] = data[ii];
-    //SolnData.var1[ii] += data[ii];
+    SolnData.var1Dot[assy4r[ii]] = data[ii];
+    //SolnData.var1Dot[ii] = data[ii];
+    //SolnData.var1[ii] = data[ii];
   }
 
   updateIterStep();
@@ -1166,7 +1166,99 @@ void ImmersedRigidSolid::resetMatrixAndVector()
   //F0 = 1.2*0.0314158*981.0;
 */
 
-//
+
+int ImmersedRigidSolid::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool zeroRes)
+{
+  if(firstIter)
+    rNorm = -1.0;
+
+  int ii, jj, ind;
+  double  y1, y2, fact, tol=1.e-12, lamn, gn, af, cn, g0, disp, beta=1.0;
+
+  double  area = 0.49;
+  //double  area = 0.5;
+  double Rt = 1.0, tCur =mpapTime.cur;
+
+  //if(tCur <=  1.0)
+    //Rt = (35.0+(-84.0+(70.0-20.0*tCur)*tCur)*tCur)*tCur*tCur*tCur*tCur;
+
+  double F0 = area*Rt;
+
+  //cout << mpapTime.cur << '\t' << tCur << '\t' << F0 << endl;
+
+  Kglobal.setZero();
+  rhsVec.setZero();
+
+  //cout << " force = " << SolnData.forceCur(0) << '\t' << SolnData.forceCur(1) << endl;
+  //cout << " values = " << SolnData.var1Cur(0) << '\t' << SolnData.forceCur(1) << endl;
+
+  //cout << SolnData.td[5] << '\t' << SolnData.td[6] << '\t' << SolnData.td[7] << endl;
+
+  //printMatrix(M);  printMatrix(C);  printMatrix(K);
+  //printVector(SolnData.forceCur);
+  //printf("\n\n");
+  //printVector(SolnData.var1Cur);
+  //printf("\n\n");
+  //printVector(SolnData.var1DotCur);
+  //printf("\n\n");
+  //printVector(SolnData.var1DotDotCur);
+  //printf("\n\n");
+
+  double  k1 = preLoad[0], k3 = preLoad[1];
+
+  if(STAGGERED)
+  {
+    MatrixXd  Ktemp;
+    VectorXd  Ftemp;
+
+    Ktemp  = SolnData.td[5]*matM + SolnData.td[6]*matC + SolnData.td[7]*matK;
+    Ktemp(1, 1) += (SolnData.td[6]*(k1+3.0*k3*SolnData.var1DotCur(1)*SolnData.var1DotCur(1)));
+
+    Ftemp    = SolnData.forceCur - matM*SolnData.var1DotDotCur - matC*SolnData.var1DotCur - matK*SolnData.var1Cur;
+    Ftemp(1) -= (SolnData.var1DotCur(1)*(k1+k3*SolnData.var1DotCur(1)*SolnData.var1DotCur(1)));
+
+    //Ftemp(1) +=  F0;
+
+    Kglobal.resize(totalDOF, totalDOF);
+    rhsVec.resize(totalDOF);
+
+    for(ii=0; ii<totalDOF; ii++)
+    {
+      rhsVec(ii) = Ftemp(assy4r[ii]);
+      for(jj=0; jj<totalDOF; jj++)
+        Kglobal(ii, jj) = Ktemp(assy4r[ii], assy4r[jj]);
+    }
+  }
+  else
+  {
+    Kglobal  = SolnData.td[5]*matM + SolnData.td[6]*matC + SolnData.td[7]*matK;
+    rhsVec   = SolnData.forceCur - matM*SolnData.var1DotDotCur - matC*SolnData.var1DotCur - matK*SolnData.var1Cur;
+
+    Kglobal /= SolnData.td[10];
+  }
+
+  //printVector(SolnData.forceCur);
+  //printf("\n\n");
+  //printMatrix(Kglobal);
+  //printf("\n\n");
+  //printVector(rhsVec);
+
+  //cout << " forceCur " << forceCur(0) << '\t' << Flocal(0) << '\t' << Klocal(0,0) << endl;
+
+  firstIter = false;
+  rNormPrev = rNorm;
+  rNorm     = rhsVec.norm();
+  //iterCount++;
+
+  //printf(" ImmersedRigidSolid .... norm  %11.4e\n", rNorm);
+  
+  return 0;
+}
+
+
+
+
+/*
 int ImmersedRigidSolid::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool zeroRes)
 {
   if(firstIter)
@@ -1301,7 +1393,7 @@ if(totalDOF > 1)
   
   return 0;
 }
-//
+*/
 
 
 
@@ -1465,24 +1557,22 @@ void ImmersedRigidSolid::calcCouplingMatrices()
 int ImmersedRigidSolid::factoriseSolveAndUpdate()
 {
   //cout << " totalDOF = " << totalDOF << endl;
-
   VectorXd  sln(totalDOF);
-  
   sln = Kglobal.fullPivLu().solve(rhsVec);
-  
+
   //printVector(sln);
 
-  for(int ii=0;ii<sln.rows();ii++)
+  for(int ii=0;ii<totalDOF;ii++)
     //SolnData.var1Dot[assy4r[ii]] += sln[ii];
     //SolnData.var1Dot[ii] += sln[ii];
-    SolnData.var1[ii] += sln[ii];
+    SolnData.var1[assy4r[ii]] += sln[ii];
 
   return 0;
 }
 
 
 
-/*
+//
 int ImmersedRigidSolid::assembleGlobalMatrixAndVector(int start1, int start2, SparseMatrixXd& mtx, double* rhs)
 {
   int ii, jj, r, c, kk, ll;
@@ -1498,7 +1588,7 @@ int ImmersedRigidSolid::assembleGlobalMatrixAndVector(int start1, int start2, Sp
       rhs[r] += Flocal[kk];
 
       for(jj=0;jj<totalDOF;jj++)
-        mtx.coeffRef(r, start2+jj) += Klocal(kk, assy4r[jj]);
+        mtx.coeffRef(r, start2+jj) += Kglobal(kk, assy4r[jj]);
     }
   }
   else
@@ -1511,10 +1601,10 @@ int ImmersedRigidSolid::assembleGlobalMatrixAndVector(int start1, int start2, Sp
       r  = start2 + ii;
       kk = assy4r[ii];
 
-      rhs[r] += Flocal[kk];
+      rhs[r] += rhsVec[kk];
 
       for(jj=0;jj<totalDOF;jj++)
-        mtx.coeffRef(r, start2+jj) += Klocal(kk, assy4r[jj]);
+        mtx.coeffRef(r, start2+jj) += Kglobal(kk, assy4r[jj]);
 
       for(jj=0;jj<forAssyCoupledHorz[ii].size();jj++)
       {
@@ -1528,11 +1618,11 @@ int ImmersedRigidSolid::assembleGlobalMatrixAndVector(int start1, int start2, Sp
 
   return 0;
 }
-*/
-
-
-
 //
+
+
+
+/*
 int ImmersedRigidSolid::assembleGlobalMatrixAndVector(int ind1, int ind2, SparseMatrixXd& mtx, double* rhs)
 {
     if(totalDOF <= 0)
@@ -1569,7 +1659,7 @@ int ImmersedRigidSolid::assembleGlobalMatrixAndVector(int ind1, int ind2, Sparse
 
     return 1;
 }
-//
+*/
 
 
 

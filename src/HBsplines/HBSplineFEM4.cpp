@@ -30,7 +30,7 @@ void HBSplineFEM::plotGeom(int val1, bool flag2, int col, bool PLOT_KNOT_LINES, 
     else
       plotGeom3D(val1, flag2, col, PLOT_KNOT_LINES, resln);
 
-    char fname[50];
+    char fname[500];
 
     sprintf(fname,"%s%s", files.Ofile.asCharArray(),"-geom.vtu");
 
@@ -399,7 +399,7 @@ void  HBSplineFEM::createPostProcessGrid2D(int vartype, int vardir, int nCol, bo
        // create a write object and write uGridVTK to it
     }
 
-    char fname[50];
+    char fname[500];
 
     sprintf(fname,"%s%s", files.Ofile.asCharArray(),"-Grid2D.vtu");
 
@@ -510,7 +510,7 @@ void  HBSplineFEM::postProcess1D(int vartype, int vardir, int nCol, bool umnxfla
          nd1 = NULL;
     }
 
-    char fname[50];
+    char fname[500];
 
     //sprintf(fname,"%s%06d%s", "BSpline-",filecount, ".vtu");
     sprintf(fname,"%s%s%06d%s", files.Ofile.asCharArray(),"-",filecount, ".dat");
@@ -786,7 +786,7 @@ void  HBSplineFEM::postProcess2D(int vartype, int vardir, int nCol, bool umnxfla
   }
 
 
-    char fname[50];
+    char fname[500];
 
     //sprintf(fname,"%s%06d%s", "BSpline-",filecount, ".vtu");
     sprintf(fname,"%s%s%06d%s", files.Ofile.asCharArray(),"-",filecount, ".vtu");
@@ -975,7 +975,7 @@ void  HBSplineFEM::createPostProcessGrid3D(int vartype, int vardir, int nCol, bo
        // create a write object and write uGridVTK to it
     }
 
-    char fname[50];
+    char fname[500];
 
     sprintf(fname,"%s%s", files.Ofile.asCharArray(),"-Grid2D.vtu");
 
@@ -1196,7 +1196,7 @@ void  HBSplineFEM::postProcess3D(int vartype, int vardir, int nCol, bool umnxfla
     //if(tis > 10)
       //FluidSolnData.soln = rhsVec;
 
-    char fname[50];
+    char fname[500];
 
     //sprintf(fname,"%s%06d%s", "BSpline-",filecount, ".vtu");
     sprintf(fname,"%s%s%06d%s", files.Ofile.asCharArray(),"-",filecount, ".vtu");
@@ -1281,7 +1281,7 @@ void HBSplineFEM::plotGaussPoints()
     //uGridVTK2->GetPointData()->SetScalars(scaVTK3);
     //uGridVTK2->GetPointData()->AddArray(scaVTK4);
 
-    char fname[200];
+    char fname[500];
 
     sprintf(fname,"%s%s", files.Ofile.asCharArray(),"-Gausspoints.vtu");
 

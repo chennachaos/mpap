@@ -256,7 +256,7 @@ rigid body stiffness
 
 rigid body degree of freedom
 ! d1   d2   d3
-  -1   1   -1  
+  -1   -1   -1  
 
 
 immersed body output

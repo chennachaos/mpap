@@ -493,6 +493,48 @@ int ImmersedFlexibleSolid::calcStiffnessAndResidual(int printRes, bool zeroMtx, 
 
     applyExternalForces();
 
+
+  if(mpapTime.cur >= 10.0)
+  {
+    int  nboundnodes = 11, nn, n1, n2, ii;
+    int boundnodes[] = {201, 402, 603, 804, 1005, 1206, 1407, 1608, 1809, 2010, 2211};
+    //double  Kd = 0.0/2.0, Kv = 0.5/2.0;
+    double  Kd = SolnData.MatlProp[0].data[4]/2.0, Kv = SolnData.MatlProp[0].data[5]/2.0;
+    //cout <<  Kd << '\t' << Kv << endl;
+
+
+    double  stiffnessFact = SolnData.td[2];
+    double  dampingFact   = SolnData.td[6];
+
+    for(ii=0; ii<nboundnodes; ii++)
+    {
+      nn = boundnodes[ii] - 1;
+
+      n1 = nn*2;
+      n2 = ID[nn][0];
+
+      if(n2 != -1)
+      {
+        solver->mtx.coeffRef(n2,  n2)   += (stiffnessFact*Kd);
+        solver->rhsVec[n2]              -= (Kd*SolnData.var1Cur[n1]);
+
+        solver->mtx.coeffRef(n2,  n2)   += (dampingFact*Kv);
+        solver->rhsVec[n2]              -= (Kv*SolnData.var1DotCur[n1]);
+      }
+
+      n1 = nn*2+1;
+      n2 = ID[nn][1];
+
+      if(n2 != -1)
+      {
+        solver->mtx.coeffRef(n2,  n2)   += (stiffnessFact*Kd);
+        solver->rhsVec[n2]              -= (Kd*SolnData.var1Cur[n1]);
+
+        solver->mtx.coeffRef(n2,  n2)   += (dampingFact*Kv);
+        solver->rhsVec[n2]              -= (Kv*SolnData.var1DotCur[n1]);
+      }
+    }
+  }
     //cout << " rhsVec " << endl;        printVector(&(rhsVec[0]), totalDOF);
 
     //printf("\n rhsVec norm = %12.6E \n", solver->rhsVec.norm());

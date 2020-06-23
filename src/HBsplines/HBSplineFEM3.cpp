@@ -93,7 +93,7 @@ void HBSplineFEM::updateIterStep()
       //cout << " AAAAAAAAAAA " << bb << endl;
       ImmersedBodyObjects[bb]->updateDisplacement(&(SolnData.var4(0)));
       //cout << " AAAAAAAAAAA " << bb << endl;
-      //ImmersedBodyObjects[bb]->updateIterStep();
+      ImmersedBodyObjects[bb]->updateIterStep();
       //cout << " AAAAAAAAAAA " << bb << endl;
     }
     //cout << " AAAAAAAAAAA " << bb << endl;

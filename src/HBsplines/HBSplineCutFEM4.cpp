@@ -224,9 +224,9 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
       }
     }
 
-    //cout << " rhsVec " << endl;
+    cout << " rhsVec " << endl;
     //printVector(&(solver->rhsVec(0)), totalDOF);
-    //printf("\n rhsVec norm = %12.6E \n", solver->rhsVec.norm());
+    //printf("\n rhsVec norm = %12.6E \n", solverPetsc->rhsVec.norm());
 
     firstIter = false;
     rNormPrev = rNorm;
@@ -243,7 +243,7 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
 
     if( std::isnan(rNorm) )
     {
-      //VecView(solverPetsc->rhsVec, PETSC_VIEWER_STDOUT_WORLD);
+      VecView(solverPetsc->rhsVec, PETSC_VIEWER_STDOUT_WORLD);
 
       cerr << "  NAN found "  << endl;
       exit(0);
