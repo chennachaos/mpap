@@ -11,7 +11,7 @@ using namespace Eigen;
 
 bool doubleGreater(double left, double right, bool orequal)
 {
-  if (fabs(left - right) < DBL_EPSILON) 
+  if (fabs(left - right) < EPSILON) 
     return (orequal);
 
   return (left > right);
@@ -20,7 +20,7 @@ bool doubleGreater(double left, double right, bool orequal)
 
 bool doubleLess(double left, double right, bool orequal)
 {
-  if (fabs(left - right) < DBL_EPSILON)
+  if (fabs(left - right) < EPSILON)
     return (orequal);
 
   return (left < right);
