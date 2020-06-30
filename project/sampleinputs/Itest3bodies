@@ -452,8 +452,7 @@ BEGIN RUN_CONTROL
 
 
 BATCH
-!anly,solv,,28,1,1,1,1,1,1
-anly,solv,,28,1,10,4,1,1,1
+anly,solv,,28,1,8,1,1,1,1
 chen,data,,28,2,2,2,1
 dt,,1.0
 wrnd

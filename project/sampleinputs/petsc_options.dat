@@ -1,0 +1,6 @@
+-ksp_type bcgs
+-pc_type ilu
+-pc_factor_levels 2
+-pc_factor_fill 2
+-ksp_rtol 1.e-8
+-ksp_max_it 1000
