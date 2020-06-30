@@ -13,9 +13,7 @@
 #include <Eigen/SparseExtra>
 #include <Eigen/IterativeSolvers>
 
-#include "myIterativeSolvers.h"
 
-#include "myCondNum.h"
 
 extern SolverTime      solverTime;
 extern ComputerTime    computerTime;
@@ -464,28 +462,6 @@ int  SolverEigen::solve()
   int niter=2000;
   double  tol=1.0e-10;
   bool info=false;
-
-  if( algoType == 8 )
-  {
-    info =  myIterSolvers::myPCG(mtx, rhsVec, soln, niter, tol);
-
-    cout << info << '\t' << tol << '\t' << niter << endl;
-    cout << endl;    cout << endl;
-  }
-
-  if( algoType == 9 )
-  {
-    info =  myIterSolvers::myPCGserial(mtx, rhsVec, soln, niter, tol);
-
-    cout << info << '\t' << tol << '\t' << niter << endl;
-    cout << endl;    cout << endl;
-  }
-
-  if( algoType == 10 )
-  {
-    myBiCGSTAB();
-    //cout << endl;    cout << endl;
-  }
 
 
   solnPrev = soln;

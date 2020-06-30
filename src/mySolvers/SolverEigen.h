@@ -6,9 +6,7 @@
 #include "Solver.h"
 #include "headersEigen.h"
 #include <vector>
-#include "myIncompleteLUT.h"
 
-using namespace myIterSolvers;
 
 enum { PARDISO_STRUCT_SYM, PARDISO_UNSYM };
 
@@ -27,8 +25,6 @@ class SolverEigen
     bool checkIO, STABILISED;
 
     double normPrev, normCur, normRef; // norm of solution error
-
-    myIncompleteLUT<double>  precond;
 
     ////////////////////////////
     //

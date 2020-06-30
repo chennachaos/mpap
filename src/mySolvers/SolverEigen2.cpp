@@ -10,30 +10,13 @@
 #include <Eigen/SparseExtra>
 #include <Eigen/IterativeSolvers>
 
-#include "myIncompleteLUT.h"
-#include "myIncompleteLUT2.h"
-#include "mySOR.h"
-#include "myJacobi.h"
-#include "myPolyprecond.h"
-
-//#include "myCondNum.h"
-
-//#include "myCondNumMatlab.h"
-
-//#include "eigenCondNumber.h"
-
-//# include "umfpack.h"
-
-//#include "engine.h"
 
 extern SolverTime      solverTime;
 extern ComputerTime    computerTime;
 
 using namespace std;
 using namespace Eigen;
-using namespace myIterSolvers;
 
-//using namespace myMatrix;
 
 
 void SolverEigen::computeConditionNumber()
@@ -1092,7 +1075,6 @@ int  SolverEigen::myBiCGSTAB()
 
 
     //y = p;
-    y = precond.solve(p);
     //iterTemp = 1;
     //tolTemp = 1.0e-4;
     //myJacobi_Sparse(mtx, p, y, iterTemp, tolTemp, omega);
@@ -1106,7 +1088,6 @@ int  SolverEigen::myBiCGSTAB()
     s = r - alpha * v;
 
     //z = s;
-    z = precond.solve(s);
     //iterTemp = 1;
     //tolTemp = 1.0e-4;
     //myJacobi_Sparse(mtx, s, z, iterTemp, tolTemp, omega);
@@ -1155,14 +1136,6 @@ void  SolverEigen::updatePreconditioner()
 
     time_t tstart, tend;
     tstart = time(0);
-
-
-  precond.free();
-
-  precond.setDroptol(1.0e-3);
-  precond.setFillfactor(3);
-
-  precond.compute(mtx);
 
   tend = time(0); 
   printf("ILUT preconditioner took %8.4f second(s) \n ", difftime(tend, tstart) );
