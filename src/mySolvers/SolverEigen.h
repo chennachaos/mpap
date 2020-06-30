@@ -77,25 +77,6 @@ class SolverEigen
 
     virtual int factoriseAndSolve();
 
-    void setupMatricesAndVectors();
-
-    void solverSchurCG();
-
-    void solverSchurGMRES();
-
-    void solverSchurBiCGSTAB();
-
-    void solverUzawaType1();
-
-    void solverUzawaType2();
-
-    int  myBiCGSTAB();
-
-    void resetPrecondFlag()
-    {
-      update_precond = 1;
-    }
-
     void  updatePreconditioner();
 
     void  computeConditionNumber();
