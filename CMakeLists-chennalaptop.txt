@@ -29,6 +29,8 @@ if(CXX_COMPILER_NAME MATCHES "gcc*")
     set(COPT "-std=c++11 -O3 -w -funroll-loops -ftree-vectorize -ftree-vectorizer-verbose=1  -Wno-write-strings -Wno-uninitialized -Wno-deprecated  -Wno-format -Wno-ignored-attributes -fpermissive -frounding-math")
 endif()
 
+# -DPARDISO_SOLVER
+
 set(COPT "-std=c++11 -O3 -D BIT64  -Wno-uninitialized -Wno-sign-compare -Wno-write-strings  -Wno-deprecated  -Wno-unused  -Wno-format -Wno-narrowing  -Wno-ignored-attributes -Wno-reorder  -Wreturn-type -D_DOMAIN2D -fopenmp  -fpermissive -frounding-math")
 
 
@@ -89,8 +91,9 @@ file(GLOB sources3 src/*/*for)
 
 add_executable(mpap  src/program/main.cpp ${sources1} ${sources2} ${sources3})
 
+#pardiso600-GNU720-X86-64
 
-target_link_libraries(mpap stdc++  gmp  mpfr  stdc++ gfortran gomp pthread m  blas  lapack  metis parmetis  petsc  mpi  mpi_cxx  superlu  pardiso600-GNU720-X86-64  CGAL CGAL_Core CGAL_ImageIO vtkCommonCore-6.3  vtkIOCore-6.3  vtkIOGeometry-6.3  vtkIOXML-6.3  vtkIOImage-6.3  vtkIOExport-6.3   vtkRenderingCore-6.3  vtkFiltersCore-6.3  vtkFiltersGeneral-6.3   vtkFiltersModeling-6.3  vtkFiltersSources-6.3  vtkRenderingAnnotation-6.3  vtkRenderingVolume-6.3  vtkRenderingVolumeOpenGL-6.3  vtkInteractionStyle-6.3  vtkCommonExecutionModel-6.3  vtkCommonDataModel-6.3  vtkFiltersExtraction-6.3  vtkRenderingFreeType-6.3  vtkRenderingOpenGL-6.3  vtkIOParallel-6.3  vtkIOParallelXML-6.3)
+target_link_libraries(mpap stdc++  gmp  mpfr  stdc++ gfortran gomp pthread m  blas  lapack  metis parmetis  petsc  mpi  mpi_cxx  superlu    CGAL CGAL_Core CGAL_ImageIO vtkCommonCore-6.3  vtkIOCore-6.3  vtkIOGeometry-6.3  vtkIOXML-6.3  vtkIOImage-6.3  vtkIOExport-6.3   vtkRenderingCore-6.3  vtkFiltersCore-6.3  vtkFiltersGeneral-6.3   vtkFiltersModeling-6.3  vtkFiltersSources-6.3  vtkRenderingAnnotation-6.3  vtkRenderingVolume-6.3  vtkRenderingVolumeOpenGL-6.3  vtkInteractionStyle-6.3  vtkCommonExecutionModel-6.3  vtkCommonDataModel-6.3  vtkFiltersExtraction-6.3  vtkRenderingFreeType-6.3  vtkRenderingOpenGL-6.3  vtkIOParallel-6.3  vtkIOParallelXML-6.3)
 
 
 install(TARGETS mpap RUNTIME DESTINATION /home/chenna/Documents/myCode/mpap/bin)

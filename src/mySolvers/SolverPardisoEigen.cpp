@@ -49,10 +49,11 @@ SolverPardisoEigen::~SolverPardisoEigen()
 {
   phase = -1; error = 0;
 
+#ifdef PARDISO_SOLVER
   pardiso_(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
            &nRow, array, &csr[0], &col[0], &perm[0], &NRHS,
            IPARM, &MSGLVL, &ddum, &ddum, &error, DPARM);
-
+#endif
 }
 
 
@@ -127,7 +128,9 @@ int SolverPardisoEigen::initialise(int numProc, int matrixType, int nr)
   else prgError(2,fct,"set environment variable OMP_NUM_THREADS!");
 */
 
+#ifdef PARDISO_SOLVER
   pardisoinit_(PT, &MTYPE, &SOLVER, IPARM, DPARM, &error);
+#endif
 
   if (error != 0)
   {
@@ -155,9 +158,11 @@ int SolverPardisoEigen::initialise(int numProc, int matrixType, int nr)
 
   perm.resize(nRow);
 
+#ifdef PARDISO_SOLVER
   pardiso_(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
            &nRow, array, &csr[0], &col[0], &perm[0], &NRHS,
            IPARM, &MSGLVL, &ddum, &ddum, &error, DPARM);
+#endif
 
   if (error != 0)
   {
@@ -190,10 +195,11 @@ int SolverPardisoEigen::factorise()
 
   computerTime.go(fct);
 
+#ifdef PARDISO_SOLVER
   pardiso_(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
            &nRow, array, &csr[0], &col[0], &perm[0], &NRHS,
            IPARM, &MSGLVL, &ddum, &ddum, &error, DPARM);
-
+#endif
   solverTime.total     -= solverTime.factorise;
   solverTime.factorise += computerTime.stop(fct);
   solverTime.total     += solverTime.factorise;
@@ -220,10 +226,11 @@ int SolverPardisoEigen::solve()
   computerTime.go(fct);
   soln.setZero();
 
+#ifdef PARDISO_SOLVER
   pardiso_(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
            &nRow, array, &csr[0], &col[0], &perm[0], &NRHS,
            IPARM, &MSGLVL, &rhsVec[0], &soln[0], &error, DPARM);
-
+#endif
   solverTime.total -= solverTime.solve;
   solverTime.solve += computerTime.stop(fct);
   solverTime.total += solverTime.solve;
@@ -246,10 +253,11 @@ int SolverPardisoEigen::factoriseAndSolve()
   computerTime.go(fct);
   soln.setZero();
 
+#ifdef PARDISO_SOLVER
   pardiso_(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
            &nRow, array, &csr[0], &col[0], &perm[0], &NRHS,
            IPARM, &MSGLVL, &rhsVec[0], &soln[0], &error, DPARM);
-
+#endif
   //printf("Peak memory [kB] phase 1       = %d \n", IPARM[14]);
   //printf("Permanent integer memory [kb]. = %d \n", IPARM[15]);
   //printf("Peak real memory [kB]          = %d \n", IPARM[16]);
@@ -272,9 +280,11 @@ int SolverPardisoEigen::free()
 {
   phase = -1; error = 0;
 
+#ifdef PARDISO_SOLVER
   pardiso_(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
            &nRow, array, &csr[0], &col[0], &perm[0], &NRHS,
            IPARM, &MSGLVL, &ddum, &ddum, &error, DPARM);
+#endif
 
   array = NULL;
 

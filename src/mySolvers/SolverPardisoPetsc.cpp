@@ -30,6 +30,12 @@ SolverPardisoPetsc::SolverPardisoPetsc()
   //VecCreate(PETSC_COMM_WORLD, &solnPrev);
   //VecCreate(PETSC_COMM_WORLD, &rhsVec);
   //VecCreate(PETSC_COMM_WORLD, &reac);
+
+#ifndef PARDISO_SOLVER
+  cerr << "PARDISO solver is not available ... " << endl;
+  cerr << " Need to be compiled with PARDISO_SOLVER preprocessor directive " << endl;
+  exit(1);
+#endif
 }
 
 
@@ -41,10 +47,11 @@ SolverPardisoPetsc::~SolverPardisoPetsc()
 
   phase = -1; error = 0;
 
+#ifdef PARDISO_SOLVER
   pardiso_(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
            &nRow, array, csr, col, perm, &NRHS,
            IPARM, &MSGLVL, &ddum, &ddum, &error, DPARM);
-
+#endif
 }
 
 
@@ -103,7 +110,9 @@ int SolverPardisoPetsc::initialise(int numProc, int matrixType, int nrow1)
   else prgError(2,fct,"set environment variable OMP_NUM_THREADS!");
 */
 
+#ifdef PARDISO_SOLVER
   pardisoinit_(PT, &MTYPE, &SOLVER, IPARM, DPARM, &error);
+#endif
 
   if (error != 0)
   {
@@ -124,10 +133,11 @@ int SolverPardisoPetsc::initialise(int numProc, int matrixType, int nrow1)
   ierr = MatSeqAIJGetArray(mtx, &array);
   //ierr = MatGetArray(mtx, &array);
 
+#ifdef PARDISO_SOLVER
   pardiso_(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
            &nRow, array, csr, col, &idum, &NRHS,
            IPARM, &MSGLVL, &ddum, &ddum, &error, DPARM);
-
+#endif
   if (error != 0)
   {
     COUT << "PARDISO ERROR = " << error << "\n\n";
@@ -156,9 +166,11 @@ int SolverPardisoPetsc::factorise()
 
   computerTime.go(fct);
 
+#ifdef PARDISO_SOLVER
   pardiso_(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
            &nRow, array, csr, col, perm, &NRHS,
            IPARM, &MSGLVL, &ddum, &ddum, &error, DPARM);
+#endif
 
   solverTime.total     -= solverTime.factorise;
   solverTime.factorise += computerTime.stop(fct);
@@ -190,9 +202,11 @@ int  SolverPardisoPetsc::solve()
   VecGetArray(rhsVec, &arrayRhs);
   VecGetArray(soln, &arraySoln);
 
+#ifdef PARDISO_SOLVER
   pardiso_(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
            &nRow, array, csr, col, perm, &NRHS,
            IPARM, &MSGLVL, arrayRhs, arraySoln, &error, DPARM);
+#endif
 
   //for(int ii=0; ii<nRow; ii++)
     //VecSetValue(soln, ii, arraySoln[ii], INSERT_VALUES);
@@ -246,9 +260,11 @@ int  SolverPardisoPetsc::factoriseAndSolve()
 
   VecRestoreArray(rhsVec, &arrayRhs);
 
+#ifdef PARDISO_SOLVER
   pardiso_(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
            &nRow, array, csr, col, perm, &NRHS,
            IPARM, &MSGLVL, &rhsTemp[0], &solnTemp[0], &error, DPARM);
+#endif
 
   VecZeroEntries(soln);
   for(ii=0; ii<nRow; ii++)
@@ -288,9 +304,11 @@ int SolverPardisoPetsc::free()
 
   phase = -1; error = 0;
 
+#ifdef PARDISO_SOLVER
   pardiso_(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
            &nRow, array, csr, col, perm, &NRHS,
            IPARM, &MSGLVL, &ddum, &ddum, &error, DPARM);
+#endif
 
   PetscBool flag;
 
