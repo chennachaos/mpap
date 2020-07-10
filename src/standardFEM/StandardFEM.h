@@ -112,8 +112,6 @@ class StandardFEM: public Domain
         SolverEigen *solverEigen;
         SolverPetsc *solverPetsc;
 
-        vtkSmartPointer<vtkDataSetMapper>        mapperVTK;
-        vtkSmartPointer<vtkActor>                actorVTK;
         vtkSmartPointer<vtkUnstructuredGrid>     uGridVTK;
         vtkSmartPointer<vtkPoints>               pointsVTK;
         vtkSmartPointer<vtkVertex>               vertexVTK;

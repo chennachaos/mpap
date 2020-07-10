@@ -105,7 +105,7 @@ HBSplineBase::HBSplineBase()
     STATUS_BCS = PERIODIC_BCS  = false;
 
     firstIter = CREATE_POSTPROCESS_GRID = true;
-    
+
     GRID_CHANGED = IB_MOVED = STABILISED = true;
 
     NodeNumsAtLevel.resize(10);
@@ -116,8 +116,6 @@ HBSplineBase::HBSplineBase()
     filecount = 0;
     IterNum = 1;
 
-    mapperVTK    =  vtkSmartPointer<vtkDataSetMapper>::New();
-    actorVTK     =  vtkSmartPointer<vtkActor>::New();
     uGridVTK     =  vtkSmartPointer<vtkUnstructuredGrid>::New(); 
     pointsVTK    =  vtkSmartPointer<vtkPoints>::New();
     lineVTK      =  vtkSmartPointer<vtkLine>::New();

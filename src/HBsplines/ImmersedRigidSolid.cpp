@@ -501,7 +501,12 @@ void  ImmersedRigidSolid::updatePointPositions2D()
 {
     int  ee, elm, ii, ind, bb;
     double  thetaNew, thetaCur, omegaNew, omegaCur, fact;
-    double  A, B, F, wn, ct, st, t0;
+    double  A, B, F, fD, wn, ct, st, t0;
+    double  tNew, tCur, af, RPM, N, wn1;
+    af = SolnData.td(2);
+
+    tNew = mpapTime.cur;
+    tCur = tNew - (1.0-af)*mpapTime.dt;
 
     myPoint  geom, param, rOrig, rNew, vNew, dCentNew, dCentCur, vCentNew, vCentCur;
     myPoint  centroidNew, centroidCur;
@@ -522,16 +527,26 @@ void  ImmersedRigidSolid::updatePointPositions2D()
     RotNew.setZero();
     RotCur.setZero();
 
+    A  = PI/2.0;
+    //fD = 0.175;
+    fD = 0.18;
+    wn = 2.0*PI*fD;
+
+    //cout << "totalDOF " << totalDOF << endl;
+    cout << "tCur = " << tCur << endl;
+
     if(totalDOF > 0)
     {
       // values at t_{n+af}
       dCentCur[0] = SolnData.var1Cur[0];
       dCentCur[1] = SolnData.var1Cur[1];
       thetaCur    = SolnData.var1Cur[2];
+      thetaCur    = A*sin(wn*tCur);
 
       vCentCur[0] = SolnData.var1DotCur[0];
       vCentCur[1] = SolnData.var1DotCur[1];
       omegaCur    = SolnData.var1DotCur[2];
+      omegaCur    = A*wn*cos(wn*tCur);
 
       //dCentCur[0] = 0.0;
       //dCentCur[1] = SolnData.var1Cur[0];
@@ -561,10 +576,12 @@ void  ImmersedRigidSolid::updatePointPositions2D()
       dCentNew[0] = SolnData.var1[0];
       dCentNew[1] = SolnData.var1[1];
       thetaNew    = SolnData.var1[2];
+      thetaNew    = A*sin(wn*tNew);
 
       vCentNew[0] = SolnData.var1Dot[0];
       vCentNew[1] = SolnData.var1Dot[1];
       omegaNew    = SolnData.var1Dot[2];
+      omegaNew    = A*wn*cos(wn*tNew);
 
       //dCentNew[0] = 0.0;
       //dCentNew[1] = SolnData.var1[0];
@@ -651,22 +668,15 @@ void  ImmersedRigidSolid::updatePointPositions2D()
     F = 0.1666*1.1;
     //F = 1.1;
 
-    t0 = 1.0/F;
-    //t0 = 2.0*t0;
+    A  = 0.25;
     t0 = 0.0;
-    wn = 1.0;
+    wn = 4.0;
 
     //cout << " PRESC_MOTION = " << PRESC_MOTION << endl;
 
     //if(PRESC_MOTION && (mpapTime.cur > t0)  && ( (id==0) || (id==1)) )
     if(PRESC_MOTION && (mpapTime.cur > t0)  && ( id==0) )
     {
-      double  tNew, tCur, af, RPM, N, wn1;
-      af = SolnData.td(2);
-
-      tNew = mpapTime.cur;
-      tCur = tNew - (1.0-af)*mpapTime.dt;
-
       /*
       N = 50.0;
 
@@ -717,9 +727,7 @@ void  ImmersedRigidSolid::updatePointPositions2D()
       //omegaCur    = -(0.25*PI)*(1.0-fact*fact);
       */
 
-      /*
-      wn = 2.0*PI*F;
-
+      //
       dCentNew[0] = 0.0;
       dCentNew[1] = A*sin(wn*(tNew-t0));
       thetaNew    = 0.0;
@@ -735,8 +743,9 @@ void  ImmersedRigidSolid::updatePointPositions2D()
       vCentCur[0] = 0.0;
       vCentCur[1] = A*wn*cos(wn*(tCur-t0));
       omegaCur    = 0.0;
-      */
+      //
 
+      /*
       wn = 2.0*PI*F;
 
       dCentNew[0] = 0.0;
@@ -754,6 +763,7 @@ void  ImmersedRigidSolid::updatePointPositions2D()
       vCentCur[0] = 0.0;
       vCentCur[1] = 0.0;
       omegaCur    = A*wn*cos(wn*(tCur-t0));
+      */
 
 
       // from Fehmi's paper
@@ -804,7 +814,7 @@ void  ImmersedRigidSolid::updatePointPositions2D()
       */
 
       // hovering insect wing
-      /* 
+      //
       double  A0=2.5, beta=PI/3.0, phi=0.0, alpha0=PI/4.0, T=0.025;
       wn = 2.0*PI/T;
 
@@ -827,7 +837,7 @@ void  ImmersedRigidSolid::updatePointPositions2D()
       vCentCur[0] = fact*cos(beta);
       vCentCur[1] = fact*sin(beta);
       omegaCur    = alpha0*(-cos(wn*tCur+phi)*wn);
-      */
+      //
 
       //cout << " disp    " << dCentNew[0] << '\t' << dCentNew[1] << '\t' << thetaNew << endl;
       //cout << " velo    " << vCentNew[0] << '\t' << vCentNew[1] << '\t' << omegaNew << endl;
@@ -1112,8 +1122,8 @@ void ImmersedRigidSolid::solveTimeStep()
 {
   if( totalDOF > 0 )
   {
-    //printf("\n Solving Immersed Rigid Solid \n");
-  
+    printf("\n Solving Immersed Rigid Solid \n");
+
     tol = 1.0e-6;
 
     for(int iter=0;iter<10;iter++)
@@ -1212,10 +1222,10 @@ int ImmersedRigidSolid::calcStiffnessAndResidual(int solver_type, bool zeroMtx, 
     VectorXd  Ftemp;
 
     Ktemp  = SolnData.td[5]*matM + SolnData.td[6]*matC + SolnData.td[7]*matK;
-    Ktemp(1, 1) += (SolnData.td[6]*(k1+3.0*k3*SolnData.var1DotCur(1)*SolnData.var1DotCur(1)));
+    //Ktemp(1, 1) += (SolnData.td[6]*(k1+3.0*k3*SolnData.var1DotCur(1)*SolnData.var1DotCur(1)));
 
     Ftemp    = SolnData.forceCur - matM*SolnData.var1DotDotCur - matC*SolnData.var1DotCur - matK*SolnData.var1Cur;
-    Ftemp(1) -= (SolnData.var1DotCur(1)*(k1+k3*SolnData.var1DotCur(1)*SolnData.var1DotCur(1)));
+    //Ftemp(1) -= (SolnData.var1DotCur(1)*(k1+k3*SolnData.var1DotCur(1)*SolnData.var1DotCur(1)));
 
     //Ftemp(1) +=  F0;
 

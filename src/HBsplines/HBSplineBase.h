@@ -108,8 +108,6 @@ class HBSplineBase: public Domain
 
         BiCGSTAB<SparseMatrixXd, IncompleteLUT<double> > solver3;
 
-        vtkSmartPointer<vtkDataSetMapper>        mapperVTK;
-        vtkSmartPointer<vtkActor>                actorVTK;
         vtkSmartPointer<vtkUnstructuredGrid>     uGridVTK;
         vtkSmartPointer<vtkPoints>               pointsVTK;
         vtkSmartPointer<vtkVertex>               vertexVTK;

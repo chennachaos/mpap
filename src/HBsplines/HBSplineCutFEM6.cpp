@@ -30,6 +30,7 @@ void  HBSplineCutFEM::solveSolidProblem()
   // in the communicator
   if(this_mpi_proc == 0)
   {
+    cout << "HBSplineCutFEM::solveSolidProblem() " << endl;
     for(bb=0; bb<nImmSolids; bb++)
     {
       ImmersedBodyObjects[bb]->solveTimeStep();
