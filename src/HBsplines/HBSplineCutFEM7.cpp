@@ -350,6 +350,7 @@ void  HBSplineCutFEM::postProcessFlow(int vartype, int vardir, int nCol, bool um
       //return;
     cout << "nCol = " << nCol << endl;
 
+
     if( (filecount % nCol) !=  0)
         return;
 
