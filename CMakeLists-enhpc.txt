@@ -1,0 +1,142 @@
+cmake_minimum_required(VERSION 2.6)
+project(mpap)
+
+enable_language(CXX Fortran)
+
+#module purge
+#module load hpcw
+#module load vtk/5.10.1 
+# intel compiler for this vtk version - compiler/intel/13.0/028,  mpi/intel/4.1/3.045
+#module load petsc/3.5.2
+
+#module load mpi/intel/2018/3
+
+
+##################################
+# project directories
+##################################
+
+
+#PROJECT_BINARY_DIR
+#PROJECT_SOURCE_DIR
+
+#get the compiler type to use
+#message ($ENV{COMPILER_TYPE})
+
+
+##################################
+# compiler options
+# C++ compiler
+##################################
+
+#if( $ENV{COMPILER_TYPE} MATCHES "INTEL")
+    #INTEL Compilers
+    ##################################
+
+    message ("Using INTEL compilers")
+
+    #set(CMAKE_C_COMPILER "/opt/intel/compilers_and_libraries_2016.3.210/linux/bin/intel64/icc")
+    #set(CMAKE_CXX_COMPILER "/opt/intel/compilers_and_libraries_2016.3.210/linux/bin/intel64/icc")
+    #set(CMAKE_Fortran_COMPILER "/opt/intel/compilers_and_libraries_2016.3.210/linux/bin/intel64/ifort")
+
+    #set(COPT "-Wall -std=c++11  -O3")
+    
+#else()
+    #GNU Compilers
+    ##################################
+
+    message ("Using GNU compilers")
+    set(CMAKE_C_COMPILER "/opt/ohpc/pub/compiler/gcc/5.3.0/bin/gcc")
+    set(CMAKE_CXX_COMPILER "/opt/ohpc/pub/compiler/gcc/5.3.0/bin/g++")
+    set(CMAKE_Fortran_COMPILER "/opt/ohpc/pub/compiler/gcc/5.3.0/bin/gfortran")
+    set(COPT "-w -std=c++11 -O3 -mavx2 -ftree-vectorize -ftree-vectorizer-verbose=1  -Wno-uninitialized -Wno-sign-compare -Wno-write-strings  -Wno-deprecated  -Wno-unused  -Wno-format -Wno-narrowing  -Wno-reorder  -Wreturn-type -Wno-unused-parameter -fopenmp  -fpermissive -frounding-math -D_DOMAIN2D ")
+
+    set(FOPT "-w -O3 -cpp -dM -fimplicit-none -ffixed-line-length-none")
+    set(bounds "-fbounds-check")
+#endif()
+
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COPT}")
+set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${FOPT}")
+
+
+##################################
+# include directories
+##################################
+include_directories(
+src/chenna
+src/lib
+src/myGeom
+src/program
+src/support
+src/HBsplines
+src/macro
+src/material
+src/mySolvers
+src/standardFEM
+src/utilities
+/home/c.kadapa/lustre/mpap3/eigen-devel  
+/home/c.kadapa/lustre/mpap3/eigen-devel/unsupported 
+/lustre/apps/vtk/7.1.1/gnu/include/vtk-7.1 
+/opt/ohpc/pub/mpi/openmpi-gnu/1.10.3/include  
+/opt/ohpc/pub/libs/gnu/metis/5.1.0/include 
+/opt/ohpc/pub/libs/gnu/openmpi/petsc/3.7.0/include 
+/opt/ohpc/pub/libs/gnu/superlu/5.1/include 
+/opt/ohpc/pub/libs/gnu/openmpi/superlu_dist/4.2/include 
+/opt/ohpc/pub/compiler/gcc/5.3.0/include/c++/5.3.0 
+/lustre/apps/boost/1.64.0/gnu/include/boost 
+/lustre/apps/boost/1.64.0/gnu/include 
+/lustre/apps/cgal/4.10/gnu/include
+)
+
+
+
+##################################
+# lib directories
+##################################
+link_directories(
+/home/c.kadapa/lustre/mpap/lib 
+/opt/ohpc/pub/compiler/gcc/5.3.0/lib64 
+/lustre/apps/vtk/7.1.1/gnu/lib 
+/opt/ohpc/pub/libs/gnu/metis/5.1.0/lib 
+/opt/ohpc/pub/libs/gnu/openmpi/hdf5/1.8.16/lib 
+#/opt/intel/compilers_and_libraries_2016.3.210/linux/compiler/lib/intel64_lin
+#/opt/intel/compilers_and_libraries_2016.3.210/linux/mkl/lib/intel64_lin
+/opt/ohpc/pub/mpi/openmpi-gnu/1.10.3/lib 
+/opt/ohpc/pub/libs/gnu/openmpi/petsc/3.7.0/lib 
+/home/c.kadapa/lustre/bzfem/lib
+/lustre/apps/cgal/4.10/gnu/lib64
+/lustre/apps/boost/1.64.0/gnu/lib
+/opt/ohpc/pub/libs/gnu/superlu/5.1/lib
+/opt/ohpc/pub/libs/gnu/openmpi/superlu_dist/4.2/lib
+)
+
+
+
+##################################
+# source files
+##################################
+
+
+file(GLOB sources1 src/*/*.h)
+file(GLOB sources2 src/*/*.cpp)
+file(GLOB sources3 src/*/*.for)
+
+##################################
+##################################
+
+add_executable(mpap  ./src/program/main.cpp ${sources1} ${sources2} ${sources3})
+
+set(VTKLIB62 "vtkCommonCore-5.10 vtkIOCore-5.10  vtkIOGeometry-5.10  vtkIOXML-5.10  vtkIOImage-5.10  vtkIOExport-5.10   vtkRenderingCore-5.10  vtkFiltersCore-5.10  vtkFiltersGeneral-5.10   vtkFiltersModeling-5.10  vtkFiltersSources-5.10  vtkRenderingAnnotation-5.10  vtkRenderingVolume-5.10  vtkRenderingVolumeOpenGL-5.10  vtkRenderingFreeTypeOpenGL-5.10  vtkInteractionStyle-5.10  vtkCommonExecutionModel-5.10  vtkCommonDataModel-5.10  vtkFiltersExtraction-5.10")
+
+
+#target_link_libraries(mpap stdc++  gmp  mpfr  stdc++ gfortran gomp pthread m  blas  lapack  metis parmetis  petsc  mpi  mpi_cxx  superlu  pardiso500-GNU481-X86-64  boost_thread boost_system  CGAL CGAL_Core CGAL_ImageIO vtkCommonCore-5.10  vtkIOCore-5.10  vtkIOGeometry-5.10  vtkIOXML-5.10  vtkIOImage-5.10  vtkIOExport-5.10   vtkRenderingCore-5.10  vtkFiltersCore-5.10  vtkFiltersGeneral-5.10   vtkFiltersModeling-5.10  vtkFiltersSources-5.10  vtkRenderingAnnotation-5.10  vtkRenderingVolume-5.10  vtkRenderingVolumeOpenGL-5.10  vtkRenderingFreeTypeOpenGL-5.10  vtkInteractionStyle-5.10  vtkCommonExecutionModel-5.10  vtkCommonDataModel-5.10  vtkFiltersExtraction-5.10  vtkRenderingFreeType-5.10  vtkRenderingOpenGL-5.10  vtkIOParallel-5.10  vtkIOParallelXML-5.10)
+
+#target_link_libraries(mpap stdc++  gmp  mpfr  "${VTKLIB62}"  boost_thread boost_system  CGAL  CGAL_Core  CGAL_ImageIO m)
+
+target_link_libraries(mpap  stdc++ gfortran gomp m metis petsc mpi mpi_cxx pardiso600-GNU720-X86-64  hdf5  hdf5_hl  vtkCommonCore-7.1  vtkIOCore-7.1  vtkIOGeometry-7.1  vtkIOXML-7.1  vtkIOImage-7.1  vtkIOExport-7.1   vtkRenderingCore-7.1  vtkFiltersCore-7.1  vtkFiltersGeneral-7.1   vtkFiltersModeling-7.1  vtkFiltersSources-7.1  vtkRenderingAnnotation-7.1  vtkRenderingVolume-7.1   vtkInteractionStyle-7.1  vtkCommonExecutionModel-7.1  vtkCommonDataModel-7.1  vtkFiltersExtraction-7.1  vtkRenderingFreeType-7.1  vtkIOParallel-7.1  vtkIOParallelXML-7.1  vtkRenderingOpenGL2-7.1   boost_thread boost_system  CGAL  CGAL_Core  CGAL_ImageIO  superlu  superlu_dist)
+
+
+install(TARGETS mpap       RUNTIME DESTINATION  /home/c.kadapa/lustre/mpap/bin)
+
+
