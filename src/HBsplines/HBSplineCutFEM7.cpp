@@ -196,13 +196,15 @@ void HBSplineCutFEM::plotGeomSubTrias2D(int val1, bool flag2, int col, bool PLOT
     vtkIdType  ptIds[20],  ptId, cellId;
     node *ndTemp;
     myPoint  ptTemp;
-    
+
     AABB  bbTemp;
 
     for(ee=0;ee<activeElements.size();ee++)
     {
-        ndTemp = elems[activeElements[ee]];
+      ndTemp = elems[activeElements[ee]];
 
+      if( ndTemp->getSubdomainId() == this_mpi_proc )
+      {
         if( !ndTemp->isCutElement() )
         {
           bbTemp = ndTemp->getAABB();
@@ -227,7 +229,7 @@ void HBSplineCutFEM::plotGeomSubTrias2D(int val1, bool flag2, int col, bool PLOT
           totalNGP += ndTemp->Quadrature.gausspoints.size();
 
           vtkSmartPointer<vtkTriangle> triaVTK =  vtkSmartPointer<vtkTriangle>::New();
-          
+
           //cout << " subTrias # = " << activeElements[ee] << '\t' << nd1->subTrias.size() << endl;
 
           myPoly *poly;
@@ -252,6 +254,7 @@ void HBSplineCutFEM::plotGeomSubTrias2D(int val1, bool flag2, int col, bool PLOT
 
           } //  for(ii=0; ii<nd->subTrias.size(); ii++)
         } //else
+      }
     } // for(ee=0;ee<elems.size();ee++)
 
     printf("\n Total number of Gauss points in cut cells = %d \n\n", totalNGP );
@@ -269,13 +272,15 @@ void HBSplineCutFEM::plotGeomSubTrias3D(int val1, bool flag2, int col, bool PLOT
     vtkIdType  ptIds[20],  ptId, cellId;
     node *ndTemp;
     myPoint  ptTemp;
-    
+
     AABB  bbTemp;
 
     for(ee=0; ee<activeElements.size(); ee++)
     {
-        ndTemp = elems[activeElements[ee]];
+      ndTemp = elems[activeElements[ee]];
 
+      if( ndTemp->getSubdomainId() == this_mpi_proc )
+      {
         //if( nd1->getDomainNumber() < 5 )
         if( !ndTemp->isCutElement() )
         {
@@ -304,7 +309,7 @@ void HBSplineCutFEM::plotGeomSubTrias3D(int val1, bool flag2, int col, bool PLOT
           totalNGP += ndTemp->Quadrature.gausspoints.size();
 
           vtkSmartPointer<vtkTetra> tetVTK =  vtkSmartPointer<vtkTetra>::New();
-          
+
           //cout << " subTrias # = " << activeElements[ee] << '\t' << nd1->subTrias.size() << endl;
 
           myPoly *poly;
@@ -329,6 +334,7 @@ void HBSplineCutFEM::plotGeomSubTrias3D(int val1, bool flag2, int col, bool PLOT
 
           } //  for(ii=0; ii<nd->subTrias.size(); ii++)
         } //else
+      }
     } // for(ee=0;ee<elems.size();ee++)
 
     printf("\n Total number of Gauss points in cut cells = %d \n\n", totalNGP );
@@ -615,140 +621,143 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
       {
         ndTemp = elems[activeElements[ee]];
 
-        knotBegin = ndTemp->getKnotBegin();
-        knotEnd   = ndTemp->getKnotEnd();
-        knotIncr  = ndTemp->getKnotIncrement();
-
-        if( !(ndTemp->isCutElement()) )
-        //if( ndTemp->getDomainNumber() <= 10 )
+        if( ndTemp->getSubdomainId() == this_mpi_proc )
         {
-          if( ndTemp->getDomainNumber() == 0 )
+          knotBegin = ndTemp->getKnotBegin();
+          knotEnd   = ndTemp->getKnotEnd();
+          knotIncr  = ndTemp->getKnotIncrement();
+
+          if( !(ndTemp->isCutElement()) )
+          //if( ndTemp->getDomainNumber() <= 10 )
           {
-            fact = knotIncr[0]/resln[0];
-            create_vector(knotBegin[0], knotEnd[0], fact, uu);
-
-            fact = knotIncr[1]/resln[1];
-            create_vector(knotBegin[1], knotEnd[1], fact, vv);
-
-            //create the coordinates of the pointsVTK (nodes in FEM)
-
-            count = 0;
-            for(jj=0;jj<vv.size();jj++)
+            if( ndTemp->getDomainNumber() == 0 )
             {
-              param[1] = vv[jj];
-              geom[1] = computeGeometry(1, vv[jj]);
-              for(ii=0;ii<uu.size();ii++)
+              fact = knotIncr[0]/resln[0];
+              create_vector(knotBegin[0], knotEnd[0], fact, uu);
+
+              fact = knotIncr[1]/resln[1];
+              create_vector(knotBegin[1], knotEnd[1], fact, vv);
+
+              //create the coordinates of the pointsVTK (nodes in FEM)
+
+              count = 0;
+              for(jj=0;jj<vv.size();jj++)
               {
-                param[0] = uu[ii];
-                geom[0] = computeGeometry(0, uu[ii]);
-
-                pt[count++] = pointsVTK->InsertNextPoint(geom[0], geom[1], 0.0);
-
-                GeomData.computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy);
-
-                if(ndTemp->getParent() == NULL)
+                param[1] = vv[jj];
+                geom[1] = computeGeometry(1, vv[jj]);
+                for(ii=0;ii<uu.size();ii++)
                 {
-                  N = NN;
-                  dN_dx = dNN_dx;
-                  dN_dy = dNN_dy;
-                }
-                else
-                {
-                  N = ndTemp->SubDivMat*NN;
-                  dN_dx = ndTemp->SubDivMat*dNN_dx;
-                  dN_dy = ndTemp->SubDivMat*dNN_dy;
-                }
+                  param[0] = uu[ii];
+                  geom[0] = computeGeometry(0, uu[ii]);
 
-                vec[0] = ndTemp->computeValue(0, N);
-                vec[1] = ndTemp->computeValue(1, N);
+                  pt[count++] = pointsVTK->InsertNextPoint(geom[0], geom[1], 0.0);
 
-                vecVTK->InsertNextTuple(vec);
+                  GeomData.computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy);
 
-                vec[0] = ndTemp->computeValueDot(0, N);
-                vec[1] = ndTemp->computeValueDot(1, N);
+                  if(ndTemp->getParent() == NULL)
+                  {
+                    N = NN;
+                    dN_dx = dNN_dx;
+                    dN_dy = dNN_dy;
+                  }
+                  else
+                  {
+                    N = ndTemp->SubDivMat*NN;
+                    dN_dx = ndTemp->SubDivMat*dNN_dx;
+                    dN_dy = ndTemp->SubDivMat*dNN_dy;
+                  }
 
-                vecVTK2->InsertNextTuple(vec);
+                  vec[0] = ndTemp->computeValue(0, N);
+                  vec[1] = ndTemp->computeValue(1, N);
 
-                fact   = ndTemp->computeValue(2, N);
-                scaVTK->InsertNextValue(fact);
-                fact = ndTemp->computeValue(1, dN_dx) - ndTemp->computeValue(0, dN_dy);
-                scaVTK2->InsertNextValue(fact);
+                  vecVTK->InsertNextTuple(vec);
 
-              } // for(ii=0;ii<uu.size();ii++)
-            } // for(jj=0;jj<vv.size();jj++)
+                  vec[0] = ndTemp->computeValueDot(0, N);
+                  vec[1] = ndTemp->computeValueDot(1, N);
 
-            quadVTK->GetPointIds()->SetId(0, pt[0]);
-            quadVTK->GetPointIds()->SetId(1, pt[1]);
-            quadVTK->GetPointIds()->SetId(2, pt[3]);
-            quadVTK->GetPointIds()->SetId(3, pt[2]);
+                  vecVTK2->InsertNextTuple(vec);
 
-            uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
-            cellDataVTK->InsertNextValue(0);
-            cellDataVTK2->InsertNextValue(ndTemp->getSubdomainId());
-          }
-        } //if( !nd->isCutElement() )
-        else // the element is cutCell
-        //if( ndTemp->getDomainNumber() == -1 )
-        {
-          vtkSmartPointer<vtkTriangle> triaVTK =  vtkSmartPointer<vtkTriangle>::New();
+                  fact   = ndTemp->computeValue(2, N);
+                  scaVTK->InsertNextValue(fact);
+                  fact = ndTemp->computeValue(1, dN_dx) - ndTemp->computeValue(0, dN_dy);
+                  scaVTK2->InsertNextValue(fact);
 
-          myPoly *poly;
+                }                                           // for(ii=0;ii<uu.size();ii++)
+              }                                             // for(jj=0;jj<vv.size();jj++)
 
-          for(ii=0; ii<ndTemp->subTrias.size(); ii++)
+              quadVTK->GetPointIds()->SetId(0, pt[0]);
+              quadVTK->GetPointIds()->SetId(1, pt[1]);
+              quadVTK->GetPointIds()->SetId(2, pt[3]);
+              quadVTK->GetPointIds()->SetId(3, pt[2]);
+
+              uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
+              cellDataVTK->InsertNextValue(0);
+              cellDataVTK2->InsertNextValue(ndTemp->getSubdomainId());
+            }
+          }                                                 //if( !nd->isCutElement() )
+          else                                              // the element is cutCell
+          //if( ndTemp->getDomainNumber() == -1 )
           {
-            poly = ndTemp->subTrias[ii];
+            vtkSmartPointer<vtkTriangle> triaVTK =  vtkSmartPointer<vtkTriangle>::New();
 
-            if( poly->getDomainNumber() == 0 )
+            myPoly *poly;
+
+            for(ii=0; ii<ndTemp->subTrias.size(); ii++)
             {
-              for(kk=0; kk<3; kk++)
+              poly = ndTemp->subTrias[ii];
+
+              if( poly->getDomainNumber() == 0 )
               {
-                geom = poly->GetPoint(kk);
-                //cout << kk << '\t' << ptTemp[0] << '\t' << ptTemp[1] << endl;
-
-                pt[kk] = pointsVTK->InsertNextPoint(geom[0], geom[1], 0.0);
-
-                geometryToParametric(geom, param);
-                GeomData.computeBasisFunctions2D(knotBegin, knotIncr, param, NN);
-
-                if(ndTemp->getParent() == NULL)
+                for(kk=0; kk<3; kk++)
                 {
-                  N = NN;
-                  dN_dx = dNN_dx;
-                  dN_dy = dNN_dy;
+                  geom = poly->GetPoint(kk);
+                  //cout << kk << '\t' << ptTemp[0] << '\t' << ptTemp[1] << endl;
+
+                  pt[kk] = pointsVTK->InsertNextPoint(geom[0], geom[1], 0.0);
+
+                  geometryToParametric(geom, param);
+                  GeomData.computeBasisFunctions2D(knotBegin, knotIncr, param, NN);
+
+                  if(ndTemp->getParent() == NULL)
+                  {
+                    N = NN;
+                    dN_dx = dNN_dx;
+                    dN_dy = dNN_dy;
+                  }
+                  else
+                  {
+                    N = ndTemp->SubDivMat*NN;
+                    dN_dx = ndTemp->SubDivMat*dNN_dx;
+                    dN_dy = ndTemp->SubDivMat*dNN_dy;
+                  }
+
+                  vec[0] = ndTemp->computeValue(0, N);
+                  vec[1] = ndTemp->computeValue(1, N);
+
+                  vecVTK->InsertNextTuple(vec);
+
+                  vec[0] = ndTemp->computeValueDot(0, N);
+                  vec[1] = ndTemp->computeValueDot(1, N);
+
+                  vecVTK2->InsertNextTuple(vec);
+
+                  fact   = ndTemp->computeValue(2, N);
+                  scaVTK->InsertNextValue(fact);
+                  fact = ndTemp->computeValue(1, dN_dx) - ndTemp->computeValue(0, dN_dy);
+                  scaVTK2->InsertNextValue(fact);
+
+                  triaVTK->GetPointIds()->SetId(kk, pt[kk] );
                 }
-                else
-                {
-                  N = ndTemp->SubDivMat*NN;
-                  dN_dx = ndTemp->SubDivMat*dNN_dx;
-                  dN_dy = ndTemp->SubDivMat*dNN_dy;
-                }
 
-                vec[0] = ndTemp->computeValue(0, N);
-                vec[1] = ndTemp->computeValue(1, N);
+                cellDataVTK->InsertNextValue(poly->getDomainNumber());
+                cellDataVTK2->InsertNextValue(0);
 
-                vecVTK->InsertNextTuple(vec);
-
-                vec[0] = ndTemp->computeValueDot(0, N);
-                vec[1] = ndTemp->computeValueDot(1, N);
-
-                vecVTK2->InsertNextTuple(vec);
-
-                fact   = ndTemp->computeValue(2, N);
-                scaVTK->InsertNextValue(fact);
-                fact = ndTemp->computeValue(1, dN_dx) - ndTemp->computeValue(0, dN_dy);
-                scaVTK2->InsertNextValue(fact);
-
-                triaVTK->GetPointIds()->SetId(kk, pt[kk] );
-              }
-
-              cellDataVTK->InsertNextValue(poly->getDomainNumber());
-              cellDataVTK2->InsertNextValue(0);
-
-              uGridVTK->InsertNextCell(triaVTK->GetCellType(), triaVTK->GetPointIds());
-            } // if( domainInclYesNo[domTemp] )
-          } //  for(ii=0; ii<nd->subTrias.size(); ii++)
-          //cout << " AAAAAAAAAA " << endl;
-        } // else
+                uGridVTK->InsertNextCell(triaVTK->GetCellType(), triaVTK->GetPointIds());
+              } // if( domainInclYesNo[domTemp] )
+            }                                               //  for(ii=0; ii<nd->subTrias.size(); ii++)
+            //cout << " AAAAAAAAAA " << endl;
+          } // else
+        }
       }
 
       //cout << " jjjjjjjjjjjjjjjjjj " << endl;
@@ -938,12 +947,14 @@ void  HBSplineCutFEM::postProcessSubTrias3D(int vartype, int vardir, int nCol, b
       {
         ndTemp = elems[activeElements[ee]];
 
-        knotBegin = ndTemp->getKnotBegin();
-        knotEnd   = ndTemp->getKnotEnd();
-        knotIncr  = ndTemp->getKnotIncrement();
-
-        if( !(ndTemp->isCutElement()) )
+        if( ndTemp->getSubdomainId() == this_mpi_proc )
         {
+          knotBegin = ndTemp->getKnotBegin();
+          knotEnd   = ndTemp->getKnotEnd();
+          knotIncr  = ndTemp->getKnotIncrement();
+
+          if( !(ndTemp->isCutElement()) )
+          {
             fact = knotIncr[0]/resln[0];
             create_vector(knotBegin[0], knotEnd[0], fact, uu);
 
@@ -1018,64 +1029,65 @@ void  HBSplineCutFEM::postProcessSubTrias3D(int vartype, int vardir, int nCol, b
             //cellDataVTK->InsertNextValue(0);
             cellDataVTK2->InsertNextValue(ndTemp->getSubdomainId());
             //cout << " ooooooooooooo " << endl;
-        } //if( !nd->isCutElement() )
-        else // the element is cutCell
-        {
-          vtkSmartPointer<vtkTetra> tetVTK =  vtkSmartPointer<vtkTetra>::New();
-
-          myPoly *poly;
-
-          for(ii=0; ii<ndTemp->subTrias.size(); ii++)
+          }                                                 //if( !nd->isCutElement() )
+          else                                              // the element is cutCell
           {
-            poly = ndTemp->subTrias[ii];
-            domTemp = poly->getDomainNumber();
-            if( domainInclYesNo[domTemp] )
+            vtkSmartPointer<vtkTetra> tetVTK =  vtkSmartPointer<vtkTetra>::New();
+
+            myPoly *poly;
+
+            for(ii=0; ii<ndTemp->subTrias.size(); ii++)
+            {
+              poly = ndTemp->subTrias[ii];
+              domTemp = poly->getDomainNumber();
+              if( domainInclYesNo[domTemp] )
 	          {
-              for(kk=0; kk<4; kk++)
-              {
-                geom = poly->GetPoint(kk);
-                //cout << kk << '\t' << ptTemp[0] << '\t' << ptTemp[1] << endl;
-
-                pt[kk] = pointsVTK->InsertNextPoint(geom[0], geom[1], geom[2]);
-
-                geometryToParametric(geom, param);
-                GeomData.computeBasisFunctions2D(knotBegin, knotIncr, param, NN);
-
-                if(ndTemp->getParent() == NULL)
+                for(kk=0; kk<4; kk++)
                 {
-                  N = NN;
-                  dN_dx = dNN_dx;
-                  dN_dy = dNN_dy;
-                  dN_dz = dNN_dz;
+                  geom = poly->GetPoint(kk);
+                  //cout << kk << '\t' << ptTemp[0] << '\t' << ptTemp[1] << endl;
+
+                  pt[kk] = pointsVTK->InsertNextPoint(geom[0], geom[1], geom[2]);
+
+                  geometryToParametric(geom, param);
+                  GeomData.computeBasisFunctions2D(knotBegin, knotIncr, param, NN);
+
+                  if(ndTemp->getParent() == NULL)
+                  {
+                    N = NN;
+                    dN_dx = dNN_dx;
+                    dN_dy = dNN_dy;
+                    dN_dz = dNN_dz;
+                  }
+                  else
+                  {
+                    N = ndTemp->SubDivMat*NN;
+                    dN_dx = ndTemp->SubDivMat*dNN_dx;
+                    dN_dy = ndTemp->SubDivMat*dNN_dy;
+                    dN_dz = ndTemp->SubDivMat*dNN_dz;
+                  }
+
+                  vec[0] = ndTemp->computeValue(0, N);
+                  vec[1] = ndTemp->computeValue(1, N);
+                  vec[2] = ndTemp->computeValue(2, N);
+                  fact   = ndTemp->computeValue(3, N);
+
+                  vecVTK->InsertNextTuple(vec);
+                  //vecVTK2->InsertNextTuple(vec);
+                  scaVTK->InsertNextValue(fact);
+                  scaVTK2->InsertNextValue(fact);
+
+                  tetVTK->GetPointIds()->SetId(kk, pt[kk] );
                 }
-                else
-                {
-                  N = ndTemp->SubDivMat*NN;
-                  dN_dx = ndTemp->SubDivMat*dNN_dx;
-                  dN_dy = ndTemp->SubDivMat*dNN_dy;
-                  dN_dz = ndTemp->SubDivMat*dNN_dz;
-                }
 
-                vec[0] = ndTemp->computeValue(0, N);
-                vec[1] = ndTemp->computeValue(1, N);
-                vec[2] = ndTemp->computeValue(2, N);
-                fact   = ndTemp->computeValue(3, N);
+                cellDataVTK->InsertNextValue(poly->getDomainNumber());
 
-                vecVTK->InsertNextTuple(vec);
-                //vecVTK2->InsertNextTuple(vec);
-                scaVTK->InsertNextValue(fact);
-                scaVTK2->InsertNextValue(fact);
-
-                tetVTK->GetPointIds()->SetId(kk, pt[kk] );
-              }
-
-              cellDataVTK->InsertNextValue(poly->getDomainNumber());
-
-              uGridVTK->InsertNextCell(tetVTK->GetCellType(), tetVTK->GetPointIds());
-            } // if( domainInclYesNo[domTemp] )
-          } //  for(ii=0; ii<nd->subTrias.size(); ii++)
-          //cout << " AAAAAAAAAA " << endl;
-        } // else
+                uGridVTK->InsertNextCell(tetVTK->GetCellType(), tetVTK->GetPointIds());
+              }                                             // if( domainInclYesNo[domTemp] )
+            }                                               //  for(ii=0; ii<nd->subTrias.size(); ii++)
+            //cout << " AAAAAAAAAA " << endl;
+          }                                                 // else
+        }
       }
 
       //cout << " jjjjjjjjjjjjjjjjjj " << endl;

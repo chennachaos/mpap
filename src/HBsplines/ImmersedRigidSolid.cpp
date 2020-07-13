@@ -533,7 +533,7 @@ void  ImmersedRigidSolid::updatePointPositions2D()
     wn = 2.0*PI*fD;
 
     //cout << "totalDOF " << totalDOF << endl;
-    cout << "tCur = " << tCur << endl;
+    //cout << "tCur = " << tCur << endl;
 
     if(totalDOF > 0)
     {
