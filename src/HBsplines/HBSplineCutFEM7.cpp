@@ -348,6 +348,10 @@ void  HBSplineCutFEM::postProcessFlow(int vartype, int vardir, int nCol, bool um
 {
     //if(this_mpi_proc != 0)
       //return;
+    cout << "nCol = " << nCol << endl;
+
+    if( (filecount % nCol) !=  0)
+        return;
 
     double tstart = MPI_Wtime();
 
