@@ -330,7 +330,7 @@ loop,,9.9999999999,2
   next
   prnt
   if,conv
-    vtk,flow,,28,1,1,1,10,1,1,1,0,0,1
+    vtk,flow,,28,1,1,1,1,1,1,1,0,0,1
     wrnd
     dt,stck
   else

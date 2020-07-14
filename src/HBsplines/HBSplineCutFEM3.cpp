@@ -491,7 +491,7 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
       //cout << " elem_start = " << elem_start << '\t' << elem_end << '\t' << nElem_local << endl;
 
-      PetscInt  *eptr, *eind, *elem_proc_id, *node_proc_id, *vwgtElem;
+      PetscInt  *elem_proc_id, *node_proc_id;
 
       ierr  = PetscMalloc1(nElem,    &elem_proc_id); CHKERRQ(ierr);
       ierr  = PetscMalloc1(nNode,    &node_proc_id); CHKERRQ(ierr);
@@ -500,6 +500,8 @@ int  HBSplineCutFEM::prepareMatrixPattern()
       //
       if(this_mpi_proc == 0)
       {
+        PetscInt  *eptr, *eind, *vwgtElem;
+
         ierr  = PetscMalloc1(nElem+1,  &eptr);  CHKERRQ(ierr);
         ierr  = PetscMalloc1(nElem,    &vwgtElem); CHKERRQ(ierr);
 
@@ -584,10 +586,10 @@ int  HBSplineCutFEM::prepareMatrixPattern()
         //for(ee=0; ee<nNode; ee++)
           //cout << ee << '\t' << node_proc_id[ee] << endl;
 
-          ierr  = PetscFree(eptr);  CHKERRQ(ierr);
-          ierr  = PetscFree(eind);  CHKERRQ(ierr);    
-          ierr  = PetscFree(vwgtElem); CHKERRQ(ierr);
-        }  //if(this_mpi_proc == 0)
+        ierr  = PetscFree(eptr);  CHKERRQ(ierr);
+        ierr  = PetscFree(eind);  CHKERRQ(ierr);
+        ierr  = PetscFree(vwgtElem); CHKERRQ(ierr);
+      }  //if(this_mpi_proc == 0)
 
 
       ierr = MPI_Barrier(MPI_COMM_WORLD);
