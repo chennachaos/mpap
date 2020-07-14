@@ -541,12 +541,12 @@ void  ImmersedRigidSolid::updatePointPositions2D()
       dCentCur[0] = SolnData.var1Cur[0];
       dCentCur[1] = SolnData.var1Cur[1];
       thetaCur    = SolnData.var1Cur[2];
-      thetaCur    = A*sin(wn*tCur);
+      //thetaCur    = A*sin(wn*tCur);
 
       vCentCur[0] = SolnData.var1DotCur[0];
       vCentCur[1] = SolnData.var1DotCur[1];
       omegaCur    = SolnData.var1DotCur[2];
-      omegaCur    = A*wn*cos(wn*tCur);
+      //omegaCur    = A*wn*cos(wn*tCur);
 
       //dCentCur[0] = 0.0;
       //dCentCur[1] = SolnData.var1Cur[0];
@@ -576,12 +576,12 @@ void  ImmersedRigidSolid::updatePointPositions2D()
       dCentNew[0] = SolnData.var1[0];
       dCentNew[1] = SolnData.var1[1];
       thetaNew    = SolnData.var1[2];
-      thetaNew    = A*sin(wn*tNew);
+      //thetaNew    = A*sin(wn*tNew);
 
       vCentNew[0] = SolnData.var1Dot[0];
       vCentNew[1] = SolnData.var1Dot[1];
       omegaNew    = SolnData.var1Dot[2];
-      omegaNew    = A*wn*cos(wn*tNew);
+      //omegaNew    = A*wn*cos(wn*tNew);
 
       //dCentNew[0] = 0.0;
       //dCentNew[1] = SolnData.var1[0];

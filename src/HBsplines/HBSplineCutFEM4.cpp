@@ -224,7 +224,6 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
       }
     }
 
-    cout << " rhsVec " << endl;
     //printVector(&(solver->rhsVec(0)), totalDOF);
     //printf("\n rhsVec norm = %12.6E \n", solverPetsc->rhsVec.norm());
 

@@ -542,7 +542,7 @@ int  HBSplineCutFEM::prepareMatrixPattern()
         if(DIM == 3)
           nodes_per_side = 4;
 
-        int  nWeights  = 1, numflag=0, node_proc_ids = n_mpi_procs, objval;
+        int  nWeights  = 1, numflag=0, nparts = n_mpi_procs, objval;
         int  *xadj, *adjncy;
         int  options[METIS_NOPTIONS];
 
@@ -561,16 +561,12 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
 
         // METIS partition routine - based on the nodal graph of the mesh
-        //int ret = METIS_PartMeshNodal(&nElem, &nNode, eptr, eind, NULL, NULL, &node_proc_ids, NULL, options, &objval, elem_proc_id, node_proc_id);
+        //int ret = METIS_PartMeshNodal(&nElem, &nNode, eptr, eind, vwgtElem, NULL, &nparts, NULL, options, &objval, elem_proc_id, node_proc_id);
 
         // METIS partition routine - based on the dual graph of the mesh
-        int ret = METIS_PartMeshDual(&nElem, &nNode, eptr, eind, NULL, NULL, &nodes_per_side, &n_mpi_procs, NULL, options, &objval, elem_proc_id, node_proc_id);
-        //int ret = METIS_PartMeshDual(&nElem, &nNode, eptr, eind, vwgtElem, NULL, &nodes_per_side, &n_mpi_procs, NULL, options, &objval, elem_proc_id, node_proc_id);
+        //int ret = METIS_PartMeshDual(&nElem, &nNode, eptr, eind, NULL, NULL, &nodes_per_side, &nparts, NULL, options, &objval, elem_proc_id, node_proc_id);
+        int ret = METIS_PartMeshDual(&nElem, &nNode, eptr, eind, vwgtElem, NULL, &nodes_per_side, &nparts, NULL, options, &objval, elem_proc_id, node_proc_id);
 
-        //idx_t  wgtflag=0, numflag=0, ncon=0, ncommonnodes=2, node_proc_ids=n_mpi_procs;
-        //idx_t  *elmdist;
-
-        //int ret = ParMETIS_V3_PartMeshKway(elmdist, eptr, eind, NULL, &wgtflag, &numflag, &ncon, &ncommonnodes, &node_proc_ids, NULL, NULL, options, NULL, node_proc_id, MPI_COMM_WORLD);
 
         if(ret == METIS_OK)
           PetscPrintf(MPI_COMM_WORLD, "   METIS partition routine successful \n");
