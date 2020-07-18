@@ -10,6 +10,7 @@
 #include  "SolverEigen.h"
 #include  "SolverPetsc.h"
 
+#include "TimeFunctionCore.h"
 #include "myCGALroutines.h"
 
 /*
@@ -60,14 +61,15 @@ class ImmersedSolid
 
         bool firstIter, STAGGERED, isNitsche, PRESC_MOTION;
 
-        vector<int>  assy4r, PrescMotionTimeFuncs;
+        vector<int>  assy4r;
         vector<double>  preLoad, initForcePred;
         vector<vector<int> >  forAssyMat, forAssyCoupledHorz, forAssyCoupledVert;
         vector<vector<int> >  OutputData;
         vector<vector<double> > rigidBodyMotionLimits;
+        vector<TimeFunctionCore> PrescMotionTimeFuncs;
 
         VectorXd  soln, totalForce, fluidAcce, fluidAccePrev, fluidAcceCur;
-        myPoint  centroid;
+        myPoint  centroid, pivotpoint;
 
         MatrixXd  Khorz, Kvert;
 
@@ -132,7 +134,7 @@ class ImmersedSolid
 
         int getTotalDOF()
         { return  totalDOF; }
-        
+
         void  setTolerance(double tt)
         { tol = tt; }
 
@@ -162,7 +164,7 @@ class ImmersedSolid
 
         void setInitDisplacement(int ind, int dir, double ttt)
         {  SolnData.var1[ind*ndof+dir] = ttt; }
-        
+
         void setInitVelocity(int ind, int dir, double ttt)
         {  SolnData.var1Dot[ind*ndof+dir] = ttt; }
 
@@ -262,8 +264,11 @@ class ImmersedSolid
         virtual void  setBoundaryConditions(vector<int>& vectemp)
         { cout << "   'SetBoundaryConditions' is not defined for this Solid!\n\n"; return; }
 
-        virtual void  setPrescribedMotion(vector<int>& vectemp)
+        virtual void  setPrescribedMotion(vector<vector<double> >& vectemp)
         { cout << "   'SetPrescribedMotion' is not defined for this Solid!\n\n"; return; }
+
+        virtual void  setPivotpoint(vector<double>&)
+        { cout << "   'setPivotpoint' is not defined for this Solid!\n\n"; return; }
 
         virtual void  setPreload(vector<double>&)
         { cout << "   'setPreload' is not defined for this Solid!\n\n"; return; }
@@ -282,7 +287,7 @@ class ImmersedSolid
 
         virtual int  calcStiffnessAndResidual(int solver_type=1, bool zeroMtx=true, bool zeroRes=true)
         { cout << "   'calcStiffnessAndResidual()' is not defined for this Solid!\n\n"; return 0; }
-        
+
         virtual int  applyBoundaryConditions(int start1, int start2, SparseMatrixXd& globalK, double* rhs)
         { cout << "   'applyBoundaryConditions()' is not defined for this Solid!\n\n"; return -1; }
 

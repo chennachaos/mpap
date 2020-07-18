@@ -31,7 +31,10 @@ ImmersedRigidSolid::ImmersedRigidSolid(int dd)
   Klocal = matM;
   Flocal.resize(ndofRigidbody);
 
-  dofData.resize(ndofRigidbody,-1);
+  // -1 for the fixed DOF
+  // -2 for the prescribed DOF
+  // all DOF are fixed by default
+  dofData.resize(ndofRigidbody, DOF_FIXED);
 
   SolnData.initialise(3, 0, 0, 0);
   SolnData.setPhysicsTypetoSolid();
@@ -39,10 +42,9 @@ ImmersedRigidSolid::ImmersedRigidSolid(int dd)
   preLoad.resize(ndofRigidbody, 0.0);
   initForcePred.resize(ndofRigidbody, 0.0);
 
-  PRESC_MOTION = false;
-  //PRESC_MOTION = true;
+  PrescMotionTimeFuncs.resize( ndofRigidbody );
 
-  PrescMotionTimeFuncs.resize(ndofRigidbody, -1);
+  USE_SPECIFIED_PIVOT = false;
 }
 
 
@@ -53,134 +55,80 @@ ImmersedRigidSolid::~ImmersedRigidSolid()
 
 void ImmersedRigidSolid::printSelf()
 {
-  printf("\n\n\n Rigid body %5d details \n\n", id);
-  printf("--------------------------------------------------------------");
-  printf("\n Mass matrix \n\n");
-  printMatrix(matM);
-  printf("\n Damping matrix \n\n");
-  printMatrix(matC);
-  printf("\n Stiffness matrix \n\n");
-  printMatrix(matK);
+    printf("\n\n\n Rigid body %5d details \n\n", id);
+    printf("--------------------------------------------------------------");
+    printf("\n Mass matrix \n\n");
+    printMatrix(matM);
+    printf("\n Damping matrix \n\n");
+    printMatrix(matC);
+    printf("\n Stiffness matrix \n\n");
+    printMatrix(matK);
 
-  //if( std::any_of(PrescMotionTimeFuncs.begin(), PrescMotionTimeFuncs.end(), [](int i){return (i!=-1);}) )
-  if(PRESC_MOTION)
-  {
-    printf(" Moves with a prescribed motion. Coupled FSI is ignored ... \n ");
+    if(dofData[0] == DOF_FIXED)
+      printf("\t Fixed in X-direction \n");
+    else if(dofData[0] == DOF_PRESCRIBED)
+      printf("\t Prescribed motion in X-direction \n");
+    else
+      printf("\t Free DOF in X-direction \n");
 
-    if(DIM==2)
+    if(dofData[1] == DOF_FIXED)
+      printf("\t Fixed in Y-direction \n");
+    else if(dofData[1] == DOF_PRESCRIBED)
+      printf("\t Prescribed motion in Y-direction \n");
+    else
+      printf("\t Free DOF in Y-direction \n");
+
+    if(DIM == 2)
     {
-      if(PrescMotionTimeFuncs[0] == -1)
-        printf("\t Is fixed in X-direction \n");
+      if(dofData[2] == DOF_FIXED)
+        printf("\t Fixed in Theta-direction \n");
+      else if(dofData[2] == DOF_PRESCRIBED)
+        printf("\t Prescribed motion in Theta-direction \n");
       else
-        printf("\t Moves in X-direction as per time function %5d \n", PrescMotionTimeFuncs[0]);
-
-      if(PrescMotionTimeFuncs[1] == -1)
-        printf("\t Is fixed in Y-direction \n");
-      else
-        printf("\t Moves in Y-direction as per time function %5d \n", PrescMotionTimeFuncs[1]);
-
-      if(PrescMotionTimeFuncs[2] == -1)
-        printf("\t Is fixed in theta-direction \n");
-      else
-        printf("\t Moves in theta-direction as per time function %5d \n", PrescMotionTimeFuncs[2]);
+        printf("\t Free DOF in Theta-direction \n");
     }
-    if(DIM==3)
+    else
     {
-      if(PrescMotionTimeFuncs[0] == -1)
-        printf("\t Is fixed in X-direction \n");
+      if(dofData[2] == DOF_FIXED)
+        printf("\t Fixed in Z-direction \n");
+      else if(dofData[2] == DOF_PRESCRIBED)
+        printf("\t Prescribed motion in Z-direction \n");
       else
-        printf("\t Moves in X-direction as per time function %5d \n", PrescMotionTimeFuncs[0]);
-
-      if(PrescMotionTimeFuncs[1] == -1)
-        printf("\t Is fixed in Y-direction \n");
-      else
-        printf("\t Moves in Y-direction as per time function %5d \n", PrescMotionTimeFuncs[1]);
-
-      if(PrescMotionTimeFuncs[2] == -1)
-        printf("\t Is fixed in Z-direction \n");
-      else
-        printf("\t Moves in Z-direction as per time function %5d \n", PrescMotionTimeFuncs[2]);
-
-      if(PrescMotionTimeFuncs[3] == -1)
-        printf("\t Is fixed in theta-direction \n");
-      else
-        printf("\t Moves in theta-direction as per time function %5d \n", PrescMotionTimeFuncs[3]);
-
-      if(PrescMotionTimeFuncs[4] == -1)
-        printf("\t Is fixed in phi-direction \n");
-      else
-        printf("\t Moves in phi-direction as per time function %5d \n", PrescMotionTimeFuncs[4]);
-
-      if(PrescMotionTimeFuncs[5] == -1)
-        printf("\t Is fixed in psi-direction \n");
-      else
-        printf("\t Moves in psi-direction as per time function %5d \n", PrescMotionTimeFuncs[5]);
+        printf("\t Free DOF in Z-direction \n");
     }
-  }
-  else
-  {
-    printf(" It has %5d free degree of freedom \n", totalDOF);
-    printVector(dofData);
 
-    if(DIM==2)
+    if(DIM == 3)
     {
-      if(dofData[0] == -1)
-        printf("\t Is fixed in X-direction \n");
+      if(dofData[3] == DOF_FIXED)
+        printf("\t Fixed in Theta-direction \n");
+      else if(dofData[3] == DOF_PRESCRIBED)
+        printf("\t Prescribed motion in Theta-direction \n");
       else
-        printf("\t FSI in X-direction \n", dofData[0]);
+        printf("\t Free DOF in Theta-direction \n");
 
-      if(dofData[1] == -1)
-        printf("\t Is fixed in Y-direction \n");
+      if(dofData[4] == DOF_FIXED)
+        printf("\t Fixed in Phi-direction \n");
+      else if(dofData[4] == DOF_PRESCRIBED)
+        printf("\t Prescribed motion in Phi-direction \n");
       else
-        printf("\t FSI in Y-direction \n", dofData[1]);
+        printf("\t Free DOF in Phi-direction \n");
 
-      if(dofData[2] == -1)
-        printf("\t Is fixed in theta-direction \n");
+      if(dofData[5] == DOF_FIXED)
+        printf("\t Fixed in Psi-direction \n");
+      else if(dofData[5] == DOF_PRESCRIBED)
+        printf("\t Prescribed motion in Psi-direction \n");
       else
-        printf("\t FSI in theta-direction \n", dofData[2]);
+        printf("\t Free DOF in Psi-direction \n");
     }
-    if(DIM==3)
-    {
-      if(dofData[0] == -1)
-        printf("\t Is fixed in X-direction \n");
-      else
-        printf("\t FSI in X-direction \n");
 
-      if(dofData[1] == -1)
-        printf("\t Is fixed in Y-direction \n");
-      else
-        printf("\t FSI in Y-direction \n");
-
-      if(dofData[2] == -1)
-        printf("\t Is fixed in Z-direction \n");
-      else
-        printf("\t FSI in Z-direction \n");
-
-      if(dofData[3] == -1)
-        printf("\t Is fixed in theta-direction \n");
-      else
-        printf("\t FSI in theta-direction \n");
-
-      if(dofData[4] == -1)
-        printf("\t Is fixed in phi-direction \n");
-      else
-        printf("\t FSI in phi-direction \n");
-
-      if(dofData[5] == -1)
-        printf("\t Is fixed in psi-direction \n");
-      else
-        printf("\t FSI in psi-direction \n");
-    }
-  }
-
-  return;
+    return;
 }
 
 
 void ImmersedRigidSolid::setMass(vector<double>& tempVec)
 {
   assert( tempVec.size() >= ndofRigidbody*ndofRigidbody );
-  
+
   int ii, jj, kk=0;
 
   for(ii=0;ii<ndofRigidbody;ii++)
@@ -188,7 +136,7 @@ void ImmersedRigidSolid::setMass(vector<double>& tempVec)
     for(jj=0;jj<ndofRigidbody;jj++)
       matM(ii, jj) = tempVec[kk++];
   }
-  
+
   return;
 }
 
@@ -204,7 +152,7 @@ void ImmersedRigidSolid::setDamping(vector<double>& tempVec)
     for(jj=0;jj<ndofRigidbody;jj++)
       matC(ii, jj) = tempVec[kk++];
   }
-  
+
   return;
 }
 
@@ -220,7 +168,7 @@ void ImmersedRigidSolid::setStiffness(vector<double>& tempVec)
     for(jj=0;jj<ndofRigidbody;jj++)
       matK(ii, jj) = tempVec[kk++];
   }
-  
+
   return;
 }
 
@@ -229,25 +177,48 @@ void ImmersedRigidSolid::setBoundaryConditions(vector<int>& vectemp)
 {
   dofData = vectemp;
 
-  //cout << " rigid body boundary conditions " << endl;  printVector(dofData);
-  
   return;
 }
 
 
 
-void ImmersedRigidSolid::setPrescribedMotion(vector<int>& vectemp)
+void ImmersedRigidSolid::setPrescribedMotion(vector<vector<double> >& vectemp)
 {
-  //cout << "  vectemp.size() = " << vectemp.size() << endl;
-  if(vectemp.size() > 0)
+  assert(vectemp.size() > 0);
+
+  bool flag = false;
+  vector<double>  vecDbl(10);
+  for(int ii=0;ii<vectemp.size();ii++)
   {
-    for(int ii=0;ii<vectemp.size()-1;ii++)
-      PrescMotionTimeFuncs.push_back(vectemp[ii+1]);
-  
-    PRESC_MOTION = true;
+    int  dof = int(vectemp[ii][0])-1;
+    if( dofData[dof] > 0 )
+    {
+      cerr << "DOF " << vectemp[ii][0] << "is already set to be free for Rigid solid " << (id+1) << "... Check the input file! " << endl;
+      flag = true;
+      break;
+    }
+
+    dofData[dof] = DOF_PRESCRIBED;
+
+    for(int jj=1; jj<vectemp[ii].size(); jj++)
+      vecDbl[jj-1] = vectemp[ii][jj];
+
+    PrescMotionTimeFuncs[dof].setData( vecDbl );
   }
-  else
-    PRESC_MOTION = false;
+
+  return;
+}
+
+
+void ImmersedRigidSolid::setPivotpoint(vector<double>& tempVec)
+{
+  assert( tempVec.size() >= 3 );
+
+  pivotpoint[0] = tempVec[0];
+  pivotpoint[1] = tempVec[1];
+  pivotpoint[2] = tempVec[2];
+
+  USE_SPECIFIED_PIVOT = true;
 
   return;
 }
@@ -262,6 +233,7 @@ void ImmersedRigidSolid::setPreload(vector<double>& tempVec)
 
   return;
 }
+
 
 void  ImmersedRigidSolid::setInitialForcePredictor(vector<double>& tempVec)
 {
@@ -349,7 +321,7 @@ void  ImmersedRigidSolid::setNodalPositions(vector<vector<double> >&  datatemp)
 void ImmersedRigidSolid::initialise()
 {
   SolnData.STAGGERED = STAGGERED;
-  
+
   //printSelf();
 
   setSolver(1);
@@ -379,21 +351,14 @@ void ImmersedRigidSolid::prepareMatrixPattern()
   //printf("\n     ImmersedRigidSolid::prepareMatrixPattern()  .... STARTED ...\n");
 
   //if( std::any_of(PrescMotionTimeFuncs.begin(), PrescMotionTimeFuncs.end(), [](int i){return (i!=-1);}) )
-  if(PRESC_MOTION)
-  {
-    totalDOF = 0;
-  }
-  else
-  {
-    int  ii, jj, kk, ll, ind;
 
-    //int size_temp = ndofRigidbody;
+    int  ii, jj, kk, ll, ind;
 
     // increase system size for contacts with Lagrange multipliers
     // contacts for limiting rigid-solid motion
     // two contacts for each DOF
     //   - one in negative direction
-    //   - one is positive direction
+    //   - one in positive direction
 
     //size_temp += 2*ndofRigidbody;
 
@@ -461,7 +426,7 @@ void ImmersedRigidSolid::prepareMatrixPattern()
       for(ii=0;ii<totalDOF;ii++)
         printVector(forAssyCoupledHorz[ii]);
     }
-  }
+
   //printf("\n     ImmersedRigidSolid::prepareMatrixPattern()  .... FINISHED ...\n\n");
 
   return;
@@ -499,24 +464,22 @@ void  ImmersedRigidSolid::updatePointPositions1D()
 
 void  ImmersedRigidSolid::updatePointPositions2D()
 {
-    int  ee, elm, ii, ind, bb;
-    double  thetaNew, thetaCur, omegaNew, omegaCur, fact;
-    double  A, B, F, fD, wn, ct, st, t0;
-    double  tNew, tCur, af, RPM, N, wn1;
-    af = SolnData.td(2);
+    int  ee, ii, ind, bb;
+    double  thetaNew, thetaCur, omegaNew, omegaCur, ct, st;
 
-    tNew = mpapTime.cur;
-    tCur = tNew - (1.0-af)*mpapTime.dt;
+    double  af = SolnData.td(2);
+    double  tNew = mpapTime.cur;
+    double  tCur = tNew - (1.0-af)*mpapTime.dt;
 
-    myPoint  geom, param, rOrig, rNew, vNew, dCentNew, dCentCur, vCentNew, vCentCur;
+    myPoint  rOrig, rNew, vNew, rCur, vCur, dCentNew, dCentCur, vCentNew, vCentCur;
     myPoint  centroidNew, centroidCur;
-    MatrixXd  RotNew(3, 3), RotCur(3, 3);
+    MatrixXd  RotNew(3,3), RotCur(3,3);
 
-    geom.setZero();
-    param.setZero();
     rOrig.setZero();
     rNew.setZero();
     vNew.setZero();
+    rCur.setZero();
+    vCur.setZero();
     dCentNew.setZero();
     dCentCur.setZero();
     vCentNew.setZero();
@@ -527,110 +490,83 @@ void  ImmersedRigidSolid::updatePointPositions2D()
     RotNew.setZero();
     RotCur.setZero();
 
-    A  = PI/2.0;
-    //fD = 0.175;
-    fD = 0.18;
-    wn = 2.0*PI*fD;
-
     //cout << "totalDOF " << totalDOF << endl;
     //cout << "tCur = " << tCur << endl;
 
-    if(totalDOF > 0)
+    // Cur --> values at t_{n+af}
+    // New --> values at t_{n+1}
+
+    for(ii=0; ii<DIM; ii++)
     {
-      // values at t_{n+af}
-      dCentCur[0] = SolnData.var1Cur[0];
-      dCentCur[1] = SolnData.var1Cur[1];
-      thetaCur    = SolnData.var1Cur[2];
-      thetaCur    = A*sin(wn*tCur);
+        if(dofData[ii] == DOF_PRESCRIBED)
+        {
+            dCentCur[ii] = PrescMotionTimeFuncs[ii].evalValue(tCur);
+            vCentCur[ii] = PrescMotionTimeFuncs[ii].evalFirstDerivative(tCur);
 
-      vCentCur[0] = SolnData.var1DotCur[0];
-      vCentCur[1] = SolnData.var1DotCur[1];
-      omegaCur    = SolnData.var1DotCur[2];
-      omegaCur    = A*wn*cos(wn*tCur);
+            dCentNew[ii] = PrescMotionTimeFuncs[ii].evalValue(tNew);
+            vCentNew[ii] = PrescMotionTimeFuncs[ii].evalFirstDerivative(tNew);
+        }
+        else
+        {
+            dCentCur[ii] = SolnData.var1Cur[ii];
+            vCentCur[ii] = SolnData.var1DotCur[ii];
 
-      //dCentCur[0] = 0.0;
-      //dCentCur[1] = SolnData.var1Cur[0];
-      //dCentCur[2] = 0.0;
-      //thetaCur    = 0.0;
+            dCentNew[ii] = SolnData.var1[ii];
+            vCentNew[ii] = SolnData.var1Dot[ii];
+        }
+    }
 
-      //vCentCur[0] = 0.0;
-      //vCentCur[1] = SolnData.var1DotCur[0];
-      //vCentCur[2] = 0.0;
-      //omegaCur    = 0.0;
 
-      //dCentCur[0] = 0.0;
-      //dCentCur[1] = 0.0;
-      //thetaCur    = SolnData.var1Cur[0];
+    if(dofData[2] == DOF_PRESCRIBED)
+    {
+        thetaCur    = PrescMotionTimeFuncs[2].evalValue(tCur);
+        omegaCur    = PrescMotionTimeFuncs[2].evalFirstDerivative(tCur);
 
-      //vCentCur[0] = 0.0;
-      //vCentCur[1] = 0.0;
-      //omegaCur    = SolnData.var1DotCur[0];
+        thetaNew    = PrescMotionTimeFuncs[2].evalValue(tNew);
+        omegaNew    = PrescMotionTimeFuncs[2].evalFirstDerivative(tNew);
+    }
+    else
+    {
+        thetaCur    = SolnData.var1Cur[2];
+        omegaCur    = SolnData.var1DotCur[2];
 
-      ct = cos(thetaCur);
-      st = sin(thetaCur);
+        thetaNew    = SolnData.var1[2];
+        omegaNew    = SolnData.var1Dot[2];
+    }
 
-      RotCur(0,0) =  ct; RotCur(0,1) = -st;
-      RotCur(1,0) =  st; RotCur(1,1) = ct;
 
-      // values at t_{n+1}
-      dCentNew[0] = SolnData.var1[0];
-      dCentNew[1] = SolnData.var1[1];
-      thetaNew    = SolnData.var1[2];
-      thetaNew    = A*sin(wn*tNew);
+    ct = cos(thetaCur);
+    st = sin(thetaCur);
 
-      vCentNew[0] = SolnData.var1Dot[0];
-      vCentNew[1] = SolnData.var1Dot[1];
-      omegaNew    = SolnData.var1Dot[2];
-      omegaNew    = A*wn*cos(wn*tNew);
+    RotCur(0,0) =  ct; RotCur(0,1) = -st;
+    RotCur(1,0) =  st; RotCur(1,1) =  ct;
 
-      //dCentNew[0] = 0.0;
-      //dCentNew[1] = SolnData.var1[0];
-      //dCentNew[2] = 0.0;
-      //thetaNew    = 0.0;
+    ct = cos(thetaNew);
+    st = sin(thetaNew);
 
-      //vCentNew[0] = 0.0;
-      //vCentNew[1] = SolnData.var1Dot[0];
-      //vCentNew[2] = 0.0;
-      //omegaNew    = 0.0;
+    RotNew(0,0) =  ct; RotNew(0,1) = -st;
+    RotNew(1,0) =  st; RotNew(1,1) =  ct;
 
-      //dCentNew[0] = 0.0;
-      //dCentNew[1] = 0.0;
-      //thetaNew    = SolnData.var1[0];
 
-      //vCentNew[0] = 0.0;
-      //vCentNew[1] = 0.0;
-      //omegaNew    = SolnData.var1Dot[0];
-
-      ct = cos(thetaNew);
-      st = sin(thetaNew);
-
-      RotNew(0,0) =  ct; RotNew(0,1) = -st;
-      RotNew(1,0) =  st; RotNew(1,1) = ct;
-
-      //cout << " disp    " << dCentCur[0] << '\t' << dCentCur[1] << '\t' << thetaCur << endl;
-      //cout << " velo    " << vCentCur[0] << '\t' << vCentCur[1] << '\t' << omegaCur << endl;
-
+    if(USE_SPECIFIED_PIVOT)
+      centroid = pivotpoint;
+    else
       computeCentroid(0);
-      //centroid[2] = 0.0;
-      //centroidCur[2] = 0.0;
-      //centroidNew[2] = 0.0;
 
-      centroidCur[0] = centroid[0] + dCentCur[0];
-      centroidCur[1] = centroid[1] + dCentCur[1];
+    centroidCur = centroid + dCentCur;
+    centroidNew = centroid + dCentNew;
 
-      centroidNew[0] = centroid[0] + dCentNew[0];
-      centroidNew[1] = centroid[1] + dCentNew[1];
+    //cout << " disp    " << dCentNew[0] << '\t' << dCentNew[1] << '\t' << thetaNew << endl;
+    //cout << " velo    " << vCentNew[0] << '\t' << vCentNew[1] << '\t' << omegaNew << endl;
+    //cout << " disp    " << dCentCur[0] << '\t' << dCentCur[1] << '\t' << thetaCur << endl;
+    //cout << " velo    " << vCentCur[0] << '\t' << vCentCur[1] << '\t' << omegaCur << endl;
 
-      //cout << " centroid    " << centroid[0] << '\t' << centroid[1] << '\t' << centroid[2] << endl;
-      //cout << " centroid    " << centroidNew[0] << '\t' << centroidNew[1] << '\t' << centroidNew[2] << endl;
-      //cout << " centroid    " << centroidCur[0] << '\t' << centroidCur[1] << '\t' << centroidCur[2] << endl;
-      //centroid[0] = 73.0;
-      //centroid[1] = 60.0;
+    //cout << " centroid    " << centroid[0]    << '\t' << centroid[1]    << '\t' << centroid[2]    << endl;
+    //cout << " centroid    " << centroidNew[0] << '\t' << centroidNew[1] << '\t' << centroidNew[2] << endl;
+    //cout << " centroid    " << centroidCur[0] << '\t' << centroidCur[1] << '\t' << centroidCur[2] << endl;
 
-      //cout << " ssssssssssss " << DIM << endl;
-
-      for(bb=0;bb<nNode;bb++)
-      {
+    for(bb=0;bb<nNode;bb++)
+    {
         for(ii=0;ii<DIM;ii++)
           rOrig(ii) = GeomData.NodePosOrig[bb][ii] ;
 
@@ -647,263 +583,19 @@ void  ImmersedRigidSolid::updatePointPositions2D()
         }
 
         // values at t_{n+af}
-        rNew = centroid + dCentCur + RotCur*(rOrig - centroid);
+        rCur = centroid + dCentCur + RotCur*(rOrig - centroid);
 
-        vNew[0] = vCentCur[0] - omegaCur*(rNew[1] - centroidCur[1]);
-        vNew[1] = vCentCur[1] + omegaCur*(rNew[0] - centroidCur[0]);
+        vCur[0] = vCentCur[0] - omegaCur*(rCur[1] - centroidCur[1]);
+        vCur[1] = vCentCur[1] + omegaCur*(rCur[0] - centroidCur[0]);
 
         for(ii=0;ii<DIM;ii++)
         {
-          //cout << bb << '\t' << ii << '\t' << rNew[ii] << endl;
-          GeomData.NodePosCur[bb][ii]  = rNew[ii];
-          GeomData.specValCur[bb][ii]  = vNew[ii];
+          GeomData.NodePosCur[bb][ii]  = rCur[ii];
+          GeomData.specValCur[bb][ii]  = vCur[ii];
         }
-
-      }
     }
 
-    A = 80.0*PI/180.0;
-    //A = 0.2;
-    B = 5.0;
-    F = 0.1666*1.1;
-    //F = 1.1;
-
-    A  = 0.25;
-    t0 = 0.0;
-    wn = 4.0;
-
-    //cout << " PRESC_MOTION = " << PRESC_MOTION << endl;
-
-    //if(PRESC_MOTION && (mpapTime.cur > t0)  && ( (id==0) || (id==1)) )
-    if(PRESC_MOTION && (mpapTime.cur > t0)  && ( id==0) )
-    {
-      /*
-      N = 50.0;
-
-      if(id == 0 )
-        RPM = -N;
-      else
-        RPM = -N;
-
-      double  RPS = RPM/60.0; // rotations per second
-
-      double  RPMS = RPS;
-      RPMS = RPS/1000.0; // Rotations per millisecond
-
-      double  tOne = abs(1.0/RPMS); // time per one rotation in milliseconds
-
-      //cout << " tOne = " << tOne << endl;
-
-      wn  = -2.0*PI*RPMS; // radians per millisecond
-
-      //if(tNew < tOne)
-        //wn1 = wn*sin(0.5*PI*tNew/tOne);
-      //else
-        wn1 = wn;
-
-      dCentNew[0] = 0.0;
-      dCentNew[1] = 0.0;
-      thetaNew    = wn1*tNew;
-      //thetaNew    = -(0.25*PI)*(1.0+fact);
-
-      vCentNew[0] = 0.0;
-      vCentNew[1] = 0.0;
-      omegaNew    = wn1;
-      //omegaNew    = -(0.25*PI)*(1.0-fact*fact);
-
-      //if(tCur < tOne)
-        //wn1 = wn*sin(0.5*PI*tCur/tOne);
-      //else
-        wn1 = wn;
-
-      dCentCur[0] = 0.0;
-      dCentCur[1] = 0.0;
-      thetaCur    = wn1*tCur;
-      //thetaCur    = -(0.25*PI)*(1.0+fact);
-
-      vCentCur[0] = 0.0;
-      vCentCur[1] = 0.0;
-      omegaCur    = wn1;
-      //omegaCur    = -(0.25*PI)*(1.0-fact*fact);
-      */
-
-      //
-      dCentNew[0] = 0.0;
-      dCentNew[1] = A*sin(wn*(tNew-t0));
-      thetaNew    = 0.0;
-
-      vCentNew[0] = 0.0;
-      vCentNew[1] = A*wn*cos(wn*(tNew-t0));
-      omegaNew    = 0.0;
-
-      dCentCur[0] = 0.0;
-      dCentCur[1] = A*sin(wn*(tCur-t0));
-      thetaCur    = 0.0;
-
-      vCentCur[0] = 0.0;
-      vCentCur[1] = A*wn*cos(wn*(tCur-t0));
-      omegaCur    = 0.0;
-      //
-
-      /*
-      wn = 2.0*PI*F;
-
-      dCentNew[0] = 0.0;
-      dCentNew[1] = 0.0;
-      thetaNew    = A*sin(wn*(tNew-t0));
-
-      vCentNew[0] = 0.0;
-      vCentNew[1] = 0.0;
-      omegaNew    = A*wn*cos(wn*(tNew-t0));
-
-      dCentCur[0] = 0.0;
-      dCentCur[1] = 0.0;
-      thetaCur    = A*sin(wn*(tCur-t0));
-
-      vCentCur[0] = 0.0;
-      vCentCur[1] = 0.0;
-      omegaCur    = A*wn*cos(wn*(tCur-t0));
-      */
-
-
-      // from Fehmi's paper
-      /*
-      double  aa=0.2;
-      double  d0=0.0;
-      double  v0=0.0;
-      double  ti=0.0;
-
-      double  d1=0.5*aa*ti*ti + v0*ti + d0;
-
-      if( tNew < ti)
-      {
-        dCentNew[0] = 0.5*aa*tNew*tNew + v0*tNew + d0;
-        dCentNew[1] = 0.0;
-        thetaNew    = 0.0;
-
-        vCentNew[0] = aa*tNew + v0;
-        vCentNew[1] = 0.0;
-        omegaNew    = 0.0;
-
-        dCentCur[0] = 0.5*aa*tCur*tCur + v0*tCur + d0;
-        dCentCur[1] = 0.0;
-        thetaCur    = 0.0;
-
-        vCentCur[0] = aa*tCur + v0;
-        vCentCur[1] = 0.0;
-        omegaCur    = 0.0;
-      }
-      else
-      {
-        dCentNew[0] = 1.0*(tNew-ti) + d1;
-        dCentNew[1] = 0.0;
-        thetaNew    = 0.0;
-
-        vCentNew[0] = 1.0;
-        vCentNew[1] = 0.0;
-        omegaNew    = 0.0;
-
-        dCentCur[0] = 1.0*(tNew-ti) + d1;
-        dCentCur[1] = 0.0;
-        thetaCur    = 0.0;
-
-        vCentCur[0] = 1.0;
-        vCentCur[1] = 0.0;
-        omegaCur    = 0.0;
-      }
-      */
-
-      // hovering insect wing
-      //
-      double  A0=2.5, beta=PI/3.0, phi=0.0, alpha0=PI/4.0, T=0.025;
-      wn = 2.0*PI/T;
-
-      fact = 0.5*A0*(1.0+cos(wn*tNew));
-      dCentNew[0] = fact*cos(beta);
-      dCentNew[1] = fact*sin(beta);
-      thetaNew    = alpha0*(1.0-sin(wn*tNew+phi));
-
-      fact = 0.5*A0*(-sin(wn*tNew))*wn;
-      vCentNew[0] = fact*cos(beta);
-      vCentNew[1] = fact*sin(beta);
-      omegaNew    = alpha0*(-cos(wn*tNew+phi)*wn);
-
-      fact = 0.5*A0*(1.0+cos(wn*tCur));
-      dCentCur[0] = fact*cos(beta);
-      dCentCur[1] = fact*sin(beta);
-      thetaCur    = alpha0*(1.0-sin(wn*tCur+phi));
-
-      fact = 0.5*A0*(-sin(wn*tCur))*wn;
-      vCentCur[0] = fact*cos(beta);
-      vCentCur[1] = fact*sin(beta);
-      omegaCur    = alpha0*(-cos(wn*tCur+phi)*wn);
-      //
-
-      //cout << " disp    " << dCentNew[0] << '\t' << dCentNew[1] << '\t' << thetaNew << endl;
-      //cout << " velo    " << vCentNew[0] << '\t' << vCentNew[1] << '\t' << omegaNew << endl;
-
-      //printf("\t %12.6f \t %12.6f \t %12.6f \n",tNew, tCur, wn);
-      //printf("\t %12.6f \t %12.6f \t %12.6f \n",dCentCur[0], dCentCur[1], thetaCur);
-      //printf("\t %12.6f \t %12.6f \t %12.6f \n",vCentCur[0], vCentCur[1], omegaCur);
-      //cout << " disp    " << dCentCur[0] << '\t' << dCentCur[1] << '\t' << thetaCur << endl;
-      //cout << " velo    " << vCentCur[0] << '\t' << vCentCur[1] << '\t' << omegaCur << endl;
-
-      ct = cos(thetaNew);
-      st = sin(thetaNew);
-
-      RotNew(0,0) =  ct; RotNew(0,1) = -st;
-      RotNew(1,0) =  st; RotNew(1,1) =  ct;
-
-      ct = cos(thetaCur);
-      st = sin(thetaCur);
-
-      RotCur(0,0) =  ct; RotCur(0,1) = -st;
-      RotCur(1,0) =  st; RotCur(1,1) =  ct;
-
-      computeCentroid(0);
-
-      centroidCur[0] = centroid[0] + dCentCur[0];
-      centroidCur[1] = centroid[1] + dCentCur[1];
-
-      centroidNew[0] = centroid[0] + dCentNew[0];
-      centroidNew[1] = centroid[1] + dCentNew[1];
-
-      //cout << " centroid    " << centroid[0] << '\t' << centroid[1] << '\t' << centroid[2] << endl;
-      //cout << " centroid    " << centroidNew[0] << '\t' << centroidNew[1] << '\t' << centroidNew[2] << endl;
-      //cout << " centroid    " << centroidCur[0] << '\t' << centroidCur[1] << '\t' << centroidCur[2] << endl;
-
-      for(bb=0; bb<nNode; bb++)
-      {
-        for(ii=0;ii<DIM;ii++)
-          rOrig(ii) = GeomData.NodePosOrig[bb][ii] ;
-
-        // values at t_{n+1}
-        rNew = centroid + dCentNew + RotNew*(rOrig - centroid);
-
-        vNew[0] = vCentNew[0] - omegaNew*(rNew[1] - centroidNew[1]);
-        vNew[1] = vCentNew[1] + omegaNew*(rNew[0] - centroidNew[0]);
-
-        for(ii=0;ii<DIM;ii++)
-        {
-          GeomData.NodePosNew[bb][ii]  = rNew[ii];
-          GeomData.specValNew[bb][ii]  = vNew[ii];
-        }
-
-        // values at t_{n+af}
-        rNew = centroid + dCentCur + RotCur*(rOrig - centroid);
-
-        vNew[0] = vCentCur[0] - omegaCur*(rNew[1] - centroidCur[1]);
-        vNew[1] = vCentCur[1] + omegaCur*(rNew[0] - centroidCur[0]);
-
-        for(ii=0;ii<DIM;ii++)
-        {
-          GeomData.NodePosCur[bb][ii]  = rNew[ii];
-          GeomData.specValCur[bb][ii]  = vNew[ii];
-        }
-      }
-    }
-
-  return;
+    return;
 }
 
 
@@ -1040,20 +732,23 @@ void ImmersedRigidSolid::updateForce()
 
   SolnData.forceTemp.setZero();
 
-  //cout << totalForce[0] << '\t' << totalForce[1] << endl;
-
-  SolnData.forceTemp[0] = totalForce[0];  // Fx
-  SolnData.forceTemp[1] = totalForce[1];  // Fy
-  SolnData.forceTemp[2] = totalForce[5];  // Mz
-
-  //SolnData.forceTemp[0] = totalForce[1];                   // Fy
-  //SolnData.forceTemp[1] = 0.0;                             // lamba - contact
-  //SolnData.forceTemp[2] = 0.0;
+  if(DIM == 2)
+  {
+    SolnData.forceTemp[0] = totalForce[0];                  // Fx
+    SolnData.forceTemp[1] = totalForce[1];                  // Fy
+    SolnData.forceTemp[2] = totalForce[5];                  // Mz
+  }
+  else
+  {
+    SolnData.forceTemp[0] = totalForce[0];                  // Fx
+    SolnData.forceTemp[1] = totalForce[1];                  // Fy
+    SolnData.forceTemp[2] = totalForce[2];                  // Fz
+    SolnData.forceTemp[3] = totalForce[3];                  // Mx
+    SolnData.forceTemp[4] = totalForce[4];                  // My
+    SolnData.forceTemp[5] = totalForce[5];                  // Mz
+  }
 
   SolnData.interpolateForce();
-
-  //printf("\n\n");  printVector(SolnData.forceTemp);  printf("\n\n");
-  //printf("\n\n");  printVector(SolnData.forceCur);  printf("\n\n");
 
   return;
 }
@@ -1064,15 +759,17 @@ void ImmersedRigidSolid::updateForce()
 
 void ImmersedRigidSolid::updateForce(double* data)
 {
-  //cout << totalForce[0] << '\t' << totalForce[1] << endl;
-
   if(DIM == 2)
   {
     totalForce[0]  = -data[0];
     totalForce[1]  = -data[1];
     totalForce[2]  = -data[5];
+
+    SolnData.forceTemp[0] = totalForce[0];                  // Fx
+    SolnData.forceTemp[1] = totalForce[1];                  // Fy
+    SolnData.forceTemp[2] = totalForce[2];                  // Mz
   }
-  else if(DIM == 3)
+  else  //if(DIM == 3)
   {
     totalForce[0]  = -data[0];
     totalForce[1]  = -data[1];
@@ -1080,23 +777,16 @@ void ImmersedRigidSolid::updateForce(double* data)
     totalForce[3]  = -data[3];
     totalForce[4]  = -data[4];
     totalForce[5]  = -data[5];
+
+    SolnData.forceTemp[0] = totalForce[0];                  // Fx
+    SolnData.forceTemp[1] = totalForce[1];                  // Fy
+    SolnData.forceTemp[2] = totalForce[2];                  // Fz
+    SolnData.forceTemp[3] = totalForce[3];                  // Mx
+    SolnData.forceTemp[4] = totalForce[4];                  // My
+    SolnData.forceTemp[5] = totalForce[5];                  // Mz
   }
 
-  //PetscPrintf(MPI_COMM_WORLD, "   Forces for solid %5d =  %12.6f \t %12.6f \t %12.6f \n\n", id, totalForce[0], totalForce[1], totalForce[2]);
-
-  SolnData.forceTemp[0] = totalForce[0];  // Fx
-  SolnData.forceTemp[1] = totalForce[1];  // Fy
-  SolnData.forceTemp[2] = totalForce[2];  // Mz
-
-  //SolnData.forceTemp[0] = totalForce[1];                   // Fy
-  //SolnData.forceTemp[0] = totalForce[2];  // Mz
-  //SolnData.forceTemp[1] = 0.0;                             // lamba - contact
-  //SolnData.forceTemp[2] = 0.0;
-
   SolnData.interpolateForce();
-
-  //printf("\n\n");  printVector(SolidSolnData.forceTemp);  printf("\n\n");
-  //printf("\n\n");  printVector(SolidSolnData.forceCur);  printf("\n\n");
 
   return;
 }
@@ -1214,7 +904,7 @@ int ImmersedRigidSolid::calcStiffnessAndResidual(int solver_type, bool zeroMtx, 
   //printVector(SolnData.var1DotDotCur);
   //printf("\n\n");
 
-  double  k1 = preLoad[0], k3 = preLoad[1];
+  //double  k1 = preLoad[0], k3 = preLoad[1];
 
   if(STAGGERED)
   {
@@ -1755,19 +1445,28 @@ void ImmersedRigidSolid::writeOutput()
 
       case  3 : // displacement
 
-             sprintf(tmp," \t %12.6E", SolnData.var1[dof]);
+            if(dofData[dof] == DOF_PRESCRIBED)
+              sprintf(tmp," \t %12.6E", PrescMotionTimeFuncs[dof].evalValue(mpapTime.cur));
+            else
+              sprintf(tmp," \t %12.6E", SolnData.var1[dof]);
 
       break;
 
       case  4 : // velocity
 
-             sprintf(tmp," \t %12.6E", SolnData.var1Dot[dof]);
+            if(dofData[dof] == DOF_PRESCRIBED)
+              sprintf(tmp," \t %12.6E", PrescMotionTimeFuncs[dof].evalFirstDerivative(mpapTime.cur));
+            else
+              sprintf(tmp," \t %12.6E", SolnData.var1Dot[dof]);
 
       break;
 
       case  5 : // acceleration
 
-             sprintf(tmp," \t %12.6E", SolnData.var1DotDot[dof]);
+            if(dofData[dof] == DOF_PRESCRIBED)
+              sprintf(tmp," \t %12.6E", PrescMotionTimeFuncs[dof].evalSecondDerivative(mpapTime.cur));
+            else
+              sprintf(tmp," \t %12.6E", SolnData.var1DotDot[dof]);
 
       break;
 

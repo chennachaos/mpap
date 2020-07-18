@@ -9,11 +9,15 @@
 using namespace std;
 
 
+enum  {DOF_FIXED = -1, DOF_PRESCRIBED = -2};
+
+
 class ImmersedRigidSolid : public ImmersedSolid
 {
     public:
 
         int ndofRigidbody;
+        bool  USE_SPECIFIED_PIVOT;
         MatrixXd  matM, matC, matK, Klocal, Kglobal;
         VectorXd  Flocal, rhsVec;
 
@@ -38,7 +42,9 @@ class ImmersedRigidSolid : public ImmersedSolid
 
         virtual void  setBoundaryConditions(vector<int>& vectemp);
 
-        virtual void  setPrescribedMotion(vector<int>& vectemp);
+        virtual void  setPrescribedMotion(vector<vector<double> >& vectemp);
+
+        virtual void  setPivotpoint(vector<double>&);
 
         virtual void  setPreload(vector<double>&);
 

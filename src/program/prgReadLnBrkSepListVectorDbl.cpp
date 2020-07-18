@@ -23,11 +23,11 @@ bool prgReadLnBrkSepListVectorDbl(std::ifstream &Ifile, MyString &line, List< Ve
     list.add(new Vector<double>);
 
     line.getNextLine(Ifile);
-    
+
     nw = line.split(&word);
 
     i = 0;  while (i < nw && word[i].toDbl(&val,false)) { list[n].append(val); i++; }
-    
+
     for (j=0; j<nw; j++) word[j].free(); delete [] word;
     //cout << list[i] << endl;
 

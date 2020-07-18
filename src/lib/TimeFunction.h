@@ -10,19 +10,19 @@
 class TimeFunction: public ListItem
 {
   public:
-	
-    TimeFunction(void);
-    
+
+    TimeFunction();
+
     ~TimeFunction();
 
     int id;
-    
+
     double prop;
-    
+
     List<TimeFunctionCore> fct;
 
-    void update(void);
-    
+    void update();
+
   private:
 
 };

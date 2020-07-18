@@ -80,14 +80,15 @@ HBSplineCutFEM::HBSplineCutFEM()
                           "rigid body stiffness",//25
                           "rigid body degree of freedom", //26
                           "rigid body prescribed motion", //27
-                          "rigid body preload", // 28
-                          "rigid body initial force predictor", // 29
-                          "rigid body motion limits", //30
-                          "solid elements",//31
-                          "immersed point boundary condition",//32
-                          "immersed body output", //33
-                          "contact elements", //34
-                          "element type", //35
+                          "rigid body pivot", // 28
+                          "rigid body preload", // 29
+                          "rigid body initial force predictor", // 30
+                          "rigid body motion limits", //31
+                          "solid elements",//32
+                          "immersed point boundary condition",//33
+                          "immersed body output", //34
+                          "contact elements", //35
+                          "element type", //36
                           "material type");
 
 }
@@ -622,26 +623,51 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
 
     case  27: //cout << "     HBSplineCutFEM: reading 'rigid body prescribed motion' ...\n\n";
 
-            if (!prgReadLnBrkSepListVectorInt(Ifile,line,lviTmp))
+            if (!prgReadLnBrkSepListVectorDbl(Ifile,line,lvdTmp))
               prgError(1,fct,"invalid input in 'rigid body prescribed motion'!");
 
-            //cerr <<  " Error in (( HBSplineCutFEM: reading 'rigid body prescribed motion' )) " << endl;
+            vecvecDbl.resize(lvdTmp.n);
 
-            vecvecInt.resize(lviTmp.n);
-
-            for(i=0;i<lviTmp.n;i++)
+            for(i=0;i<lvdTmp.n;i++)
             {
-                vecvecInt[i].resize(lviTmp[i].n);
-                if(lviTmp[i].n < 1)
+                cout << lvdTmp[i] << endl;
+                vecvecDbl[i].resize(lvdTmp[i].n);
+                if(lvdTmp[i].n < 1)
                    prgError(2, fct, "invalid number of 'rigid body prescribed motion' !");
 
-                for(j=0;j<lviTmp[i].n;j++)
-                  vecvecInt[i][j] = lviTmp[i][j];
+                for(j=0;j<lvdTmp[i].n;j++)
+                  vecvecDbl[i][j] = lvdTmp[i][j];
             }
+            //for(i=0;i<vecvecDbl.size();i++)
+              //printVector(&(vecvecDbl[i][0]), vecvecDbl[i].size());
+
+            assert(ImmersedBodyObjects.size() > 0);
+
+            bb = ImmersedBodyObjects.size() - 1;
+
+            ImmersedBodyObjects[bb]->setPrescribedMotion(vecvecDbl);
 
             break;
 
-    case  28: //cout << "     HBSplineCutFEM: reading 'rigid body preload' ...\n\n";
+    case  28: //cout << "     HBSplineCutFEM: reading 'rigid body pivot' ...\n\n";
+
+            if (!prgReadLnBrkSepListVectorDbl(Ifile,line,lvdTmp))
+              prgError(1,fct,"invalid input in 'rigid body pivot'!");
+
+            vecDbl.resize(lvdTmp[0].n);
+
+            for(j=0; j<lvdTmp[0].n; j++)
+              vecDbl[j] = lvdTmp[0][j];
+
+            assert(ImmersedBodyObjects.size() > 0);
+
+            bb = ImmersedBodyObjects.size() - 1;
+
+            ImmersedBodyObjects[bb]->setPivotpoint(vecDbl);
+
+            break;
+
+    case  29: //cout << "     HBSplineCutFEM: reading 'rigid body preload' ...\n\n";
 
             if (!prgReadLnBrkSepListVectorDbl(Ifile,line,lvdTmp))
               prgError(1,fct,"invalid input in 'rigid body preload'!");
@@ -659,7 +685,7 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
 
             break;
 
-    case  29: //cout << "     HBSplineCutFEM: reading 'rigid body initial force predictor' ...\n\n";
+    case  30: //cout << "     HBSplineCutFEM: reading 'rigid body initial force predictor' ...\n\n";
 
             if (!prgReadLnBrkSepListVectorDbl(Ifile,line,lvdTmp))
               prgError(1,fct,"invalid input in 'rigid body initial force predictor'!");
@@ -677,7 +703,7 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
 
             break;
 
-    case  30: //cout << "     HBSplineCutFEM: reading 'rigid body motion limits' ...\n\n";
+    case  31: //cout << "     HBSplineCutFEM: reading 'rigid body motion limits' ...\n\n";
 
             if (!prgReadLnBrkSepListVectorDbl(Ifile,line,lvdTmp))
               prgError(1,fct,"invalid input in 'rigid body motion limits'!");
@@ -702,7 +728,7 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
 
             break;
 
-    case  31: //cout << "     HBSplineCutFEM: reading 'solid elements' ...\n\n";
+    case  32: //cout << "     HBSplineCutFEM: reading 'solid elements' ...\n\n";
 
             if (!prgReadLnBrkSepListVectorInt(Ifile,line,lviTmp))
               prgError(1,fct,"invalid input in 'solid elements'!");
@@ -728,7 +754,7 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
 
             break;
 
-    case  32: //cout << "     HBSplineCutFEM: reading 'immersed point boundary condition' ...\n\n";
+    case  33: //cout << "     HBSplineCutFEM: reading 'immersed point boundary condition' ...\n\n";
 
             if (!prgReadLnBrkSepListVectorDbl(Ifile,line,lvdTmp))
               prgError(1,fct,"invalid input in 'immersed point boundary condition'!");
@@ -757,7 +783,7 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
 
             break;
 
-    case  33: //cout << "     HBSplineCutFEM: reading 'immersed body output' ...\n\n";
+    case  34: //cout << "     HBSplineCutFEM: reading 'immersed body output' ...\n\n";
 
             if (!prgReadLnBrkSepListVectorInt(Ifile,line,lviTmp))
               prgError(1,fct,"invalid input in 'immersed body output'!");
@@ -782,7 +808,7 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
 
             break;
 
-    case  34: //cout << "     HBSplineCutFEM: reading 'contact elements' ...\n\n";
+    case  35: //cout << "     HBSplineCutFEM: reading 'contact elements' ...\n\n";
 
             if (!prgReadLnBrkSepListVectorInt(Ifile,line,lviTmp))
               prgError(1,fct,"invalid input in 'contact elements'!");
@@ -801,7 +827,7 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
 
             break;
 
-    case  35: //cout << "     HBSplineCutFEM: reading 'element type' ...\n\n";
+    case  36: //cout << "     HBSplineCutFEM: reading 'element type' ...\n\n";
 
             //ElemProp.add(new PropertyItem(ELEMENTTYPE));
             //ElemProp[ElemProp.n-1].readInputData(Ifile,line,"input error in 'element type'!");
@@ -815,7 +841,7 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
 
             break;
 
-    case  36: //cout << "     HBSplineCutFEM: reading 'material type' ...\n\n";
+    case  37: //cout << "     HBSplineCutFEM: reading 'material type' ...\n\n";
 
             //MatlProp.add(new PropertyItem(MATERIAL));
             //MatlProp[MatlProp.n-1].readInputData(Ifile,line,"input error in 'material type'!");
