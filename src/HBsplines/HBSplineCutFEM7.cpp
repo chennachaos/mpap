@@ -767,7 +767,7 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
 
       //cout << " jjjjjjjjjjjjjjjjjj " << endl;
       vecVTK->SetName("vel");
-      vecVTK2->SetName("acce");
+      //vecVTK2->SetName("acce");
       scaVTK->SetName("pres");
       scaVTK2->SetName("vortz");
 
@@ -778,7 +778,7 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
 
       uGridVTK->GetPointData()->SetScalars(scaVTK);
       uGridVTK->GetPointData()->SetVectors(vecVTK);
-      uGridVTK->GetPointData()->AddArray(vecVTK2);
+      //uGridVTK->GetPointData()->AddArray(vecVTK2);
       uGridVTK->GetPointData()->AddArray(scaVTK2);
 
       uGridVTK->GetCellData()->SetScalars(cellDataVTK2);

@@ -55,6 +55,7 @@ ImmersedRigidSolid::~ImmersedRigidSolid()
 
 void ImmersedRigidSolid::printSelf()
 {
+
     printf("\n\n\n Rigid body %5d details \n\n", id);
     printf("--------------------------------------------------------------");
     printf("\n Mass matrix \n\n");
@@ -814,7 +815,7 @@ void ImmersedRigidSolid::solveTimeStep()
   {
     printf("\n Solving Immersed Rigid Solid \n");
 
-    tol = 1.0e-6;
+    tol = 1.0e-7;
 
     for(int iter=0;iter<10;iter++)
     {

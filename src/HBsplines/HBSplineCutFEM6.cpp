@@ -1376,8 +1376,195 @@ void  HBSplineCutFEM::solveSolidProblem()
 
 void  HBSplineCutFEM::writeReadResult(int index, MyString &fileName)
 {
-  char fct[] = "HBSplineCutFEM::writeReadResult";
-  cout << "  HBSplineCutFEM::writeReadResult  " << endl;
+    cout << "  HBSplineCutFEM::writeReadResult  " << endl;
+
+    char fct[] = "HBSplineCutFEM::writeReadResult";
+
+    int  ii, jj, ind, ee, bb, count;
+    double  val1, val2;
+
+    if(index == 1)                                          // write result to a file
+    {
+        ofstream  fout;
+
+        char tmp[500], ff[100];
+        sprintf(ff,"%s%s%06d%s", fileName.asCharArray(),"-",filecount, ".dat");
+
+        MyString  fName;
+
+        fName = ff;
+
+        fout.open(ff);
+
+        if(!fout)
+        {
+            prgWarning(1,"HBSplineFEM::writeReadResult","could not open file for writing!");
+            return;
+        }
+
+        fout << "Dimension" << endl;
+        fout << DIM << endl;
+        fout << "DomainOrigin" << endl;
+        fout << origin[0] << '\t' << origin[1] << endl;
+        fout << "DomainSize" << endl;
+        fout << gridLEN[0] << '\t' << gridLEN[1] << endl;
+        fout << "NumElements" << endl;
+        fout << nelem[0] << '\t' << nelem[1] << endl;
+        fout << "Degree" << endl;
+        fout << degree[0] << '\t' << degree[1] << endl;
+        fout << "Levels" << endl;
+        fout << CURRENT_LEVEL << endl;
+        fout << "GridBasisFuncs" << endl;
+        fout << gridBF1 << endl;
+        fout << "DOFperBF" << endl;
+        fout << ndof << endl;
+        fout << "Time" << endl;
+        fout << mpapTime.cur << endl;
+        fout << "Result-Fluid" << endl;
+
+        for(ii=0; ii<gridBF1; ii++)
+        {
+            ind = ndof*ii;
+            //cout << ii << '\t' << ind << endl;
+
+            sprintf(tmp," %16.12f", SolnData.var1(ind));
+            sprintf(&(tmp[strlen(tmp)])," %16.12f", SolnData.var1(ind+1));
+            sprintf(&(tmp[strlen(tmp)])," %16.12f", SolnData.var1(ind+2));
+
+            sprintf(&(tmp[strlen(tmp)])," %16.12f", SolnData.var1Dot(ind));
+            sprintf(&(tmp[strlen(tmp)])," %16.12f", SolnData.var1Dot(ind+1));
+            sprintf(&(tmp[strlen(tmp)])," %16.12f", SolnData.var1Dot(ind+2));
+
+            //sprintf(&(tmp[strlen(tmp)])," %14.8f", FluidSolnData.var2(ii));
+            fout << tmp << "\n";
+            //fout << SolnData.var1(ind) << '\t' << SolnData.var1(ind+1) << '\t' << SolnData.var1(ind+2) << endl ;
+        }
+        //fout << "\n\n" ;
+        //cout << " AAAAAAAAAAAAA " << endl;
+
+        /*
+        fout << "Result-Solid" << endl;
+
+        ImmersedIntegrationElement  *lme;
+
+        for(bb=0;bb<ImmersedBodyObjects.size();bb++)
+        {
+            if( ImmersedBodyObjects[bb]->isBoundaryConditionTypeLagrange() )
+            {
+              for(ii=0;ii<ImmersedBodyObjects[bb]->getNumberOfNodes();ii++)
+              {
+                //ind = ImmersedBodyObjects[bb]->GlobalPointNumbers[ii];
+                ind = ii;
+                sprintf(tmp," %5d", ind);
+                ind = ind*DIM;
+                sprintf(&(tmp[strlen(tmp)])," %14.8f", SolnData.var3(ind));
+                sprintf(&(tmp[strlen(tmp)])," %14.8f", SolnData.var3(ind+1));
+
+                sprintf(&(tmp[strlen(tmp)])," %14.8f", ImmersedBodyObjects[bb]->GeomData.NodePosCur[ii][0]);
+                sprintf(&(tmp[strlen(tmp)])," %14.8f", ImmersedBodyObjects[bb]->GeomData.NodePosCur[ii][1]);
+                sprintf(&(tmp[strlen(tmp)])," %14.8f", ImmersedBodyObjects[bb]->GeomData.specValCur[ii][0]);
+                sprintf(&(tmp[strlen(tmp)])," %14.8f", ImmersedBodyObjects[bb]->GeomData.specValCur[ii][1]);
+
+                fout << tmp << "\n";
+              }
+            }
+        }
+        */
+        fout << "End" << endl;
+
+        fout.close();
+    }
+    else                                                    // read result from a file
+    {
+        ifstream  infile( string(fileName.asCharArray()) );
+
+        if(infile.fail())
+        {
+            prgWarning(1,"HBSplineFEM::writeReadResult","could not open file for reading!");
+            exit(1);
+        }
+
+        string  line, stringVal, stringVec[10];
+        int  ii, arrayInt[100], valInt;
+        double  tempDbl, arrayDbl[10];
+
+        // read the dimension
+        infile >> stringVal;
+        infile >> valInt;
+        assert(DIM ==  valInt);
+
+        // read the Domain origin
+        infile >> stringVal;
+        cout << stringVal << endl;
+        infile >> arrayDbl[0] >> arrayDbl[1];
+        cout << arrayDbl[0] << '\t' <<  arrayDbl[1] << endl;
+        assert( abs(origin[0]-arrayDbl[0]) < 1.0e-10 );
+        assert( abs(origin[1]-arrayDbl[1]) < 1.0e-10 );
+
+        // read the Domain size
+        infile >> stringVal;
+        infile >> arrayDbl[0] >> arrayDbl[1];
+        assert( abs(gridLEN[0]-arrayDbl[0]) < 1.0e-10 );
+        assert( abs(gridLEN[1]-arrayDbl[1]) < 1.0e-10 );
+
+        // read number of elements
+        infile >> stringVal;
+        infile >> arrayInt[0] >> arrayInt[1];
+        assert( nelem[0] == arrayInt[0] );
+        assert( nelem[1] == arrayInt[1] );
+
+        // read polynomial degree
+        infile >> stringVal;
+        infile >> arrayInt[0] >> arrayInt[1];
+        assert( degree[0] == arrayInt[0] );
+        assert( degree[1] == arrayInt[1] );
+
+        // read number of levels
+        infile >> stringVal;
+        infile >> arrayInt[0];
+        assert( CURRENT_LEVEL == arrayInt[0] );
+
+        // read number of gird basis functions
+        infile >> stringVal;
+        infile >> arrayInt[0];
+        assert( gridBF1 == arrayInt[0] );
+
+        // read number of DOF per basis function
+        infile >> stringVal;
+        infile >> arrayInt[0];
+        assert( ndof == arrayInt[0] );
+
+        // read Time
+        infile >> stringVal;
+        infile >> arrayDbl[0];
+        //assert( ndof == arrayInt[0] );
+
+        // read the solution for the fluid domain
+        infile >> stringVal;
+
+
+        for(ii=0; ii<gridBF1; ii++)
+        {
+            infile >> arrayDbl[0] >> arrayDbl[1] >> arrayDbl[2] >> arrayDbl[3] >> arrayDbl[4] >> arrayDbl[5];
+
+            ind = ndof*ii;
+
+            SolnData.var1(ind)   = arrayDbl[0];
+            SolnData.var1(ind+1) = arrayDbl[1];
+            SolnData.var1(ind+2) = arrayDbl[2];
+
+            SolnData.var1Dot(ind)   = arrayDbl[3];
+            SolnData.var1Dot(ind+1) = arrayDbl[4];
+            SolnData.var1Dot(ind+2) = arrayDbl[5];
+        }
+
+        SolnData.var1Prev = SolnData.var1;
+        SolnData.var1DotPrev = SolnData.var1Dot;
+
+        infile.close();
+    }
+
+    return;
 }
 
 
