@@ -827,3 +827,58 @@ void  ImmersedFlexibleSolid::updateDisplacement(double* data)
 
 
 
+
+void  ImmersedFlexibleSolid::writeResult(ofstream& fout)
+{
+    fout << "NumberOfPoints" << endl;
+    fout << nNode << endl;
+
+    fout << "Displacement" << endl;
+    fout << SolnData.var1[0] << '\t' << SolnData.var1[1] << '\t' << SolnData.var1[2] << endl;
+
+    fout << "Velocity" << endl;
+    fout << SolnData.var1Dot[0] << '\t' << SolnData.var1Dot[1] << '\t' << SolnData.var1Dot[2] << endl;
+
+    fout << "Acceleration" << endl;
+    fout << SolnData.var1DotDot[0] << '\t' << SolnData.var1DotDot[1] << '\t' << SolnData.var1DotDot[2] << endl;
+
+    fout << "Force" << endl;
+    fout << SolnData.force[0] << '\t' << SolnData.force[1] << '\t' << SolnData.force[2] << endl;
+
+    fout << "ForcePrevious" << endl;
+    fout << SolnData.forcePrev[0] << '\t' << SolnData.forcePrev[1] << '\t' << SolnData.forcePrev[2] << endl;
+
+/*
+    ImmersedIntegrationElement  *lme;
+
+    for(int ii=0; ii<nNode; ii++)
+    {
+                //ind = ImmersedBodyObjects[bb]->GlobalPointNumbers[ii];
+                ind = ii;
+                sprintf(tmp," %5d", ind);
+                ind = ind*DIM;
+                sprintf(&(tmp[strlen(tmp)])," %14.8f", SolnData.var3(ind));
+                sprintf(&(tmp[strlen(tmp)])," %14.8f", SolnData.var3(ind+1));
+
+                sprintf(&(tmp[strlen(tmp)])," %14.8f", ImmersedBodyObjects[bb]->GeomData.NodePosCur[ii][0]);
+                sprintf(&(tmp[strlen(tmp)])," %14.8f", ImmersedBodyObjects[bb]->GeomData.NodePosCur[ii][1]);
+                sprintf(&(tmp[strlen(tmp)])," %14.8f", ImmersedBodyObjects[bb]->GeomData.specValCur[ii][0]);
+                sprintf(&(tmp[strlen(tmp)])," %14.8f", ImmersedBodyObjects[bb]->GeomData.specValCur[ii][1]);
+
+                fout << tmp << "\n";
+    }
+*/
+    return;
+}
+
+
+void  ImmersedFlexibleSolid::readResult(ifstream& fin)
+{
+
+    return;
+}
+
+
+
+
+

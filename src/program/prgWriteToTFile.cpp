@@ -24,11 +24,11 @@ int prgWriteToTFile(MyString &addStr)
 
   if (mpapTime.write + 1.e-12 < mpapTime.cur) 
   { 
-    sprintf(tmp,"\n%12.5g",mpapTime.cur);
+    sprintf(tmp,"\n%12.5f",mpapTime.cur);
     timeStr.append(tmp);
     for (i=0; i<timeFunction.n; i++)
     {
-      sprintf(tmp," %12.5g",timeFunction[i].prop);
+      sprintf(tmp," %12.5f",timeFunction[i].prop);
       timeStr.append(tmp);
     }
     mpapTime.write = mpapTime.cur;

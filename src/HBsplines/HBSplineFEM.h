@@ -17,9 +17,7 @@ class HBSplineFEM: public HBSplineBase
     public:
 
         HBSplineFEM();
-        
-        //HBSplineFEM(int deg, int dim1, double XX, double YY);
-        
+
         virtual ~HBSplineFEM();
 
         virtual  void  printData(int, int);
@@ -57,7 +55,7 @@ class HBSplineFEM: public HBSplineBase
         void  writeImmersedSolidOutput();
         void  writeFluidOutput();
 
-        virtual  void  writeReadResult(int, MyString &);
+        virtual  void  writeReadResult(int, string&, int);
 
         ///////////////////////////////////////////////////////////
         //

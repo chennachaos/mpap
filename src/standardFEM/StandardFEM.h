@@ -168,13 +168,13 @@ class StandardFEM: public Domain
         {
           nodePosData = nodeVec;
         }
-        
+
         void  readNodes(ifstream& fname);
-        
+
         void  readElementConnectivity(ifstream& fname);
-        
+
         void  readElementProps(ifstream& fname);
-        
+
         void  readMaterialProps(ifstream& fname);
 
         void  readInput(ifstream& fname);
@@ -224,7 +224,7 @@ class StandardFEM: public Domain
         }
 
         virtual void printData(int, int);
-        
+
         int  solveStep(int niter);
 
         ///////////////////////////////////////////////////////////
@@ -251,7 +251,7 @@ class StandardFEM: public Domain
         void  geometryToParametric(const myPoint& geom, myPoint& param);
 
         double  computeGeometry(const int dir, double param);
-        
+
         void  computeGeometry(const myPoint& param, myPoint& geom);
 
         void  printInfo();
@@ -270,7 +270,7 @@ class StandardFEM: public Domain
 
         void  writeNodalData();
 
-        void  writeReadResult(int, MyString &);
+        void  writeReadResult(int, MyString &, int);
 
         ///////////////////////////////////////////////////////////
         //

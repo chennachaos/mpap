@@ -99,6 +99,10 @@ class ImmersedRigidSolid : public ImmersedSolid
         virtual int assembleGlobalMatrixAndVectorCutFEM(int ind1, int ind2, SolverPetsc* solverTemp);
 
         virtual void  assembleElementVector(int ind, bool flag, double* rhs);
+
+        virtual  void  writeResult(ofstream&);
+
+        virtual  void  readResult(ifstream&);
 };
 
 

@@ -247,28 +247,21 @@ void HBSplineFEM::printData(int index, int patchnum)
 
 
 
-void  HBSplineFEM::writeReadResult(int index, MyString &fileName)
+void  HBSplineFEM::writeReadResult(int index, string& filename, int stride)
 {
+    if( (filecount % stride) !=  0)
+        return;
+
     char fct[] = "HBSplineFEM::writeReadResult";
 
     int  ii, jj, ind, ee, bb, count;
-    
     double  val1, val2;
 
    if(index == 1) // write result to a file
    {
-      ofstream  fout;
+      char tmp[500];
 
-      char tmp[500], ff[100];
-      sprintf(ff,"%s%s%06d%s", fileName.asCharArray(),"-",filecount, ".dat");
-
-      MyString  fName;
-      
-      fName = ff;
-
-      //fout.open(fName.asCharArray());
-      fout.open(ff);
-
+      ofstream  fout(filename);
       if(!fout)
       {
          prgWarning(1,"HBSplineFEM::writeReadResult","could not open file for writing!");
@@ -345,6 +338,7 @@ void  HBSplineFEM::writeReadResult(int index, MyString &fileName)
    }
    else // read result from a file
    {
+      /*
       ifstream  Ifile;
 
       MyString line, tmpl;
@@ -418,17 +412,6 @@ void  HBSplineFEM::writeReadResult(int index, MyString &fileName)
                if (!prgReadLnBrkSepListVectorDbl(Ifile,line,lvdTmp))
                  prgError(1,fct,"invalid input in 'HBSplineFEM::writeReadResult'!");
 
-               /*
-               if(lvdTmp.n == IBpoints.size())
-               {
-                 for(ii=0;ii<lvdTmp.n;ii++)
-                 {
-                    ind = ii*ndof;
-                    for(jj=0;jj<2;jj++)
-                      IBpoints[ii]->SetDisplacement(jj, lvdTmp[ii][jj]*1.0);
-                 }
-               }
-               */
                break;
 
 
@@ -440,7 +423,10 @@ void  HBSplineFEM::writeReadResult(int index, MyString &fileName)
       while(prgNextDataKey(Ifile, line));
 
       Ifile.close();
+      */
    }
+
+   return;
 }
 
 

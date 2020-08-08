@@ -85,6 +85,10 @@ class ImmersedFlexibleSolid : public ImmersedSolid
         virtual void  setBoundaryConditions(vector<vector<double> >& vectemp);
 
         void  prepareMatrixPattern();
+
+        virtual  void  writeResult(ofstream&);
+
+        virtual  void  readResult(ifstream&);
 };
 
 

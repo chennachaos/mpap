@@ -31,19 +31,27 @@ int macro210(Macro &macro)
 
     macro.db.frameButtonBox();
 
+
+    macro.db.addTextField("index ", 1);
+
+    macro.db.addTextField("stride ", 10);
+
+    macro.db.frameButtonBox();
+
     return 0;	  
   }
 //--------------------------------------------------------------------------------------------------
 
-  int  type, id, patchnum, geom, index, rr;
+  int type   = roundToInt(macro.p[0]);
+  int id     = roundToInt(macro.p[1]) - 1;
+  int index  = roundToInt(macro.p[2]);
+  int stride = roundToInt(macro.p[3]);
 
-  type = roundToInt(macro.p[0]);
-  id   = roundToInt(macro.p[1]) - 1;
-  index = macro.p[2];
+  //cout << id << '\t' << index << '\t' << stride << '\t' << macro.strg <<  endl;
 
-  cout << type << '\t' << id << '\t' << index << endl;
+  string  filename(macro.strg.asCharArray());
 
-  hbsplineCutFEM(domain(type,id)).writeReadResult(index, macro.strg);
+  hbsplineCutFEM(domain(type,id)).writeReadResult(index, filename, stride);
 
 //--------------------------------------------------------------------------------------------------
   return 0;  

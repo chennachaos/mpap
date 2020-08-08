@@ -3081,8 +3081,8 @@ void TreeNode<2>::applyNeumannBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal,
               Flocal(ndof*ii+dir) += (res*N(ii));
 
 
-          if(side == 110)
-          {
+          //if(side == 110)
+          //{
             dvol *= PENALTY;
 
             stress(0,0) = computeValue(0, dN_dx);
@@ -3091,9 +3091,9 @@ void TreeNode<2>::applyNeumannBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal,
             stress(1,1) = computeValue(1, dN_dy);
 
             pres   = computeValue(2, N);
-            stress = mu*stress;
-            stress(0,0) -= pres;
-            stress(1,1) -= pres;
+            //stress = mu*stress;
+            //stress(0,0) -= pres;
+            //stress(1,1) -= pres;
 
             specVal = NeumannData[aa][2];
 
@@ -3103,9 +3103,9 @@ void TreeNode<2>::applyNeumannBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal,
               {
                 TI = ndof*ii;
                 //D(TI)   = mu*af*(dN_dx[ii]*normal[0] + dN_dy[ii]*normal[1]);
-                D(TI)   = mu*(dN_dx[ii]*normal[0] + dN_dy[ii]*normal[1]);
+                D(TI)   = (dN_dx[ii]*normal[0] + dN_dy[ii]*normal[1]);
                 D(TI+1) = 0.0;
-                D(TI+2) = -N[ii]*normal[0];
+                //D(TI+2) = -N[ii]*normal[0];
               }
 
               res = specVal - (stress(0,0)*normal[0]+stress(0,1)*normal[1]);
@@ -3117,8 +3117,8 @@ void TreeNode<2>::applyNeumannBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal,
                 TI = ndof*ii;
                 D(TI)   = 0.0;
                 //D(TI+1) = mu*af*(dN_dx[ii]*normal[0] + dN_dy[ii]*normal[1]);
-                D(TI+1) = mu*(dN_dx[ii]*normal[0] + dN_dy[ii]*normal[1]);
-                D(TI+2) = -N[ii]*normal[1];
+                D(TI+1) = (dN_dx[ii]*normal[0] + dN_dy[ii]*normal[1]);
+                //D(TI+2) = -N[ii]*normal[1];
               }
 
               res = specVal - (stress(1,0)*normal[0]+stress(1,1)*normal[1]);
@@ -3128,7 +3128,7 @@ void TreeNode<2>::applyNeumannBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal,
 
             Flocal += (res)*D;
             Klocal += (dvol*D)*D.transpose();
-          }
+          //}
         }// for(gp=0...
       } // for(aa=0;aa<NeumannData.size();aa++)
   } // if(NeumannData.size() > 0)

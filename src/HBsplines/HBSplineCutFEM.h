@@ -87,7 +87,7 @@ class HBSplineCutFEM: public HBSplineBase
 
         virtual  void  readInputData(std::ifstream &, MyString &);
 
-        virtual  void  writeReadResult(int, MyString &);
+        virtual  void  writeReadResult(int, string&, int);
 
         virtual  void  plotGeom(int, bool, int, bool, int*);
 
@@ -188,7 +188,6 @@ class HBSplineCutFEM: public HBSplineBase
         //virtual  int  solveFluidProblem();
 
         virtual  int  deallocatePetscObjects();
-
 };
 
 

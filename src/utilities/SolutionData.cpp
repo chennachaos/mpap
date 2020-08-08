@@ -198,9 +198,10 @@ void  SolutionData::timeUpdate()
   var3Prev = var3;
   var4Prev = var4;
 
-  var1Extrap = var1Prev;
+  //var1Extrap = var1Prev;
   //var1Extrap = 2.0*var1Prev - var1Prev2;
   //var1Extrap = 3.0*var1Prev - 3.0*var1Prev2 + var1Prev3;
+  //var1 = 2.0*var1Prev - var1Prev2;
 
   var1DotPrev = var1Dot;
   var1DotDotPrev = var1DotDot;

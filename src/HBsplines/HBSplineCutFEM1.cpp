@@ -63,32 +63,32 @@ HBSplineCutFEM::HBSplineCutFEM()
                           "profile to refine",//8
                           "dirichlet boundary conditions", //9
                           "neumann boundary conditions", //10
-                          "point boundary conditions", //11
-                          "periodic boundary conditions", //12
-                          "initial conditions", //13
-                          "fluid properties", //14
-                          "control parameters", //15
-                          "staggered or monolithic", //16
-                          "Galerkin or Leastsquares", //17
-                          "analytical function", //18
-                          "cutfem parameters", //19
-                          "immersed body data", //20
-                          "immersed points", //21
-                          "immersed integration elements",//22
-                          "rigid body mass", //23
-                          "rigid body damping",//24
-                          "rigid body stiffness",//25
-                          "rigid body degree of freedom", //26
-                          "rigid body prescribed motion", //27
-                          "rigid body pivot", // 28
-                          "rigid body preload", // 29
-                          "rigid body initial force predictor", // 30
-                          "rigid body motion limits", //31
-                          "solid elements",//32
-                          "immersed point boundary condition",//33
-                          "immersed body output", //34
-                          "contact elements", //35
-                          "element type", //36
+                          "point boundary conditions", //12
+                          "periodic boundary conditions", //13
+                          "initial conditions", //14
+                          "fluid properties", //15
+                          "control parameters", //16
+                          "staggered or monolithic", //17
+                          "Galerkin or Leastsquares", //18
+                          "analytical function", //19
+                          "cutfem parameters", //20
+                          "immersed body data", //21
+                          "immersed points", //22
+                          "immersed integration elements",//23
+                          "rigid body mass", //24
+                          "rigid body damping",//25
+                          "rigid body stiffness",//26
+                          "rigid body degree of freedom", //27
+                          "rigid body prescribed motion", //28
+                          "rigid body pivot", // 29
+                          "rigid body preload", // 30
+                          "rigid body initial force predictor", // 31
+                          "rigid body motion limits", //32
+                          "solid elements",//33
+                          "immersed point boundary condition",//34
+                          "immersed body output", //35
+                          "contact elements", //36
+                          "element type", //37
                           "material type");
 
 }

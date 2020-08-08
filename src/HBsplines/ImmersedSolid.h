@@ -324,7 +324,7 @@ class ImmersedSolid
         void  computeAABB(int index);
 
         virtual  int  within(myPoint& pt);
-        
+
         virtual  int  doAABBintersect(AABB&  bb2);
 
         virtual  int  doIntersect2D(AABB&  bb2, bool  flag, vector<int>&  vecTemp, vector<myPoint>&  ptOut);
@@ -365,12 +365,18 @@ class ImmersedSolid
 
         virtual void  updateDisplacement(double*)
         { cout << "   'updateDisplacement()' is not defined for this Solid!\n\n"; return; }
-        
+
         virtual void  resetMatrixAndVector()
         { cout << "   'resetMatrixAndVector()' is not defined for this Solid!\n\n"; return; }
 
         virtual void  assembleElementVector(int ind, bool flag, double* rhs)
         { cout << "   'assembleElementVector()' is not defined for this Solid!\n\n"; return; }
+
+        virtual  void  writeResult(ofstream&)
+        { cout << " writeResult() ... is not defined for the class... " << endl; return; }
+
+        virtual  void  readResult(ifstream&)
+        { cout << " readResult() ... is not defined for the class... " << endl; return; }
 
         virtual  void  perform_Aitken_accelerator_force()
         {   SolnData.perform_Aitken_accelerator_force(); return; }

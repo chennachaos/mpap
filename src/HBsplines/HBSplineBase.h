@@ -338,7 +338,7 @@ class HBSplineBase: public Domain
         void  createImmersedBoundaryPoints();
 
         virtual  void  solveSolidProblem()
-        { cout << " solveSolidProblemwriteReadResult() ... is not defined for the class... " << endl; return; }
+        { cout << " solveSolidProblem() ... is not defined for the class... " << endl; return; }
 
         void  updateImmersedPointPositions();
 
@@ -354,7 +354,7 @@ class HBSplineBase: public Domain
         void  pointBasedRefinement(int kk);
         void  limitBasedRefinement(int kk);
 
-        virtual  void  writeReadResult(int, MyString &)
+        virtual  void  writeReadResult(int, string &, int)
         { cout << " writeReadResult() ... is not defined for the class... " << endl; return; }
 
         ///////////////////////////////////////////////////////////

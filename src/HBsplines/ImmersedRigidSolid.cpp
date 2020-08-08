@@ -45,6 +45,8 @@ ImmersedRigidSolid::ImmersedRigidSolid(int dd)
   PrescMotionTimeFuncs.resize( ndofRigidbody );
 
   USE_SPECIFIED_PIVOT = false;
+
+  PRESC_MOTION = false;
 }
 
 
@@ -206,6 +208,8 @@ void ImmersedRigidSolid::setPrescribedMotion(vector<vector<double> >& vectemp)
 
     PrescMotionTimeFuncs[dof].setData( vecDbl );
   }
+
+  PRESC_MOTION = true;
 
   return;
 }
@@ -449,10 +453,10 @@ int  ImmersedRigidSolid::updatePointPositions()
   else if(DIM == 3)
     updatePointPositions3D();
 
-  if(PRESC_MOTION)
+  if( (totalDOF>0) || PRESC_MOTION )
     return 1;
-  else
-    return (totalDOF>0);
+
+  return 0;
 }
 
 
@@ -1508,5 +1512,138 @@ void ImmersedRigidSolid::postProcess(int index)
 
   return;
 }
+
+
+
+void  ImmersedRigidSolid::writeResult(ofstream& fout)
+{
+    char tmp[500];
+
+    fout << "##########################" << endl;
+    fout << "##  BEGIN Rigid solid   ##" << endl;
+    fout << "##########################" << endl;
+
+    fout << "RigidSolid" << endl;
+    fout << id+1 << endl;
+
+    fout << "NumberOfPoints" << endl;
+    fout << nNode << endl;
+
+    fout << "Displacement" << endl;
+    sprintf(tmp," %16.12f \t %16.12f \t %16.12f", SolnData.var1(0), SolnData.var1(1), SolnData.var1(2));
+    fout << tmp << "\n";
+
+    fout << "Velocity" << endl;
+    sprintf(tmp," %16.12f \t %16.12f \t %16.12f", SolnData.var1Dot(0), SolnData.var1Dot(1), SolnData.var1Dot(2));
+    fout << tmp << "\n";
+
+    fout << "Acceleration" << endl;
+    sprintf(tmp," %16.12f \t %16.12f \t %16.12f", SolnData.var1DotDot(0), SolnData.var1DotDot(1), SolnData.var1DotDot(2));
+    fout << tmp << "\n";
+
+    fout << "Force" << endl;
+    sprintf(tmp," %16.12f \t %16.12f \t %16.12f", SolnData.force(0), SolnData.force(1), SolnData.force(2));
+    fout << tmp << "\n";
+
+    fout << "ForcePrevious" << endl;
+    sprintf(tmp," %16.12f \t %16.12f \t %16.12f", SolnData.forcePrev(0), SolnData.forcePrev(1), SolnData.forcePrev(2));
+    fout << tmp << "\n";
+
+    fout << "DOFs" << endl;
+    sprintf(tmp," %d \t %d \t %d", dofData[0], dofData[1], dofData[2]);
+    fout << tmp << "\n";
+
+    fout << "Pivot" << endl;
+    fout << USE_SPECIFIED_PIVOT << endl;
+    sprintf(tmp," %16.12f \t %16.12f", pivotpoint[0], pivotpoint[1]);
+    fout << tmp << "\n";
+
+    fout << "##########################" << endl;
+    fout << "##  END Rigid solid     ##" << endl;
+    fout << "##########################" << endl;
+
+    return;
+}
+
+
+void  ImmersedRigidSolid::readResult(ifstream& infile)
+{
+    string  line, stringVal, stringVec[10];
+    int  arrayInt[100], valInt;
+    double  tempDbl, arrayDbl[10];
+
+    // read the comment lines
+    getline(infile, line);
+    cout << line << endl;
+    getline(infile, line);
+    cout << line << endl;
+    getline(infile, line);
+    cout << line << endl;
+
+    //RigidSolid and its ID
+    getline(infile, line);
+    getline(infile, line);
+
+    //NumberOfPoints"
+    //getline(infile, line);
+    //cout << line << endl;
+    infile >> stringVal;
+    cout << stringVal << endl;
+    infile >> valInt;
+    cout << "valInt = " << valInt << endl;
+    assert(nNode == valInt);
+
+    //Displacement
+    //getline(infile, line);
+    infile >> stringVal;
+    infile >> SolnData.var1(0) >> SolnData.var1(1) >> SolnData.var1(2);
+
+    //Velocity
+    //getline(infile, line);
+    infile >> stringVal;
+    infile >> SolnData.var1Dot(0) >> SolnData.var1Dot(1) >> SolnData.var1Dot(2);
+
+    //Acceleration
+    //getline(infile, line);
+    infile >> stringVal;
+    infile >> SolnData.var1DotDot(0) >> SolnData.var1DotDot(1) >> SolnData.var1DotDot(2);
+
+    //Force
+    //getline(infile, line);
+    infile >> stringVal;
+    infile >> SolnData.force(0) >> SolnData.force(1) >> SolnData.force(2);
+
+    //ForcePrevious
+    //getline(infile, line);
+    infile >> stringVal;
+    infile >> SolnData.forcePrev(0) >> SolnData.forcePrev(1) >> SolnData.forcePrev(2);
+
+    //DOFs
+    //getline(infile, line);
+    infile >> stringVal;
+    infile >> dofData[0] >> dofData[1] >> dofData[2];
+    cout << dofData[0] << '\t' <<  dofData[1] << '\t' <<  dofData[2] << endl;
+
+    //Pivot
+    //getline(infile, line);
+    infile >> stringVal;
+    getline(infile, line);
+    cout << line << endl;
+    getline(infile, line);
+    cout << line << endl;
+
+    // read the comment lines
+    getline(infile, line);
+    cout << line << endl;
+    getline(infile, line);
+    cout << line << endl;
+    getline(infile, line);
+    getline(infile, line);
+    cout << line << endl;
+
+    return;
+}
+
+
 
 

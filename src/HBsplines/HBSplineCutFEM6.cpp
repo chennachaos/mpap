@@ -4,9 +4,12 @@
 #include "MpapTime.h"
 #include "ImmersedIntegrationElement.h"
 #include "QuadratureUtil.h"
+#include "Files.h"
 
 
 extern MpapTime           mpapTime;
+extern Files files;
+
 
 using namespace std;
 
@@ -1374,8 +1377,14 @@ void  HBSplineCutFEM::solveSolidProblem()
 
 
 
-void  HBSplineCutFEM::writeReadResult(int index, MyString &fileName)
+void  HBSplineCutFEM::writeReadResult(int index, string& filename, int stride)
 {
+    if(this_mpi_proc != 0)
+        return;
+
+    if( (filecount % stride) !=  0)
+        return;
+
     cout << "  HBSplineCutFEM::writeReadResult  " << endl;
 
     char fct[] = "HBSplineCutFEM::writeReadResult";
@@ -1385,22 +1394,21 @@ void  HBSplineCutFEM::writeReadResult(int index, MyString &fileName)
 
     if(index == 1)                                          // write result to a file
     {
+        char tmp[500], ff[500];
+        sprintf(ff," %s%s%d%s", files.Ofile.asCharArray(), "-", filecount, ".rst");
+
         ofstream  fout;
-
-        char tmp[500], ff[100];
-        sprintf(ff,"%s%s%06d%s", fileName.asCharArray(),"-",filecount, ".dat");
-
-        MyString  fName;
-
-        fName = ff;
-
         fout.open(ff);
 
         if(!fout)
         {
-            prgWarning(1,"HBSplineFEM::writeReadResult","could not open file for writing!");
+            prgWarning(1,"HBSplineCutFEM::writeReadResult","could not open file for writing!");
             return;
         }
+
+        fout << "##########################" << endl;
+        fout << "##  BEGIN Fluid domain  ##" << endl;
+        fout << "##########################" << endl;
 
         fout << "Dimension" << endl;
         fout << DIM << endl;
@@ -1420,12 +1428,10 @@ void  HBSplineCutFEM::writeReadResult(int index, MyString &fileName)
         fout << ndof << endl;
         fout << "Time" << endl;
         fout << mpapTime.cur << endl;
-        fout << "Result-Fluid" << endl;
-
+        fout << "FluidSolution" << endl;
         for(ii=0; ii<gridBF1; ii++)
         {
             ind = ndof*ii;
-            //cout << ii << '\t' << ind << endl;
 
             sprintf(tmp," %16.12f", SolnData.var1(ind));
             sprintf(&(tmp[strlen(tmp)])," %16.12f", SolnData.var1(ind+1));
@@ -1434,59 +1440,56 @@ void  HBSplineCutFEM::writeReadResult(int index, MyString &fileName)
             sprintf(&(tmp[strlen(tmp)])," %16.12f", SolnData.var1Dot(ind));
             sprintf(&(tmp[strlen(tmp)])," %16.12f", SolnData.var1Dot(ind+1));
             sprintf(&(tmp[strlen(tmp)])," %16.12f", SolnData.var1Dot(ind+2));
-
-            //sprintf(&(tmp[strlen(tmp)])," %14.8f", FluidSolnData.var2(ii));
             fout << tmp << "\n";
             //fout << SolnData.var1(ind) << '\t' << SolnData.var1(ind+1) << '\t' << SolnData.var1(ind+2) << endl ;
         }
-        //fout << "\n\n" ;
-        //cout << " AAAAAAAAAAAAA " << endl;
 
-        /*
-        fout << "Result-Solid" << endl;
+        fout << "##########################" << endl;
+        fout << "##  END Fluid domain    ##" << endl;
+        fout << "##########################" << endl;
 
-        ImmersedIntegrationElement  *lme;
+        fout << "##########################" << endl;
+        fout << "##  BEGIN Solid domains ##" << endl;
+        fout << "##########################" << endl;
 
-        for(bb=0;bb<ImmersedBodyObjects.size();bb++)
+        fout << "StaggeredParameters" << endl;
+        fout << stagParams[0] << '\t' << stagParams[1] << '\t' << stagParams[2] << endl;
+
+        for(int bb=0; bb<ImmersedBodyObjects.size(); bb++)
         {
-            if( ImmersedBodyObjects[bb]->isBoundaryConditionTypeLagrange() )
-            {
-              for(ii=0;ii<ImmersedBodyObjects[bb]->getNumberOfNodes();ii++)
-              {
-                //ind = ImmersedBodyObjects[bb]->GlobalPointNumbers[ii];
-                ind = ii;
-                sprintf(tmp," %5d", ind);
-                ind = ind*DIM;
-                sprintf(&(tmp[strlen(tmp)])," %14.8f", SolnData.var3(ind));
-                sprintf(&(tmp[strlen(tmp)])," %14.8f", SolnData.var3(ind+1));
-
-                sprintf(&(tmp[strlen(tmp)])," %14.8f", ImmersedBodyObjects[bb]->GeomData.NodePosCur[ii][0]);
-                sprintf(&(tmp[strlen(tmp)])," %14.8f", ImmersedBodyObjects[bb]->GeomData.NodePosCur[ii][1]);
-                sprintf(&(tmp[strlen(tmp)])," %14.8f", ImmersedBodyObjects[bb]->GeomData.specValCur[ii][0]);
-                sprintf(&(tmp[strlen(tmp)])," %14.8f", ImmersedBodyObjects[bb]->GeomData.specValCur[ii][1]);
-
-                fout << tmp << "\n";
-              }
-            }
+            ImmersedBodyObjects[bb]->writeResult(fout);
         }
-        */
-        fout << "End" << endl;
+
+        fout << "##########################" << endl;
+        fout << "##  END Solid domains   ##" << endl;
+        fout << "##########################" << endl;
 
         fout.close();
     }
     else                                                    // read result from a file
     {
-        ifstream  infile( string(fileName.asCharArray()) );
+        //char ff[500];
+        //sprintf(ff," %s%s", files.Ofile.asCharArray(), ".rst");
+        cout << filename << endl;
 
-        if(infile.fail())
+        ifstream  infile(filename);
+        //infile.open("Orectangle-AR4-r0p0-alpha90-L3-dt0p1-fixed-3130.rst");
+
+        if(!infile)
         {
-            prgWarning(1,"HBSplineFEM::writeReadResult","could not open file for reading!");
+            PetscPrintf(MPI_COMM_WORLD, "HBSplineCutFEM::writeReadResult ... could not open file for reading! \n");
+
             exit(1);
         }
 
         string  line, stringVal, stringVec[10];
         int  ii, arrayInt[100], valInt;
         double  tempDbl, arrayDbl[10];
+
+        // read the commented part
+        getline(infile, line);
+        getline(infile, line);
+        getline(infile, line);
 
         // read the dimension
         infile >> stringVal;
@@ -1495,9 +1498,7 @@ void  HBSplineCutFEM::writeReadResult(int index, MyString &fileName)
 
         // read the Domain origin
         infile >> stringVal;
-        cout << stringVal << endl;
         infile >> arrayDbl[0] >> arrayDbl[1];
-        cout << arrayDbl[0] << '\t' <<  arrayDbl[1] << endl;
         assert( abs(origin[0]-arrayDbl[0]) < 1.0e-10 );
         assert( abs(origin[1]-arrayDbl[1]) < 1.0e-10 );
 
@@ -1537,6 +1538,7 @@ void  HBSplineCutFEM::writeReadResult(int index, MyString &fileName)
         // read Time
         infile >> stringVal;
         infile >> arrayDbl[0];
+        mpapTime.cur = arrayDbl[0];
         //assert( ndof == arrayInt[0] );
 
         // read the solution for the fluid domain
@@ -1561,7 +1563,35 @@ void  HBSplineCutFEM::writeReadResult(int index, MyString &fileName)
         SolnData.var1Prev = SolnData.var1;
         SolnData.var1DotPrev = SolnData.var1Dot;
 
+        // read the commented part
+        getline(infile, line);
+        getline(infile, line);
+        getline(infile, line);
+
+        getline(infile, line);
+        getline(infile, line);
+        getline(infile, line);
+
+        // StaggeredParameters
+        getline(infile, line);
+        getline(infile, line);
+        getline(infile, line);
+        //infile << stagParams[0] << '\t' << stagParams[1] << '\t' << stagParams[2] << endl;
+
+        for(int bb=0; bb<ImmersedBodyObjects.size(); bb++)
+        {
+            ImmersedBodyObjects[bb]->readResult(infile);
+            ImmersedBodyObjects[bb]->updatePointPositions();
+        }
+
+        getline(infile, line);
+        getline(infile, line);
+        getline(infile, line);
+
         infile.close();
+
+        filecount--;
+        timeUpdate();
     }
 
     return;
