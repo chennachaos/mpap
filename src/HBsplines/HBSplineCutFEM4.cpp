@@ -145,6 +145,9 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
           nd->applyNeumannBCsCutFEMFluid(Klocal, Flocal, domTemp);
           //cout << " EEEEEEEEEEEEEEEEE " << endl;
 
+          nd->applyDerivativeBCsCutFEMFluid(Klocal, Flocal, domTemp);
+          //cout << " EEEEEEEEEEEEEEEEE " << endl;
+
           //printMatrix(Klocal);
           //printf("\n\n\n");
           //printVector(Flocal);

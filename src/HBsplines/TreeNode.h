@@ -316,6 +316,8 @@ class TreeNode
 
         void  applyNeumannBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int domainCur=0);
 
+        void  applyDerivativeBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int domainCur=0);
+
         void  applyBoundaryConditionsAtApoint(myDataIntegrateCutFEM&);
 
         // for CutFEM for fluid flow 
@@ -324,6 +326,8 @@ class TreeNode
         void  applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal, int domainCur=0);
 
         void  applyNeumannBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal, int domainCur=0);
+
+        void  applyDerivativeBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal, int domainCur=0);
 
         void  applyBoundaryConditionsAtApointCutFEMFluid(myDataIntegrateCutFEM&);
 

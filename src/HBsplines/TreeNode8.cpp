@@ -2658,22 +2658,19 @@ void TreeNode<2>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
 
     int ii, jj, aa, gp, nGauss, TI, TIp1, TIp2, index, TJ, TJp1, TJp2, dir, side;
     double  theta, y0, y1, Ta[3], Tb[3], res, JacTemp, temp, NitscheFact, pres;
-    double  dvol, specVal, PENALTY1, PENALTY2, Jac, fact, rad, R, bb1, bb2, a;
+    double  dvol, specVal, PENALTY, Jac, fact, rad, R, bb1, bb2, a;
     bool  isNitsche;
 
     bool   axsy = ((int)elmDat[2] == 1);
     double  rho = elmDat[3];
     double  mu  = elmDat[4];
 
-    double  af = SolnData->td(2);
-    af = 1.0;
-
     double  hx = bbox.maxBB[0]-bbox.minBB[0];
     double  hy = bbox.maxBB[1]-bbox.minBB[1];
 
     VectorXd  N(totnlbf), dN_dx(totnlbf), dN_dy(totnlbf);
     VectorXd  NN(totnlbf), dNN_dx(totnlbf), dNN_dy(totnlbf), trac(2);
-    MatrixXd  grad(2, 2), stress(2,2);
+    MatrixXd  grad(2,2), stress(2,2);
     myPoint  param, normal, geom;
     double *gws;
     myPoint *gps;
@@ -2684,43 +2681,27 @@ void TreeNode<2>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
 
     for(aa=0;aa<DirichletData.size();aa++)
     {
-        // printVector(DirichletData[aa]);
         isNitsche   = false;
         side        = (int) (DirichletData[aa][0] - 1);
         dir         = (int) (DirichletData[aa][1] - 1);
         specVal     = DirichletData[aa][2];
-        PENALTY1    = DirichletData[aa][3];
-        PENALTY2    = PENALTY1;
+        PENALTY     = DirichletData[aa][3];
         isNitsche   = ( (int) DirichletData[aa][4] == 1 );
         NitscheFact = DirichletData[aa][5];
 
-        //PENALTY1    = 1.0/max(hx, hy);                     // GeomData-> degree;
+        //PENALTY    = 1.0/max(hx, hy);                     // GeomData-> degree;
 
-        //for symmetric Nitsche method -> NitscheFact = 1.0
+        //for symmetric Nitsche method   -> NitscheFact =  1.0
         //for unsymmetric Nitsche method -> NitscheFact = -1.0
 
         normal = GeomData->boundaryNormals[side];
 
         if(domNums.size() > 1)
         {
-          // to avoid singularities at the corners
-          PENALTY2    = 1000.0*PENALTY1;
-          PENALTY2    = PENALTY1;
-          //printVector(LocalBasisFuncs);
-          //printVector(GlobalBasisFuncs);
-
-          //TreeNode<2>::computeGaussPointsAdapIntegrationBoundary(side, 0, 0, 0, 0);
-
           nGauss = BoundaryQuadrature[side].gausspoints.size() ;
 
           gps = &(BoundaryQuadrature[side].gausspoints[0]);
           gws = &(BoundaryQuadrature[side].gaussweights[0]);
-
-          //printVector(BoundaryQuadrature[side].gausspoints[0]);
-          //printVector(BoundaryQuadrature[side].gausspoints[1]);
-          //printVector(BoundaryQuadrature[side].gaussweights);
-
-          //cout << BoundaryQuadrature[side].gaussweights[0] << '\t' << BoundaryQuadrature[side].gaussweights[1] << endl;
 
           JacTemp = 1.0;
         }
@@ -2752,15 +2733,15 @@ void TreeNode<2>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
 
             if(parent == NULL)
             {
-              GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, N, dN_dx, dN_dy );
+                GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, N, dN_dx, dN_dy );
             }
             else
             {
-              GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy );
+                GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy );
 
-              N = SubDivMat*NN;
-              dN_dx = SubDivMat*dNN_dx;
-              dN_dy = SubDivMat*dNN_dy;
+                N = SubDivMat*NN;
+                dN_dx = SubDivMat*dNN_dx;
+                dN_dy = SubDivMat*dNN_dy;
             }
 
             specVal = DirichletData[aa][2];
@@ -2811,53 +2792,43 @@ void TreeNode<2>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
               }
               */
 
-              //specVal = GeomData->analyDBC->computeValue(dir, xx, yy);
-              //specVal = analy.computeValue(dir, geom[0], geom[1]);
+            //specVal = GeomData->analyDBC->computeValue(dir, xx, yy);
+            //specVal = analy.computeValue(dir, geom[0], geom[1]);
 
-              specVal *= timeFunction[0].prop;
+            specVal *= timeFunction[0].prop;
 
-              //if( GeomData->distFuncs[0]->ComputeDistance(xx, yy) > 0.0 )
-              //if( xx <= 0.5 )
-              //if( rad >= 0.5 )
+            res = specVal - computeValue(dir, N);
 
-              mu = elmDat[4];
-              res = specVal - computeValue(dir, N);
+            grad(0,0) = computeValue(0, dN_dx);
+            grad(0,1) = computeValue(0, dN_dy);
+            grad(1,0) = computeValue(1, dN_dx);
+            grad(1,1) = computeValue(1, dN_dy);
+            pres      = computeValue(2, N);
 
-              grad(0,0) = computeValue(0, dN_dx);
-              grad(0,1) = computeValue(0, dN_dy);
-              grad(1,0) = computeValue(1, dN_dx);
-              grad(1,1) = computeValue(1, dN_dy);
-              pres      = computeValue(2, N);
+            stress = mu*grad;
+            stress(0,0) -= pres;
+            stress(1,1) -= pres;
 
-              //stress = mu*(grad+grad.transpose());
-              stress = mu*grad;
-              stress(0,0) -= pres;
-              stress(1,1) -= pres;
+            trac[0] = stress(0,0)*normal[0] + stress(0,1)*normal[1] ;
+            trac[1] = stress(1,0)*normal[0] + stress(1,1)*normal[1] ;
 
-              trac[0] = stress(0,0)*normal[0] + stress(0,1)*normal[1] ;
-              trac[1] = stress(1,0)*normal[0] + stress(1,1)*normal[1] ;
-
-              for(ii=0;ii<totnlbf2;ii++)
-              {
-                fact = (dvol*PENALTY2)* N[ii] ;
-
-                //fact = (dvol*PENALTY*(mu/rho)/hx)* N[ii] ;
+            for(ii=0;ii<totnlbf2;ii++)
+            {
+                fact = (dvol*PENALTY)* N[ii] ;
 
                 TI = ndof*ii+dir;
 
                 Flocal(TI) += fact*res;
 
-                //fact *= af;
-
                 for(jj=0;jj<totnlbf2;jj++)
                 {
                   Klocal(TI, ndof*jj+dir) += fact * N[jj];
                 }
-              }
+            }
 
-              // terms corresponding to Nitsche method for Stokes and Navier-Stokes
-              if(isNitsche)
-              {
+            // terms corresponding to Nitsche method for Stokes and Navier-Stokes
+            if(isNitsche)
+            {
                 if(dir == 0)
                 {
                   for(ii=0;ii<totnlbf2;ii++)
@@ -2878,7 +2849,7 @@ void TreeNode<2>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
                       TJp1 = TJ+1;
                       TJp2 = TJ+2;
 
-                      Tb[0] = (mu*af)*(normal[0]*dN_dx(jj)+normal[1]*dN_dy(jj));
+                      Tb[0] = mu*(normal[0]*dN_dx(jj)+normal[1]*dN_dy(jj));
                       Tb[1] = 0.0;
                       Tb[2] = -normal[0]*N(jj);
 
@@ -2887,9 +2858,9 @@ void TreeNode<2>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
                       Klocal(TI, TJp2) -= (bb1*Tb[2]);
 
                       // Nitsche terms
-                      Klocal(TI,   TJ) -= (Ta[0]*af*N(jj))*NitscheFact;
-                      Klocal(TIp1, TJ) -= (Ta[1]*af*N(jj))*NitscheFact;
-                      Klocal(TIp2, TJ) -= (Ta[2]*af*N(jj))*NitscheFact;
+                      Klocal(TI,   TJ) -= (Ta[0]*N(jj))*NitscheFact;
+                      Klocal(TIp1, TJ) -= (Ta[1]*N(jj))*NitscheFact;
+                      Klocal(TIp2, TJ) -= (Ta[2]*N(jj))*NitscheFact;
                     }
 
                     Flocal(TI)   += (bb1*trac[0]);
@@ -2920,7 +2891,7 @@ void TreeNode<2>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
                       TJp2 = TJ+2;
 
                       Tb[0] = 0.0;
-                      Tb[1] = (mu*af)*(normal[0]*dN_dx(jj)+normal[1]*dN_dy(jj));
+                      Tb[1] = mu*(normal[0]*dN_dx(jj)+normal[1]*dN_dy(jj));
                       Tb[2] = -normal[1]*N(jj);
 
                       Klocal(TIp1, TJ)    -= (bb1*Tb[0]);
@@ -2928,9 +2899,9 @@ void TreeNode<2>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
                       Klocal(TIp1, TJp2)  -= (bb1*Tb[2]);
 
                       // Nitsche terms
-                      Klocal(TI,   TJp1)  -= (Ta[0]*af*N(jj))*NitscheFact;
-                      Klocal(TIp1, TJp1)  -= (Ta[1]*af*N(jj))*NitscheFact;
-                      Klocal(TIp2, TJp1)  -= (Ta[2]*af*N(jj))*NitscheFact;
+                      Klocal(TI,   TJp1)  -= (Ta[0]*N(jj))*NitscheFact;
+                      Klocal(TIp1, TJp1)  -= (Ta[1]*N(jj))*NitscheFact;
+                      Klocal(TIp2, TJp1)  -= (Ta[2]*N(jj))*NitscheFact;
                     }
 
                     Flocal(TIp1) += (bb1*trac[1]);
@@ -2940,7 +2911,7 @@ void TreeNode<2>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
                     Flocal(TIp2) -= (Ta[2]*res)*NitscheFact;
                   }
                 }
-              } //if(isNitsche)
+            } //if(isNitsche)
            //} // if(! GeomData->polyImm.within(xx, yy) )
         }// for(gp=0...
 
@@ -2963,176 +2934,233 @@ void TreeNode<1>::applyNeumannBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal,
 template<>
 void TreeNode<2>::applyNeumannBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
 {
-  //if(mpapTime.cur > 0.005)
-    //return;
+    if( NeumannData.size() > 0 )
+    {
+        int ii, jj, aa, gp, nGauss, TI, TIp1, TIp2, index, dir, side;
+        double  y0, y1, res, JacTemp;
+        double  dvol, specVal, rad, freq, pres, PENALTY;
 
-  if( NeumannData.size() > 0 )
-  {
-      int ii, jj, aa, gp, nGauss, TI, TIp1, TIp2, index, dir, side;
-      double  y0, y1, res, JacTemp;
-      double  dvol, specVal, rad, freq, pres, PENALTY=100.0;
+        VectorXd  NN(totnlbf), dNN_dx(totnlbf), dNN_dy(totnlbf);
+        VectorXd  N(totnlbf2);
 
-      VectorXd  N(totnlbf), dN_dx(totnlbf), dN_dy(totnlbf);
-      VectorXd  NN(totnlbf), dNN_dx(totnlbf), dNN_dy(totnlbf);
-      MatrixXd  D(forAssyVec.size(),1), stress(2,2);
-      D.setZero();
+        myPoint  param, geom, normal;
+        double *gws;
+        myPoint *gps;
 
-      myPoint  param, geom, normal;
-      double *gws;
-      myPoint *gps;
+        bool   axsy = ((int)elmDat[2] == 1);
+        double  rho = elmDat[3];
+        double  mu  = elmDat[4];
 
-      bool   axsy = ((int)elmDat[2] == 1);
-      double  rho = elmDat[3];
-      double  mu  = elmDat[4];
-
-      for(aa=0;aa<NeumannData.size();aa++)
-      {
-        side    = (int) (NeumannData[aa][0] - 1);
-        dir     = (int) (NeumannData[aa][1] - 1);
-
-
-        normal = GeomData->boundaryNormals[side];
-
-        if(domNums.size() > 1)
+        for(aa=0;aa<NeumannData.size();aa++)
         {
-          //TreeNode<2>::computeGaussPointsAdapIntegrationBoundary(side, 0, 0, 0, 0);
+            side    = (int) (NeumannData[aa][0] - 1);
+            dir     = (int) (NeumannData[aa][1] - 1);
+            specVal = NeumannData[aa][2];
 
-          nGauss = BoundaryQuadrature[side].gausspoints.size() ;
+            normal = GeomData->boundaryNormals[side];
 
-          gps = &(BoundaryQuadrature[side].gausspoints[0]);
-          gws = &(BoundaryQuadrature[side].gaussweights[0]);
-
-          JacTemp = 1.0;
-        }
-        else
-        {
-          nGauss = GeomData->boundaryQuadrature2D[side].gausspoints.size();
-
-          gps = &(GeomData->boundaryQuadrature2D[side].gausspoints[0]);
-          gws = &(GeomData->boundaryQuadrature2D[side].gaussweights[0]);
-
-          JacTemp = GeomData->boundaryJacobians[side][level];
-        }
-
-
-        for(gp=0; gp<nGauss; gp++)
-        {
-            param[0]  = 0.5*(knotIncr[0] * gps[gp][0] + knotSum[0]);
-            param[1]  = 0.5*(knotIncr[1] * gps[gp][1] + knotSum[1]);
-
-            dvol = JacTemp * gws[gp] ;
-
-            geom[0] = GeomData->computeCoord(0, param[0]);
-            geom[1] = GeomData->computeCoord(1, param[1]);
-            //r = sqrt(xx*xx+yy*yy);
-            //val = 1.0+log(2.0*r);
-            //cout << xx << '\t' << yy << endl;
-
-            if(axsy)
+            if(domNums.size() > 1)
             {
-              if(side != 0)
-                dvol *= 2.0*PI*geom[0];
-            }
+                nGauss = BoundaryQuadrature[side].gausspoints.size() ;
 
-            GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy );
+                gps = &(BoundaryQuadrature[side].gausspoints[0]);
+                gws = &(BoundaryQuadrature[side].gaussweights[0]);
 
-            if(parent == NULL)
-            {
-              N = NN;
-              dN_dx = dNN_dx;
-              dN_dy = dNN_dy;
+                JacTemp = 1.0;
             }
             else
             {
-              N = SubDivMat*NN;
-              dN_dx = SubDivMat*dNN_dx;
-              dN_dy = SubDivMat*dNN_dy;
+                nGauss = GeomData->boundaryQuadrature2D[side].gausspoints.size();
+
+                gps = &(GeomData->boundaryQuadrature2D[side].gausspoints[0]);
+                gws = &(GeomData->boundaryQuadrature2D[side].gaussweights[0]);
+
+                JacTemp = GeomData->boundaryJacobians[side][level];
             }
 
-            specVal = NeumannData[aa][2];
-
-            /*
-            if(side == 10)
+            for(gp=0; gp<nGauss; gp++)
             {
-              if(dir == 0)
-              {
-                if(abs(geom[1]) > 0.5)
-                  specVal = 0.0;
+                param[0]  = 0.5*(knotIncr[0] * gps[gp][0] + knotSum[0]);
+                param[1]  = 0.5*(knotIncr[1] * gps[gp][1] + knotSum[1]);
+
+                dvol = JacTemp * gws[gp] ;
+
+                geom[0] = GeomData->computeCoord(0, param[0]);
+                geom[1] = GeomData->computeCoord(1, param[1]);
+
+                if(axsy)
+                {
+                    if(side != 0)
+                      dvol *= 2.0*PI*geom[0];
+                }
+
+                GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy );
+
+                if(parent == NULL)
+                {
+                  N = NN;
+                }
                 else
-                  specVal = NeumannData[aa][2];
-              }
-            }
-            */
+                {
+                  N = SubDivMat*NN;
+                }
 
-            res = dvol * specVal * timeFunction[0].prop;
-            //res = dvol * specVal * tanh(20.0*mpapTime.cur);
-            //cout << specVal << '\t' << axsy << '\t' << dir << endl;
+                res = specVal * timeFunction[0].prop;
 
-            //res *= (0.5*(1.0-cos(2.0*PI*SolnData->ElemProp.data[6]*mpapTime.cur)));
-            //w1 = tanh(SolnData->ElemProp.data[5]*mpapTime.cur);
+                //res = dvol * specVal * tanh(20.0*mpapTime.cur);
+                //cout << specVal << '\t' << axsy << '\t' << dir << endl;
+                //res *= (0.5*(1.0-cos(2.0*PI*SolnData->ElemProp.data[6]*mpapTime.cur)));
+                //w1 = tanh(SolnData->ElemProp.data[5]*mpapTime.cur);
 
-            //freq = 2.0*PI*10.0;
-            //res = dvol* specVal * (0.5*(1.0-cos(freq*mpapTime.cur)));
-            //res = dvol * specVal * sin(freq*mpapTime.cur);
-            //res *= tanh(50.0*timeFunction[0].prop);
+                //freq = 2.0*PI*10.0;
+                //res = dvol* specVal * (0.5*(1.0-cos(freq*mpapTime.cur)));
+                //res = dvol * specVal * sin(freq*mpapTime.cur);
+                //res *= tanh(50.0*timeFunction[0].prop);
 
-            //cout << " yy " << geom[1] << '\t' << res << endl;
-            for(ii=0;ii<totnlbf2;ii++)
-              Flocal(ndof*ii+dir) += (res*N(ii));
+                res *= dvol;
+                for(ii=0;ii<totnlbf2;ii++)
+                  Flocal(ndof*ii+dir) += (res*N(ii));
+
+            } // for(gp=0...
+        } // for(aa=0;aa<NeumannData.size();aa++)
+    } // if(NeumannData.size() > 0)
+
+    return;
+}
 
 
-          //if(side == 110)
-          //{
-            dvol *= PENALTY;
 
-            stress(0,0) = computeValue(0, dN_dx);
-            stress(0,1) = computeValue(0, dN_dy);
-            stress(1,0) = computeValue(1, dN_dx);
-            stress(1,1) = computeValue(1, dN_dy);
-
-            pres   = computeValue(2, N);
-            //stress = mu*stress;
-            //stress(0,0) -= pres;
-            //stress(1,1) -= pres;
-
-            specVal = NeumannData[aa][2];
-
-            if(dir == 0)
-            {
-              for(ii=0;ii<totnlbf2;ii++)
-              {
-                TI = ndof*ii;
-                //D(TI)   = mu*af*(dN_dx[ii]*normal[0] + dN_dy[ii]*normal[1]);
-                D(TI)   = (dN_dx[ii]*normal[0] + dN_dy[ii]*normal[1]);
-                D(TI+1) = 0.0;
-                //D(TI+2) = -N[ii]*normal[0];
-              }
-
-              res = specVal - (stress(0,0)*normal[0]+stress(0,1)*normal[1]);
-            }
-            if(dir == 1)
-            {
-              for(ii=0;ii<totnlbf2;ii++)
-              {
-                TI = ndof*ii;
-                D(TI)   = 0.0;
-                //D(TI+1) = mu*af*(dN_dx[ii]*normal[0] + dN_dy[ii]*normal[1]);
-                D(TI+1) = (dN_dx[ii]*normal[0] + dN_dy[ii]*normal[1]);
-                //D(TI+2) = -N[ii]*normal[1];
-              }
-
-              res = specVal - (stress(1,0)*normal[0]+stress(1,1)*normal[1]);
-            }
-
-            res *= dvol;
-
-            Flocal += (res)*D;
-            Klocal += (dvol*D)*D.transpose();
-          //}
-        }// for(gp=0...
-      } // for(aa=0;aa<NeumannData.size();aa++)
-  } // if(NeumannData.size() > 0)
-
+template<>
+void TreeNode<1>::applyDerivativeBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
+{
   return;
 }
+
+
+
+template<>
+void TreeNode<2>::applyDerivativeBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
+{
+    if( DerivativeBCData.size() > 0 )
+    {
+        int ii, jj, aa, gp, nGauss, TI, TIp1, TIp2, index, dir, side;
+        double  y0, y1, res, JacTemp;
+        double  dvol, specVal, rad, freq, pres, PENALTY;
+
+        VectorXd  N(totnlbf), dN_dx(totnlbf), dN_dy(totnlbf);
+        VectorXd  NN(totnlbf), dNN_dx(totnlbf), dNN_dy(totnlbf), grad(2);
+        MatrixXd  D(forAssyVec.size(),1);
+        D.setZero();
+
+        myPoint  param, geom, normal;
+        double *gws;
+        myPoint *gps;
+
+        bool   axsy = ((int)elmDat[2] == 1);
+        double  rho = elmDat[3];
+        double  mu  = elmDat[4];
+
+        for(aa=0;aa<DerivativeBCData.size();aa++)
+        {
+            side    = (int) (DerivativeBCData[aa][0] - 1);
+            dir     = (int) (DerivativeBCData[aa][1] - 1);
+            specVal = DerivativeBCData[aa][2];
+            PENALTY = DerivativeBCData[aa][3];
+
+            normal = GeomData->boundaryNormals[side];
+
+            if(domNums.size() > 1)
+            {
+                nGauss = BoundaryQuadrature[side].gausspoints.size() ;
+
+                gps = &(BoundaryQuadrature[side].gausspoints[0]);
+                gws = &(BoundaryQuadrature[side].gaussweights[0]);
+
+                JacTemp = 1.0;
+            }
+            else
+            {
+                nGauss = GeomData->boundaryQuadrature2D[side].gausspoints.size();
+
+                gps = &(GeomData->boundaryQuadrature2D[side].gausspoints[0]);
+                gws = &(GeomData->boundaryQuadrature2D[side].gaussweights[0]);
+
+                JacTemp = GeomData->boundaryJacobians[side][level];
+            }
+
+
+            for(gp=0; gp<nGauss; gp++)
+            {
+                param[0]  = 0.5*(knotIncr[0] * gps[gp][0] + knotSum[0]);
+                param[1]  = 0.5*(knotIncr[1] * gps[gp][1] + knotSum[1]);
+
+                dvol = JacTemp * gws[gp] ;
+
+                geom[0] = GeomData->computeCoord(0, param[0]);
+                geom[1] = GeomData->computeCoord(1, param[1]);
+
+                if(axsy)
+                {
+                  if(side != 0)
+                    dvol *= 2.0*PI*geom[0];
+                }
+
+                dvol *= PENALTY;
+
+                GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy );
+
+                if(parent == NULL)
+                {
+                  N = NN;
+                  dN_dx = dNN_dx;
+                  dN_dy = dNN_dy;
+                }
+                else
+                {
+                  N = SubDivMat*NN;
+                  dN_dx = SubDivMat*dNN_dx;
+                  dN_dy = SubDivMat*dNN_dy;
+                }
+
+                if(dir == 0)
+                {
+                    grad(0) = computeValue(0, dN_dx);
+                    grad(1) = computeValue(0, dN_dy);
+
+                    for(ii=0;ii<totnlbf2;ii++)
+                    {
+                        TI = ndof*ii;
+                        D(TI)   = (dN_dx[ii]*normal[0] + dN_dy[ii]*normal[1]);
+                        D(TI+1) = 0.0;
+                    }
+
+                    res = specVal - (grad(0)*normal[0]+grad(1)*normal[1]);
+                }
+
+                if(dir == 1)
+                {
+                    grad(0) = computeValue(1, dN_dx);
+                    grad(1) = computeValue(1, dN_dy);
+
+                    for(ii=0;ii<totnlbf2;ii++)
+                    {
+                        TI = ndof*ii;
+                        D(TI)   = 0.0;
+                        D(TI+1) = (dN_dx[ii]*normal[0] + dN_dy[ii]*normal[1]);
+                    }
+
+                    res = specVal - (grad(0)*normal[0]+grad(1)*normal[1]);
+                }
+
+                Flocal += (dvol*res)*D;
+                Klocal += (dvol*D)*D.transpose();
+
+            } // for(gp=0...
+        } // for(aa=0;aa<NeumannData.size();aa++)
+    } // if(NeumannData.size() > 0)
+
+    return;
+}
+
+
 
