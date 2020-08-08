@@ -1724,7 +1724,7 @@ void  HBSplineCutFEM::computeTotalForce2D(int bb)
 
               ndTemp->computeVelocityAndStress(param, vel, stress, acceFluid);
 
-              printf("%12.6f \t %12.6f \t %12.6f \t %12.6f \n", velSpec[0], velSpec[1], vel[0], vel[1]);
+              //printf("%12.6f \t %12.6f \t %12.6f \t %12.6f \n", velSpec[0], velSpec[1], vel[0], vel[1]);
 
               //printf("FluidAcce[0] = %12.6f, FluidAcce[1] = %12.6f \n", FluidAcce[0], FluidAcce[1]);
 
