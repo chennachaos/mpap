@@ -124,13 +124,7 @@ void StandardFEM::plotGeom(int a1, bool b1, int c1, bool d1, int* ffff)
     //sprintf(fname,"%s%s%06d%s", VTKfilename, "-", filecount, ".vtu");
 
     writerUGridVTK->SetFileName(fname);
-
-#if VTK_MAJOR_VERSION == 5
-    writerUGridVTK->SetInput(uGridVTK);
-#else
     writerUGridVTK->SetInputData(uGridVTK);
-#endif
-
     writerUGridVTK->Write();
 
     return;
@@ -547,13 +541,7 @@ else
     //sprintf(fname,"%s%s%06d%s", VTKfilename, "-", filecount, ".vtu");
 
     writerUGridVTK->SetFileName(fname);
-
-#if VTK_MAJOR_VERSION == 5
-    writerUGridVTK->SetInput(uGridVTK);
-#else
     writerUGridVTK->SetInputData(uGridVTK);
-#endif
-
     writerUGridVTK->Write();
 
     return;

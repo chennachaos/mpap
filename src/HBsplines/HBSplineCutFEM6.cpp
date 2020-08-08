@@ -1395,7 +1395,7 @@ void  HBSplineCutFEM::writeReadResult(int index, string& filename, int stride)
     if(index == 1)                                          // write result to a file
     {
         char tmp[500], ff[500];
-        sprintf(ff," %s%s%d%s", files.Ofile.asCharArray(), "-", filecount, ".rst");
+        sprintf(ff, "%s%s%06d%s", files.Ofile.asCharArray(), "-", filecount, ".rst");
 
         ofstream  fout;
         fout.open(ff);
@@ -1468,12 +1468,8 @@ void  HBSplineCutFEM::writeReadResult(int index, string& filename, int stride)
     }
     else                                                    // read result from a file
     {
-        //char ff[500];
-        //sprintf(ff," %s%s", files.Ofile.asCharArray(), ".rst");
-        cout << filename << endl;
-
+        PetscPrintf(MPI_COMM_WORLD, "Input file: %s \n", filename.c_str());
         ifstream  infile(filename);
-        //infile.open("Orectangle-AR4-r0p0-alpha90-L3-dt0p1-fixed-3130.rst");
 
         if(!infile)
         {
@@ -1485,6 +1481,19 @@ void  HBSplineCutFEM::writeReadResult(int index, string& filename, int stride)
         string  line, stringVal, stringVec[10];
         int  ii, arrayInt[100], valInt;
         double  tempDbl, arrayDbl[10];
+        std::stringstream   linestream(filename);
+        vector<string>  stringlist;
+
+        // extract file count from the rst file
+        while(getline(linestream,stringVal,'-'))
+        {
+          //std::cout << stringVal << '\t';
+
+          stringlist.push_back(stringVal);
+        }
+        filecount = stoi(stringlist[stringlist.size()-1]);
+        cout << " filecount = " << filecount << endl;
+
 
         // read the commented part
         getline(infile, line);
@@ -1714,6 +1723,8 @@ void  HBSplineCutFEM::computeTotalForce2D(int bb)
               //printf("xx = %12.6f, yy = %12.6f, zz = %12.6f, dvol = %12.6f, \n", param[0], param[1], param[2], dvol);
 
               ndTemp->computeVelocityAndStress(param, vel, stress, acceFluid);
+
+              printf("%12.6f \t %12.6f \t %12.6f \t %12.6f \n", velSpec[0], velSpec[1], vel[0], vel[1]);
 
               //printf("FluidAcce[0] = %12.6f, FluidAcce[1] = %12.6f \n", FluidAcce[0], FluidAcce[1]);
 

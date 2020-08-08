@@ -229,30 +229,10 @@ void  SolutionData::timeUpdate()
     double  knp1 = mpapTime.dt/mpapTime.dtPrev;
 
     int  predType = (int) stagParams[1];
-    //cout << " predType = " << predType << endl;
-    //cout << " mpapTime.dt    = " << mpapTime.dt << endl;
-    //cout << " mpapTime.prev  = " << mpapTime.prev << endl;
-    //cout << " mpapTime.prev2 = " << mpapTime.prev2 << endl;
-    //cout << " knp1 = " << knp1 << endl;
-
-    // Creating vectors inside if conditions to dynamic memory allocations which keep growing
-    //VectorXd  tempForce(force.rows());
-    //tempForce.setZero();
-
-    //if( var1[0] < 1.0e-10 )
-    //if( (var1[0] <= 1.0e-10) || (var1[0] >= 1.55) )
-    //if( (var1[0] <= 1.0e-10) || (var1[0] > 0.5) )
-    //if( (var1[1] > 1.0e-10) || (var1[2] > 1.0e-10) )
-    //{
-      //predType = 1;
-      //var1DotPrev.setZero();
-      //var1DotDotPrev.setZero();
-    //}
 
     double  beta = stagParams[2];
     //double  z = (1.0+beta+beta*rho-2.0*sqrt(beta+beta*rho))/(1.0-beta);
     double  z=0.5;
-    //cout << "z = " << z << endl;
 
     switch(predType)
     {
@@ -287,7 +267,6 @@ void  SolutionData::timeUpdate()
     forcePred = q1*force + q2*forcePrev + q3*forcePrev2 + q4*forcePrev3;
 
     forceCur  = td[2]*forcePred + (1.0-td[2])*force;
-
   }
 
   forcePrev5 = forcePrev4;

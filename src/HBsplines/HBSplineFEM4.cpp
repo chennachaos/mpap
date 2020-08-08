@@ -35,13 +35,7 @@ void HBSplineFEM::plotGeom(int val1, bool flag2, int col, bool PLOT_KNOT_LINES, 
     sprintf(fname,"%s%s", files.Ofile.asCharArray(),"-geom.vtu");
 
     writerUGridVTK->SetFileName(fname);
-
-#if VTK_MAJOR_VERSION == 5
-    writerUGridVTK->SetInput(uGridVTK);
-#else
     writerUGridVTK->SetInputData(uGridVTK);
-#endif
-
     writerUGridVTK->Write();
 
     return;
@@ -404,15 +398,9 @@ void  HBSplineFEM::createPostProcessGrid2D(int vartype, int vardir, int nCol, bo
     sprintf(fname,"%s%s", files.Ofile.asCharArray(),"-Grid2D.vtu");
 
     writerUGridVTK->SetFileName(fname);
-
-#if VTK_MAJOR_VERSION == 5
-    writerUGridVTK->SetInput(uGridVTK);
-#else
     writerUGridVTK->SetInputData(uGridVTK);
-#endif
-
     writerUGridVTK->Write();
-    
+
     return;
 }
 //
@@ -792,13 +780,7 @@ void  HBSplineFEM::postProcess2D(int vartype, int vardir, int nCol, bool umnxfla
     sprintf(fname,"%s%s%06d%s", files.Ofile.asCharArray(),"-",filecount, ".vtu");
 
     writerUGridVTK->SetFileName(fname);
-
-#if VTK_MAJOR_VERSION == 5
-    writerUGridVTK->SetInput(uGridVTK);
-#else
     writerUGridVTK->SetInputData(uGridVTK);
-#endif
-
     writerUGridVTK->Write();
 
     for(ee=0;ee<ImmersedBodyObjects.size();ee++)
@@ -806,7 +788,7 @@ void  HBSplineFEM::postProcess2D(int vartype, int vardir, int nCol, bool umnxfla
       if( ImmersedBodyObjects[ee]->isFlexibleBody() )
         ImmersedBodyObjects[ee]->postProcess(filecount);
     }
-    
+
     return;
 }
 //
@@ -980,15 +962,9 @@ void  HBSplineFEM::createPostProcessGrid3D(int vartype, int vardir, int nCol, bo
     sprintf(fname,"%s%s", files.Ofile.asCharArray(),"-Grid2D.vtu");
 
     writerUGridVTK->SetFileName(fname);
-
-#if VTK_MAJOR_VERSION == 5
-    writerUGridVTK->SetInput(uGridVTK);
-#else
     writerUGridVTK->SetInputData(uGridVTK);
-#endif
-
     writerUGridVTK->Write();
-    
+
     return;
 }
 
@@ -1202,15 +1178,9 @@ void  HBSplineFEM::postProcess3D(int vartype, int vardir, int nCol, bool umnxfla
     sprintf(fname,"%s%s%06d%s", files.Ofile.asCharArray(),"-",filecount, ".vtu");
 
     writerUGridVTK->SetFileName(fname);
-
-#if VTK_MAJOR_VERSION == 5
-    writerUGridVTK->SetInput(uGridVTK);
-#else
     writerUGridVTK->SetInputData(uGridVTK);
-#endif
-
     writerUGridVTK->Write();
-    
+
     return;
 }
 
@@ -1286,13 +1256,7 @@ void HBSplineFEM::plotGaussPoints()
     sprintf(fname,"%s%s", files.Ofile.asCharArray(),"-Gausspoints.vtu");
 
     writerUGridVTK->SetFileName(fname);
-
-#if VTK_MAJOR_VERSION == 5
-    writerUGridVTK->SetInput(uGridVTK2);
-#else
     writerUGridVTK->SetInputData(uGridVTK2);
-#endif
-
     writerUGridVTK->Write();
 
     return;

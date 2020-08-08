@@ -1501,13 +1501,7 @@ void ImmersedRigidSolid::postProcess(int index)
   sprintf(fname1,"%s%d%s", "immersedpoly-", id,".vtp");
 
   writerPolyData->SetFileName(fname1);
-
-#if VTK_MAJOR_VERSION == 5
-    writerPolyData->SetInput(polyDataVTK);
-#else
-    writerPolyData->SetInputData(polyDataVTK);
-#endif
-
+  writerPolyData->SetInputData(polyDataVTK);
   writerPolyData->Write();
 
   return;
@@ -1530,15 +1524,33 @@ void  ImmersedRigidSolid::writeResult(ofstream& fout)
     fout << nNode << endl;
 
     fout << "Displacement" << endl;
-    sprintf(tmp," %16.12f \t %16.12f \t %16.12f", SolnData.var1(0), SolnData.var1(1), SolnData.var1(2));
+    for(int dof=0; dof<3; dof++)
+    {
+      if(dofData[dof] == DOF_PRESCRIBED)
+        sprintf(tmp,"%16.12f \t", PrescMotionTimeFuncs[dof].evalValue(mpapTime.cur));
+      else
+        sprintf(tmp,"%16.12f \t", SolnData.var1[dof]);
+    }
     fout << tmp << "\n";
 
     fout << "Velocity" << endl;
-    sprintf(tmp," %16.12f \t %16.12f \t %16.12f", SolnData.var1Dot(0), SolnData.var1Dot(1), SolnData.var1Dot(2));
+    for(int dof=0; dof<3; dof++)
+    {
+      if(dofData[dof] == DOF_PRESCRIBED)
+        sprintf(tmp,"%16.12f \t", PrescMotionTimeFuncs[dof].evalFirstDerivative(mpapTime.cur));
+      else
+        sprintf(tmp,"%16.12f \t", SolnData.var1Dot[dof]);
+    }
     fout << tmp << "\n";
 
     fout << "Acceleration" << endl;
-    sprintf(tmp," %16.12f \t %16.12f \t %16.12f", SolnData.var1DotDot(0), SolnData.var1DotDot(1), SolnData.var1DotDot(2));
+    for(int dof=0; dof<3; dof++)
+    {
+      if(dofData[dof] == DOF_PRESCRIBED)
+        sprintf(tmp,"%16.12f \t", PrescMotionTimeFuncs[dof].evalSecondDerivative(mpapTime.cur));
+      else
+        sprintf(tmp,"%16.12f \t", SolnData.var1DotDot[dof]);
+    }
     fout << tmp << "\n";
 
     fout << "Force" << endl;

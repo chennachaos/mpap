@@ -1041,11 +1041,7 @@ void HBSplineCutFEM::prepareInputData()
 
   for(bb=0; bb<nImmSolids; bb++)
   {
-    #if VTK_MAJOR_VERSION == 5
-      ImmersedBodyObjects[bb]->selectEnclosedPoints->SetInput(pointsPolydataVTK);
-    #else
-      ImmersedBodyObjects[bb]->selectEnclosedPoints->SetInputData(pointsPolydataVTK);
-    #endif
+    ImmersedBodyObjects[bb]->selectEnclosedPoints->SetInputData(pointsPolydataVTK);
 
     //cout << "  HBSplineCutFEM::setImmersedFaces()  " << endl;
     ImmersedBodyObjects[bb]->setImmersedFaces();

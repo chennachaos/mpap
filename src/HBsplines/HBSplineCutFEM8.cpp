@@ -46,11 +46,8 @@ void HBSplineCutFEM::plotGeomAdapIntegration2D(int val1, bool flag2, int col, bo
     {
       ndTemp = elems[activeElements[ee]];
 
-      //volTotal += ndTemp->getVolumeGaussPoints(1);
-
       if( ndTemp->getSubdomainId() == this_mpi_proc )
       {
-        //cout << " Node # " << elems[ee]->getID() << '\t' << elems[ee]->isLeaf() << endl;
         //if( !nd->isCutElement() )
         //if( !(ndTemp->getDomainNumber() == -1) )
         if( !ndTemp->isCutElement() )
@@ -494,8 +491,6 @@ void  HBSplineCutFEM::postProcessAdapIntegration1D(int vartype, int vardir, int 
           fact = (knotEnd[0] - knotBegin[0])/resln[0];
           create_vector(knotBegin[0], knotEnd[0], fact, uu);
         }
-          //cout << uu << endl;
-
           //create the coordinates of the pointsVTK (nodes in FEM)
 
           for(ii=0;ii<uu.size();ii++)
@@ -515,11 +510,11 @@ void  HBSplineCutFEM::postProcessAdapIntegration1D(int vartype, int vardir, int 
                 dN_dx = nd1->SubDivMat*dNN_dx;
                 d2N_dx2 = nd1->SubDivMat*d2NN_dx2;
               }
-              
+
               xx[0] = computeGeometry(0, uu[ii]);
 
               pt[ii] = pointsVTK->InsertNextPoint(xx[0], 0.0, 0.0);
-              
+
               //if(nd1->getDomainNumber() == 0)
               if(xx[0] <= 0.5)
               {
@@ -559,8 +554,6 @@ void  HBSplineCutFEM::postProcessAdapIntegration1D(int vartype, int vardir, int 
 
     uGridVTK->GetPointData()->SetScalars(scaVTK);
     uGridVTK->GetPointData()->AddArray(scaVTK2);
-
-//    cout << "   Number of pointsVTK in uGridVTK " << uGridVTK->GetNumberOfPoints()  << endl;
 
     return;
 }
@@ -699,7 +692,6 @@ void  HBSplineCutFEM::postProcessAdapIntegration2D(int vartype, int vardir, int 
               uGridVTK->InsertNextCell(triaVTK->GetCellType(), triaVTK->GetPointIds());
             }
           } //  for(ii=0; ii<nd->subTrias.size(); ii++)
-          //cout << " AAAAAAAAAA " << endl;
         } // else
     }
 
@@ -730,12 +722,9 @@ void  HBSplineCutFEM::postProcessAdapIntegration2D(int vartype, int vardir, int 
     //scaVTK->SetNumberOfTuples(count);
     //scaVTK2->SetNumberOfTuples(count);
 
-    //cout << " Node aaaaaaaaaaa " << endl;
-
     for(ee=0; ee<activeElements.size(); ee++)
     {
       ndTemp = elems[activeElements[ee]];
-      //cout << " Node # " << nd->getID() << endl;
 
       if( ndTemp->getSubdomainId() == this_mpi_proc )
       {
@@ -806,8 +795,6 @@ void  HBSplineCutFEM::postProcessAdapIntegration2D(int vartype, int vardir, int 
 
             cellDataVTK->InsertNextValue(ndTemp->getDomainNumber() );
             cellDataVTK2->InsertNextValue(ndTemp->getSubdomainId());
-
-            //cout << " ooooooooooooo " << endl;
         } //if( !nd->isCutElement() )
 
         if( ndTemp->getDomainNumber() == -1 )
@@ -917,7 +904,6 @@ void  HBSplineCutFEM::postProcessAdapIntegration2D(int vartype, int vardir, int 
             }
           } // while( adapNd2 != NULL )
           //
-          //cout << " AAAAAAAAAA " << endl;
 
           /*
           /////////////////////////////////////////////////////////////
@@ -1027,7 +1013,6 @@ void  HBSplineCutFEM::postProcessAdapIntegration2D(int vartype, int vardir, int 
       }
     }
 
-      //cout << " jjjjjjjjjjjjjjjjjj " << endl;
       vecVTK->SetName("vel");
       //vecVTK2->SetName("force");
       scaVTK->SetName("pres");
@@ -1045,10 +1030,7 @@ void  HBSplineCutFEM::postProcessAdapIntegration2D(int vartype, int vardir, int 
 
       uGridVTK->GetCellData()->SetScalars(cellDataVTK);
       uGridVTK->GetCellData()->AddArray(cellDataVTK2);
-
-      //cout << " jjjjjjjjjjjjjjjjjj " << endl;
-  }
-
+    }
 
     return;
 }
@@ -1059,8 +1041,6 @@ void  HBSplineCutFEM::postProcessAdapIntegration2D(int vartype, int vardir, int 
 
 void  HBSplineCutFEM::postProcessAdapIntegration3D(int vartype, int vardir, int nCol, bool umnxflag, double umin, double umax, int* resln)
 {
-    //cout << " jjjjjjjjjjjjjjjjjj " << endl;
-
     //vtkSmartPointer<vtkMergePoints>   mergePoints  =  vtkSmartPointer<vtkMergePoints>::New();
     //vtkSmartPointer<vtkPoints>        pointsVTK    = vtkSmartPointer<vtkPoints>::New();
     // using mergePoints algorithm takes 45 seconds for the Level-1 mesh for the 3D cylinder problem
@@ -1100,11 +1080,6 @@ void  HBSplineCutFEM::postProcessAdapIntegration3D(int vartype, int vardir, int 
     node* ndTemp;
 
 
-  //if(ndf == 1)
-  //{
-  //}
-  //else // for Stokes and Navier-Stokes
-  //{
       double vec[]={0.0, 0.0, 0.0};
 
       vecVTK->SetName("vel");
@@ -1200,18 +1175,17 @@ void  HBSplineCutFEM::postProcessAdapIntegration3D(int vartype, int vardir, int 
             cellDataVTK->InsertNextValue(ndTemp->getDomainNumber() );
             cellDataVTK2->InsertNextValue(ndTemp->getSubdomainId());
 
-            //cout << " ooooooooooooo " << endl;
         } // if( (ndTemp->domNums.size() == 0) && (ndTemp->domNums[0] == 0) )
         else if( ndTemp->domNums.size() > 1 )
         {
           /////////////////////////////////////////////////////////////
           //  method 2
           /////////////////////////////////////////////////////////////
-        
+
           typedef  typename  node::adapTreePTR  adapTreePTR;
 
           adapTreePTR  adapNd1, adapNd2, adapNd3;
-        
+
           adapNd2 = ndTemp->adapIntegNode;
 
           while( adapNd2 != NULL )
@@ -1318,7 +1292,6 @@ void  HBSplineCutFEM::postProcessAdapIntegration3D(int vartype, int vardir, int 
           {
             adapNd2 = adapNd2->getChild(0);
           }
-          //cout << " AAAAAAAAAA " << endl;
 	      }// else
         }
       } // for(ee=0; ee<activeElements.size(); ee++)
@@ -1332,11 +1305,9 @@ void  HBSplineCutFEM::postProcessAdapIntegration3D(int vartype, int vardir, int 
 
       //uGridVTK->GetCellData()->SetScalars(cellDataVTK);
       //uGridVTK->GetCellData()->AddArray(cellDataVTK2);
+    }
 
-      //cout << " jjjjjjjjjjjjjjjjjj " << endl;
-  }
-
-  return;
+    return;
 }
 
 

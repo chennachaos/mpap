@@ -524,12 +524,7 @@ void  HBSplineCutFEM::prepareCutElementsSubTrias2D()
       //delaunay->SetAlpha(0.0);
       delaunay->SetOffset(1000.0);
 
-      #if VTK_MAJOR_VERSION == 5
-        delaunay->SetInput(polyDataLoc);
-      #else
-        delaunay->SetInputData(polyDataLoc);
-      #endif
-
+      delaunay->SetInputData(polyDataLoc);
       delaunay->Update();
 
       polyDataLoc2 = delaunay->GetOutput();
@@ -1106,13 +1101,7 @@ void  HBSplineCutFEM::prepareCutElementsSubTrias3D()
       //
       delaunay3d->SetTolerance(0.0010);
       delaunay3d->SetOffset(1000.0);
-
-#if VTK_MAJOR_VERSION == 5
-      delaunay3d->SetInput(polyDataLoc);
-#else
       delaunay3d->SetInputData(polyDataLoc);
-#endif
-
       delaunay3d->Update();
 
       uGridLoc = delaunay3d->GetOutput();

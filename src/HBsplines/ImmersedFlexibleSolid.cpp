@@ -648,13 +648,7 @@ void ImmersedFlexibleSolid::postProcess(int index)
     sprintf(fname,"%s%s%02d%s%06d%s", files.Ofile.asCharArray(),"-FB",id,"-", index, ".vtu");
 
     writerUGridVTK->SetFileName(fname);
-
-#if VTK_MAJOR_VERSION == 5
-    writerUGridVTK->SetInput(uGridVTK);
-#else
     writerUGridVTK->SetInputData(uGridVTK);
-#endif
-
     writerUGridVTK->Write();
 
   return;

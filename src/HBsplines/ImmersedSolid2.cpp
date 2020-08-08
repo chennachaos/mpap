@@ -117,13 +117,7 @@ void  ImmersedSolid::setImmersedFaces()
     vtkSmartPointer<vtkXMLUnstructuredGridWriter>  writerUGridVTK = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
 
     writerUGridVTK->SetFileName(fname);
-
-#if VTK_MAJOR_VERSION == 5
-    writerUGridVTK->SetInput(uGridVTK2);
-#else
     writerUGridVTK->SetInputData(uGridVTK2);
-#endif
-
     writerUGridVTK->Write();
 
     // The area of a convex polygon is 
@@ -234,17 +228,9 @@ void  ImmersedSolid::setImmersedFaces()
     sprintf(fname1,"%s%s%d%s", files.Ofile.asCharArray(), "-immersedsolid-", id,".vtp");
 
     writerPolyData->SetFileName(fname1);
-
-#if VTK_MAJOR_VERSION == 5
-    writerPolyData->SetInput(polyDataVTK);
-    selectEnclosedPoints->SetSurface(polyDataVTK);
-    //massProp->SetInput(polyDataVTK);
-#else
     writerPolyData->SetInputData(polyDataVTK);
     selectEnclosedPoints->SetSurfaceData(polyDataVTK);
     //massProp->SetInputData(polyDataVTK);
-#endif
-
     writerPolyData->Write();
 
     selectEnclosedPoints->SetTolerance(0.000001);
@@ -335,13 +321,7 @@ void  ImmersedSolid::setImmersedFaces()
       vtkSmartPointer<vtkXMLUnstructuredGridWriter>  writerUGridVTK = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
 
       writerUGridVTK->SetFileName(fname);
-
-#if VTK_MAJOR_VERSION == 5
-      writerUGridVTK->SetInput(uGridVTK2);
-#else
       writerUGridVTK->SetInputData(uGridVTK2);
-#endif
-
       writerUGridVTK->Write();
 
       // The area of a convex polygon is 
@@ -481,21 +461,12 @@ void  ImmersedSolid::setImmersedFaces()
         sprintf(fname1,"%s%s%d%s", files.Ofile.asCharArray(), "-immersedsolid-", id,".vtp");
 
         writerPolyData->SetFileName(fname1);
+        writerPolyData->SetInputData(polyDataVTK);
+        //massProp->SetInputData(polyDataVTK);
+        writerPolyData->Write();
+    }
 
-#if VTK_MAJOR_VERSION == 5
-    writerPolyData->SetInput(polyDataVTK);
-    //massProp->SetInput(polyDataVTK);
-#else
-    writerPolyData->SetInputData(polyDataVTK);
-    //massProp->SetInputData(polyDataVTK);
-#endif
-
-    writerPolyData->Write();
-  }
-
-    //cout << "  ImmersedSolid::setImmersedFaces()  " << endl;
-
-  return;
+    return;
 }
 
 
