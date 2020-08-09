@@ -30,11 +30,7 @@ void ImmersedIntegrationElement::prepareElemData()
 void ImmersedIntegrationElement::initialiseDOFvalues()
 {
   int  ii, jj, ind1;
-<<<<<<< HEAD:HBsplines/ImmersedIntegrationElement.cpp
-  
-=======
 
->>>>>>> collabchandan:src/HBsplines/ImmersedIntegrationElement.cpp
   ind1 = pointNums.size();
   elemNums.resize(ind1);
 
@@ -139,10 +135,6 @@ void ImmersedIntegrationElement::computeVelocity(const VectorXd& NN, myPoint&  v
 void ImmersedIntegrationElement::computeVelocityCur(const VectorXd& NN, myPoint&  velSpec)
 {
   assert(NN.rows() == pointNums.size());
-<<<<<<< HEAD:HBsplines/ImmersedIntegrationElement.cpp
-
-  //cout << " pointNums ...  " << pointNums[0] << '\t' << pointNums[1] << endl;
-=======
 
   int  ii, jj;
   velSpec.setZero();
@@ -161,18 +153,13 @@ void ImmersedIntegrationElement::computeVelocityCur(const VectorXd& NN, myPoint&
 void ImmersedIntegrationElement::computeAcceleration(const VectorXd& NN, myPoint&  velSpec)
 {
   assert(NN.rows() == pointNums.size());
->>>>>>> collabchandan:src/HBsplines/ImmersedIntegrationElement.cpp
 
   int  ii, jj;
   velSpec.setZero();
   for(ii=0;ii<pointNums.size();ii++)
   {
     for(jj=0; jj<DIM; jj++)
-<<<<<<< HEAD:HBsplines/ImmersedIntegrationElement.cpp
-      velSpec[jj] += (GeomDataLag->specValCur[pointNums[ii]][jj] * NN[ii] );
-=======
       velSpec[jj] += (GeomDataLag->acceNew[pointNums[ii]][jj] * NN[ii] );
->>>>>>> collabchandan:src/HBsplines/ImmersedIntegrationElement.cpp
   }
 
   return;

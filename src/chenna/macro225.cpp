@@ -3,10 +3,6 @@
 #include "DomainTree.h"
 #include "HBSplineFEM.h"
 #include "HBSplineCutFEM.h"
-<<<<<<< HEAD:chenna/macro225.cpp
-//#include "Plot.h"
-=======
->>>>>>> collabchandan:src/chenna/macro225.cpp
 
 
 extern DomainTree domain;

@@ -2,17 +2,9 @@
 #include "DomainTree.h"
 #include "HBSplineFEM.h"
 #include "HBSplineCutFEM.h"
-<<<<<<< HEAD:chenna/macro229.cpp
-//#include "Plot.h"
 
 
 extern DomainTree domain;
-//extern Plot       plot;
-=======
-
-
-extern DomainTree domain;
->>>>>>> collabchandan:src/chenna/macro229.cpp
 
 
 int macro229(Macro &macro)

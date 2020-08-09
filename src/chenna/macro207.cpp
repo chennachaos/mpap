@@ -4,19 +4,10 @@
 #include "HBSplineFEM.h"
 #include "HBSplineCutFEM.h"
 #include "StandardFEM.h"
-<<<<<<< HEAD:chenna/macro207.cpp
-//#include "Plot.h"
-//#include "HBScutFEMElasticity.h"
-
-
-extern DomainTree domain;
-//extern Plot       plot;
-=======
 
 
 
 extern DomainTree domain;
->>>>>>> collabchandan:src/chenna/macro207.cpp
 
 
 int macro207(Macro &macro)

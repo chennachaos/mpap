@@ -1,23 +1,14 @@
 
 #include "HBSplineBase.h"
-<<<<<<< HEAD:HBsplines/HBSplineBase5.cpp
-#include "SolverPardisoEigen.h"
-#include "SolverMA41Eigen.h"
-#include "SolverEigen.h"
-=======
->>>>>>> collabchandan:src/HBsplines/HBSplineBase5.cpp
 
 #include "SolverEigen.h"
 #include "SolverMA41Eigen.h"
 #include "SolverPardisoEigen.h"
 
-<<<<<<< HEAD:HBsplines/HBSplineBase5.cpp
-=======
 #include "SolverPetsc.h"
 #include "SolverPardisoPetsc.h"
 
 
->>>>>>> collabchandan:src/HBsplines/HBSplineBase5.cpp
 int  HBSplineBase::findCellNumber(const myPoint& geom)
 {
   int  ii, ind[3]={0,0,0}, nn[3]={0,0,0}, num;
@@ -241,11 +232,7 @@ void HBSplineBase::setSolver(int slv, int *parm, bool cIO)
 {
     slv_type = slv;
     
-<<<<<<< HEAD:HBsplines/HBSplineBase5.cpp
-    cout << " slv_type = " << slv << '\t' << slv_type << endl;
-=======
     //PetscPrintf(MPI_COMM_WORLD, " slv_type = %5d \t  %5d. \n", slv, slv_type);
->>>>>>> collabchandan:src/HBsplines/HBSplineBase5.cpp
 
     //Eigen::initParallel();
     Eigen::setNbThreads(0);
@@ -351,9 +338,6 @@ void HBSplineBase::setSolver(int slv, int *parm, bool cIO)
             if(solverPetsc->initialise(0, 0, totalDOF) != 0)
               return;
 
-<<<<<<< HEAD:HBsplines/HBSplineBase5.cpp
-            solverPetsc->SetSolverAndParameters();
-=======
             solverPetsc->setSolverAndParameters();
 
             //solverPetsc->printInfo();
@@ -388,7 +372,6 @@ void HBSplineBase::setSolver(int slv, int *parm, bool cIO)
             }
 
             solverPetsc->setSolverAndParameters();
->>>>>>> collabchandan:src/HBsplines/HBSplineBase5.cpp
 
             //solverPetsc->printInfo();
 

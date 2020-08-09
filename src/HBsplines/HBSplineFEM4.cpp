@@ -7,14 +7,7 @@
 #include "headersVTK.h"
 
 
-<<<<<<< HEAD:HBsplines/HBSplineFEM4.cpp
-extern PlotVTK  plotvtk;
 extern MpapTime mpapTime;
-
-
-=======
-extern MpapTime mpapTime;
->>>>>>> collabchandan:src/HBsplines/HBSplineFEM4.cpp
 extern Files files;
 
 
@@ -22,14 +15,6 @@ extern Files files;
 void HBSplineFEM::plotGeom(int val1, bool flag2, int col, bool PLOT_KNOT_LINES, int* resln)
 {
     //cout << "     HBSplineFEM: plotgeometry ...\n\n";
-<<<<<<< HEAD:HBsplines/HBSplineFEM4.cpp
-
-    //if(!plotvtk.ActiveFlag)
-      //plotvtk.set();
-
-    //plotvtk.clearWindow();
-=======
->>>>>>> collabchandan:src/HBsplines/HBSplineFEM4.cpp
 
     pointsVTK->Reset();
     //lineVTK->Reset();
@@ -50,41 +35,9 @@ void HBSplineFEM::plotGeom(int val1, bool flag2, int col, bool PLOT_KNOT_LINES, 
     sprintf(fname,"%s%s", files.Ofile.asCharArray(),"-geom.vtu");
 
     writerUGridVTK->SetFileName(fname);
-<<<<<<< HEAD:HBsplines/HBSplineFEM4.cpp
-
-#if VTK_MAJOR_VERSION == 5
-    writerUGridVTK->SetInput(uGridVTK);
-#else
-    writerUGridVTK->SetInputData(uGridVTK);
-#endif
-
-    writerUGridVTK->Write();
-
-    //mapperVTK->SetInputConnection(uGridVTK->GetProducerPort());
-    ////mapperVTK->SetInputData(uGridVTK);
-
-    //actorVTK->SetMapper(mapperVTK);
-    //actorVTK->GetProperty()->EdgeVisibilityOn();
-    //actorVTK->GetProperty()->SetEdgeColor(0,0,0);
-    //actorVTK->GetProperty()->SetPointSize(5.0);
-    //actorVTK->GetProperty()->SetLineWidth(2.0);
-
-    //double  color[3];
-    //getColorValue(col, color);
-
-    //actorVTK->GetProperty()->SetColor(color[0], color[1], color[2]);
-
-    //actorVTK->SetMapper(mapperVTK);
-
-    //plotvtk.rendr->AddActor(actorVTK);
-    //plotvtk.rendr->ResetCamera();
-    //plotvtk.renWindow->Render();
-
-=======
     writerUGridVTK->SetInputData(uGridVTK);
     writerUGridVTK->Write();
 
->>>>>>> collabchandan:src/HBsplines/HBSplineFEM4.cpp
     return;
 }
 
@@ -239,11 +192,6 @@ void HBSplineFEM::plotGeom3D(int val1, bool flag2, int col, bool PLOT_KNOT_LINES
 
 void  HBSplineFEM::postProcessFlow(int vartype, int vardir, int nCol, bool umnxflag, double umin, double umax, int* resln)
 {
-<<<<<<< HEAD:HBsplines/HBSplineFEM4.cpp
-    //plotvtk.clearWindow();
-
-=======
->>>>>>> collabchandan:src/HBsplines/HBSplineFEM4.cpp
     if(CREATE_POSTPROCESS_GRID)
     {
       if(DIM == 1)
@@ -450,35 +398,8 @@ void  HBSplineFEM::createPostProcessGrid2D(int vartype, int vardir, int nCol, bo
     sprintf(fname,"%s%s", files.Ofile.asCharArray(),"-Grid2D.vtu");
 
     writerUGridVTK->SetFileName(fname);
-<<<<<<< HEAD:HBsplines/HBSplineFEM4.cpp
-
-#if VTK_MAJOR_VERSION == 5
-    writerUGridVTK->SetInput(uGridVTK);
-#else
-    writerUGridVTK->SetInputData(uGridVTK);
-#endif
-
-    writerUGridVTK->Write();
-    
-    // a file Bspline.vtu will be created which can be directly read into paraview
-
-    //mapperVTK->SetInputConnection(uGridVTK->GetProducerPort());
-    ////mapperVTK->SetInputData(uGridVTK);
-
-    //actorVTK->SetMapper(mapperVTK);
-    //actorVTK->GetProperty()->EdgeVisibilityOff();
-    //actorVTK->GetProperty()->SetEdgeColor(0,0,0);
-    //actorVTK->GetProperty()->SetPointSize(5.0);
-    //actorVTK->GetProperty()->SetLineWidth(2.0);
-    ////actorVTK->GetProperty()->SetColor(0,0,1);
-
-    //plotvtk.rendr->AddActor(actorVTK);
-    //plotvtk.rendr->ResetCamera();
-    //plotvtk.renWindow->Render();
-=======
     writerUGridVTK->SetInputData(uGridVTK);
     writerUGridVTK->Write();
->>>>>>> collabchandan:src/HBsplines/HBSplineFEM4.cpp
 
     return;
 }
@@ -624,23 +545,6 @@ void  HBSplineFEM::postProcess1D(int vartype, int vardir, int nCol, bool umnxfla
 
     uGridVTK->SetPoints(pointsVTK);
 
-<<<<<<< HEAD:HBsplines/HBSplineFEM4.cpp
-    //mapperVTK->SetInputConnection(uGridVTK->GetProducerPort());
-    ////mapperVTK->SetInputData(uGridVTK);
-
-    //actorVTK->SetMapper(mapperVTK);
-    //actorVTK->GetProperty()->EdgeVisibilityOn();
-    //actorVTK->GetProperty()->SetEdgeColor(0,0,0);
-    //actorVTK->GetProperty()->SetPointSize(5.0);
-    //actorVTK->GetProperty()->SetLineWidth(2.0);
-    ////actorVTK->GetProperty()->SetColor(0,0,1); //green
-
-    //plotvtk.rendr->AddActor(actorVTK);
-    //plotvtk.rendr->ResetCamera();
-    //plotvtk.renWindow->Render();
-
-=======
->>>>>>> collabchandan:src/HBsplines/HBSplineFEM4.cpp
     return;
 }
 
@@ -649,11 +553,6 @@ void  HBSplineFEM::postProcess1D(int vartype, int vardir, int nCol, bool umnxfla
 // for the general mesh (including Hierarchical splines)
 void  HBSplineFEM::postProcess2D(int vartype, int vardir, int nCol, bool umnxflag, double umin, double umax, int* resln)
 {
-<<<<<<< HEAD:HBsplines/HBSplineFEM4.cpp
-    //plotvtk.clearWindow();
-
-=======
->>>>>>> collabchandan:src/HBsplines/HBSplineFEM4.cpp
     //uGridVTK->Reset();
     //pointsVTK->Reset();
 
@@ -881,17 +780,7 @@ void  HBSplineFEM::postProcess2D(int vartype, int vardir, int nCol, bool umnxfla
     sprintf(fname,"%s%s%06d%s", files.Ofile.asCharArray(),"-",filecount, ".vtu");
 
     writerUGridVTK->SetFileName(fname);
-<<<<<<< HEAD:HBsplines/HBSplineFEM4.cpp
-
-#if VTK_MAJOR_VERSION == 5
-    writerUGridVTK->SetInput(uGridVTK);
-#else
     writerUGridVTK->SetInputData(uGridVTK);
-#endif
-
-=======
-    writerUGridVTK->SetInputData(uGridVTK);
->>>>>>> collabchandan:src/HBsplines/HBSplineFEM4.cpp
     writerUGridVTK->Write();
 
     for(ee=0;ee<ImmersedBodyObjects.size();ee++)
@@ -899,24 +788,6 @@ void  HBSplineFEM::postProcess2D(int vartype, int vardir, int nCol, bool umnxfla
       if( ImmersedBodyObjects[ee]->isFlexibleBody() )
         ImmersedBodyObjects[ee]->postProcess(filecount);
     }
-<<<<<<< HEAD:HBsplines/HBSplineFEM4.cpp
-    
-    // a file Bspline.vtu will be created which can be directly read into paraview
-
-    //mapperVTK->SetInputConnection(uGridVTK->GetProducerPort());
-    ////mapperVTK->SetInputData(uGridVTK);
-
-    //actorVTK->SetMapper(mapperVTK);
-    //actorVTK->GetProperty()->EdgeVisibilityOff();
-    //actorVTK->GetProperty()->SetEdgeColor(0,0,0);
-    //actorVTK->GetProperty()->SetPointSize(5.0);
-    //actorVTK->GetProperty()->SetLineWidth(2.0);
-
-    //plotvtk.rendr->AddActor(actorVTK);
-    //plotvtk.rendr->ResetCamera();
-    //plotvtk.renWindow->Render();
-=======
->>>>>>> collabchandan:src/HBsplines/HBSplineFEM4.cpp
 
     return;
 }
@@ -934,11 +805,6 @@ void  HBSplineFEM::createPostProcessGrid3D(int vartype, int vardir, int nCol, bo
       exit(1);
     }
     
-<<<<<<< HEAD:HBsplines/HBSplineFEM4.cpp
-    //plotvtk.clearWindow();
-
-=======
->>>>>>> collabchandan:src/HBsplines/HBSplineFEM4.cpp
     uGridVTK->Reset();
     pointsVTK->Reset();
 
@@ -1096,37 +962,9 @@ void  HBSplineFEM::createPostProcessGrid3D(int vartype, int vardir, int nCol, bo
     sprintf(fname,"%s%s", files.Ofile.asCharArray(),"-Grid2D.vtu");
 
     writerUGridVTK->SetFileName(fname);
-<<<<<<< HEAD:HBsplines/HBSplineFEM4.cpp
-
-#if VTK_MAJOR_VERSION == 5
-    writerUGridVTK->SetInput(uGridVTK);
-#else
-    writerUGridVTK->SetInputData(uGridVTK);
-#endif
-
-    writerUGridVTK->Write();
-    
-    // a file Bspline.vtu will be created which can be directly read into paraview
-
-    //mapperVTK->SetInputConnection(uGridVTK->GetProducerPort());
-    ////mapperVTK->SetInputData(uGridVTK);
-
-    //actorVTK->SetMapper(mapperVTK);
-    //actorVTK->GetProperty()->EdgeVisibilityOff();
-    //actorVTK->GetProperty()->SetEdgeColor(0,0,0);
-    //actorVTK->GetProperty()->SetPointSize(5.0);
-    //actorVTK->GetProperty()->SetLineWidth(2.0);
-    ////actorVTK->GetProperty()->SetColor(0,0,1);
-
-    //plotvtk.rendr->AddActor(actorVTK);
-    //plotvtk.rendr->ResetCamera();
-    //plotvtk.renWindow->Render();
-
-=======
     writerUGridVTK->SetInputData(uGridVTK);
     writerUGridVTK->Write();
 
->>>>>>> collabchandan:src/HBsplines/HBSplineFEM4.cpp
     return;
 }
 
@@ -1136,11 +974,6 @@ void  HBSplineFEM::postProcess3D(int vartype, int vardir, int nCol, bool umnxfla
 {
     //cout << " HBSplineFEM::postProcess3D " << endl;
 
-<<<<<<< HEAD:HBsplines/HBSplineFEM4.cpp
-    //plotvtk.clearWindow();
-
-=======
->>>>>>> collabchandan:src/HBsplines/HBSplineFEM4.cpp
     uGridVTK->Reset();
     pointsVTK->Reset();
 
@@ -1345,35 +1178,8 @@ void  HBSplineFEM::postProcess3D(int vartype, int vardir, int nCol, bool umnxfla
     sprintf(fname,"%s%s%06d%s", files.Ofile.asCharArray(),"-",filecount, ".vtu");
 
     writerUGridVTK->SetFileName(fname);
-<<<<<<< HEAD:HBsplines/HBSplineFEM4.cpp
-
-#if VTK_MAJOR_VERSION == 5
-    writerUGridVTK->SetInput(uGridVTK);
-#else
-    writerUGridVTK->SetInputData(uGridVTK);
-#endif
-
-    writerUGridVTK->Write();
-    
-    // a file Bspline.vtu will be created which can be directly read into paraview
-
-    //mapperVTK->SetInputConnection(uGridVTK->GetProducerPort());
-    ////mapperVTK->SetInputData(uGridVTK);
-
-    //actorVTK->SetMapper(mapperVTK);
-    //actorVTK->GetProperty()->EdgeVisibilityOff();
-    //actorVTK->GetProperty()->SetEdgeColor(0,0,0);
-    //actorVTK->GetProperty()->SetPointSize(5.0);
-    //actorVTK->GetProperty()->SetLineWidth(2.0);
-    ////actorVTK->GetProperty()->SetColor(0,0,1);
-
-    //plotvtk.rendr->AddActor(actorVTK);
-    //plotvtk.rendr->ResetCamera();
-    //plotvtk.renWindow->Render();
-=======
     writerUGridVTK->SetInputData(uGridVTK);
     writerUGridVTK->Write();
->>>>>>> collabchandan:src/HBsplines/HBSplineFEM4.cpp
 
     return;
 }
@@ -1450,17 +1256,7 @@ void HBSplineFEM::plotGaussPoints()
     sprintf(fname,"%s%s", files.Ofile.asCharArray(),"-Gausspoints.vtu");
 
     writerUGridVTK->SetFileName(fname);
-<<<<<<< HEAD:HBsplines/HBSplineFEM4.cpp
-
-#if VTK_MAJOR_VERSION == 5
-    writerUGridVTK->SetInput(uGridVTK2);
-#else
     writerUGridVTK->SetInputData(uGridVTK2);
-#endif
-
-=======
-    writerUGridVTK->SetInputData(uGridVTK2);
->>>>>>> collabchandan:src/HBsplines/HBSplineFEM4.cpp
     writerUGridVTK->Write();
 
     return;

@@ -1345,12 +1345,8 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
     myPoint  param, geom, normal, trac;
     VectorXd  N(totnlbf), dN_dx(totnlbf), dN_dy(totnlbf);
     VectorXd  NN(totnlbf), dNN_dx(totnlbf), dNN_dy(totnlbf);
-<<<<<<< HEAD:HBsplines/TreeNode4.cpp
-    vector<double>  boundaryGPs1, boundaryGWs1, boundaryGPs2, boundaryGWs2;
-=======
     double *gws;
     myPoint *gps;
->>>>>>> collabchandan:src/HBsplines/TreeNode4.cpp
 
 
     bool   axsy = ((int)elmDat[2] == 1);
@@ -1421,10 +1417,7 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
                 dvol *= (2.0*PI*geom[0]);
             }
 
-<<<<<<< HEAD:HBsplines/TreeNode4.cpp
-=======
 
->>>>>>> collabchandan:src/HBsplines/TreeNode4.cpp
             if(parent == NULL)
             {
               GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, N, dN_dx, dN_dy );
@@ -1441,12 +1434,7 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
 
             specVal = DirichletData[aa][2];
 
-<<<<<<< HEAD:HBsplines/TreeNode4.cpp
-            //if(2 < 1)
-	    /*
-=======
             /*
->>>>>>> collabchandan:src/HBsplines/TreeNode4.cpp
             if(side == 0 )
             {
               if(dir == 0)
@@ -1454,10 +1442,6 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
                 // heart-valve benchmark
                 y0 = 0.0;    y1 = 1.61;
                 specVal = DirichletData[aa][2]*(y1-geom[1])*(geom[1]-y0);
-<<<<<<< HEAD:HBsplines/TreeNode4.cpp
-                //cout << " specVal =  " << specVal << endl;
-                
-=======
 
                 // single-leaf benchmark
                 //y0 = 0.0;    y1 = 2.0;
@@ -1466,7 +1450,6 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
                 //cout << " specVal =  " << specVal << endl;
 
                 //y0=0.0; y1=0.5;
->>>>>>> collabchandan:src/HBsplines/TreeNode4.cpp
                 //if(geom[1] <= 0.5)
                   //specVal = DirichletData[aa][2]*(1.0-geom[1]*geom[1]/y1/y1);
                 //else
@@ -1474,27 +1457,6 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
               }
             }
             */
-<<<<<<< HEAD:HBsplines/TreeNode4.cpp
-            /*
-            if(side == 3)
-            {
-              if(dir == 0)
-              {
-                //val = sin(PI*xx);
-                if(uu<0.5)
-                  specVal = tanh(20.0*uu);
-                else
-                  specVal = -tanh(20.0*(uu-1.0));
-              }
-            }
-            */
-
-            /*
-            if(side == 0 || side == 11)
-            {
-              if(dir == 0)
-              {
-=======
             //
             //if(side == 3333)
             //{
@@ -1513,7 +1475,6 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
             //{
               //if(dir == 0)
               //{
->>>>>>> collabchandan:src/HBsplines/TreeNode4.cpp
                 //specVal = DirichletData[aa][2]*(yy-0.25);
                 //specVal = 1.5*yy*(2.0-yy);
                 //if(yy <= y0 || yy >= y1)
@@ -1523,26 +1484,6 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
                   //specVal = DirichletData[aa][2]*(y1-yy)*(yy-y0);
                   //specVal = (y1-xx)*(xx-y0);
                   //specVal = 3600.0*(1.0-yy*yy/R/R);
-<<<<<<< HEAD:HBsplines/TreeNode4.cpp
-              }
-            }
-            */
-            /*
-            R = 0.5;
-            if(side == 2)
-            {
-              if(dir == 1)
-              {
-                if(xx >= R)
-                  specVal = 0.0;
-                else
-                  //specVal = 1.0*xx*(1.5-xx);
-                  specVal = 3600.0*(1.0-xx*xx/R/R);
-              }
-            }
-            //
-            */
-=======
               //}
             //}
             //
@@ -1561,7 +1502,6 @@ void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int 
             //}
             //
             //
->>>>>>> collabchandan:src/HBsplines/TreeNode4.cpp
 
             //specVal = analy.computeValue(dir, xx, yy);
             //cout << side << '\t' << dir << '\t' << specVal << endl;

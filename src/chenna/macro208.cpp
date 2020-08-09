@@ -3,18 +3,10 @@
 #include "DomainTree.h"
 #include "HBSplineCutFEM.h"
 #include "StandardFEM.h"
-<<<<<<< HEAD:chenna/macro208.cpp
-//#include "Plot.h"
-
-
-extern DomainTree domain;
-//extern Plot       plot;
-=======
 
 
 extern DomainTree domain;
 
->>>>>>> collabchandan:src/chenna/macro208.cpp
 
 int macro208(Macro &macro)
 {

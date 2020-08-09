@@ -124,21 +124,8 @@ void StandardFEM::plotGeom(int a1, bool b1, int c1, bool d1, int* ffff)
     //sprintf(fname,"%s%s%06d%s", VTKfilename, "-", filecount, ".vtu");
 
     writerUGridVTK->SetFileName(fname);
-<<<<<<< HEAD:standardFEM/StandardFEM3.cpp
-
-#if VTK_MAJOR_VERSION == 5
-    writerUGridVTK->SetInput(uGridVTK);
-#else
-    writerUGridVTK->SetInputData(uGridVTK);
-#endif
-
-    writerUGridVTK->Write();
-
-    //cout << " AAAAAAAAAAA " << endl;
-=======
     writerUGridVTK->SetInputData(uGridVTK);
     writerUGridVTK->Write();
->>>>>>> collabchandan:src/standardFEM/StandardFEM3.cpp
 
     return;
 }
@@ -150,20 +137,9 @@ void  StandardFEM::postProcess(int vartype, int vardir, int nCol, bool umnxflag,
 {
     //cout << " StandardFEM::postProcess " << endl;
 
-<<<<<<< HEAD:standardFEM/StandardFEM3.cpp
-    PetscMPIInt  this_mpi_proc;
-
-    MPI_Comm_rank(MPI_COMM_WORLD, &this_mpi_proc);
-
     if(this_mpi_proc != 0)
       return;
 
-
-=======
-    if(this_mpi_proc != 0)
-      return;
-
->>>>>>> collabchandan:src/standardFEM/StandardFEM3.cpp
     int  dd, ii, jj, kk, ll, nlocal, index, ind1, ind2, e, ee, count, gcount, ind;
     double vec[3], vec2[3], xx, yy, zz;
 
@@ -565,21 +541,8 @@ else
     //sprintf(fname,"%s%s%06d%s", VTKfilename, "-", filecount, ".vtu");
 
     writerUGridVTK->SetFileName(fname);
-<<<<<<< HEAD:standardFEM/StandardFEM3.cpp
-
-#if VTK_MAJOR_VERSION == 5
-    writerUGridVTK->SetInput(uGridVTK);
-#else
-    writerUGridVTK->SetInputData(uGridVTK);
-#endif
-
-    writerUGridVTK->Write();
-
-    //cout << " AAAAAAAAAAA " << endl;
-=======
     writerUGridVTK->SetInputData(uGridVTK);
     writerUGridVTK->Write();
->>>>>>> collabchandan:src/standardFEM/StandardFEM3.cpp
 
     return;
 }

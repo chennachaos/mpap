@@ -2,10 +2,6 @@
 #include "Macro.h"
 #include "DomainTree.h"
 #include "HBSplineFEM.h"
-<<<<<<< HEAD:chenna/macro212.cpp
-//#include "Plot.h"
-=======
->>>>>>> collabchandan:src/chenna/macro212.cpp
 
 
 extern DomainTree domain;

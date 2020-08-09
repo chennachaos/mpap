@@ -19,11 +19,7 @@ ImmersedSolid::ImmersedSolid()
   nImmInt = 0;
   PENALTY = 1.0e2;
   BC_ENFORCE_TYPE = BC_ENFORCE_TYPE_PENALTY;
-<<<<<<< HEAD:HBsplines/ImmersedSolid.cpp
-  
-=======
 
->>>>>>> collabchandan:src/HBsplines/ImmersedSolid.cpp
   isNitsche = false;
   NitscheFact = 1.0;
 

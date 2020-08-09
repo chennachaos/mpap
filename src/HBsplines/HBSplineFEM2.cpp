@@ -507,11 +507,7 @@ void  HBSplineFEM::applyInterfaceTerms2D()
             {
               xx[ii] = lme->GeomDataLag->NodePosCur[lme->pointNums[ii]][0];
               yy[ii] = lme->GeomDataLag->NodePosCur[lme->pointNums[ii]][1];
-<<<<<<< HEAD:HBsplines/HBSplineFEM2.cpp
-              
-=======
 
->>>>>>> collabchandan:src/HBsplines/HBSplineFEM2.cpp
               specValx[ii] = lme->GeomDataLag->specValCur[lme->pointNums[ii]][0];
               specValy[ii] = lme->GeomDataLag->specValCur[lme->pointNums[ii]][1];
             }
@@ -557,11 +553,7 @@ void  HBSplineFEM::applyInterfaceTerms2D()
               //printf("Nb = %12.6f, nlb = %5d \n", Nb[0], nlb);
               //printf("vel2[0] = %12.6f, vel2[1] = %12.6f \n", vel2[0], vel2[1]);
               //printf("lagmults[0] = %12.6f, lagmults[1] = %12.6f \n", lagmults[0], lagmults[1]);
-<<<<<<< HEAD:HBsplines/HBSplineFEM2.cpp
-              //printf("detJ = %12.6f, gw = %5d \n", detJ, lme->gaussweights[gp]);
-=======
               //printf("detJ = %12.6f, gw = %12.6f \n", detJ, lme->gaussweights[gp]);
->>>>>>> collabchandan:src/HBsplines/HBSplineFEM2.cpp
 
               nd = elems[findCellNumber(geom)];
 

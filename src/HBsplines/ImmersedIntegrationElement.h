@@ -3,10 +3,6 @@
 
 
 #include "util.h"
-<<<<<<< HEAD:HBsplines/ImmersedIntegrationElement.h
-
-=======
->>>>>>> collabchandan:src/HBsplines/ImmersedIntegrationElement.h
 #include "TreeNode.h"
 
 using namespace std;

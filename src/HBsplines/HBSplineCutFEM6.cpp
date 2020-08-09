@@ -4,10 +4,7 @@
 #include "MpapTime.h"
 #include "ImmersedIntegrationElement.h"
 #include "QuadratureUtil.h"
-<<<<<<< HEAD:HBsplines/HBSplineCutFEM6.cpp
-=======
 #include "Files.h"
->>>>>>> collabchandan:src/HBsplines/HBSplineCutFEM6.cpp
 
 
 extern MpapTime           mpapTime;
@@ -1656,15 +1653,7 @@ void  HBSplineCutFEM::computeTotalForce2D(int bb)
     ImmersedIntegrationElement  *lme;
     myPoly*  poly;
 
-<<<<<<< HEAD:HBsplines/HBSplineCutFEM6.cpp
-          PENALTY = ImmersedBodyObjects[bb]->GetPenaltyParameter();
-
-          nlb = ImmersedBodyObjects[bb]->ImmIntgElems[0]->pointNums.size();
-
-          nGauss = (int) cutFEMparams[1];
-=======
     PENALTY = ImmersedBodyObjects[bb]->getPenaltyParameter();
->>>>>>> collabchandan:src/HBsplines/HBSplineCutFEM6.cpp
 
     nlb = ImmersedBodyObjects[bb]->ImmIntgElems[0]->pointNums.size();
 
@@ -1735,13 +1724,8 @@ void  HBSplineCutFEM::computeTotalForce2D(int bb)
               //trac[0] += stagParams[3]*rho*(acceFluid[0] - acceSpec[0]);
               //trac[1] += stagParams[3]*rho*(acceFluid[1] - acceSpec[1]);
 
-<<<<<<< HEAD:HBsplines/HBSplineCutFEM6.cpp
-              //cout << aa << '\t' << ImmersedBodyObjects[bb]->ImmIntgElems[aa]->pointNums0] ;
-              //cout << '\t' << ImmersedBodyObjects[bb]->ImmIntgElems[aa]->pointNums[1] << endl;
-=======
               //trac[0] += stagParams[2]*(rhoSolid*acceSpec[0] - rho*acceFluid[0]);
               //trac[1] += stagParams[2]*(rhoSolid*acceSpec[1] - rho*acceFluid[1]);
->>>>>>> collabchandan:src/HBsplines/HBSplineCutFEM6.cpp
 
               trac *= dvol;
 
@@ -1761,12 +1745,8 @@ void  HBSplineCutFEM::computeTotalForce2D(int bb)
               {
                 for(ii=0;ii<nlb;ii++)
                 {
-<<<<<<< HEAD:HBsplines/HBSplineCutFEM6.cpp
-                  jj = ImmersedBodyObjects[bb]->ImmIntgElems[aa]->pointNums[ii];
-=======
                   jj = lme->pointNums[ii];
                   kk = 2*jj;
->>>>>>> collabchandan:src/HBsplines/HBSplineCutFEM6.cpp
 
                   totalForce[kk]   += (Nb[ii]*trac[0]);
                   totalForce[kk+1] += (Nb[ii]*trac[1]);
@@ -1831,11 +1811,7 @@ void  HBSplineCutFEM::computeTotalForce3D(int bb)
 
     PENALTY = ImmersedBodyObjects[bb]->getPenaltyParameter();
 
-<<<<<<< HEAD:HBsplines/HBSplineCutFEM6.cpp
-          nlb = ImmersedBodyObjects[bb]->ImmIntgElems[0]->pointNums.size();
-=======
     int nlb = ImmersedBodyObjects[bb]->ImmIntgElems[0]->pointNums.size();
->>>>>>> collabchandan:src/HBsplines/HBSplineCutFEM6.cpp
 
     Nb.resize(nlb);
 

@@ -8,12 +8,6 @@
 
 
 extern MpapTime           mpapTime;
-<<<<<<< HEAD:HBsplines/HBSplineFEM3.cpp
-
-
-//using namespace std;
-=======
->>>>>>> collabchandan:src/HBsplines/HBSplineFEM3.cpp
 
 
 

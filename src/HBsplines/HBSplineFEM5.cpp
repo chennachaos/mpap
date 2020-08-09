@@ -315,14 +315,8 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
     tstart = time(0);
     for(ii=0;ii<activeElements.size();ii++)
     {
-<<<<<<< HEAD:HBsplines/HBSplineFEM5.cpp
-      //cout << ii << '\t' << omp_get_thread_num() << '\t' << omp_get_num_threads() << '\t' << omp_get_max_threads() << endl;
-      node *nd = elems[activeElements[ii]];
-      //cout << " nd->GetID() " <<  nd->GetID() << '\t' <<  nd->GetLevel() << endl;
-=======
       node *nd = elems[activeElements[ii]];
       //cout << " nd->getID() " <<  nd->getID() << '\t' <<  nd->getLevel() << endl;
->>>>>>> collabchandan:src/HBsplines/HBSplineFEM5.cpp
 
       //printVector(nd->forAssyVec);
       //printVector(nd->forAssyVec2);
@@ -336,30 +330,16 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
       Klocal = MatrixXd::Zero(nr, nr);
       Flocal = VectorXd::Zero(nr);
 
-<<<<<<< HEAD:HBsplines/HBSplineFEM5.cpp
-      //cout << " AAAAAAAAAAAAAAAAA " << endl;
-      nd->calcStiffnessAndResidualGFEM(Klocal, Flocal);
-=======
       matM = MatrixXd::Zero(nr, nr);
       matK = MatrixXd::Zero(nr, nr);
 
       //cout << " AAAAAAAAAAAAAAAAA " << endl;
       nd->calcStiffnessAndResidualGFEM(Klocal, Flocal);
       //matK = Klocal;
->>>>>>> collabchandan:src/HBsplines/HBSplineFEM5.cpp
       //cout << " AAAAAAAAAAAAAAAAA " << endl;
       //printMatrix(Klocal);
       //printf("\n\n");
       //printVector(Flocal);
-<<<<<<< HEAD:HBsplines/HBSplineFEM5.cpp
-      nd->applyDirichletBCsGFEM(Klocal, Flocal);
-      //cout << " BBBBBBBBBBBBBBBBB " << endl;
-      nd->applyNeumannBCsGFEM(Klocal, Flocal);
-      //cout << " BBBBBBBBBBBBBBBBB " << endl;
-       //printMatrix(Klocal);
-       //printf("\n\n");
-       //printVector(Flocal);
-=======
       //Klocal.setZero();
       nd->applyDirichletBCsGFEM(Klocal, Flocal);
       //matM = Klocal;
@@ -369,7 +349,6 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
       //printMatrix(Klocal);
       //printf("\n\n");
       //printVector(Flocal);
->>>>>>> collabchandan:src/HBsplines/HBSplineFEM5.cpp
 
        //cout << " AAAAAAAAAAAAAAAAA " << endl;
        //nd->calcStiffnessAndResidualLSFEM(1, Klocal, Flocal);
@@ -386,15 +365,9 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
        //if(IterNum)
        //cout << " AAAAAAAAAAAAAAAAA " << endl;
       //#pragma omp critical
-<<<<<<< HEAD:HBsplines/HBSplineFEM5.cpp
-        solverEigen->AssembleMatrixAndVector(0, 0, nd->forAssyVec, Klocal, Flocal);
-      //else
-        //solverEigen->AssembleVector(velDOF, 0, nd->forAssyVec, Flocal);
-=======
         solverEigen->assembleMatrixAndVector(0, 0, nd->forAssyVec, Klocal, Flocal);
       //else
         //solverEigen->assembleVector(velDOF, 0, nd->forAssyVec, Flocal);
->>>>>>> collabchandan:src/HBsplines/HBSplineFEM5.cpp
       //cout << " AAAAAAAAAAAAAAAAA " << endl;
     }
 
@@ -597,11 +570,7 @@ int HBSplineFEM::factoriseSolveAndUpdate()
 
   //cout << " rhsVec " << endl;        printVector(&(solverEigen->rhsVec(0)), totalDOF);
   //cout << " rhsVec " << endl;
-<<<<<<< HEAD:HBsplines/HBSplineFEM5.cpp
-  //for(int ii=fluidDOF-10;ii<totalDOF;ii++)
-=======
   //for(int ii=fluidDOF-20;ii<totalDOF;ii++)
->>>>>>> collabchandan:src/HBsplines/HBSplineFEM5.cpp
     //printf("%5d \t %12.8f \n", ii, solverEigen->rhsVec(ii));
 
   tstart = time(0);

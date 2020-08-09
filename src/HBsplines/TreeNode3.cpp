@@ -929,10 +929,7 @@ void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
   return;
 }
 */
-<<<<<<< HEAD:HBsplines/TreeNode3.cpp
-=======
 
->>>>>>> collabchandan:src/HBsplines/TreeNode3.cpp
 
 
 /*
@@ -1013,10 +1010,7 @@ void TreeNode<2>::calcStiffnessAndResidualGFEM(MatrixXd& Klocal, VectorXd& Floca
 */
 
 
-<<<<<<< HEAD:HBsplines/TreeNode3.cpp
-=======
 
->>>>>>> collabchandan:src/HBsplines/TreeNode3.cpp
 /*
 template<>
 void TreeNode<2>::applyDirichletBCsGFEM(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)

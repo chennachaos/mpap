@@ -1,27 +1,15 @@
 
-<<<<<<< HEAD:HBsplines/HBSplineCutFEM1.cpp
-#include "HBSplineCutFEM.h"
-#include "MathBasic.h"
-=======
 #include "HBSplineFEM.h"
->>>>>>> collabchandan:src/HBsplines/HBSplineFEM1.cpp
 #include "DataBlockTemplate.h"
 #include "ComputerTime.h"
 #include "MpapTime.h"
 #include "TimeFunction.h"
 #include "PropertyTypeEnum.h"
-<<<<<<< HEAD:HBsplines/HBSplineCutFEM1.cpp
-=======
 #include "ImmersedIntegrationElement.h"
->>>>>>> collabchandan:src/HBsplines/HBSplineFEM1.cpp
 #include "ImmersedFlexibleSolid.h"
 #include "ImmersedRigidSolid.h"
 #include "ImmersedSolid.h"
 #include "ContactElementPointToPoint2D.h"
-<<<<<<< HEAD:HBsplines/HBSplineCutFEM1.cpp
-#include <omp.h>
-=======
->>>>>>> collabchandan:src/HBsplines/HBSplineFEM1.cpp
 
 
 extern DomainTree         domain;
@@ -872,20 +860,10 @@ void HBSplineFEM::prepareInputData()
     soln.setZero();
     solnInit = soln;
 
-<<<<<<< HEAD:HBsplines/HBSplineCutFEM1.cpp
-  for(bb=0; bb<nImmSolids; bb++)
-  {
-    #if VTK_MAJOR_VERSION == 5
-      ImmersedBodyObjects[bb]->selectEnclosedPoints->SetInput(pointsPolydataVTK);
-    #else
-      ImmersedBodyObjects[bb]->selectEnclosedPoints->SetInputData(pointsPolydataVTK);
-    #endif
-=======
     //matxGrid.free();
     //MatrixSparse<double> matxtemp;
     //prepareMatrixPatternGrid(matxtemp);
     //matxGrid = matxtemp;
->>>>>>> collabchandan:src/HBsplines/HBSplineFEM1.cpp
 
     GRID_CHANGED = true;
     IB_MOVED = false;

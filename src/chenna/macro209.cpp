@@ -1,17 +1,7 @@
 #include "Macro.h"
 #include "DomainTree.h"
-<<<<<<< HEAD:chenna/macro209.cpp
-#include "IsogeometricFEM.h"
-
-//#include "Plot.h"
-
 
 extern DomainTree domain;
-//extern Plot       plot;
-=======
-
-extern DomainTree domain;
->>>>>>> collabchandan:src/chenna/macro209.cpp
 
 
 int macro209(Macro &macro)
@@ -79,11 +69,7 @@ int macro209(Macro &macro)
 
   //if (!plot)
   //{
-<<<<<<< HEAD:chenna/macro209.cpp
-     domain(type,id).findMinMaxX(xmn,xmx,defm);
-=======
      //domain(type,id).findMinMaxX(xmn,xmx,defm);
->>>>>>> collabchandan:src/chenna/macro209.cpp
 
     //plot.fit(xmn,xmx,domain(type,id).ndm);
   //}

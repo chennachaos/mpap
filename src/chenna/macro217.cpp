@@ -1,18 +1,9 @@
 
 #include "Macro.h"
 #include "DomainTree.h"
-<<<<<<< HEAD:chenna/macro217.cpp
-#include "IsogeometricFEM.h"
-//#include "Plot.h"
 
 
 extern DomainTree domain;
-//extern Plot       plot;
-=======
-
-
-extern DomainTree domain;
->>>>>>> collabchandan:src/chenna/macro217.cpp
 
 
 int macro217(Macro &macro)
@@ -95,15 +86,6 @@ int macro217(Macro &macro)
 
     //plot.fit(xmn,xmx,domain(type,id).ndm);
   //}/
-<<<<<<< HEAD:chenna/macro217.cpp
-
-  isogeometricFEM(domain(type,id)).contourplotVTK(val1, val2, flag1, index, nCols, umnx, umn, umx, resln);
-
-
-  
-  
-=======
->>>>>>> collabchandan:src/chenna/macro217.cpp
 
   //isogeometricFEM(domain(type,id)).contourplotVTK(val1, val2, flag1, index, nCols, umnx, umn, umx, resln);
 

@@ -1,11 +1,6 @@
 
 #include "Macro.h"
 #include "DomainTree.h"
-<<<<<<< HEAD:chenna/macro202.cpp
-#include "IsogeometricFEM.h"
-//#include "Plot.h"
-=======
->>>>>>> collabchandan:src/chenna/macro202.cpp
 
 extern DomainTree domain;
 

@@ -1,20 +1,11 @@
 
 #include "Macro.h"
 #include "DomainTree.h"
-<<<<<<< HEAD:chenna/macro210.cpp
-#include "IsogeometricFEM.h"
-//#include "Plot.h"
-=======
->>>>>>> collabchandan:src/chenna/macro210.cpp
 #include "HBSplineFEM.h"
 #include "HBSplineCutFEM.h"
 
 
 extern DomainTree domain;
-<<<<<<< HEAD:chenna/macro210.cpp
-//extern Plot       plot;
-=======
->>>>>>> collabchandan:src/chenna/macro210.cpp
 
 int macro210(Macro &macro)
 {

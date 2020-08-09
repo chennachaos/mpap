@@ -947,17 +947,10 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
 
           evaluateStabParams_algo3(velTemp, matG, dt, rho, mu, CI, tau);
 
-<<<<<<< HEAD:HBsplines/TreeNode9.cpp
-          if( abs(mpapTime.cur - mpapTime.dt) < 1.0e-10 )
-            tau[0] = 0.0;
-          else
-            tau[0] *= elmDat[8];  // SUPG
-=======
           //if( abs(mpapTime.cur - mpapTime.dt) < 1.0e-10 )
             //tau[0] = 0.0;
           //else
             //tau[0] *= elmDat[8];  // SUPG
->>>>>>> collabchandan:src/HBsplines/TreeNode8.cpp
 
           tau[0] *= elmDat[8];  // SUPG
           tau[1] *= elmDat[9];  // PSPG
@@ -1316,12 +1309,8 @@ void TreeNode<2>::calcStiffnessAndResidualCutFEMFluid(MatrixXd& Klocal, VectorXd
           //force = 0.0;
           //cout << force(0) << '\t' << force(1) << endl;
 
-<<<<<<< HEAD:HBsplines/TreeNode9.cpp
-          velExt = velPrev;
-=======
           //velExt = velPrev;
           velExt = 2.0*velPrev-velPrev2;
->>>>>>> collabchandan:src/HBsplines/TreeNode8.cpp
           //velExt = af*(2.0*velPrev-velPrev2) + (1.0-af)*velPrev;
 
           gradTvel = grad*velExt;
@@ -2685,15 +2674,6 @@ void TreeNode<2>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
     myPoint  param, normal, geom;
     double *gws;
     myPoint *gps;
-<<<<<<< HEAD:HBsplines/TreeNode9.cpp
-    
-    y0 = 0.0;    y1 = 0.41;
-    y0 = -5.0;  y1 = 5.0;
-    //y0 = 0.90;  y1 = 1.30;
-    //y0 = 0.5;  y1 = 1.50;
-    //y0 = 0.0;    y1 = 1.61;
-=======
->>>>>>> collabchandan:src/HBsplines/TreeNode8.cpp
 
     //KimMoinFlow  analy(rho, mu);
     //Kovasznay  analy;
@@ -2718,11 +2698,6 @@ void TreeNode<2>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
 
         if(domNums.size() > 1)
         {
-<<<<<<< HEAD:HBsplines/TreeNode9.cpp
-          //TreeNode<2>::computeGaussPointsAdapIntegrationBoundary(side, 0, 0, 0, 0);
-
-=======
->>>>>>> collabchandan:src/HBsplines/TreeNode8.cpp
           nGauss = BoundaryQuadrature[side].gausspoints.size() ;
 
           gps = &(BoundaryQuadrature[side].gausspoints[0]);
@@ -2789,13 +2764,9 @@ void TreeNode<2>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
                   specVal = DirichletData[aa][2]*(6.0/y1/y1)*(y1-geom[1])*(geom[1]-y0);
 
                   //specVal = DirichletData[aa][2]*(y1*y1-geom[1]*geom[1])/0.5625;
-<<<<<<< HEAD:HBsplines/TreeNode9.cpp
-                  //specVal = DirichletData[aa][2]*(6.0/(y1-y0)/(y1-y0))*(y1-geom[1])*(geom[1]-y0); // throttle valve
-=======
 
                   // throttle valve
                   //specVal = DirichletData[aa][2]*(6.0/(y1-y0)/(y1-y0))*(y1-geom[1])*(geom[1]-y0);
->>>>>>> collabchandan:src/HBsplines/TreeNode8.cpp
                   //if(geom[1] >= y0 && geom[1] <= y1)
 
                   // heart-valve benchmark
@@ -2817,22 +2788,6 @@ void TreeNode<2>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
                   //else
                     //specVal = 0.0;
                     //specVal = DirichletData[aa][2]*(1.0-geom[1]*geom[1]);
-<<<<<<< HEAD:HBsplines/TreeNode9.cpp
-                }
-              }
-              */
-
-              /*
-              if(side == 3)
-              {
-                if(dir == 0)
-                {
-                  if(param[0]<0.5)
-                    specVal = tanh(param[0]/knots[0][2]);
-                  else
-                    specVal = -tanh((param[0]-1.0)/knots[0][2]);
-=======
->>>>>>> collabchandan:src/HBsplines/TreeNode8.cpp
                 }
               }
               */

@@ -8,21 +8,13 @@
 #include "myGeomUtilities.h"
 #include "myTria.h"
 #include "myTet.h"
-<<<<<<< HEAD:HBsplines/HBSplineCutFEM2.cpp
-
-=======
 #include <omp.h>
->>>>>>> collabchandan:src/HBsplines/HBSplineCutFEM2.cpp
 
 //#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 //#include <CGAL/Triangulation_3.h>
 //#include <CGAL/Delaunay_triangulation_3.h>
 //#include <CGAL/Triangulation_vertex_base_with_info_3.h>
 
-<<<<<<< HEAD:HBsplines/HBSplineCutFEM2.cpp
-#include <omp.h>
-=======
->>>>>>> collabchandan:src/HBsplines/HBSplineCutFEM2.cpp
 
 extern ComputerTime       computerTime;
 extern MpapTime mpapTime;
@@ -30,8 +22,6 @@ extern Files files;
 
 using namespace myGeom;
 
-<<<<<<< HEAD:HBsplines/HBSplineCutFEM2.cpp
-=======
 
 void  HBSplineCutFEM::prepareCutElements()
 {
@@ -145,7 +135,6 @@ void  HBSplineCutFEM::prepareCutElements()
           cerr << " Error in prepareCutCell() for TreeNode<>::prepareCutCell() " << kk << endl;
           exit(kk);
         }
->>>>>>> collabchandan:src/HBsplines/HBSplineCutFEM2.cpp
 
         if( nd1->isCutElement() )
         {
@@ -259,19 +248,6 @@ void  HBSplineCutFEM::prepareCutElements()
     ImmersedBodyObjects[bb]->computeAABB(2);
   }
 
-<<<<<<< HEAD:HBsplines/HBSplineCutFEM2.cpp
-  cout << " HBSplineCutFEM::prepareCutElements() " << endl;
-
-  //GeomData.domainFixedYesNo[0] = 0;
-  //GeomData.domainFixedYesNo[1] = 0;
-
-/*
-//#pragma omp parallel for default(shared)  private(ee, nd1)
-//{
-  for(ee=0; ee<activeElements.size(); ee++)
-  {
-    nd1 = elems[activeElements[ee]];
-=======
   //GeomData.domainFixedYesNo[0] = 0;
   //GeomData.domainFixedYesNo[1] = 0;
 
@@ -339,7 +315,6 @@ void  HBSplineCutFEM::prepareCutElements()
           } // if( lme->isActive() )
         }//for(aa=0...
       }//for(bb=0;...
->>>>>>> collabchandan:src/HBsplines/HBSplineCutFEM2.cpp
 
       // remove duplicate immsered solid numbers from 'domNums' of cut cells
       //
@@ -418,37 +393,6 @@ void  HBSplineCutFEM::prepareCutElements()
       nNode++;
     }
   }
-<<<<<<< HEAD:HBsplines/HBSplineCutFEM2.cpp
-//}
-*/
-
-
-  for(ee=0; ee<activeElements.size(); ee++)
-  {
-    nd1 = elems[activeElements[ee]];
-
-      if( nd1->prepareCutCell(cutFEMparams) != 1)
-      {
-        cerr << " Error in prepareCutCell() for TreeNode<2>::prepareCutCell() " << endl;
-      }
-      
-      //if( nd1->IsRightBoundary() && nd1->IsTopBoundary() && nd1->IsBackBoundary() )
-        //printVector(nd1->domNums);
-
-      if( nd1->IsCutElement() )
-      {
-        cutCellIds.push_back(activeElements[ee]);
-
-        //cout << " hhhhhhhhhhhh " << endl;
-
-        if(cutFEMparams[0] == 1)
-          nd1->computeGaussPointsSubTrias(cutFEMparams[2], false);
-        else
-          nd1->computeGaussPointsAdapIntegration(cutFEMparams[3], cutFEMparams[4], false, true);
-      }
-      //cout << " ffffffffffff " << endl;
-  }
-=======
 
   //for(ee=0; ee<gridBF1; ee++)
     //cout << ee << '\t' << grid_to_cutfem_DOF[ee] << endl;
@@ -456,7 +400,6 @@ void  HBSplineCutFEM::prepareCutElements()
 
   nElem     =  fluidElementIds.size();
   fluidDOF  =  nNode*ndof;
->>>>>>> collabchandan:src/HBsplines/HBSplineCutFEM2.cpp
 
   //PetscPrintf(MPI_COMM_WORLD, "  nNode    = %d \n", nNode);
   //PetscPrintf(MPI_COMM_WORLD, "  fluidDOF = %d \n", fluidDOF);
@@ -581,17 +524,7 @@ void  HBSplineCutFEM::prepareCutElementsSubTrias2D()
       //delaunay->SetAlpha(0.0);
       delaunay->SetOffset(1000.0);
 
-<<<<<<< HEAD:HBsplines/HBSplineCutFEM2.cpp
-      #if VTK_MAJOR_VERSION == 5
-        delaunay->SetInput(polyDataLoc);
-      #else
-        delaunay->SetInputData(polyDataLoc);
-      #endif
-
-
-=======
       delaunay->SetInputData(polyDataLoc);
->>>>>>> collabchandan:src/HBsplines/HBSplineCutFEM2.cpp
       delaunay->Update();
 
       polyDataLoc2 = delaunay->GetOutput();
@@ -1168,17 +1101,7 @@ void  HBSplineCutFEM::prepareCutElementsSubTrias3D()
       //
       delaunay3d->SetTolerance(0.0010);
       delaunay3d->SetOffset(1000.0);
-<<<<<<< HEAD:HBsplines/HBSplineCutFEM2.cpp
-
-#if VTK_MAJOR_VERSION == 5
-      delaunay3d->SetInput(polyDataLoc);
-#else
       delaunay3d->SetInputData(polyDataLoc);
-#endif
-
-=======
-      delaunay3d->SetInputData(polyDataLoc);
->>>>>>> collabchandan:src/HBsplines/HBSplineCutFEM2.cpp
       delaunay3d->Update();
 
       uGridLoc = delaunay3d->GetOutput();
