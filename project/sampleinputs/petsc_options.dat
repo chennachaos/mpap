@@ -1,0 +1,8 @@
+-ksp_type bcgs
+-pc_type bjacobi
+-sub_ksp_type preonly
+-sub_pc_type ilu
+-sub_pc_factor_levels 3
+-sub_pc_factor_fill 3
+-ksp_rtol 1.e-10
+-ksp_max_it 1000
