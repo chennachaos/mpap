@@ -56,6 +56,7 @@ class ImmersedSolid
         int  id, DIM, type, localStiffnessError, filecount, iterCount, tis, ndof, solverOK ;
         int  nElem, nImmInt, totalDOF, npElem, nNode, nsize, nElem_Constraint;
         int  matId, elemId, BC_ENFORCE_TYPE;
+        int  n_mpi_procs, this_mpi_proc;
 
         double  rNorm, rNormPrev, tol, dt, rho, beta, ctimCalcStiffRes, ctimFactSolvUpdt, PENALTY, NitscheFact;
 

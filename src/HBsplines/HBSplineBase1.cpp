@@ -188,39 +188,15 @@ HBSplineBase::~HBSplineBase()
 
 void HBSplineBase::prepareInputData()
 {
-    //printf("\n     HBSplineBase::prepareInputData()  .... STARTED ...\n");
+    PetscPrintf(MPI_COMM_WORLD, "  HBSplineBase::prepareInputData()  .... STARTED ...\n");
 
     int ii, jj, kk, ee, aa, bb, cc, gp, r;
-
-    /*
-    if(DIM == 2)
-    {
-      kk = ((nelem[0]+1)*(nelem[1]+1))*pow(4,refinementData[1]);
-    }
-    else if(DIM == 3)
-    {
-      kk = ((nelem[0]+1)*(nelem[1]+1)*(nelem[2]+1))*pow(8,refinementData[1]);
-    }
-
-    gridVertices.reserve(kk);
-    */
 
     // go and inherit from ancestors
     Domain::prepareInputData();
 
     //cout << " DIM  = " << DIM << endl;
     //cout << " ndof = " << ndof << endl;
-
-    /*
-    if(LSFEM_FLAG)
-    {
-      if(ndof > DIM)
-      {
-        printf("\n HBSplineBase : Preparing element data ...... 'ndof' can't be more than 'DIM' \n \n ");
-        exit(1);
-      }
-    }
-    */
 
     // ==================================================
     //
@@ -239,14 +215,13 @@ void HBSplineBase::prepareInputData()
     for(ii=0;ii<DIM;ii++)
       nlbf[ii] = degree[ii] + 1;
 
-    //cout << " AAAAAAAAAAAAAAAAA " << endl;
 
     ///////////////////////////////////////////////////////////////////
     //
     // set FluidSolnData details
     //
     ///////////////////////////////////////////////////////////////////
-    
+
     GeomData.setDimension(DIM);
 
     for(ii=0;ii<DIM;ii++)
@@ -258,12 +233,9 @@ void HBSplineBase::prepareInputData()
     }
 
     GeomData.FluidProps = fluidProps;
-    //printVector(GeomData.FluidProps);
 
     GeomData.setNdof(ndf);
     GeomData.build();
-    
-    //cout << " BBBBBBBBBBBBBBB " << endl;
 
     ///////////////////////////////////////////////////////////////////
     //
@@ -274,8 +246,6 @@ void HBSplineBase::prepareInputData()
     boundaryNodes.resize(2*DIM);
 
     buildBase();
-
-    //printf("\n HBSplineBase : buildBase        DONE \n \n ");
 
     /////////////////////////////////////////////////////////////
     //
@@ -299,10 +269,6 @@ void HBSplineBase::prepareInputData()
 
     nImmSolids = ImmersedBodyObjects.size();
 
-    //cout << " nImmSolids = " << nImmSolids << endl;
-
-    //ImmersedSolid  *imsolid;
-
     if(nImmSolids > 0)
     {
       cc = 0;
@@ -316,7 +282,6 @@ void HBSplineBase::prepareInputData()
 
         ImmersedBodyObjects[bb]->SolnData.stagParams = stagParams;
 
-        //cout << " zzzzzzzzzzzzzzzzz " << endl;
         if( ImmersedBodyObjects[bb]->isFlexibleBody() )
         {
           //if( ImmersedBodyData[bb][4] > 0 )
@@ -335,10 +300,8 @@ void HBSplineBase::prepareInputData()
           //cout << " VVVVVVVVVVV " << endl;
         }
 
-        //cout << " PPPPPPPPPPP " << endl;
         ImmersedBodyObjects[bb]->initialise();
 
-        //cout << " PPPPPPPPPPP " << endl;
         GeomData.immSolidPtrs.push_back( ImmersedBodyObjects[bb] );
 
         GeomData.domainFixedYesNo.push_back( ImmersedBodyObjects[bb]->getTotalDOF() == 0 ) ;
@@ -351,11 +314,11 @@ void HBSplineBase::prepareInputData()
     param.setZero();
 
     // Refine the underlying grid if specified
-    
+
     if(refinementData.size() > 0)
     {
       //printf("\n HBSplineBase : Refinement process ...... STARTED \n \n ");
-      
+
       for(kk=0;kk<refinementData[1];kk++)
       {
         elemsToRefine.clear();
@@ -402,7 +365,7 @@ void HBSplineBase::prepareInputData()
       }
       //printf("\n HBSplineBase : Refinement process ...... FINISHED \n \n ");
     }
-    
+
     /////////////////////////////////
     // assign boundary conditions to the element
     //
@@ -415,7 +378,7 @@ void HBSplineBase::prepareInputData()
     {
       // account for periodic boundary conditions if any
       /////////////////////////////////////////////////////
-    
+
       cout << " PERIODIC_BCS " << PERIODIC_BCS << '\t' << gridBF1 << endl;
 
       if(PERIODIC_BCS)
@@ -443,7 +406,7 @@ void HBSplineBase::prepareInputData()
     // prepare element data
     // 
     ///////////////////////////////////////////////////
-    
+
     time_t tstart, tend;
 
     PetscSynchronizedPrintf(MPI_COMM_WORLD, "\n   HBSplineBase : Preparing element data ...... STARTED \n\n");
@@ -455,19 +418,6 @@ void HBSplineBase::prepareInputData()
         activeElements.push_back(elems[ee]->getID());
     }
 
-    /*
-    omp_set_num_threads(4);
-    printf("Max number of threads: %i \n",omp_get_max_threads());
-    printf("Number of threads: %i \n",omp_get_num_threads());
-    #pragma omp parallel
-      printf("Number of threads: %i \n",omp_get_num_threads());
-
-    #pragma omp parallel num_threads(8)
-      printf("Hello from thread %d, nthreads %d, nprocs %d\n", omp_get_thread_num(), omp_get_num_threads(), omp_get_num_procs());
-    */
-
-    //#pragma omp parallel for private(ii)
-
     //printf("\n number of total  elements = %6d \n", elems.size());
     //printf("\n number of active elements = %6d \n", activeElements.size());
 
@@ -475,10 +425,8 @@ void HBSplineBase::prepareInputData()
     {
       ee = activeElements[ii];
 
-      //cout << " elems[ee]->isProcessed() " << '\t' << elems[ee]->getID() << '\t' << elems[ee]->isProcessed() << endl;
-      //cout << " elems[ee]->getID() " << '\t' << elems[ee]->getID() << '\t' << elems[ee]->getLevel() << endl;
       elems[ee]->prepareElemData();
-      //cout << " uuuuuuuuuuuuu " << endl;
+
       elems[ee]->calcSubdivisionMatrix();
       //cout << " uuuuuuuuuuuuu " << endl;
       //elems[ee]->initialiseDOFvalues();
@@ -488,24 +436,18 @@ void HBSplineBase::prepareInputData()
 
     tend = time(0);
 
-    //cout << "It took "<< difftime(tend, tstart) <<" second(s)."<< endl;
-
     //printf("\n HBSplineBase : Preparing element data ...... FINISHED \n \n ");
 
     // total number of DOF for the background grid
 
     gridBF2 = gridBF1;
 
-    //gridBFtotal = gridBF1 + gridBF2;
-
     PetscPrintf(MPI_COMM_WORLD, "\n    Number of basis functions in the background grid  =  %5d\n\n", gridBF1);
 
     /////////////////////////////////////////
     // create contact elements
     ////////////////////////////////////////
-    
-    //cout << " jjjjjjjjjjjjjjj  " << endl;
-    
+
     ContactElementPointToPoint2D  *contElm;
 
     for(aa=0; aa<contElemData.size(); aa++)
@@ -575,7 +517,7 @@ void HBSplineBase::refinementforAdvDiff1D()
 
       nd2=elems[boundaryNodes[1][0]];
       elemsToRefine.push_back(nd2->getID());
-    
+
       for(ii=0;ii<degree[2];ii++)
       {
         nd2 = nd2->getNeighbour(LEFT);
@@ -597,25 +539,19 @@ void HBSplineBase::refinementforAdvDiff2D()
 
     for(kk=0;kk<degree[2];kk++)
     {
-      //cout << " PPPPPPPPPPPPPPP " << endl;
-
       elemsToRefine.clear();
 
       for(ee=0;ee<NodeNumsAtLevel[kk].size();ee++)
       {
           nd = elems[NodeNumsAtLevel[kk][ee]];
-          
-          //cout << " nd->getID() " << nd->getID() << '\t' << nd->isGhost() << endl;
-          //nd->printSelf();
+
           if(nd->isLeftBoundary() && nd->isBottomBoundary())
           {
              while(!nd->isGhost())
              {
-                //cout << " nd->getID() " << nd->getID() << endl;
                 elemsToRefine.push_back(nd->getID());
                 nd = nd->getNeighbour(EAST);
                 nd = nd->getNeighbour(NORTH);
-                //cout << " AAAAAAAAAAAAAAAAAAAAA " << nd->getID() << '\t' << nd->isGhost() << endl;
              }
           }
        }
@@ -630,9 +566,7 @@ void HBSplineBase::refinementforAdvDiff2D()
        {
          nodes2divide.push_back(elemsToRefine[ii]);
          nd = elems[elemsToRefine[ii]];
-   
-         //cout << nd->getID() << endl;
-   
+
          nd1 = nd->getNeighbour(WEST);
          if(nd1 != NULL)
          {
@@ -688,7 +622,6 @@ void HBSplineBase::limitBasedRefinement(int kk)
 
     assert(refinementData[1] <= refineLimitVals.size());
 
-    //cout << " PPPPPPPPPP " << endl;
       if(DIM == 1)
       {
         //printVector(NodeNumsAtLevel[kk]);
@@ -744,17 +677,8 @@ void HBSplineBase::limitBasedRefinement(int kk)
             param = nd->getKnotSum();
             param *= 0.5;
 
-            //printf("%12.6f \t %12.6f \t %12.6f \n", param[0], param[1], param[2]);
             computeGeometry(param, geom);
-            //val[0] = computeGeometry(0, tmp1[0]);
-            //val[1] = computeGeometry(0, tmp1[1]);
-            //val[2] = computeGeometry(1, tmp2[0]);
-            //val[3] = computeGeometry(1, tmp2[1]);
-            //val[4] = computeGeometry(2, tmp3[0]);
-            //val[5] = computeGeometry(2, tmp3[1]);
 
-            //printf("%12.6f \t %12.6f \t %12.6f \t %12.6f \t %12.6f \t %12.6f \n", param[0], param[1], param[2], geom[0], geom[1], geom[2]);
-            //printf("%12.6f \t %12.6f \t %12.6f \t %12.6f \t %12.6f \t %12.6f \n", val[0], val[1], val[2], val[3], val[4], val[5]);
             for(mm=0;mm<refineLimitVals.size();mm++)
             {
               //printVector(refineLimitVals[mm]);
@@ -764,9 +688,6 @@ void HBSplineBase::limitBasedRefinement(int kk)
                     (geom[1] >= refineLimitVals[mm][3] && geom[1] <  refineLimitVals[mm][4]) &&
                     (geom[2] >= refineLimitVals[mm][5] && geom[2] <  refineLimitVals[mm][6]) )
                 {
-                  //printf("%12.6f \t %12.6f \t %12.6f \t %12.6f \t %12.6f \t %12.6f \n", tmp1[0], tmp1[1], tmp2[0], tmp2[1], tmp3[0], tmp3[1]);
-                  //printf("%12.6f \t %12.6f \t %12.6f \t %12.6f \t %12.6f \t %12.6f \n", val[0], val[1], val[2], val[3], val[4], val[5]);
-                  //printf("xx = %12.6f, yy = %12.6f, zz = %12.6f, cell = %5d, \n", geom[0], geom[1], geom[2], nd->getID());
                   elemsToRefine.push_back(nd->getID());
                 }
               }
@@ -813,8 +734,6 @@ void  HBSplineBase::addNeighbourElements2D(int depth)
        nodes2divide.push_back(elemsToRefine[ii]);
 
        nd = elems[elemsToRefine[ii]];
-   
-       //cout << nd->getID() << endl;
 
        nd4=nd;
        for(bb=0;bb<depth;bb++)
@@ -874,11 +793,9 @@ void  HBSplineBase::addNeighbourElements2D(int depth)
        }
     }
 
-    //findUnique(nodes2divide);
-
     elemsToRefine = nodes2divide;
 
-  return;
+    return;
 }
 
 
@@ -896,8 +813,6 @@ void  HBSplineBase::addNeighbourElements3D(int depth)
        nodes2divide.push_back(elemsToRefine[ee]);
 
        nd = elems[elemsToRefine[ee]];
-   
-       //cout << nd->getID() << endl;
 
        nd1=nd;
        aa=0;bb=0;cc=0;
@@ -923,7 +838,7 @@ void  HBSplineBase::addNeighbourElements3D(int depth)
          else
            break;
        }
-       
+
        nd2 = nd1;
        for(kk=0;kk<=(depth+cc);kk++)
        {
@@ -957,11 +872,9 @@ void  HBSplineBase::addNeighbourElements3D(int depth)
        }
     }
 
-    //findUnique(nodes2divide);
-
     elemsToRefine = nodes2divide;
 
-  return;
+    return;
 }
 
 
@@ -973,8 +886,6 @@ void HBSplineBase::pointBasedRefinement(int kk)
 
   ImmersedIntegrationElement *lme;
 
-  //cout << " hhhhhhhhhhhh " << kk << endl;
-
   for(bb=0;bb<ImmersedBodyObjects.size();bb++)
   {
     for(aa=0; aa<ImmersedBodyObjects[bb]->getNumberOfNodes(); aa++)
@@ -983,36 +894,17 @@ void HBSplineBase::pointBasedRefinement(int kk)
 
       for(ii=0;ii<DIM;ii++)
         geom[ii] = ImmersedBodyObjects[bb]->GeomData.NodePosCur[aa][ii];
-      
-      //lme->computePointAtGP(ee, geom);
 
         cc = findCellNumber(geom);
         nd = elems[cc];
 
-        //printf("xx = %12.6f, yy = %12.6f, zz = %12.6f, cell = %5d, \n", geom[0], geom[1], geom[2], cc);
-
         if(!nd->isGhost())
         {
           elemsToRefine.push_back(nd->getID());
-
-          /*
-          if(bb == 1)
-          {
-            nd1 = nd->getNeighbour(NORTH);
-            nd2 = nd->getNeighbour(SOUTH);
-            for(ll=0;ll<4;ll++)
-            {
-              elemsToRefine.push_back(nd1->getID());
-              elemsToRefine.push_back(nd2->getID());
-              nd1 = nd1->getNeighbour(NORTH);
-              nd2 = nd2->getNeighbour(SOUTH);
-            }
-          }
-          */
         }
     }
   }
-    
+
   addNeighbourElements(kk);
 
   return;

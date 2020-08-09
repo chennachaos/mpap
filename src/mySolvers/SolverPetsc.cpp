@@ -126,9 +126,9 @@ int SolverPetsc::zeroMtx()
 
 int SolverPetsc::free()
 {
-  //if(FREED) return 1;
+  if(FREED) return 1;
 
-  PetscPrintf(MPI_COMM_WORLD, "SolverPetsc::free() \n");
+  //PetscPrintf(MPI_COMM_WORLD, "SolverPetsc::free() \n");
 
   ierr = VecDestroy(&soln);CHKERRQ(ierr);
   //cout << " ierr = " << ierr << endl;
@@ -152,7 +152,7 @@ int SolverPetsc::free()
 
   FREED = true;
 
-  PetscPrintf(MPI_COMM_WORLD, "SolverPetsc::free() \n");
+  //PetscPrintf(MPI_COMM_WORLD, "SolverPetsc::free() \n");
 
   return 1;
 }
@@ -260,8 +260,6 @@ int SolverPetsc::solve()
 
   //VecView(rhsVec, PETSC_VIEWER_STDOUT_WORLD);
 
-  //tstart = time(0);
-
   ierr = KSPSolve(ksp,rhsVec,soln); CHKERRQ(ierr);
 
   //PetscPrintf(MPI_COMM_WORLD, "  SolverPetsc::solve() ... KSP solve ...  \n\n");
@@ -284,13 +282,8 @@ int SolverPetsc::solve()
     PetscPrintf(MPI_COMM_WORLD, "\n Convergence in %d iterations.\n\n", its);
   }
 
-
   //ierr = KSPView(ksp,PETSC_VIEWER_STDOUT_WORLD);//CHKERRQ(ierr);
   //VecView(soln, PETSC_VIEWER_STDOUT_WORLD);
-
-  //tend = time(0); 
-  
-  //cout << "SolverPetsc::solve()  took "<< difftime(tend, tstart) <<" second(s)."<< endl;
 
   solverTime.total -= solverTime.solve;
   solverTime.solve += computerTime.stop(fct);

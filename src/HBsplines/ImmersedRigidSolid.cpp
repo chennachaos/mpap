@@ -57,6 +57,7 @@ ImmersedRigidSolid::~ImmersedRigidSolid()
 
 void ImmersedRigidSolid::printSelf()
 {
+    if(this_mpi_proc != 0)  return;
 
     printf("\n\n\n Rigid body %5d details \n\n", id);
     printf("--------------------------------------------------------------");
@@ -66,6 +67,7 @@ void ImmersedRigidSolid::printSelf()
     printMatrix(matC);
     printf("\n Stiffness matrix \n\n");
     printMatrix(matK);
+    printf("\n totalDOF = %d \n\n",  totalDOF);
 
     if(dofData[0] == DOF_FIXED)
       printf("\t Fixed in X-direction \n");
@@ -261,7 +263,6 @@ void  ImmersedRigidSolid::setRigidBodyMotionLimits(vector<vector<double> >& temp
 void  ImmersedRigidSolid::setNodalPositions(vector<vector<double> >&  datatemp)
 {
   nNode = datatemp.size();
-  //cout << " nNode  = " << nNode << endl;
 
   GeomData.NodePosOrig.resize(nNode);
   GeomData.NodePosCur.resize(nNode);
@@ -327,8 +328,6 @@ void ImmersedRigidSolid::initialise()
 {
   SolnData.STAGGERED = STAGGERED;
 
-  //printSelf();
-
   setSolver(1);
   setTimeParam();
   computeInitialAcceleration();
@@ -385,13 +384,8 @@ void ImmersedRigidSolid::prepareMatrixPattern()
       }
     }
 
-    cout << " ndofRigidbody     " << ndofRigidbody << endl;
-    cout << " totalDOF " << totalDOF << endl;
-    cout << " assy4r " << endl;
-    printVector(assy4r);
-
     bool pp1=0;
-    pp1=1;
+    //pp1=1;
     if(pp1)
     {
       printf("   dof to dof connectivity ...:  \n\n");
@@ -432,9 +426,9 @@ void ImmersedRigidSolid::prepareMatrixPattern()
         printVector(forAssyCoupledHorz[ii]);
     }
 
-  //printf("\n     ImmersedRigidSolid::prepareMatrixPattern()  .... FINISHED ...\n\n");
+    printSelf();
 
-  return;
+    return;
 }
 
 
@@ -494,9 +488,6 @@ void  ImmersedRigidSolid::updatePointPositions2D()
 
     RotNew.setZero();
     RotCur.setZero();
-
-    //cout << "totalDOF " << totalDOF << endl;
-    //cout << "tCur = " << tCur << endl;
 
     // Cur --> values at t_{n+af}
     // New --> values at t_{n+1}
@@ -617,10 +608,10 @@ void  ImmersedRigidSolid::updatePointPositions3D()
 
     myPoint  geom, param, rOrig, rNew, vNew, dCentNew, dCentCur, vCentNew, vCentCur;
     MatrixXd  RotNew(3, 3), RotCur(3, 3);
-    
+
     RotNew.setZero();
     RotCur.setZero();
-    
+
     bool pres_motion=true;
     pres_motion = false;
 
@@ -674,8 +665,6 @@ void  ImmersedRigidSolid::updatePointPositions3D()
 
       computeCentroid(0);
 
-      //cout << " ssssssssssss " << DIM << endl;
-
       for(bb=0;bb<nNode;bb++)
       {
         for(ii=0;ii<DIM;ii++)
@@ -688,7 +677,7 @@ void  ImmersedRigidSolid::updatePointPositions3D()
         //vNew[1] = vCentNew[1] + omegaNew*(rNew[1] - centroid[1]);
         //
         rNew = dCentNew + rOrig;
-        
+
         vNew = vCentNew;
 
         for(ii=0;ii<DIM;ii++)
@@ -702,7 +691,7 @@ void  ImmersedRigidSolid::updatePointPositions3D()
 
         //vNew[0] = vCentCur[0] - omegaCur*(rNew[0] - centroid[0]);
         //vNew[1] = vCentCur[1] + omegaCur*(rNew[1] - centroid[1]);
-        
+
         rNew = dCentCur + rOrig;
 
         vNew = vCentCur;
@@ -862,15 +851,6 @@ void ImmersedRigidSolid::resetMatrixAndVector()
   return;
 }
 
-/*
-  double F0=9.0;
-  //double F0=0.0035;
-  //F0 = 1.2*0.196349540849362*981.0;
-  //F0 = 0.0072*1.7671e+03*9.81*0.001;
-  //F0 = 0.001996*0.0314158*981.0;
-  //F0 = 1.2*0.0314158*981.0;
-*/
-
 
 int ImmersedRigidSolid::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool zeroRes)
 {
@@ -922,7 +902,9 @@ int ImmersedRigidSolid::calcStiffnessAndResidual(int solver_type, bool zeroMtx, 
     Ftemp    = SolnData.forceCur - matM*SolnData.var1DotDotCur - matC*SolnData.var1DotCur - matK*SolnData.var1Cur;
     //Ftemp(1) -= (SolnData.var1DotCur(1)*(k1+k3*SolnData.var1DotCur(1)*SolnData.var1DotCur(1)));
 
-    //Ftemp(1) +=  F0;
+    Ftemp(0) += preLoad[0];
+    Ftemp(1) += preLoad[1];
+    Ftemp(2) += preLoad[2];
 
     Kglobal.resize(totalDOF, totalDOF);
     rhsVec.resize(totalDOF);
@@ -942,21 +924,10 @@ int ImmersedRigidSolid::calcStiffnessAndResidual(int solver_type, bool zeroMtx, 
     Kglobal /= SolnData.td[10];
   }
 
-  //printVector(SolnData.forceCur);
-  //printf("\n\n");
-  //printMatrix(Kglobal);
-  //printf("\n\n");
-  //printVector(rhsVec);
-
-  //cout << " forceCur " << forceCur(0) << '\t' << Flocal(0) << '\t' << Klocal(0,0) << endl;
-
   firstIter = false;
   rNormPrev = rNorm;
   rNorm     = rhsVec.norm();
-  //iterCount++;
 
-  //printf(" ImmersedRigidSolid .... norm  %11.4e\n", rNorm);
-  
   return 0;
 }
 

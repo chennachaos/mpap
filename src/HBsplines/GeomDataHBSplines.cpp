@@ -58,12 +58,12 @@ void GeomDataHBSplines::build()
     }
 
     //cout << " Jacobian[0] " << Jacobian[0] << '\t' << Jacobian[1] << '\t' << Jacobian[2] << '\t'<< Jfull << endl;
-    cout << " totalNGP " << nGP[0] << '\t' << nGP[1] << '\t' << totalNGP << endl;
+    //cout << " totalNGP " << nGP[0] << '\t' << nGP[1] << '\t' << totalNGP << endl;
 
     // compute subdivision coefficient matrices
 
     size = degree[0]+1;
-        
+
     coeffLeft.resize(size,size);
     coeffRight.resize(size,size);
 
@@ -72,7 +72,7 @@ void GeomDataHBSplines::build()
     getGaussPoints1D(nGP[0], gausspoints1, gaussweights1);
     gausspoints2 = gausspoints1;
     gausspoints3 = gausspoints1;
-    
+
     gaussweights2 = gaussweights1;
     gaussweights3 = gaussweights1;
 
@@ -81,7 +81,7 @@ void GeomDataHBSplines::build()
       ind = nGP[0];
       gausspoints.resize(ind);
       gaussweights.resize(ind);
-  
+
       ind=0;
       for(ii=0; ii<nGP[0]; ii++)
       {
@@ -96,7 +96,7 @@ void GeomDataHBSplines::build()
       ind = nGP[0]*nGP[0];
       gausspoints.resize(ind);
       gaussweights.resize(ind);
-  
+
       ind=0;
       for(jj=0; jj<nGP[0]; jj++)
       {
@@ -115,7 +115,7 @@ void GeomDataHBSplines::build()
       ind = nGP[0]*nGP[0];
       gausspoints2D.resize(ind);
       gaussweights2D.resize(ind);
-  
+
       ind=0;
       for(jj=0; jj<nGP[0]; jj++)
       {
@@ -186,7 +186,7 @@ void GeomDataHBSplines::build()
         TensorProduct(coeffRight, coeffNW, coeffNW_Front);
         TensorProduct(coeffRight, coeffNE, coeffNE_Front);
     }
-    
+
     gpsLeft.push_back(-1.0);
     gpsRight.push_back(1.0);
 
@@ -200,7 +200,7 @@ void GeomDataHBSplines::build()
     double  incr1, incr2, incr3, val1, val2, val3, val4, val5, val6, uu, vv, ww;
 
     shpfns.resize(8); // index 1 - level(s)
-    
+
     myPoint  knotBegin, knotIncr, param;
     knotBegin.setZero();
     knotIncr = knotBegin;
@@ -464,7 +464,7 @@ void GeomDataHBSplines::build()
                   ptTemp[0] = gpsLeft[ii];
 
                   wt = gaussweights3[kk]*gaussweights2[jj]*gwsLeft[ii];
-                  
+
                   boundaryQuadrature3D[0].gausspoints.push_back(ptTemp);
                   boundaryQuadrature3D[0].gaussweights.push_back(wt);
                 }
@@ -599,10 +599,10 @@ void GeomDataHBSplines::build()
   // generate polygons for the immersed boundaries
   //
   ////////////////////////////////////////
-  
+
   DistanceFunction  *distF1 = new Circle(0.0, 0.0, 0.5);
   Circle distF(0.0, 0.0, 0.5);
-  
+
   distFuncs.push_back(distF1);
 
   return;

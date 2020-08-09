@@ -1681,16 +1681,11 @@ void  HBSplineCutFEM::computeTotalForce2D(int bb)
 
     centroid = ImmersedBodyObjects[bb]->getCentroid(2);
 
-    //cout << " centroid = " << centroid[0] << '\t' << centroid[1] << endl;
-    //centroid[0] = 73.0;
-    //centroid[1] = 60.0;
-
     for(aa=0; aa<ImmersedBodyObjects[bb]->ImmIntgElems.size(); aa++)
     {
       lme  = ImmersedBodyObjects[bb]->ImmIntgElems[aa];
       poly = ImmersedBodyObjects[bb]->ImmersedFaces[aa];
 
-      //cout << " aa = " << aa << '\t' << lme->isActive() << endl;
       if( lme->isActive() )
       {
           for(gp=0; gp<nGauss; gp++)
@@ -1701,8 +1696,6 @@ void  HBSplineCutFEM::computeTotalForce2D(int bb)
 
               dvol  = gaussweights[gp] * detJ;
 
-              //printf(" %12.6f,  %12.6f, %12.6f \n", Nb[0], Nb[1], dvol);
-
               if(axsy)
               {
                 dvol *= 2.0*PI*geom[0];
@@ -1711,22 +1704,13 @@ void  HBSplineCutFEM::computeTotalForce2D(int bb)
               lme->computeVelocity(Nb, velSpec);
               lme->computeAcceleration(Nb, acceSpec);
 
-              //cout << " uuuuuuuuuuu " << endl;
-
               ndTemp = elems[findCellNumber(geom)];
 
               geometryToParametric(geom, param);
 
               poly->computeNormal(geom, normal);
 
-              //printf("xx = %12.6f, yy = %12.6f, zz = %12.6f, dvol = %12.6f, \n", geom[0], geom[1], geom[2], dvol);
-              //printf("xx = %12.6f, yy = %12.6f, zz = %12.6f, dvol = %12.6f, \n", param[0], param[1], param[2], dvol);
-
               ndTemp->computeVelocityAndStress(param, vel, stress, acceFluid);
-
-              //printf("%12.6f \t %12.6f \t %12.6f \t %12.6f \n", velSpec[0], velSpec[1], vel[0], vel[1]);
-
-              //printf("FluidAcce[0] = %12.6f, FluidAcce[1] = %12.6f \n", FluidAcce[0], FluidAcce[1]);
 
               trac[0] =  stress(0,0)*normal[0] + stress(0,1)*normal[1] ;
               trac[1] =  stress(1,0)*normal[0] + stress(1,1)*normal[1] ;
@@ -1744,8 +1728,6 @@ void  HBSplineCutFEM::computeTotalForce2D(int bb)
               //trac[1] += stagParams[2]*(rhoSolid*acceSpec[1] - rho*acceFluid[1]);
 
               trac *= dvol;
-
-              //cout << trac[0] << '\t' << trac[1] << endl;
 
               fact = rho*dvol;
 

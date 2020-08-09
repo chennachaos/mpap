@@ -38,6 +38,10 @@ ImmersedSolid::ImmersedSolid()
 
   totalForce.resize(6);
   totalForce.setZero();
+
+
+  MPI_Comm_size(MPI_COMM_WORLD, &n_mpi_procs);
+  MPI_Comm_rank(MPI_COMM_WORLD, &this_mpi_proc);
 }
 
 
@@ -150,8 +154,6 @@ void  ImmersedSolid::setImmersedIntegrationElements(vector<vector<int> >& datate
     int ii=0, jj=0, ind=0;
     int kk = datatemp[0].size()-1 ;
 
-    //cout << " datatemp.size() = " << datatemp.size() << '\t' << kk << endl;
-
     nImmInt = datatemp.size();
 
     ImmersedIntegrationElement* lme;
@@ -165,13 +167,11 @@ void  ImmersedSolid::setImmersedIntegrationElements(vector<vector<int> >& datate
       lme->setDimension(DIM);
       lme->prepareElemData();
 
-      //cout << " ii " << ii << endl;
       for(jj=0; jj<kk; jj++)
       {
         ind = datatemp[ii][1+jj] ;
         lme->pointNums.push_back(ind);
       }
-      //printVector(lme->pointNums);
 
       lme->initialiseDOFvalues();
 
@@ -182,8 +182,6 @@ void  ImmersedSolid::setImmersedIntegrationElements(vector<vector<int> >& datate
 
       ImmIntgElems.push_back(lme);
     }
-
-    //cout << " nImmInt " << nImmInt << endl;
 
     return;
 }

@@ -24,7 +24,6 @@ void HBSplineFEM::setInitialConditions()
 /*
     for(int ii=0;ii<activeElements.size();ii++)
     {
-       //cout << ii << '\t' << omp_get_thread_num() << '\t' << omp_get_num_threads() << '\t' << omp_get_max_threads() << endl;
        node *nd = elems[activeElements[ii]];
 
        nd->setInitialProfile();
@@ -101,20 +100,11 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
     tstart = time(0);
     //node *nd;
 
-    //printf("Number of threads: %i \n",omp_get_num_procs());
-    //omp_set_num_threads(1);
-    //#pragma omp parallel
-    //{
-      //printf("Number of threads: %i \n",omp_get_num_procs());
-    //}
-
 
   if(LSFEM_FLAG)
   {
-    //#pragma omp parallel for
     for(ii=0;ii<activeElements.size();ii++)
     {
-       //cout << ii << '\t' << omp_get_thread_num() << '\t' << omp_get_num_threads() << '\t' << omp_get_max_threads() << endl;
        node *nd;
        nd = elems[activeElements[ii]];
        //cout << " nd->getID() " <<  nd->getID() << '\t' <<  nd->getLevel() << endl;
@@ -320,16 +310,11 @@ int HBSplineFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool ze
     //
     ////////////////////////////////////////////////////////
 
-    //#pragma omp parallel
-      //printf("Number of threads: %i \n",omp_get_num_procs());
-
       MatrixXd  matM, matK;
 
     tstart = time(0);
-    //#pragma omp parallel for
     for(ii=0;ii<activeElements.size();ii++)
     {
-      //cout << ii << '\t' << omp_get_thread_num() << '\t' << omp_get_num_threads() << '\t' << omp_get_max_threads() << endl;
       node *nd = elems[activeElements[ii]];
       //cout << " nd->getID() " <<  nd->getID() << '\t' <<  nd->getLevel() << endl;
 
