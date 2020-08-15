@@ -36,7 +36,7 @@ ImmersedRigidSolid::ImmersedRigidSolid(int dd)
   // all DOF are fixed by default
   dofData.resize(ndofRigidbody, DOF_FIXED);
 
-  SolnData.initialise(3, 0, 0, 0);
+  SolnData.initialise(ndofRigidbody, 0, 0, 0);
   SolnData.setPhysicsTypetoSolid();
 
   preLoad.resize(ndofRigidbody, 0.0);
