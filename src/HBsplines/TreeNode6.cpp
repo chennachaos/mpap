@@ -36,7 +36,7 @@ double TreeNode<3>::computeTotalBodyForce(int, int)
 
 
 template<>
-void TreeNode<3>::setInitialProfile()
+void TreeNode<3>::setInitialProfile(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
 {
   return;
 }

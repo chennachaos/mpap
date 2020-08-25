@@ -186,7 +186,7 @@ void HBSplineBase::setInitialConditions()
         //cout << " elems[ee]->getID() " <<  elems[ee]->getID() << '\t' <<  elems[ee]->getLevel() << endl;
 
         //elems[ee]->resetMatrixAndVector();
-        elems[ee]->setInitialProfile();
+        //elems[ee]->setInitialProfile();
         //elems[ee]->assembleMatrixAndVector(1, solver->mtx, &(rhsVec(0)));
       }
     }
@@ -231,7 +231,7 @@ void HBSplineBase::computeConditionNumber()
 void HBSplineBase::setSolver(int slv, int *parm, bool cIO)
 {
     slv_type = slv;
-    
+
     //PetscPrintf(MPI_COMM_WORLD, " slv_type = %5d \t  %5d. \n", slv, slv_type);
 
     //Eigen::initParallel();
@@ -392,8 +392,8 @@ void HBSplineBase::setSolver(int slv, int *parm, bool cIO)
     if(solverPetsc != NULL)
       solverPetsc->checkIO = cIO;
 
-    //if(tis > 0)
-      //setInitialConditions();
+    if(tis > 0)
+      setInitialConditions();
 
     return;
 }

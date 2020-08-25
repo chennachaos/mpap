@@ -14,6 +14,9 @@ extern MpapTime mpapTime;
 
 void HBSplineCutFEM::setInitialConditions()
 {
+    SolnData.var1.setZero();
+
+    /*
     double* tmp;
 
     solverEigen->zeroMtx();
@@ -35,7 +38,13 @@ void HBSplineCutFEM::setInitialConditions()
     solnInit = soln;
     SolnData.var1 = solnInit;
 
-   return;
+    for(int ii=0; ii<gridBF1; ii++)
+    {
+        SolnData.var1[ii*ndof] = DirichletBCs[0][2];
+    }
+    */
+
+    return;
 }
 
 

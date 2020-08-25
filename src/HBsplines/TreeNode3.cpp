@@ -672,7 +672,7 @@ double  TreeNode<2>::calcError(int index, int domainCur)
 
 
 template<>
-void TreeNode<2>::setInitialProfile()
+void TreeNode<2>::setInitialProfile(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
 {
     // to compute the level set function
     // or
@@ -684,12 +684,13 @@ void TreeNode<2>::setInitialProfile()
     //Circle  circ3(0.4,0.6,0.15);
     //Circle  circ4(0.6,0.6,0.15);
 
-    PearsonVortex analy(elmDat[4]);
+    //PearsonVortex analy(elmDat[4]);
 
     int ii, jj, gp, TI, TIp1, TIp2, TJ, TJp1, TJp2;
-    double  Jac, dvol, fact, fact1, fact2, fact3, y0, y1, xx, yy, y2;
+    double  Jac, dvol, fact, fact1, fact2, fact3, y0, y1, xx, yy, y2, specVal;
 
     VectorXd  N(totnlbf), dN_dx(totnlbf), d2N_dx2(totnlbf), dN_dy(totnlbf), d2N_dy2(totnlbf);
+    VectorXd  NN(totnlbf), dNN_dx(totnlbf), d2NN_dx2(totnlbf), dNN_dy(totnlbf), d2NN_dy2(totnlbf);
     //double  *N, *dN_dx, *d2N_dx2, *dN_dy, *d2N_dy2;
 
     y0 = 0.25;
@@ -704,8 +705,8 @@ void TreeNode<2>::setInitialProfile()
     MatrixXd  D(forAssyVec.size(),3); D.setZero();
     myPoint  param;
 
-    //Klocal.setZero();
-    //Flocal.setZero();
+    Klocal.setZero();
+    Flocal.setZero();
 
     for(gp=0; gp<GeomData->gausspoints.size(); gp++)
     {
@@ -714,9 +715,21 @@ void TreeNode<2>::setInitialProfile()
 
         dvol = GeomData->gaussweights[gp] * JacMultElem;
 
+        if(parent == NULL)  //cout << " parent is NULL " << endl;
+        {
           GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, N, dN_dx, dN_dy, d2N_dx2, d2N_dy2);
-          //computeBasisFunctions2D(uu, vv, N, dN_dx, dN_dy, d2N_dx2, d2N_dy2);
-          
+        }
+        else
+        {
+          GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy, d2NN_dx2, d2NN_dy2);
+          //cout << " parent is not NULL " << endl;
+          N = SubDivMat*NN;
+          dN_dx = SubDivMat*dNN_dx;
+          dN_dy = SubDivMat*dNN_dy;
+          d2N_dx2 = SubDivMat*d2NN_dx2;
+          d2N_dy2 = SubDivMat*d2NN_dy2;
+        }
+
           //if(circ1.checkPointLocation(uu, vv) & !circ2.checkPointLocation(uu, vv)) // || circ3.checkPointLocation(uu, vv) || circ4.checkPointLocation(uu, vv))
             //fact = 1.0;
           //else
@@ -732,25 +745,27 @@ void TreeNode<2>::setInitialProfile()
           xx = GeomData->computeCoord(0, param[0]);
           yy = GeomData->computeCoord(1, param[1]);
 
-          if(yy <= y1 && yy >= y0)
-            res(0) = y2*(yy-y0)*(y1-yy);
+          //if(yy <= y1 && yy >= y0)
+            //res(0) = y2*(yy-y0)*(y1-yy);
+
+          specVal     = DirichletData[0][2];
 
           for(ii=0;ii<totnlbf;ii++)
           {
              TI = 3*ii;
 
-             D(TI,0)   = N[ii];
+             D(TI,  0) = N[ii];
              D(TI+1,1) = N[ii];
              D(TI+2,2) = N[ii];
           }
 
-          //Klocal += ((D*dvol) * D.transpose());
-          //Flocal += (D*(dvol*res));
+          Klocal += ((D*dvol) * D.transpose());
+          Flocal += (D*(dvol*res));
     } //gp
 
     //printf("\n\n");
     //printVector(Flocal);
-    
+
    return;
 }
 
