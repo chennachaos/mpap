@@ -1624,12 +1624,13 @@ void TreeNode<3>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
 
                   y0 = 0.0;    y1 = 3.0;  z0 = -2.0;    z1 = 2.0;
 
-                  fact = (36.0)*(1.0/(y1-y0)/(y1-y0))*(1.0/(z1-z0)/(z1-z0));
-                  specVal = DirichletData[aa][2]*fact*(y1-geom[1])*(geom[1]-y0)*(z1-geom[2])*(geom[2]-z0);  // plate Wall
+                  //fact = (36.0)*(1.0/(y1-y0)/(y1-y0))*(1.0/(z1-z0)/(z1-z0));
+                  // plate Wall
+                  //specVal = DirichletData[aa][2]*fact*(y1-geom[1])*(geom[1]-y0)*(z1-geom[2])*(geom[2]-z0);
 
                   // Turek cylinder
-                  //y0 = 0.0;    y1 = 0.41;  z0 = 0.0;    z1 = 0.41;
-                  //specVal = DirichletData[aa][2]*(6.0/y1/y1)*(y1-geom[1])*(geom[1]-y0)*(6.0/z1/z1)*(z1-geom[2])*(geom[2]-z0);
+                  y0 = 0.0;    y1 = 0.41;  z0 = 0.0;    z1 = 0.41;
+                  specVal = DirichletData[aa][2]*(6.0/y1/y1)*(y1-geom[1])*(geom[1]-y0)*(6.0/z1/z1)*(z1-geom[2])*(geom[2]-z0);
 
                   //y0 = 0.0;    y1 = 0.41;  z0 = -0.35;    z1 = 0.35; // Turek beam 3D
                   //fact = (4.0/(y1-y0)/(y1-y0))*(4.0/(z1-z0)/(z1-z0));
@@ -1913,6 +1914,150 @@ void TreeNode<3>::applyNeumannBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal,
   } // if(NeumannData.size() > 0)
 
   return;
+}
+
+
+
+
+template<>
+void TreeNode<3>::applyDerivativeBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
+{
+    if( DerivativeBCData.size() > 0 )
+    {
+        int ii, jj, aa, gp, nGauss, TI, TIp1, TIp2, index, dir, side;
+        double  y0, y1, res, JacTemp;
+        double  dvol, specVal, rad, freq, pres, PENALTY;
+
+        VectorXd  N(totnlbf), dN_dx(totnlbf), dN_dy(totnlbf), dN_dz(totnlbf);
+        VectorXd  NN(totnlbf), dNN_dx(totnlbf), dNN_dz(totnlbf), dNN_dy(totnlbf), grad(3);
+        MatrixXd  D(forAssyVec.size(),1);
+        D.setZero();
+
+        myPoint  param, geom, normal;
+        double *gws;
+        myPoint *gps;
+
+        bool   axsy = ((int)elmDat[2] == 1);
+        double  rho = elmDat[3];
+        double  mu  = elmDat[4];
+
+        for(aa=0;aa<DerivativeBCData.size();aa++)
+        {
+            side    = (int) (DerivativeBCData[aa][0] - 1);
+            dir     = (int) (DerivativeBCData[aa][1] - 1);
+            specVal = DerivativeBCData[aa][2];
+            PENALTY = DerivativeBCData[aa][3];
+
+            normal = GeomData->boundaryNormals[side];
+
+            if(domNums.size() > 1)
+            {
+                nGauss = BoundaryQuadrature[side].gausspoints.size() ;
+
+                gps = &(BoundaryQuadrature[side].gausspoints[0]);
+                gws = &(BoundaryQuadrature[side].gaussweights[0]);
+
+                JacTemp = 1.0;
+            }
+            else
+            {
+                nGauss = GeomData->boundaryQuadrature2D[side].gausspoints.size();
+
+                gps = &(GeomData->boundaryQuadrature2D[side].gausspoints[0]);
+                gws = &(GeomData->boundaryQuadrature2D[side].gaussweights[0]);
+
+                JacTemp = GeomData->boundaryJacobians[side][level];
+            }
+
+
+            for(gp=0; gp<nGauss; gp++)
+            {
+                param[0]  = 0.5*(knotIncr[0] * gps[gp][0] + knotSum[0]);
+                param[1]  = 0.5*(knotIncr[1] * gps[gp][1] + knotSum[1]);
+                param[2]  = 0.5*(knotIncr[2] * gps[gp][2] + knotSum[2]);
+
+                dvol = JacTemp * gws[gp] ;
+
+                geom[0] = GeomData->computeCoord(0, param[0]);
+                geom[1] = GeomData->computeCoord(1, param[1]);
+                geom[2] = GeomData->computeCoord(2, param[2]);
+
+                dvol *= PENALTY;
+
+                GeomData->computeBasisFunctions3D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy, dNN_dz);
+
+                if(parent == NULL)
+                {
+                  N = NN;
+                  dN_dx = dNN_dx;
+                  dN_dy = dNN_dy;
+                  dN_dz = dNN_dz;
+                }
+                else
+                {
+                  N = SubDivMat*NN;
+                  dN_dx = SubDivMat*dNN_dx;
+                  dN_dy = SubDivMat*dNN_dy;
+                  dN_dz = SubDivMat*dNN_dz;
+                }
+
+                if(dir == 0)
+                {
+                    grad(0) = computeValue(0, dN_dx);
+                    grad(1) = computeValue(0, dN_dy);
+                    grad(2) = computeValue(0, dN_dz);
+
+                    for(ii=0;ii<totnlbf2;ii++)
+                    {
+                        TI = ndof*ii;
+                        D(TI)   = (dN_dx[ii]*normal[0] + dN_dy[ii]*normal[1] + dN_dz[ii]*normal[2]);
+                        D(TI+1) = 0.0;
+                        D(TI+2) = 0.0;
+                    }
+
+                    res = specVal - (grad(0)*normal[0]+grad(1)*normal[1]+grad(2)*normal[2]);
+                }
+                else if(dir == 1)
+                {
+                    grad(0) = computeValue(1, dN_dx);
+                    grad(1) = computeValue(1, dN_dy);
+                    grad(2) = computeValue(1, dN_dz);
+
+                    for(ii=0;ii<totnlbf2;ii++)
+                    {
+                        TI = ndof*ii;
+                        D(TI)   = 0.0;
+                        D(TI+1) = (dN_dx[ii]*normal[0] + dN_dy[ii]*normal[1] + dN_dz[ii]*normal[2]);
+                        D(TI+2) = 0.0;
+                    }
+
+                    res = specVal - (grad(0)*normal[0]+grad(1)*normal[1]+grad(2)*normal[2]);
+                }
+                else if(dir == 2)
+                {
+                    grad(0) = computeValue(2, dN_dx);
+                    grad(1) = computeValue(2, dN_dy);
+                    grad(2) = computeValue(2, dN_dz);
+
+                    for(ii=0;ii<totnlbf2;ii++)
+                    {
+                        TI = ndof*ii;
+                        D(TI)   = 0.0;
+                        D(TI+1) = 0.0;
+                        D(TI+2) = (dN_dx[ii]*normal[0] + dN_dy[ii]*normal[1] + dN_dz[ii]*normal[2]);
+                    }
+
+                    res = specVal - (grad(0)*normal[0]+grad(1)*normal[1]+grad(2)*normal[2]);
+                }
+
+                Flocal += (dvol*res)*D;
+                Klocal += (dvol*D)*D.transpose();
+
+            } // for(gp=0...
+        } // for(aa=0;aa<DerivativeBCData.size();aa++)
+    } // if(DerivativeBCData.size() > 0)
+
+    return;
 }
 
 
