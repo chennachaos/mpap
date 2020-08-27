@@ -305,7 +305,7 @@ class TreeNode
 
         void  checkPartitionOfUnity();
 
-        void  setInitialProfile(MatrixXd& Klocal, VectorXd& Flocal, int domainCur=0);
+        void  setInitialProfile(MatrixXd& Klocal, VectorXd& Flocal, VectorXd&  specVal, int domainCur=0);
 
         double  getJacBoundary(int side);
 

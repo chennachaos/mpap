@@ -14,35 +14,50 @@ extern MpapTime mpapTime;
 
 void HBSplineCutFEM::setInitialConditions()
 {
+    PetscPrintf(MPI_COMM_WORLD, "     HBSplineCutFEM: setting initial conditions ...\n\n");
+
     SolnData.var1.setZero();
 
-    /*
-    double* tmp;
+    VectorXd  specVal(3);
+    specVal.setZero();
+    specVal(0) = DirichletBCs[0][2];
+    specVal(2) = 0.1;
 
-    solverEigen->zeroMtx();
+    //timeUpdate();
 
-    for(int ee=0;ee<elems.size();ee++)
+    solverPetsc->zeroMtx();
+
+    int start = 0, nr, domTemp;
+    for(int ee=0; ee<fluidElementIds.size(); ee++)
     {
-       if( !(elems[ee]->isGhost()) &&  elems[ee]->isLeaf() )
-       {
-           //elems[ee]->resetMatrixAndVector();
-           elems[ee]->setInitialProfile();
-           //elems[ee]->assembleMatrixAndVector(1, solver->mtx, &(rhsVec(0)));
-       }
+      node *nd = elems[fluidElementIds[ee]];
+
+      if( nd->getSubdomainId() == this_mpi_proc )
+      {
+        domTemp = nd->getDomainNumber() ;
+
+        if( domTemp <= 0 )
+        {
+          nr = nd->forAssyVec.size();
+
+          MatrixXd  Klocal = MatrixXd::Zero(nr, nr);
+          VectorXd  Flocal = VectorXd::Zero(nr);
+
+          nd->setInitialProfile(Klocal, Flocal, specVal, domTemp);
+
+          solverPetsc->assembleMatrixAndVectorCutFEM(start, start, nd->forAssyVec, grid_to_proc_DOF, Klocal, Flocal);
+        }
+      }
     }
 
-    solverEigen->currentStatus = ASSEMBLY_OK;
+    solverPetsc->currentStatus = ASSEMBLY_OK;
+
+    PetscPrintf(MPI_COMM_WORLD, "     HBSplineCutFEM: solving initial conditions ...\n\n");
 
     factoriseSolveAndUpdate();
 
-    solnInit = soln;
-    SolnData.var1 = solnInit;
-
-    for(int ii=0; ii<gridBF1; ii++)
-    {
-        SolnData.var1[ii*ndof] = DirichletBCs[0][2];
-    }
-    */
+    //for(int ii=0; ii<gridBF1; ii++)
+      //SolnData.var1[ii*ndof] = DirichletBCs[0][2];
 
     return;
 }
