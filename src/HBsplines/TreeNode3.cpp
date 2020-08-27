@@ -690,7 +690,7 @@ void TreeNode<2>::setInitialProfile(MatrixXd& Klocal, VectorXd& Flocal, VectorXd
     double  Jac, JacTemp, dvol, fact, fact1, fact2, fact3, y0, y1, xx, yy, y2, geom[3];
 
     // to avoid potential convergence issues due to small elements
-    double  PEN = 1.0e6;
+    double  PEN = 1.0e9;
 
     VectorXd  N(totnlbf), dN_dx(totnlbf), d2N_dx2(totnlbf), dN_dy(totnlbf), d2N_dy2(totnlbf);
     VectorXd  NN(totnlbf), dNN_dx(totnlbf), d2NN_dx2(totnlbf), dNN_dy(totnlbf), d2NN_dy2(totnlbf);

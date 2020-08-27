@@ -50,6 +50,9 @@ void HBSplineCutFEM::setInitialConditions()
       }
     }
 
+    if(DIM == 2)
+      applyInterfaceTerms2D();
+
     solverPetsc->currentStatus = ASSEMBLY_OK;
 
     PetscPrintf(MPI_COMM_WORLD, "     HBSplineCutFEM: solving initial conditions ...\n\n");
