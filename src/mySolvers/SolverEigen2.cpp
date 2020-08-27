@@ -6,7 +6,7 @@
 #include "util.h"
 
 
-#include <Eigen/SuperLUSupport>
+//#include <Eigen/SuperLUSupport>
 #include <Eigen/SparseExtra>
 #include <Eigen/IterativeSolvers>
 

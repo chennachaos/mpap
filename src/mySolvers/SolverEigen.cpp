@@ -9,7 +9,7 @@
 #include "ComputerTime.h"
 #include "util.h"
 
-#include <Eigen/SuperLUSupport>
+//#include <Eigen/SuperLUSupport>
 #include <Eigen/SparseExtra>
 #include <Eigen/IterativeSolvers>
 
@@ -232,9 +232,9 @@ int  SolverEigen::solve()
   {
     //cout << " Solving with Eigen::SimplicialLDLT " << endl;
 
-    //SimplicialLDLT<SparseMatrix<double> > solver;
+    SimplicialLDLT<SparseMatrix<double> > solver;
 
-    SuperLU<SparseMatrixXd > solver;
+    //SuperLU<SparseMatrixXd > solver;
     tstart = time(0);
   
     solver.compute(mtx);
