@@ -5,10 +5,12 @@
 #include "MpapTime.h"
 #include "myDataIntegrateCutFEM.h"
 #include "ImmersedIntegrationElement.h"
+#include "TimeFunction.h"
 
 
 extern ComputerTime       computerTime;
 extern MpapTime mpapTime;
+extern List<TimeFunction> timeFunction;
 
 
 
@@ -20,7 +22,7 @@ void HBSplineCutFEM::setInitialConditions()
 
     VectorXd  specVal(3);
     specVal.setZero();
-    specVal(0) = DirichletBCs[0][2];
+    specVal(0) = DirichletBCs[0][2] * timeFunction[0].prop;
     specVal(2) = 0.1;
 
     //timeUpdate();
