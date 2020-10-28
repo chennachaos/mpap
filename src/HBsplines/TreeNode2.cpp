@@ -477,7 +477,7 @@ void TreeNode<1>::calcStiffnessAndResidual(int ind1, int ind2, double inp1, doub
 
 
 template<>
-void TreeNode<1>::setInitialProfile()
+void TreeNode<1>::setInitialProfile(MatrixXd& Klocal, VectorXd& Flocal, VectorXd& specVal, int domainCur)
 {
     // to compute the level set function
     // or

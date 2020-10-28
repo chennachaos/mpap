@@ -672,7 +672,7 @@ double  TreeNode<2>::calcError(int index, int domainCur)
 
 
 template<>
-void TreeNode<2>::setInitialProfile()
+void TreeNode<2>::setInitialProfile(MatrixXd& Klocal, VectorXd& Flocal, VectorXd&  specVal, int domainCur)
 {
     // to compute the level set function
     // or
@@ -684,13 +684,16 @@ void TreeNode<2>::setInitialProfile()
     //Circle  circ3(0.4,0.6,0.15);
     //Circle  circ4(0.6,0.6,0.15);
 
-    PearsonVortex analy(elmDat[4]);
+    //PearsonVortex analy(elmDat[4]);
 
-    int ii, jj, gp, TI, TIp1, TIp2, TJ, TJp1, TJp2;
-    double  Jac, dvol, fact, fact1, fact2, fact3, y0, y1, xx, yy, y2;
+    int ii, jj, gp, TI, TIp1, TIp2, TJ, TJp1, TJp2, nGauss;
+    double  Jac, JacTemp, dvol, fact, fact1, fact2, fact3, y0, y1, xx, yy, y2, geom[3];
+
+    // to avoid potential convergence issues due to small elements
+    double  PEN = 1.0e9;
 
     VectorXd  N(totnlbf), dN_dx(totnlbf), d2N_dx2(totnlbf), dN_dy(totnlbf), d2N_dy2(totnlbf);
-    //double  *N, *dN_dx, *d2N_dx2, *dN_dy, *d2N_dy2;
+    VectorXd  NN(totnlbf), dNN_dx(totnlbf), d2NN_dx2(totnlbf), dNN_dy(totnlbf), d2NN_dy2(totnlbf);
 
     y0 = 0.25;
     y1 = 0.75;
@@ -707,16 +710,51 @@ void TreeNode<2>::setInitialProfile()
     //Klocal.setZero();
     //Flocal.setZero();
 
-    for(gp=0; gp<GeomData->gausspoints.size(); gp++)
+    double *gws;
+    myPoint *gps;
+
+    if(domNums.size() > 1)
     {
-        param[0] = 0.5*(knotIncr[0] * GeomData->gausspoints[gp][0] + knotSum[0]);
-        param[1] = 0.5*(knotIncr[1] * GeomData->gausspoints[gp][1] + knotSum[1]);
+      nGauss = Quadrature.gausspoints.size();
 
-        dvol = GeomData->gaussweights[gp] * JacMultElem;
+      gps = &(Quadrature.gausspoints[0]);
+      gws = &(Quadrature.gaussweights[0]);
 
-          GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, N, dN_dx, dN_dy, d2N_dx2, d2N_dy2);
-          //computeBasisFunctions2D(uu, vv, N, dN_dx, dN_dy, d2N_dx2, d2N_dy2);
-          
+      JacTemp = 1.0;
+    }
+    else
+    {
+      nGauss = GeomData->gausspoints.size();
+
+      gps = &(GeomData->gausspoints[0]);
+      gws = &(GeomData->gaussweights[0]);
+
+      JacTemp = JacMultElem;
+    }
+
+    for(gp=0; gp<nGauss; gp++)
+    {
+        param[0]  = 0.5*(knotIncr[0] * gps[gp][0] + knotSum[0]);
+        param[1]  = 0.5*(knotIncr[1] * gps[gp][1] + knotSum[1]);
+
+        dvol = gws[gp] * JacTemp * PEN;
+
+        geom[0] = GeomData->computeCoord(0, param[0]);
+        geom[1] = GeomData->computeCoord(1, param[1]);
+
+        if(parent == NULL)  //cout << " parent is NULL " << endl;
+        {
+          GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, N, dN_dx, dN_dy);
+        }
+        else
+        {
+          GeomData->computeBasisFunctions2D(knotBegin, knotIncr, param, NN, dNN_dx, dNN_dy);
+          //cout << " parent is not NULL " << endl;
+          N = SubDivMat*NN;
+          dN_dx = SubDivMat*dNN_dx;
+          dN_dy = SubDivMat*dNN_dy;
+        }
+
           //if(circ1.checkPointLocation(uu, vv) & !circ2.checkPointLocation(uu, vv)) // || circ3.checkPointLocation(uu, vv) || circ4.checkPointLocation(uu, vv))
             //fact = 1.0;
           //else
@@ -729,28 +767,30 @@ void TreeNode<2>::setInitialProfile()
           //res(1) = analy.computeYVelocity(uu, vv);
           //res(2) = analy.computePressure(uu, vv);
 
-          xx = GeomData->computeCoord(0, param[0]);
-          yy = GeomData->computeCoord(1, param[1]);
+          //if(yy <= y1 && yy >= y0)
+            //res(0) = y2*(yy-y0)*(y1-yy);
 
-          if(yy <= y1 && yy >= y0)
-            res(0) = y2*(yy-y0)*(y1-yy);
+          res(0) = specVal(0) - computeValue(0, N);
+          res(1) = specVal(1) - computeValue(1, N);
+          res(2) = specVal(2) - computeValue(2, N);
 
-          for(ii=0;ii<totnlbf;ii++)
+          for(ii=0;ii<totnlbf2;ii++)
           {
              TI = 3*ii;
 
-             D(TI,0)   = N[ii];
+             D(TI,  0) = N[ii];
              D(TI+1,1) = N[ii];
              D(TI+2,2) = N[ii];
           }
 
-          //Klocal += ((D*dvol) * D.transpose());
-          //Flocal += (D*(dvol*res));
+          Klocal += ((D*dvol) * D.transpose());
+          Flocal += (D*(dvol*res));
     } //gp
 
     //printf("\n\n");
+    //printMatrix(Klocal);
     //printVector(Flocal);
-    
+
    return;
 }
 

@@ -126,7 +126,7 @@ int SolverPetsc::zeroMtx()
 
 int SolverPetsc::free()
 {
-  if(FREED) return 1;
+  //if(FREED) return 1;
 
   //PetscPrintf(MPI_COMM_WORLD, "SolverPetsc::free() \n");
 

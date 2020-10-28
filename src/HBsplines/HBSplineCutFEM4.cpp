@@ -5,37 +5,66 @@
 #include "MpapTime.h"
 #include "myDataIntegrateCutFEM.h"
 #include "ImmersedIntegrationElement.h"
+#include "TimeFunction.h"
 
 
 extern ComputerTime       computerTime;
 extern MpapTime mpapTime;
+extern List<TimeFunction> timeFunction;
 
 
 
 void HBSplineCutFEM::setInitialConditions()
 {
-    double* tmp;
+    PetscPrintf(MPI_COMM_WORLD, "     HBSplineCutFEM: setting initial conditions ...\n\n");
 
-    solverEigen->zeroMtx();
+    SolnData.var1.setZero();
 
-    for(int ee=0;ee<elems.size();ee++)
+    VectorXd  specVal(3);
+    specVal.setZero();
+    specVal(0) = DirichletBCs[0][2] * timeFunction[0].prop;
+    specVal(2) = 0.1;
+
+    //timeUpdate();
+
+    solverPetsc->zeroMtx();
+
+    int start = 0, nr, domTemp;
+    for(int ee=0; ee<fluidElementIds.size(); ee++)
     {
-       if( !(elems[ee]->isGhost()) &&  elems[ee]->isLeaf() )
-       {
-           //elems[ee]->resetMatrixAndVector();
-           elems[ee]->setInitialProfile();
-           //elems[ee]->assembleMatrixAndVector(1, solver->mtx, &(rhsVec(0)));
-       }
+      node *nd = elems[fluidElementIds[ee]];
+
+      if( nd->getSubdomainId() == this_mpi_proc )
+      {
+        domTemp = nd->getDomainNumber() ;
+
+        if( domTemp <= 0 )
+        {
+          nr = nd->forAssyVec.size();
+
+          MatrixXd  Klocal = MatrixXd::Zero(nr, nr);
+          VectorXd  Flocal = VectorXd::Zero(nr);
+
+          nd->setInitialProfile(Klocal, Flocal, specVal, domTemp);
+
+          solverPetsc->assembleMatrixAndVectorCutFEM(start, start, nd->forAssyVec, grid_to_proc_DOF, Klocal, Flocal);
+        }
+      }
     }
 
-    solverEigen->currentStatus = ASSEMBLY_OK;
+    if(DIM == 2)
+      applyInterfaceTerms2D();
+
+    solverPetsc->currentStatus = ASSEMBLY_OK;
+
+    PetscPrintf(MPI_COMM_WORLD, "     HBSplineCutFEM: solving initial conditions ...\n\n");
 
     factoriseSolveAndUpdate();
 
-    solnInit = soln;
-    SolnData.var1 = solnInit;
+    //for(int ii=0; ii<gridBF1; ii++)
+      //SolnData.var1[ii*ndof] = DirichletBCs[0][2];
 
-   return;
+    return;
 }
 
 

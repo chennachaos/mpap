@@ -316,6 +316,10 @@ void  HBSplineCutFEM::postProcessFlow(int vartype, int vardir, int nCol, bool um
     if( (filecount % nCol) !=  0)
         return;
 
+    if(this_mpi_proc != 0)
+        return;
+
+
     double tstart = MPI_Wtime();
 
     uGridVTK->Reset();
@@ -357,33 +361,37 @@ void  HBSplineCutFEM::postProcessFlow(int vartype, int vardir, int nCol, bool um
 
     cellDataVTK2->SetName("SubdomId");
 
-    MPI_Barrier(MPI_COMM_WORLD);
+    //MPI_Barrier(MPI_COMM_WORLD);
 
     /////////////////////
     // write VTK files
 
     // write parallel vtu master (pvtu) file
 
-    char fnameMaster[500];
+    if(DIM == 3)
+    {
+      char fnameMaster[500];
 
-    sprintf(fnameMaster,"%s%s%06d%s", files.Ofile.asCharArray(),"-",filecount,".pvtu");
+      sprintf(fnameMaster,"%s%s%06d%s", files.Ofile.asCharArray(),"-",filecount,".pvtu");
 
-    vtkSmartPointer<vtkXMLPUnstructuredGridWriter> writeruGridP  =  vtkSmartPointer<vtkXMLPUnstructuredGridWriter>::New();
+      vtkSmartPointer<vtkXMLPUnstructuredGridWriter> writeruGridP  =  vtkSmartPointer<vtkXMLPUnstructuredGridWriter>::New();
 
-    writeruGridP->SetFileName(fnameMaster);
-    writeruGridP->SetInputData(uGridVTK);
-    writeruGridP->SetNumberOfPieces(n_mpi_procs);
-    writeruGridP->SetStartPiece(0);
-    writeruGridP->SetEndPiece(n_mpi_procs-1);
-    writeruGridP->Write();
+      writeruGridP->SetFileName(fnameMaster);
+      writeruGridP->SetInputData(uGridVTK);
+      writeruGridP->SetNumberOfPieces(n_mpi_procs);
+      writeruGridP->SetStartPiece(0);
+      writeruGridP->SetEndPiece(n_mpi_procs-1);
+      writeruGridP->Write();
 
-    MPI_Barrier(MPI_COMM_WORLD);
+      MPI_Barrier(MPI_COMM_WORLD);
+    }
 
     // write individual vtu files
 
     char fnameLocal[500];
 
-    sprintf(fnameLocal,"%s%s%06d%s%d%s", files.Ofile.asCharArray(),"-",filecount,"_",this_mpi_proc,".vtu");
+    sprintf(fnameLocal,"%s%s%06d%s", files.Ofile.asCharArray(),"-",filecount,".vtu");
+    //sprintf(fnameLocal,"%s%s%06d%s%d%s", files.Ofile.asCharArray(),"-",filecount,"_",this_mpi_proc,".vtu");
 
     writerUGridVTK->SetFileName(fnameLocal);
     writerUGridVTK->SetInputData(uGridVTK);
@@ -569,8 +577,8 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
       {
         ndTemp = elems[activeElements[ee]];
 
-        if( ndTemp->getSubdomainId() == this_mpi_proc )
-        {
+        //if( ndTemp->getSubdomainId() == this_mpi_proc )
+        //{
           knotBegin = ndTemp->getKnotBegin();
           knotEnd   = ndTemp->getKnotEnd();
           knotIncr  = ndTemp->getKnotIncrement();
@@ -704,7 +712,7 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
               } // if( domainInclYesNo[domTemp] )
             }                                               //  for(ii=0; ii<nd->subTrias.size(); ii++)
           } // else
-        }
+        //}
       }
 
       //cout << " jjjjjjjjjjjjjjjjjj " << endl;

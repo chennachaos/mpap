@@ -1624,12 +1624,13 @@ void TreeNode<3>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
 
                   y0 = 0.0;    y1 = 3.0;  z0 = -2.0;    z1 = 2.0;
 
-                  fact = (36.0)*(1.0/(y1-y0)/(y1-y0))*(1.0/(z1-z0)/(z1-z0));
-                  specVal = DirichletData[aa][2]*fact*(y1-geom[1])*(geom[1]-y0)*(z1-geom[2])*(geom[2]-z0);  // plate Wall
+                  //fact = (36.0)*(1.0/(y1-y0)/(y1-y0))*(1.0/(z1-z0)/(z1-z0));
+                  // plate Wall
+                  //specVal = DirichletData[aa][2]*fact*(y1-geom[1])*(geom[1]-y0)*(z1-geom[2])*(geom[2]-z0);
 
                   // Turek cylinder
-                  //y0 = 0.0;    y1 = 0.41;  z0 = 0.0;    z1 = 0.41;
-                  //specVal = DirichletData[aa][2]*(6.0/y1/y1)*(y1-geom[1])*(geom[1]-y0)*(6.0/z1/z1)*(z1-geom[2])*(geom[2]-z0);
+                  y0 = 0.0;    y1 = 0.41;  z0 = 0.0;    z1 = 0.41;
+                  specVal = DirichletData[aa][2]*(6.0/y1/y1)*(y1-geom[1])*(geom[1]-y0)*(6.0/z1/z1)*(z1-geom[2])*(geom[2]-z0);
 
                   //y0 = 0.0;    y1 = 0.41;  z0 = -0.35;    z1 = 0.35; // Turek beam 3D
                   //fact = (4.0/(y1-y0)/(y1-y0))*(4.0/(z1-z0)/(z1-z0));
@@ -1914,6 +1915,118 @@ void TreeNode<3>::applyNeumannBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal,
 
   return;
 }
+
+
+
+template<>
+void TreeNode<3>::applyDerivativeBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Flocal, int domainCur)
+{
+  if( NeumannData.size() > 0 )
+  {
+      int  aa, ii, jj, gp, nGauss, TI, TIp1, TIp2, index, dir, side;
+      double  y0, y1, res, JacTemp;
+      double  dvol, specVal, freq;
+
+      VectorXd  N(totnlbf), NN(totnlbf);
+      myPoint  param, normal, geom;
+      double *gws;
+      myPoint *gps;
+
+      for(aa=0;aa<NeumannData.size();aa++)
+      {
+        side    = (int) (NeumannData[aa][0] - 1);
+        dir     = (int) (NeumannData[aa][1] - 1);
+        specVal = NeumannData[aa][2];
+
+        normal = GeomData->boundaryNormals[side];
+
+        if(domNums.size() > 1)
+        {
+          nGauss = BoundaryQuadrature[side].gausspoints.size() ;
+
+          gps = &(BoundaryQuadrature[side].gausspoints[0]);
+          gws = &(BoundaryQuadrature[side].gaussweights[0]);
+
+          JacTemp = 1.0;
+        }
+        else
+        {
+          nGauss = GeomData->boundaryQuadrature3D[side].gausspoints.size();
+
+          gps = &(GeomData->boundaryQuadrature3D[side].gausspoints[0]);
+          gws = &(GeomData->boundaryQuadrature3D[side].gaussweights[0]);
+
+          JacTemp = GeomData->boundaryJacobians[side][level];
+        }
+
+        for(gp=0; gp<nGauss; gp++)
+        {
+            param[0] = 0.5*(knotIncr[0] * gps[gp][0] + knotSum[0]);
+            param[1] = 0.5*(knotIncr[1] * gps[gp][1] + knotSum[1]);
+            param[2] = 0.5*(knotIncr[2] * gps[gp][2] + knotSum[2]);
+
+            dvol = JacTemp * gws[gp] ;
+
+            if(parent == NULL)
+            {
+              GeomData->computeBasisFunctions3D(knotBegin, knotIncr, param, N);
+            }
+            else
+            {
+              GeomData->computeBasisFunctions3D(knotBegin, knotIncr, param, NN);
+              N = SubDivMat*NN;
+            }
+
+            geom[0] = GeomData->computeCoord(0, param[0]);
+            geom[1] = GeomData->computeCoord(1, param[1]);
+            geom[2] = GeomData->computeCoord(2, param[2]);
+
+            //r = sqrt(xx*xx+yy*yy);
+            //val = 1.0+log(2.0*r);
+            //cout << xx << '\t' << yy << endl;
+
+            specVal = NeumannData[aa][2];
+
+            /*
+            if(side == 110)
+            {
+              if(dir == 0)
+              {
+                if(abs(yy) >= 0.75)
+                  specVal = 0.0;
+                else
+                  specVal = NeumannData[aa][2];
+              }
+            }
+            */
+
+            res = dvol * specVal * timeFunction[0].prop;
+            //res = dvol * specVal * tanh(20.0*mpapTime.cur);
+            //cout << specVal << '\t' << axsy << '\t' << dir << endl;
+
+            //res *= (0.5*(1.0-cos(2.0*PI*SolnData->ElemProp.data[6]*mpapTime.cur)));
+            //w1 = tanh(SolnData->ElemProp.data[5]*mpapTime.cur);
+
+            freq = 2.0*PI*10.0;
+            //res = dvol* specVal * (0.5*(1.0-cos(freq*mpapTime.cur)));
+            //res = dvol * specVal * sin(freq*mpapTime.cur);
+            //res *= tanh(50.0*timeFunction[0].prop);
+
+            //cout << " yy " << yy << '\t' << res << endl;
+            for(ii=0;ii<totnlbf2;ii++)
+              Flocal(ndof*ii+dir) += (res*N[ii]);
+
+        }// for(gp=0...
+      } // for(aa=0;aa<NeumannData.size();aa++)
+  } // if(NeumannData.size() > 0)
+
+  return;
+}
+
+
+
+
+
 
 
 

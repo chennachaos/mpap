@@ -38,6 +38,8 @@ void HBSplineCutFEM::timeUpdate()
 {
   //PetscPrintf(MPI_COMM_WORLD, "   HBSplineCutFEM::timeUpdate() ... STARTED \n\n");
 
+  double tstart = MPI_Wtime();
+
   IB_MOVED = false;
 
   SOLID_SOLVED = 0;
@@ -58,6 +60,9 @@ void HBSplineCutFEM::timeUpdate()
   MPI_Barrier(MPI_COMM_WORLD);
 
   updateIterStep();
+
+  double tend = MPI_Wtime();
+  PetscPrintf(MPI_COMM_WORLD, " HBSplineCutFEM::timeUpdate() took %f  milliseconds \n", (tend-tstart)*1000);
 
   //PetscPrintf(MPI_COMM_WORLD, "   HBSplineCutFEM::timeUpdate() ... FINISHED \n\n");
 
@@ -115,7 +120,12 @@ void HBSplineCutFEM::updateIterStep()
       else
         solverEigen->free();
 
+      double tstart = MPI_Wtime();
+
       prepareMatrixPattern();
+
+      double tend = MPI_Wtime();
+      PetscPrintf(MPI_COMM_WORLD, " prepareMatrixPattern() took %f  milliseconds \n", (tend-tstart)*1000);
 
       switch(slv_type)
       {
