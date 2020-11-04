@@ -645,7 +645,7 @@ void ImmersedFlexibleSolid::postProcess(int index)
 
     char fname[500];
 
-    sprintf(fname,"%s%s%02d%s%06d%s", files.Ofile.asCharArray(),"-FB",id,"-", index, ".vtu");
+    sprintf(fname,"%s%s%s%s%02d%s%06d%s", files.projDir.asCharArray(), "/", files.Ofile.asCharArray(),"-FB",id,"-", index, ".vtu");
 
     writerUGridVTK->SetFileName(fname);
     writerUGridVTK->SetInputData(uGridVTK);

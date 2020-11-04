@@ -89,25 +89,32 @@ void HBSplineCutFEM::plotGeom(int val1, bool flag2, int col, bool PLOT_KNOT_LINE
 
     // write parallel vtu master (pvtu) file
 
-    char fnameMaster[500];
+    if(DIM == 3)
+    {
+      char fnameMaster[500];
 
-    sprintf(fnameMaster,"%s%s", files.Ofile.asCharArray(),"-geom.pvtu");
+      cout << "files.projDir = " << files.projDir << endl;
+      //sprintf(fnameMaster,"%s%s", files.Ofile.asCharArray(),"-geom.pvtu");
+      sprintf(fnameMaster,"%s%s%s%s", files.projDir.asCharArray(), "/", files.Ofile.asCharArray(),"-geom.pvtu");
 
-    vtkSmartPointer<vtkXMLPUnstructuredGridWriter> writeruGridP  =  vtkSmartPointer<vtkXMLPUnstructuredGridWriter>::New();
+      vtkSmartPointer<vtkXMLPUnstructuredGridWriter> writeruGridP  =  vtkSmartPointer<vtkXMLPUnstructuredGridWriter>::New();
 
-    writeruGridP->SetFileName(fnameMaster);
-    writeruGridP->SetInputData(uGridVTK);
-    writeruGridP->SetNumberOfPieces(n_mpi_procs);
-    writeruGridP->SetStartPiece(0);
-    writeruGridP->SetEndPiece(n_mpi_procs-1);
-    writeruGridP->Write();
+      writeruGridP->SetFileName(fnameMaster);
+      writeruGridP->SetInputData(uGridVTK);
+      writeruGridP->SetNumberOfPieces(n_mpi_procs);
+      writeruGridP->SetStartPiece(0);
+      writeruGridP->SetEndPiece(n_mpi_procs-1);
+      writeruGridP->Write();
 
-    MPI_Barrier(MPI_COMM_WORLD);
+      MPI_Barrier(MPI_COMM_WORLD);
+    }
 
     // write individual vtu files
     char fnameLocal[500];
 
-    sprintf(fnameLocal,"%s%s%d%s", files.Ofile.asCharArray(),"-geom_",this_mpi_proc,".vtu");
+    //sprintf(fnameLocal,"%s%s%d%s", files.Ofile.asCharArray(),"-geom_",this_mpi_proc,".vtu");
+    //sprintf(fnameLocal,"%s%s%s%s%d%s", files.projDir.asCharArray(), "/", files.Ofile.asCharArray(),"-geom_",this_mpi_proc,".vtu");
+    sprintf(fnameLocal,"%s%s%s%s%s", files.projDir.asCharArray(), "/", files.Ofile.asCharArray(),"-geom",".vtu");
 
     writerUGridVTK->SetFileName(fnameLocal);
     writerUGridVTK->SetNumberOfPieces(1);
@@ -372,7 +379,8 @@ void  HBSplineCutFEM::postProcessFlow(int vartype, int vardir, int nCol, bool um
     {
       char fnameMaster[500];
 
-      sprintf(fnameMaster,"%s%s%06d%s", files.Ofile.asCharArray(),"-",filecount,".pvtu");
+      //sprintf(fnameMaster,"%s%s%06d%s", files.Ofile.asCharArray(),"-",filecount,".pvtu");
+      sprintf(fnameMaster,"%s%s%s%s%06d%s", files.projDir.asCharArray(), "/", files.Ofile.asCharArray(),"-",filecount,".pvtu");
 
       vtkSmartPointer<vtkXMLPUnstructuredGridWriter> writeruGridP  =  vtkSmartPointer<vtkXMLPUnstructuredGridWriter>::New();
 
@@ -390,7 +398,9 @@ void  HBSplineCutFEM::postProcessFlow(int vartype, int vardir, int nCol, bool um
 
     char fnameLocal[500];
 
-    sprintf(fnameLocal,"%s%s%06d%s", files.Ofile.asCharArray(),"-",filecount,".vtu");
+    //sprintf(fnameLocal,"%s%s%06d%s", files.Ofile.asCharArray(),"-",filecount,".vtu");
+    sprintf(fnameLocal,"%s%s%s%s%06d%s", files.projDir.asCharArray(), "/", files.Ofile.asCharArray(),"-",filecount,".vtu"); 
+
     //sprintf(fnameLocal,"%s%s%06d%s%d%s", files.Ofile.asCharArray(),"-",filecount,"_",this_mpi_proc,".vtu");
 
     writerUGridVTK->SetFileName(fnameLocal);

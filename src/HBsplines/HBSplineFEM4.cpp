@@ -32,7 +32,7 @@ void HBSplineFEM::plotGeom(int val1, bool flag2, int col, bool PLOT_KNOT_LINES, 
 
     char fname[500];
 
-    sprintf(fname,"%s%s", files.Ofile.asCharArray(),"-geom.vtu");
+    sprintf(fname,"%s%s%s%s", files.projDir.asCharArray(), "/", files.Ofile.asCharArray(),"-geom.vtu");
 
     writerUGridVTK->SetFileName(fname);
     writerUGridVTK->SetInputData(uGridVTK);
@@ -65,7 +65,7 @@ void HBSplineFEM::plotGeom1D(int val1, bool flag2, int col, bool PLOT_KNOT_LINES
           param[0] = knotEnd[0];
           computeGeometry(param, geom);
           pt1 = pointsVTK->InsertNextPoint(geom[0], 0.0, 0.0);
-          
+
           vertexVTK->GetPointIds()->SetId(0, pt0);
           uGridVTK->InsertNextCell(vertexVTK->GetCellType(), vertexVTK->GetPointIds());
 
@@ -167,9 +167,9 @@ void HBSplineFEM::plotGeom3D(int val1, bool flag2, int col, bool PLOT_KNOT_LINES
 
           for(ll=0;ll<8;ll++)
             hexVTK->GetPointIds()->SetId(ll, pt[ll]);
-          
+
           cellDataVTK->InsertNextValue(elems[ee]->getLevel());
-          
+
           uGridVTK->InsertNextCell(hexVTK->GetCellType(), hexVTK->GetPointIds());
        }
     }
@@ -232,7 +232,7 @@ void  HBSplineFEM::createPostProcessGrid2D(int vartype, int vardir, int nCol, bo
       cout << " resolution is too high for this postprocess algorithm "  << endl;
       exit(1);
     }
-    
+
     uGridVTK->Reset();
     pointsVTK->Reset();
     cellDataVTK->Reset();
@@ -253,7 +253,7 @@ void  HBSplineFEM::createPostProcessGrid2D(int vartype, int vardir, int nCol, bo
     node* nd1;
 
     vtkIdType pt[4];
-    
+
     //cout << " Llllllllll " << endl;
 //
     globalK2 *= 0.0;
@@ -262,7 +262,7 @@ void  HBSplineFEM::createPostProcessGrid2D(int vartype, int vardir, int nCol, bo
        //cout << elems[ee]->getID() << endl;
        elems[activeElements[e]]->MatrixToMapResult(1,1, globalK2);
     }
-    
+
     //cout << " Llllllllll " << endl;
 
     solver3.compute(globalK2);
@@ -291,7 +291,7 @@ void  HBSplineFEM::createPostProcessGrid2D(int vartype, int vardir, int nCol, bo
 
           fact = (knotEnd[1] - knotBegin[1])/resln[1];
           create_vector(knotBegin[1], knotEnd[1], fact, vv);
-           
+
           //cellDataVTK->InsertNextValue(0);
 
           for(jj=0;jj<vv.size();jj++)
@@ -310,12 +310,12 @@ void  HBSplineFEM::createPostProcessGrid2D(int vartype, int vardir, int nCol, bo
 
            // create the connectivity of elements/nodes
            // use triangle/quadrilateral as required
-              
+
            for(jj=0;jj<vv.size()-1;jj++)
            {
               ind1 = index + (resln[0]+1) * jj ;
               ind2 = index + (resln[0]+1) * (jj+1) ;
-                 
+
               for(ii=0;ii<uu.size()-1;ii++)
               {
                  pt[0] = ind1 + ii;
@@ -325,7 +325,7 @@ void  HBSplineFEM::createPostProcessGrid2D(int vartype, int vardir, int nCol, bo
 
                  for(ll=0;ll<4;ll++)
                     quadVTK->GetPointIds()->SetId(ll, pt[ll]);
-          
+
                  uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
               }
            }
@@ -349,7 +349,7 @@ void  HBSplineFEM::createPostProcessGrid2D(int vartype, int vardir, int nCol, bo
         scaVTK->SetTuple1(ii, 0.0);
         scaVTK2->SetTuple1(ii, 0.0);
       }
-    
+
       //assign nodal coordinates and field data to uGridVTK
       // no need to create lookup table here. All this stuff can be done in Paraview
 
@@ -370,9 +370,9 @@ void  HBSplineFEM::createPostProcessGrid2D(int vartype, int vardir, int nCol, bo
        vecVTK2->SetNumberOfTuples(count);
        scaVTK->SetNumberOfTuples(count);
        scaVTK2->SetNumberOfTuples(count);
-    
+
        double vec[3];
-    
+
        vec[0] = vec[1] = vec[2] = 0.0;
        for(ii=0;ii<count;ii++)
        {
@@ -381,7 +381,7 @@ void  HBSplineFEM::createPostProcessGrid2D(int vartype, int vardir, int nCol, bo
          scaVTK->SetTuple1(ii, 0.0);
          scaVTK2->SetTuple1(ii, 0.0);
        }
-    
+
        //assign nodal coordinates and field data to uGridVTK
        // no need to create lookup table here. All this stuff can be done in Paraview
 
@@ -395,7 +395,7 @@ void  HBSplineFEM::createPostProcessGrid2D(int vartype, int vardir, int nCol, bo
 
     char fname[500];
 
-    sprintf(fname,"%s%s", files.Ofile.asCharArray(),"-Grid2D.vtu");
+    sprintf(fname,"%s%s%s%s", files.projDir.asCharArray(), "/", files.Ofile.asCharArray(),"-Grid2D.vtu");
 
     writerUGridVTK->SetFileName(fname);
     writerUGridVTK->SetInputData(uGridVTK);
@@ -423,7 +423,7 @@ void  HBSplineFEM::postProcess1D(int vartype, int vardir, int nCol, bool umnxfla
     vector<int> bfs;
 
     node* nd1;
-    
+
     nd1 = elems[degree[0]];
     //nd1 = elems[0];
     AdvDiffExact1D  analy;
@@ -436,7 +436,7 @@ void  HBSplineFEM::postProcess1D(int vartype, int vardir, int nCol, bool umnxfla
            knotBegin = nd1->getKnotBegin();
            knotEnd = nd1->getKnotEnd();
            knotIncr  = nd1->getKnotIncrement();
-               
+
            fact = (knotEnd[0] - knotBegin[0])/resln[0];
 
            //
@@ -459,7 +459,7 @@ void  HBSplineFEM::postProcess1D(int vartype, int vardir, int nCol, bool umnxfla
 
                  param[0] = uu[kk];
                  GeomData.computeBasisFunctions1D(knotBegin, knotIncr, param, NN, dNN_dx, d2NN_dx2);
-                 
+
                  if(nd1->getParent() == NULL)
                  {
                    N = NN;
@@ -504,7 +504,7 @@ void  HBSplineFEM::postProcess1D(int vartype, int vardir, int nCol, bool umnxfla
     sprintf(fname,"%s%s%06d%s", files.Ofile.asCharArray(),"-",filecount, ".dat");
 
     //ofstream fout("advdiff-result-HB.dat");
-    
+
     ofstream fout(fname);
 
     if(fout.fail())
@@ -516,7 +516,7 @@ void  HBSplineFEM::postProcess1D(int vartype, int vardir, int nCol, bool umnxfla
     fout.setf(ios::fixed);
     fout.setf(ios::showpoint);
     fout.precision(8);
-   
+
     for(ii=0;ii<u1.size();ii++)
        fout << u1[ii] << setw(20) << outp[ii] << setw(20) << outp2[ii] << setw(20) << outp3[ii] << endl;
 
@@ -535,11 +535,11 @@ void  HBSplineFEM::postProcess1D(int vartype, int vardir, int nCol, bool umnxfla
     for(ii=1;ii<u1.size()-1;ii++)
     {
         pt1 = pointsVTK->InsertNextPoint(u1[ii+1], outp[ii+1], 0.0);
-          
+
         lineVTK->GetPointIds()->SetId(0,pt0);
         lineVTK->GetPointIds()->SetId(1,pt1);
         uGridVTK->InsertNextCell(lineVTK->GetCellType(), lineVTK->GetPointIds());
-          
+
         pt0 = pt1;
     }
 
@@ -601,7 +601,7 @@ void  HBSplineFEM::postProcess2D(int vartype, int vardir, int nCol, bool umnxfla
 
     //tend = time(0);
     //printf("It took %8.4f second(s) \n ", difftime(tend, tstart) );
-    
+
     //BiharmonicEx1 analy;
     PoissonEx3  analy;
 
@@ -615,7 +615,7 @@ void  HBSplineFEM::postProcess2D(int vartype, int vardir, int nCol, bool umnxfla
            knotBegin = nd1->getKnotBegin();
            knotEnd   = nd1->getKnotEnd();
            knotIncr  = nd1->getKnotIncrement();
-               
+
            fact = (knotEnd[0] - knotBegin[0])/resln[0];
            create_vector(knotBegin[0], knotEnd[0], fact, uu);
 
@@ -676,7 +676,7 @@ void  HBSplineFEM::postProcess2D(int vartype, int vardir, int nCol, bool umnxfla
            knotBegin = nd1->getKnotBegin();
            knotEnd   = nd1->getKnotEnd();
            knotIncr  = nd1->getKnotIncrement();
-               
+
            fact = (knotEnd[0] - knotBegin[0])/resln[0];
            create_vector(knotBegin[0], knotEnd[0], fact, uu);
 
@@ -708,13 +708,13 @@ void  HBSplineFEM::postProcess2D(int vartype, int vardir, int nCol, bool umnxfla
 
                  for(dd=0;dd<ndof;dd++)
                    outp2[dd].push_back(nd1->computeValue(dd, N));
-                 
+
                  //if(!LSFEM_FLAG)
                    //outp2[2].push_back(nd1->computeValue2(0, N));
 
                  //fact = nd1->computeValue(1, dN_dx);
                  //fact -= nd1->computeValue(0, dN_dy);
-                 
+
                  if(ndof == 3)
                  {
                    fact = nd1->computeVorticity(N);
@@ -740,9 +740,9 @@ void  HBSplineFEM::postProcess2D(int vartype, int vardir, int nCol, bool umnxfla
     vecVTK2->SetName("force");
     scaVTK->SetName("pres");
     scaVTK2->SetName("vortz");
-    
+
     double vec[3], vec2[3];
-    
+
     vec[2] = 0.0;
     for(ii=0;ii<outp2[0].size();ii++)
     {
@@ -763,7 +763,7 @@ void  HBSplineFEM::postProcess2D(int vartype, int vardir, int nCol, bool umnxfla
       vecVTK2->InsertTuple(ii, vec2);
     }
     //cout << " jjjjjjjjjjjjjjjjjj " << endl;
-    
+
     //assign nodal coordinates and field data to uGridVTK
     // no need to create lookup table here. All this stuff can be done in Paraview
 
@@ -777,7 +777,7 @@ void  HBSplineFEM::postProcess2D(int vartype, int vardir, int nCol, bool umnxfla
     char fname[500];
 
     //sprintf(fname,"%s%06d%s", "BSpline-",filecount, ".vtu");
-    sprintf(fname,"%s%s%06d%s", files.Ofile.asCharArray(),"-",filecount, ".vtu");
+    sprintf(fname,"%s%s%s%s%06d%s", files.projDir.asCharArray(), "/", files.Ofile.asCharArray(),"-",filecount, ".vtu");
 
     writerUGridVTK->SetFileName(fname);
     writerUGridVTK->SetInputData(uGridVTK);
@@ -804,7 +804,7 @@ void  HBSplineFEM::createPostProcessGrid3D(int vartype, int vardir, int nCol, bo
       cout << " resolution is too high for this postprocess algorithm "  << endl;
       exit(1);
     }
-    
+
     uGridVTK->Reset();
     pointsVTK->Reset();
 
@@ -822,7 +822,7 @@ void  HBSplineFEM::createPostProcessGrid3D(int vartype, int vardir, int nCol, bo
     node* nd1;
 
     vtkIdType pt[8];
-    
+
     index = 0;
     for(e=0;e<activeElements.size();e++)
     {
@@ -831,7 +831,7 @@ void  HBSplineFEM::createPostProcessGrid3D(int vartype, int vardir, int nCol, bo
            knotBegin = nd1->getKnotBegin();
            knotEnd   = nd1->getKnotEnd();
            knotIncr  = nd1->getKnotIncrement();
-               
+
            fact = (knotEnd[0] - knotBegin[0])/resln[0];
            create_vector(knotBegin[0], knotEnd[0], fact, uu);
 
@@ -865,7 +865,7 @@ void  HBSplineFEM::createPostProcessGrid3D(int vartype, int vardir, int nCol, bo
            n1 = uu.size();
            n2 = vv.size();
            n3 = ww.size();
-    
+
            nn = n1*n2;
 
            for(kk=0;kk<n3-1;kk++)
@@ -877,7 +877,7 @@ void  HBSplineFEM::createPostProcessGrid3D(int vartype, int vardir, int nCol, bo
                {
                   ind1 = ind5 + n1*jj;
                   ind2 = ind5 + n1*(jj+1);
-       
+
                   ind3 = ind6 + n1*jj;
                   ind4 = ind6 + n1*(jj+1);
 
@@ -887,10 +887,10 @@ void  HBSplineFEM::createPostProcessGrid3D(int vartype, int vardir, int nCol, bo
                      pt[1] = pt[0]+1;         pt[5] = pt[4]+1;
                      pt[3] = ind2+ii;         pt[7] = ind4+ii;
                      pt[2] = pt[3]+1;         pt[6] = pt[7]+1;
-              
+
                      for(ll=0;ll<8;ll++)
                         hexVTK->GetPointIds()->SetId(ll, pt[ll]);
-          
+
                      uGridVTK->InsertNextCell(hexVTK->GetCellType(), hexVTK->GetPointIds());
                   }
                }
@@ -915,7 +915,7 @@ void  HBSplineFEM::createPostProcessGrid3D(int vartype, int vardir, int nCol, bo
         scaVTK->SetTuple1(ii, 0.0);
         scaVTK2->SetTuple1(ii, 0.0);
       }
-    
+
       //assign nodal coordinates and field data to uGridVTK
       // no need to create lookup table here. All this stuff can be done in Paraview
 
@@ -934,9 +934,9 @@ void  HBSplineFEM::createPostProcessGrid3D(int vartype, int vardir, int nCol, bo
        vecVTK2->SetNumberOfTuples(count);
        scaVTK->SetNumberOfTuples(count);
        scaVTK2->SetNumberOfTuples(count);
-    
+
        double vec[3];
-    
+
        vec[0] = vec[1] = vec[2] = 0.0;
        for(ii=0;ii<count;ii++)
        {
@@ -945,7 +945,7 @@ void  HBSplineFEM::createPostProcessGrid3D(int vartype, int vardir, int nCol, bo
          scaVTK->SetTuple1(ii, 0.0);
          scaVTK2->SetTuple1(ii, 0.0);
        }
-    
+
        //assign nodal coordinates and field data to uGridVTK
        // no need to create lookup table here. All this stuff can be done in Paraview
 
@@ -959,7 +959,7 @@ void  HBSplineFEM::createPostProcessGrid3D(int vartype, int vardir, int nCol, bo
 
     char fname[500];
 
-    sprintf(fname,"%s%s", files.Ofile.asCharArray(),"-Grid2D.vtu");
+    sprintf(fname,"%s%s%s%s", files.projDir.asCharArray(), "/", files.Ofile.asCharArray(),"-Grid2D.vtu");
 
     writerUGridVTK->SetFileName(fname);
     writerUGridVTK->SetInputData(uGridVTK);
@@ -1005,7 +1005,7 @@ void  HBSplineFEM::postProcess3D(int vartype, int vardir, int nCol, bool umnxfla
            knotBegin = nd1->getKnotBegin();
            knotEnd   = nd1->getKnotEnd();
            knotIncr  = nd1->getKnotIncrement();
-               
+
            fact = (knotEnd[0] - knotBegin[0])/resln[0];
            create_vector(knotBegin[0], knotEnd[0], fact, uu);
 
@@ -1014,11 +1014,11 @@ void  HBSplineFEM::postProcess3D(int vartype, int vardir, int nCol, bool umnxfla
 
            fact = (knotEnd[2] - knotBegin[2])/resln[2];
            create_vector(knotBegin[2], knotEnd[2], fact, ww);
-              
+
            //cout << uu << endl;
            //cout << vv << endl;
            //cout << ww << endl;
-          
+
            //create the coordinates of the pointsVTK (nodes in FEM)
 
            for(kk=0;kk<ww.size();kk++)
@@ -1075,7 +1075,7 @@ void  HBSplineFEM::postProcess3D(int vartype, int vardir, int nCol, bool umnxfla
            knotBegin = nd1->getKnotBegin();
            knotEnd   = nd1->getKnotEnd();
            knotIncr  = nd1->getKnotIncrement();
-               
+
            fact = (knotEnd[0] - knotBegin[0])/resln[0];
            create_vector(knotBegin[0], knotEnd[0], fact, uu);
 
@@ -1141,9 +1141,9 @@ void  HBSplineFEM::postProcess3D(int vartype, int vardir, int nCol, bool umnxfla
     vecVTK->SetName("vel");
     vecVTK2->SetName("vortz");
     scaVTK->SetName("pres");
-    
+
     double vec[3], vec2[3];
-    
+
     for(ii=0;ii<outp2[0].size();ii++)
     {
       vec[0] = outp2[0][ii];
@@ -1159,7 +1159,7 @@ void  HBSplineFEM::postProcess3D(int vartype, int vardir, int nCol, bool umnxfla
 
       vecVTK2->InsertTuple(ii, vec2);
     }
-    
+
     //assign nodal coordinates and field data to uGridVTK
     // no need to create lookup table here. All this stuff can be done in Paraview
 
@@ -1175,7 +1175,7 @@ void  HBSplineFEM::postProcess3D(int vartype, int vardir, int nCol, bool umnxfla
     char fname[500];
 
     //sprintf(fname,"%s%06d%s", "BSpline-",filecount, ".vtu");
-    sprintf(fname,"%s%s%06d%s", files.Ofile.asCharArray(),"-",filecount, ".vtu");
+    sprintf(fname,"%s%s%s%s%06d%s", files.projDir.asCharArray(), "/", files.Ofile.asCharArray(),"-",filecount, ".vtu");
 
     writerUGridVTK->SetFileName(fname);
     writerUGridVTK->SetInputData(uGridVTK);
@@ -1218,7 +1218,7 @@ void HBSplineFEM::plotGaussPoints()
 
            knotIncr  = nd1->getKnotIncrement();
            knotSum   = nd1->getKnotSum();
-               
+
           //getGaussPoints1D(nGP, gausspoints1, gaussweights1);
           //getGaussPoints1D(nGP, gausspoints2, gaussweights2);
 
@@ -1243,7 +1243,7 @@ void HBSplineFEM::plotGaussPoints()
     }
 
     uGridVTK2->SetPoints(pointsVTK2);
-    
+
     //cellDataVTK2->SetName("IsGhost");
     //scaVTK3->SetName("dist");
     //scaVTK4->SetName("InOut");
@@ -1253,7 +1253,7 @@ void HBSplineFEM::plotGaussPoints()
 
     char fname[500];
 
-    sprintf(fname,"%s%s", files.Ofile.asCharArray(),"-Gausspoints.vtu");
+    sprintf(fname,"%s%s%s%s", files.projDir.asCharArray(), "/", files.Ofile.asCharArray(),"-Gausspoints.vtu");
 
     writerUGridVTK->SetFileName(fname);
     writerUGridVTK->SetInputData(uGridVTK2);

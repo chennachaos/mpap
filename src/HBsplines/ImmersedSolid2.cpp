@@ -313,8 +313,8 @@ void  ImmersedSolid::setImmersedFaces()
         //polyList->InsertNextCell(vertexVTK2);
       }
 
-      char fname[200];
-      sprintf(fname,"%s%s%d%s", files.Ofile.asCharArray(), "-immersedsolid-", id,".vtu");
+      char fname[500];
+      sprintf(fname,"%s%s%s%s%d%s", files.projDir.asCharArray(), "/", files.Ofile.asCharArray(), "-immersedsolid-", id,".vtu");
 
       uGridVTK2->SetPoints(pointsVTK);
 
@@ -458,7 +458,7 @@ void  ImmersedSolid::setImmersedFaces()
         //vtkSmartPointer<vtkMassProperties>  massProp =     vtkSmartPointer<vtkMassProperties>::New();
 
         char fname1[200];
-        sprintf(fname1,"%s%s%d%s", files.Ofile.asCharArray(), "-immersedsolid-", id,".vtp");
+        sprintf(fname1,"%s%s%s%s%d%s", files.projDir.asCharArray(), "/", files.Ofile.asCharArray(), "-immersedsolid-", id,".vtp");
 
         writerPolyData->SetFileName(fname1);
         writerPolyData->SetInputData(polyDataVTK);

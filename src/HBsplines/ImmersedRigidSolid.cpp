@@ -6,10 +6,12 @@
 #include "FunctionsProgram.h"
 #include "MpapTime.h"
 #include "TimeFunction.h"
+#include "Files.h"
 
 
 extern MpapTime mpapTime;
 extern List<TimeFunction> timeFunction;
+extern Files files;
 
 
 ImmersedRigidSolid::ImmersedRigidSolid()
@@ -1468,8 +1470,8 @@ void ImmersedRigidSolid::postProcess(int index)
 
   vtkSmartPointer<vtkXMLPolyDataWriter>  writerPolyData =   vtkSmartPointer<vtkXMLPolyDataWriter>::New();
 
-  char fname1[50];
-  sprintf(fname1,"%s%d%s", "immersedpoly-", id,".vtp");
+  char fname1[500];
+  sprintf(fname1,"%s%s%s%s%d%s", files.projDir.asCharArray(), "/", files.Ofile.asCharArray(), "-immersedpoly-", id,".vtp");
 
   writerPolyData->SetFileName(fname1);
   writerPolyData->SetInputData(polyDataVTK);
