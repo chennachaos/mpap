@@ -67,7 +67,7 @@ cutfem parameters
 
 immersed body data
 ! R/F  P/L  penalty  Nitsche  NitscheFact
-   1    1     00.0       1        -1.0
+   1    1     100.0       1        -1.0
 
 
 immersed points 
