@@ -493,9 +493,30 @@ int ImmersedFlexibleSolid::calcStiffnessAndResidual(int printRes, bool zeroMtx, 
 
     applyExternalForces();
 
+    if(mpapTime.cur >= 100000.0)  addControlTerms();
 
-  if(mpapTime.cur >= 10.0)
-  {
+
+    //cout << " rhsVec " << endl;        printVector(&(rhsVec[0]), totalDOF);
+
+    //printf("\n rhsVec norm = %12.6E \n", solver->rhsVec.norm());
+
+    firstIter = false;
+    SolnData.firstIter = firstIter;
+    rNormPrev = rNorm;
+    rNorm     = solver->rhsVec.norm();
+
+    //printf(" ImmersedFlexibleSolid:  %11.4e \n", rNorm);
+
+    solver->currentStatus = ASSEMBLY_OK;
+
+    return 0;
+}
+
+
+
+
+void  ImmersedFlexibleSolid::addControlTerms()
+{
     int  nboundnodes = 11, nn, n1, n2, ii;
     int boundnodes[] = {201, 402, 603, 804, 1005, 1206, 1407, 1608, 1809, 2010, 2211};
     //double  Kd = 0.0/2.0, Kv = 0.5/2.0;
@@ -534,23 +555,9 @@ int ImmersedFlexibleSolid::calcStiffnessAndResidual(int printRes, bool zeroMtx, 
         solver->rhsVec[n2]              -= (Kv*SolnData.var1DotCur[n1]);
       }
     }
-  }
-    //cout << " rhsVec " << endl;        printVector(&(rhsVec[0]), totalDOF);
 
-    //printf("\n rhsVec norm = %12.6E \n", solver->rhsVec.norm());
-
-    firstIter = false;
-    SolnData.firstIter = firstIter;
-    rNormPrev = rNorm;
-    rNorm     = solver->rhsVec.norm();
-
-    //printf(" ImmersedFlexibleSolid:  %11.4e \n", rNorm);
-
-    solver->currentStatus = ASSEMBLY_OK;
-
-    return 0;
+    return;
 }
-
 
 
 

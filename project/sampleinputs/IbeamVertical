@@ -33,7 +33,7 @@ number of elements
 
 fluid properties
 ! nGP flag  axsy   rho    mu      fx    fy  fz   tauSUPG  tauPSPG  tauLSIC
-   2    0    0     1.0   0.01    0.0   0.0  0.0    1.0      1.0      1.0      0.0    0.0
+   2    0    0     1.0   0.01    0.0   0.0  0.0    1.0      1.0      0.0      0.0    0.0
 
 
 refinement type
@@ -57,7 +57,7 @@ dirichlet boundary conditions
 
 
 staggered or monolithic
-0  2  0.2  0.0  0.0
+0  2  0.05  0.0  0.0
 
 
 cutfem parameters
@@ -67,7 +67,7 @@ cutfem parameters
 
 immersed body data
 ! R/F  P/L  penalty  Nitsche  NitscheFact
-   1    1     100.0       1        -1.0
+   1    1     00.0       1        -1.0
 
 
 immersed points 
@@ -498,7 +498,7 @@ immersed integration elements
 
 
 element type
- 1  LagrangeElem2DBbarFbar      4  0  1  2  1.0  5.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  
+ 1  LagrangeElem2DBbarFbar      4  0  1  2  1.0  1.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  
 
 ! 1  LagrangeElem2DStructSolidQuad4Node    4  0  1  2  1.0  1.0  0.0   0.0  0.0   0.0  0.0   0.0
 
@@ -862,7 +862,7 @@ immersed body output
 
 control parameters
 ! tol    tis   tis_param
- 1.0e-6   2       0.0
+ 1.0e-6   4       0.0
 
 
 
@@ -899,7 +899,7 @@ BATCH
 anly,solv,,27,1,8,1,1,1,1
 !anly,solv,,27,1,8,3,1,1,1
 chen,data,,27,2,2,2,1
-dt,,0.04
+dt,,0.01
 wrnd
 vtk,flow,,27,1,1,1,10,1,1,1,0,0,1
 wait,mous
@@ -922,7 +922,8 @@ loop,,4.99999999,2
   next
   prnt
   !if,conv
-    vtk,flow,,27,1,1,1,10,1,1,1,0,0,1
+    !vtk,flow,,27,1,1,1,10,1,1,1,0,0,1
+    vtk,flow,,27,1,1,1,1,1,1,1,0,0,1
     wrnd
     !dt,stck
   !else

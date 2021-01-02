@@ -59,7 +59,7 @@ dirichlet boundary conditions
 
 
 staggered or monolithic
- 0  1  0.1  0.0
+ 0  2  0.1  0.0
 
 
 cutfem parameters
@@ -3077,20 +3077,20 @@ immersed integration elements
 
 
 element type
-! 1  LagrangeElem2DBbarFbar      2  0  1  2  1.0  10.0  0.0   0.0  0.0   0.0  0.0   0.0
+! 1  LagrangeElem2DBbarFbar                4  0  1  2  1.0  10.0  0.0   0.0  0.0   0.0  0.0   0.0
 
- 1  LagrangeElem2DStructSolidQuad4Node    4  0  0  2  1.0  10.0  0.0  0.0  0.0  0.0  0.0  !FSI2
+ 1  LagrangeElem2DStructSolidQuad4Node    4  0  1  2  1.0  10.0  0.0  0.0  0.0  0.0  0.0  !FSI2
 
 ! 1  LagrangeElem2DStructSolidQuad4Node    2  0  1  2  1.0  1.0  0.0  0.0  0.0  0.0  0.0  !FSI3
 
 
 
 material type
- 1  smallStrainElasticity  2333.33333  500.000
+! 1  smallStrainElasticity  2333.33333  500.000
 
 ! 1  StVenantKirchhoffElasticity  2333333.33  500000.000
 
-! 1  StVenantKirchhoffElasticity  2333.33333  500.000  !FSI2
+ 1  StVenantKirchhoffElasticity  2333.33333  500.000  !FSI2
 
 ! 1  StVenantKirchhoffElasticity  9333.333   2000.000  !FSI3
 
@@ -5520,7 +5520,7 @@ immersed body output
 
 control parameters
 !  tol    tis   tis_param
-  1.0e-6   2      0.0
+  1.0e-6   4      0.0
 
 
 
@@ -5567,7 +5567,7 @@ BATCH
 anly,solv,,28,1,8,3,1,1,1
 !anly,solv,,28,1,10,3,1,1,1
 chen,data,,28,2,2,2,1
-dt,,0.002
+dt,,0.008
 wrnd
 wait,mous
 loop,,19.9999999999,2
@@ -5577,7 +5577,7 @@ loop,,19.9999999999,2
   time
   updt
   loop,,15
-    wait,mous
+    !wait,mous
     anly,tang,,28,1,1
     if,conv
       prnt,CONVERGED
@@ -5589,7 +5589,8 @@ loop,,19.9999999999,2
   next
   prnt
   if,conv
-    vtk,flow,,28,1,1,1,10,1,1,1,0,0,1
+    !vtk,flow,,28,1,1,1,10,1,1,1,0,0,1
+    vtk,flow,,28,1,1,1,1,1,1,1,0,0,1
     wrnd
     dt,stck
   else

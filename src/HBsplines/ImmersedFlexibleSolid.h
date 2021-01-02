@@ -23,7 +23,7 @@ class ImmersedFlexibleSolid : public ImmersedSolid
         LagrangeElement  **elems;
 
         ImmersedFlexibleSolid();
-        
+
         ImmersedFlexibleSolid(int dd);
 
         virtual ~ImmersedFlexibleSolid();
@@ -85,6 +85,8 @@ class ImmersedFlexibleSolid : public ImmersedSolid
         virtual void  setBoundaryConditions(vector<vector<double> >& vectemp);
 
         void  prepareMatrixPattern();
+
+        void  addControlTerms();
 
         virtual  void  writeResult(ofstream&);
 

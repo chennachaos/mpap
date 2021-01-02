@@ -392,8 +392,8 @@ void HBSplineBase::setSolver(int slv, int *parm, bool cIO)
     if(solverPetsc != NULL)
       solverPetsc->checkIO = cIO;
 
-    if(tis > 0)
-      setInitialConditions();
+    //if(tis > 0)
+      //setInitialConditions();
 
     return;
 }

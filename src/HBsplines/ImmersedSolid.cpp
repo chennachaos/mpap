@@ -119,7 +119,7 @@ void ImmersedSolid::reset()
 
 bool ImmersedSolid::converged()
 {
-  tol=1.0e-4;
+  tol=1.0e-6;
 
   if (rNorm < tol && localStiffnessError == 0)
   {
