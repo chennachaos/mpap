@@ -2756,12 +2756,12 @@ void TreeNode<2>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
                   //specVal = DirichletData[aa][2]*(1.0-(50.0-geom[1])*(50.0-geom[1])/2500.0);
 
                   // vertical beam - Wall
-                  y0 = 0.0;    y1 = 0.6;
-                  specVal = DirichletData[aa][2]*(6.0/y1/y1)*(y1-geom[1])*(geom[1]-y0);
+                  //y0 = 0.0;    y1 = 0.6;
+                  //specVal = DirichletData[aa][2]*(6.0/y1/y1)*(y1-geom[1])*(geom[1]-y0);
 
                   // Turek beam
-                  //y0 = 0.0;    y1 = 0.41;
-                  //specVal = DirichletData[aa][2]*(6.0/y1/y1)*(y1-geom[1])*(geom[1]-y0);
+                  y0 = 0.0;    y1 = 0.41;
+                  specVal = DirichletData[aa][2]*(6.0/y1/y1)*(y1-geom[1])*(geom[1]-y0);
 
                   //specVal = DirichletData[aa][2]*(y1*y1-geom[1]*geom[1])/0.5625;
 
