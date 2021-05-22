@@ -1192,7 +1192,8 @@ void  HBSplineCutFEM::postProcessAdapIntegration3D(int vartype, int vardir, int 
           {
             if( adapNd2->isLeaf()  )
             {
-              if( adapNd2->getDomainNumber() <= 0 && (adapNd2->getLevel() < 3) )
+              //if( adapNd2->getDomainNumber() <= 0 && (adapNd2->getLevel() < 3) )
+              if( adapNd2->getDomainNumber() <= 0 )
               {
                 knotBeginTemp = adapNd2->getKnotBegin();
                 knotEndTemp   = adapNd2->getKnotEnd();
