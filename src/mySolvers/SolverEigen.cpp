@@ -263,9 +263,6 @@ int  SolverEigen::solve()
 
     BiCGSTAB<SparseMatrixXd, IncompleteLUT<double> > solver;
 
-    solver.preconditioner().setDroptol(1.0e-3);
-    solver.preconditioner().setFillfactor(3);
-    
     //BiCGSTAB<SparseMatrixXd> solver;
 
     //GMRES<SparseMatrixXd, IncompleteLUT<double> > solver;
@@ -274,12 +271,14 @@ int  SolverEigen::solve()
 
     //ConjugateGradient<SparseMatrixXd, Lower, IncompleteLUT<double> >   solver;
 
-    
     //solver.set_restart(100);
     //solver.setEigenv(10);
 
-    solver.setMaxIterations(500);
-    solver.setTolerance(1.0e-10);
+    solver.preconditioner().setDroptol(1.0e-3);
+    solver.preconditioner().setFillfactor(1);
+
+    solver.setMaxIterations(2000);
+    solver.setTolerance(1.0e-8);
 
     tstart = time(0);
   
