@@ -17,7 +17,7 @@ void ImmersedFlexibleSolid::initialise()
 {
   SolnData.STAGGERED = STAGGERED;
 
-  setSolver(1);
+  setSolver(4);
   setTimeParam();
   computeInitialAcceleration();
 
@@ -54,7 +54,7 @@ void ImmersedFlexibleSolid::setSolver(int slv, int *parm, bool cIO)
 
             solver = (SolverEigen*) new SolverEigen;
 
-            solver->setAlgorithmType(1);
+            solver->setAlgorithmType(2);
 
             prepareMatrixPattern();
 
