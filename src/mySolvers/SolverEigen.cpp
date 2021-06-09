@@ -278,7 +278,7 @@ int  SolverEigen::solve()
     //solver.set_restart(100);
     //solver.setEigenv(10);
 
-    solver.setMaxIterations(500);
+    solver.setMaxIterations(2000);
     solver.setTolerance(1.0e-10);
 
     tstart = time(0);
