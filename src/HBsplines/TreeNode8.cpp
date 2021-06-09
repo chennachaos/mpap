@@ -2656,8 +2656,8 @@ void TreeNode<2>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
     //}
 
 
-    int ii, jj, aa, gp, nGauss, TI, TIp1, TIp2, index, TJ, TJp1, TJp2, dir, side;
-    double  theta, y0, y1, Ta[3], Tb[3], res, JacTemp, temp, NitscheFact, pres;
+    int ii, jj, aa, gp, nGauss, TI, TIp1, TIp2, index, TJ, TJp1, TJp2, dir, side, profile_type;
+    double  theta, l0, l1, Ta[3], Tb[3], res, JacTemp, temp, NitscheFact, pres;
     double  dvol, specVal, PENALTY, Jac, fact, rad, R, bb1, bb2, a;
     bool  isNitsche;
 
@@ -2684,15 +2684,23 @@ void TreeNode<2>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
         isNitsche   = false;
         side        = (int) (DirichletData[aa][0] - 1);
         dir         = (int) (DirichletData[aa][1] - 1);
-        specVal     = DirichletData[aa][2];
-        PENALTY     = DirichletData[aa][3];
-        isNitsche   = ( (int) DirichletData[aa][4] == 1 );
-        NitscheFact = DirichletData[aa][5];
+
+        PENALTY     = DirichletData[aa][2];
+        isNitsche   = ( (int) DirichletData[aa][3] == 1 );
+        NitscheFact = DirichletData[aa][4];
 
         //PENALTY    = 1.0/max(hx, hy);                     // GeomData-> degree;
 
         //for symmetric Nitsche method   -> NitscheFact =  1.0
         //for unsymmetric Nitsche method -> NitscheFact = -1.0
+
+
+        profile_type  = (int) DirichletData[aa][5];
+        specVal       = DirichletData[aa][6];
+        l0            = DirichletData[aa][7];
+        l1            = DirichletData[aa][8];
+
+
 
         normal = GeomData->boundaryNormals[side];
 
@@ -2744,58 +2752,25 @@ void TreeNode<2>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
                 dN_dy = SubDivMat*dNN_dy;
             }
 
-            specVal = DirichletData[aa][2];
+            // constant value
+            if(profile_type == 1 )
+            {
+                specVal = DirichletData[aa][6];
+            }
+            // parabolic profile
+            else
+            {
+                // faces parallel to X-axis
+                if(dir == 0 || dir == 1)
+                  specVal = DirichletData[aa][6]*(6.0/(l1-l0)/(l1-l0))*(l1-geom[1])*(geom[1]-l0);
+                // faces parallel to Y-axis
+                else
+                  specVal = DirichletData[aa][6]*(6.0/(l1-l0)/(l1-l0))*(l1-geom[0])*(geom[0]-l0);
+            }
 
-              //
-              if(side == 0 )
-              {
-                if(dir == 0)
-                {
-                  // beam Bathe
-                  //y0 = 0.0;    y1 = 0.5;
-                  //specVal = DirichletData[aa][2]*(1.0-(50.0-geom[1])*(50.0-geom[1])/2500.0);
-
-                  // vertical beam - Wall
-                  //y0 = 0.0;    y1 = 0.6;
-                  //specVal = DirichletData[aa][2]*(6.0/y1/y1)*(y1-geom[1])*(geom[1]-y0);
-
-                  // Turek beam
-                  y0 = 0.0;    y1 = 0.41;
-                  specVal = DirichletData[aa][2]*(6.0/y1/y1)*(y1-geom[1])*(geom[1]-y0);
-
-                  //specVal = DirichletData[aa][2]*(y1*y1-geom[1]*geom[1])/0.5625;
-
-                  // throttle valve
-                  //specVal = DirichletData[aa][2]*(6.0/(y1-y0)/(y1-y0))*(y1-geom[1])*(geom[1]-y0);
-                  //if(geom[1] >= y0 && geom[1] <= y1)
-
-                  // heart-valve benchmark
-                  //y0 = 0.0;    y1 = 1.61;
-                  //specVal = DirichletData[aa][2]*(y1-geom[1])*(geom[1]-y0);
-
-                  // single-leaf benchmark
-                  //y0 = 0.0;    y1 = 2.0;
-                  //specVal = DirichletData[aa][2]*(y1-geom[1])*(geom[1]-y0);
-
-                  // heart-valve contacts
-                  //y0 = 0.0;    y1 = 1.85;
-                  //specVal = DirichletData[aa][2]*(y1-geom[1])*(geom[1]-y0);
-
-                  // Neumann problem
-                  //y0 = 0.0;    y1 = 1.0;
-                  //specVal = DirichletData[aa][2]*(y1-geom[1])*(geom[1]-y0);
-
-                  //else
-                    //specVal = 0.0;
-                    //specVal = DirichletData[aa][2]*(1.0-geom[1]*geom[1]);
-                }
-              }
-              //
-
-            //specVal = GeomData->analyDBC->computeValue(dir, xx, yy);
-            //specVal = analy.computeValue(dir, geom[0], geom[1]);
-
+            // multiply the velocity value with the time factor
             specVal *= timeFunction[0].prop;
+
 
             res = specVal - computeValue(dir, N);
 
