@@ -77,36 +77,13 @@ int Macro::exec(void)
     case  20: return macro20(*this);
 
 
-    case 201: return macro201(*this); 
-    case 202: return macro202(*this); 
-    case 203: return macro203(*this); 
-    case 204: return macro204(*this); 
-    case 205: return macro205(*this); 
-    case 206: return macro206(*this); 
-    case 207: return macro207(*this); 
-    case 208: return macro208(*this); 
-    case 209: return macro209(*this); 
-    case 210: return macro210(*this); 
-    case 211: return macro211(*this); 
-    case 212: return macro212(*this); 
-    case 213: return macro213(*this); 
-    case 214: return macro214(*this); 
-    case 215: return macro215(*this); 
-    case 216: return macro216(*this); 
-    case 217: return macro217(*this); 
-    case 218: return macro218(*this); 
-    case 219: return macro219(*this); 
-    case 220: return macro220(*this); 
-    case 221: return macro221(*this); 
-    case 222: return macro222(*this); 
-    case 223: return macro223(*this); 
-    case 224: return macro224(*this); 
-    case 225: return macro225(*this); 
-    case 226: return macro226(*this); 
-    case 227: return macro227(*this); 
-    case 228: return macro228(*this); 
-    case 229: return macro229(*this); 
-    case 230: return macro230(*this); 
+    case 201: return macro201(*this);
+    case 202: return macro202(*this);
+    case 203: return macro203(*this);
+    case 204: return macro204(*this);
+    case 205: return macro205(*this);
+    case 206: return macro206(*this);
+    case 207: return macro207(*this);
   }
   return 0;
 }

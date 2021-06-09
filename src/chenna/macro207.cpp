@@ -1,10 +1,8 @@
-
 #include "Macro.h"
 #include "DomainTree.h"
+#include "HBSplineBase.h"
 #include "HBSplineFEM.h"
 #include "HBSplineCutFEM.h"
-#include "StandardFEM.h"
-
 
 
 extern DomainTree domain;
@@ -14,9 +12,9 @@ int macro207(Macro &macro)
 {
   if (!macro) 
   { 
-    macro.name = "pout";
+    macro.name = "fsi";
     macro.type = "chen";
-    macro.what = "print data onto screen";
+    macro.what = " FSI schemes ";
 
     macro.sensitivity[INTER] = true;
     macro.sensitivity[BATCH] = true;
@@ -25,18 +23,15 @@ int macro207(Macro &macro)
 
     macro.db.frameButtonBox();
 
-    macro.db.addRadioBox("*ufull","Uinit","resi","stif","CnAr","reac","kvts","cntr","mpat","bfns","elIV");
+    macro.db.addRadioBox("*StagForcePred","StagDispPred","MonoFixedPointFP","MonoFixedPointDP");
+
+    macro.db.frameButtonBox();
+
+    macro.db.addTextField("Niter = ",10);
     
+    macro.db.addTextField("Tol = ",0.0001,6);
+
     macro.db.frameRadioBox();
-
-    macro.db.frameButtonBox();
-
-    macro.db.addTextField(" patch = ",1);
-
-    macro.db.addTextField(" elem # = ",1);
-
-    macro.db.frameButtonBox();
-
 
     // and other stuff
 
@@ -44,49 +39,53 @@ int macro207(Macro &macro)
   }
 //--------------------------------------------------------------------------------------------------
 
- // std::cout << "          " << macro << "\n\n";
+  int  domType, id, Niter, soltype;
+  double  tol;
+  bool flag1;
 
-  int  type, id, val, patch, elenum;
+  domType  = roundToInt(macro.p[0]);
+  id       = roundToInt(macro.p[1]) - 1;
+  soltype  = roundToInt(macro.p[2]);
+  Niter    = roundToInt(macro.p[3]);
+  tol      = macro.p[4];
 
-  type    = roundToInt(macro.p[0]);
-  id      = roundToInt(macro.p[1]) - 1;
-  val     = roundToInt(macro.p[2]);
-  patch   = roundToInt(macro.p[3])-1;
-  elenum  = roundToInt(macro.p[4])-1;
+  //cout << " domType = " << domType << endl;
+  //cout << " id = " << id << endl;
+  //cout << " soltype = " << soltype << endl;
 
-    //if(type == 26)
-    //{
-      //if(val<11)
-        //isogeometricFEM(domain(type,id)).printData(val, patch);
-      //else
-        //isogeometricFEM(domain(type,id)).printElemInvVars(patch, elenum);
-    //}
-
-    if(type == 27)
+  if(domType == 27)
+  {
+    if(soltype == 1)
+      hbsplineFEM(domain(domType,id)).fsi_staggered_force_predictor(Niter, tol);
+    else if(soltype == 2)
+      hbsplineFEM(domain(domType,id)).fsi_staggered_displacement_predictor(Niter, tol);
+    else if(soltype == 3)
+      hbsplineFEM(domain(domType,id)).fsi_monolithic_fixedpoint_forcePred(Niter, tol);
+    else if(soltype == 4)
+      hbsplineFEM(domain(domType,id)).fsi_monolithic_fixedpoint_dispPred(Niter, tol);
+    else
     {
-      if(val<11)
-        hbsplineFEM(domain(type,id)).printData(val, patch);
-      else
-        printf("\n hbsplineFEM(domain(type,id)).printData .... Index out of range \n");
+      cout << " macro230 ... FSI schemes ... undefined for this domain " << endl;
     }
-
-    if(type == 28)
+  }
+  else if(domType == 28)
+  {
+    if(soltype == 1)
+      hbsplineCutFEM(domain(domType,id)).fsi_staggered_force_predictor(Niter, tol);
+    else if(soltype == 2)
+      hbsplineCutFEM(domain(domType,id)).fsi_staggered_displacement_predictor(Niter, tol);
+    else if(soltype == 3)
+      hbsplineCutFEM(domain(domType,id)).fsi_monolithic_fixedpoint_forcePred(Niter, tol);
+    else if(soltype == 4)
+      hbsplineCutFEM(domain(domType,id)).fsi_monolithic_fixedpoint_dispPred(Niter, tol);
+    else
     {
-      if(val<11)
-        hbsplineCutFEM(domain(type,id)).printData(val, patch);
-      else
-        printf("\n hbsplineFEM(domain(type,id)).printData .... Index out of range \n");
+      cout << " macro230 ... FSI schemes ... undefined for this domain " << endl;
     }
+  }
 
-    //if(type == 30)
-    //{
-      //if(val<11)
-        //hbscutFEMElasticity(domain(type,id)).printData(val, patch);
-      //else
-        //printf("\n hbsplineFEM(domain(type,id)).printData .... Index out of range \n");
-    //}
+  //--------------------------------------------------------------------------------------------------
 
-//--------------------------------------------------------------------------------------------------
   return 0;  
 }
 
