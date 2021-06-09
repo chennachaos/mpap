@@ -1,41 +1,35 @@
 
 #include "Macro.h"
-#include "DomainTree.h"
+#include "FunctionsProgram.h"
+#include "RunControl.h"
 
-extern DomainTree domain;
+
+extern RunControl runCtrl;
 
 
 int macro8(Macro &macro)
 {
-  if (!macro) 
+  if (!macro)
   { 
-    macro.name = "disp";
-    macro.type = "outp";
-    macro.what = "print nodal displacements etc";
+    macro.name = "end";
+    macro.type = "ctrl";
+    macro.what = "close interactive/batch mode";
 
     macro.sensitivity[INTER] = true;
     macro.sensitivity[BATCH] = true;
     macro.sensitivity[PRE]   = true;
-    
-    macro.db.selectDomain();
-    
-    macro.db.addTextField("node number = ",0,7);
 
-    macro.db.addLabel("to print all nodal data, set to 0");
-    
+    macro.db.addToggleButton("exit mpap2",false);
 
-    return 0;	  
+    return 0;
   }
 //--------------------------------------------------------------------------------------------------
 
-  int type, id, node;
-  
-  type = roundToInt(macro.p[0]);
-  id   = roundToInt(macro.p[1]) - 1;
-    
-  node = roundToInt(macro.p[2]);
-  
-  domain(type,id).printNodalData(node);  
+  std::cout << "          " << macro << "\n\n";
+
+  std::cout << "          This macro will never be executed!                             \n";
+  std::cout << "                                                                         \n";
+  std::cout << "          The necessary actions are implemented in 'MacroQueue::append'. \n\n";
 
 //--------------------------------------------------------------------------------------------------
   return 0;  

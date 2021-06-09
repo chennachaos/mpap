@@ -1,34 +1,32 @@
 
 #include "Macro.h"
-//#include "Plot.h"
-#include "FunctionsEssGrp.h"
+#include "DomainTree.h"
 
 
-////extern Plot plot;
+extern DomainTree domain;
 
 
 int macro17(Macro &macro)
 {
   if (!macro) 
   { 
-    macro.name = "wipe";
-    macro.type = "plot";
-    macro.what = "wipe the plot area";
+    macro.name = "rset";
+    macro.type = "anly";
+    macro.what = "reset domain data to previous time instant";
 
-    macro.sensitivity[INTER]  = true;
-    macro.sensitivity[BATCH]  = true;
-    macro.sensitivity[NOPROJ] = true;
-    macro.sensitivity[PRE]    = true;
+    macro.sensitivity[INTER] = true;
+    macro.sensitivity[BATCH] = true;
 
-    macro.db.addToggleButton("unset view settings", false);
-    
+    macro.db.selectDomain();
+
     return 0;	  
   }
 //--------------------------------------------------------------------------------------------------
 
-  //if (roundToInt(macro.p[0]) == 1) plot.resetCoor();
-
-  //essGrpWipe();
+  int type = roundToInt(macro.p[0]),
+      id   = roundToInt(macro.p[1]) - 1;
+  
+  domain(type,id).reset();
   
 //--------------------------------------------------------------------------------------------------
   return 0;  

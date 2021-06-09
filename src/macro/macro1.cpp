@@ -1,46 +1,52 @@
 
 #include "Macro.h"
-#include "RunControl.h"
-#include "MathBasic.h"
+#include "MpapTime.h"
+#include "MacroQueue.h"
+#include "Loop.h"
 
 
-extern RunControl runCtrl;
+extern MpapTime   mpapTime;
+extern MacroQueue macroQueue;
 
 
 int macro1(Macro &macro)
 {
   if (!macro) 
   { 
-/*    macro.name = "mode";
+    macro.name = "loop";
     macro.type = "ctrl";
-    macro.what = "set mpap2 mode";
+    macro.what = "begin macro loop";
+
+    macro.db.stringTextField("loop name :","",30);
+
+    macro.db.addTextField("iterations or time :", 10, 8);
+
+    macro.db.addRadioBox("*count iterations","stop at max time");
 
     macro.sensitivity[INTER] = true; 
+    macro.sensitivity[BATCH] = true; 
     macro.sensitivity[PRE]   = true; 
-    
-    macro.db.addRadioBox("pre-processor","*analysis","post-processor");
-    
-    macro.db.frameRadioBox();
-*/
+
     return 0;
   }
 //--------------------------------------------------------------------------------------------------
-/*
-  RunMode mode;
-  
-  if (runCtrl.mode == BATCH) return 0;
-  
-  if (roundToInt(macro.p[0]) <= 1) mode = PRE;
-  if (roundToInt(macro.p[0]) == 2) mode = INTER;
 
-  runCtrl.newMode(mode);
+  int    i = roundToInt(macro.p[0]), maxIter;
+  Loop   *loop = &(macroQueue.loop[i]);
+  double maxTime;
 
-  if (runCtrl.mode == PRE)   runCtrl.newStatus(PREPRO);
-  if (runCtrl.mode == INTER) runCtrl.newStatus(INTERACTIVE);
- 
-  macro.db.dflt[0] = macro.p[0];
-*/
+  if (roundToInt(macro.p[2]) == 2)
+  {
+    maxTime = macro.p[1];
+    if (maxTime <= mpapTime.cur) return loop->end + 2;
+  }
+  else
+  {
+    maxIter = roundToInt(macro.p[1]);
+    if (loop->cnt > maxIter) { loop->cnt = 1; return loop->end + 2; }
+  }
+
 //--------------------------------------------------------------------------------------------------
-  return 0;  
+  return 0;
 }
 

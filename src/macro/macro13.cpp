@@ -1,73 +1,52 @@
 
 #include "Macro.h"
-#include "MpapTime.h"
-#include "FunctionsEssGrp.h"
-#include "FunctionsProgram.h"
-#include "List.h"
-#include "TimeFunction.h"
-
-#include "petscmat.h"
+#include "DomainTree.h"
 
 
-extern MpapTime           mpapTime;
-extern List<TimeFunction> timeFunction;
-extern double             globalMaxIncrement;
+extern DomainTree domain;
+
 
 
 int macro13(Macro &macro)
 {
-  if (!macro) 
-  { 
-    macro.name = "time";
+  if (!macro)
+  {
+    macro.name = "solv";
     macro.type = "anly";
-    macro.what = "increment time";
+    macro.what = "select and initialise solver";
 
     macro.sensitivity[INTER] = true;
     macro.sensitivity[BATCH] = true;
 
-    macro.db.stringList("*forw","back");
-    
-    return 0;    
+    macro.db.selectDomain();
+
+    macro.db.addList("*MA41","PARDISO(sym)","PARDISO(unsym)");
+
+    macro.db.addTextField("parameter 1: ",1,5);
+    macro.db.addTextField("parameter 2: ",1,5);
+    macro.db.addTextField("parameter 3: ",1,5);
+
+    macro.db.addToggleButton("checkIO",false);
+
+    return 0;	  
   }
 //--------------------------------------------------------------------------------------------------
 
-  if (!mpapTime.dtOK)
-  {
-    COUT << "    use 'dt' to set the time step size first!\n\n";
-    return 0;
-  }
+  int    type, id, slv, parm[10];
 
-  globalMaxIncrement = 0.;
- 
-  if (macro.strg == "forw")
-  {
-    //mpapTime.dtPrev  = mpapTime.dt;
-    
-    mpapTime.prev2 = mpapTime.prev;
+  bool   cIO;
 
-    mpapTime.prev  = mpapTime.cur;
+  type    = roundToInt(macro.p[0]);
+  id      = roundToInt(macro.p[1]) - 1;
+  slv     = roundToInt(macro.p[2]);
+  parm[0] = roundToInt(macro.p[3]);
+  parm[1] = roundToInt(macro.p[4]);
+  parm[2] = roundToInt(macro.p[5]);
+  cIO     = (roundToInt(macro.p[6]) == 1);
 
-    mpapTime.cur  += mpapTime.dt;
-  }
-  else if (macro.strg == "back")
-  {
-    if (mpapTime.prev > mpapTime.prev2 + 1.e-12)
-    {
-      mpapTime.cur  = mpapTime.prev;
-      mpapTime.prev = mpapTime.prev2;
-    }
-    else
-    {
-      prgWarning(1,"macro13","'time,back' ignored (I can only do one step back!)");
-      return 0;
-    }
-  }
-  //essGrpWriteTime();
+ // cout << type << '\t' << id << endl;
 
-  for(int i=0; i<timeFunction.n; i++)
-    timeFunction[i].update();
-
-  PetscPrintf(MPI_COMM_WORLD, "    time update, current time = %10.6f  \n\n", mpapTime.cur);
+  domain(type,id).setSolver(slv,parm,cIO);
 
 //--------------------------------------------------------------------------------------------------
   return 0;  

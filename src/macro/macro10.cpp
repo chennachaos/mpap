@@ -1,36 +1,42 @@
 
 #include "Macro.h"
-#include "FunctionsProgram.h"
-#include "RunControl.h"
+#include "DomainTree.h"
+//#include "Mesh.h"
 
 
-extern RunControl runCtrl;
+using namespace std;
+
+extern DomainTree domain;
 
 
 int macro10(Macro &macro)
 {
-  if (!macro) 
-  { 
-    macro.name = "end";
-    macro.type = "ctrl";
-    macro.what = "close interactive/batch mode";
+  if (!macro)
+  {
+    macro.name = "info";
+    macro.type = "anly";
+    macro.what = "print basic information";
 
-    macro.sensitivity[INTER] = true;
     macro.sensitivity[BATCH] = true;
+    macro.sensitivity[INTER] = true;
     macro.sensitivity[PRE]   = true;
 
-    macro.db.addToggleButton("exit mpap2",false);
-    
-    return 0;	  
+    macro.db.selectDomain();
+
+    return 0;
   }
 //--------------------------------------------------------------------------------------------------
 
-  std::cout << "          " << macro << "\n\n";
-  
-  std::cout << "          This macro will never be executed!                             \n";
-  std::cout << "                                                                         \n";
-  std::cout << "          The necessary actions are implemented in 'MacroQueue::append'. \n\n";
-  
+  int type, id;
+
+  type = roundToInt(macro.p[0]);
+  id   = roundToInt(macro.p[1]) - 1;
+
+  cout << "\n          " << domain[type].type << " (" << id+1 << ")\n          ===========";
+  for (int i=0; i<domain[type].type.length(); i++) cout << "="; cout << "\n";
+
+  domain(type,id).printInfo();
+
 //--------------------------------------------------------------------------------------------------
   return 0;  
 }

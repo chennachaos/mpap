@@ -1,50 +1,75 @@
 
 #include "Macro.h"
-#include "DomainTree.h"
 #include "MpapTime.h"
+#include "FunctionsEssGrp.h"
+#include "FunctionsProgram.h"
+#include "List.h"
+#include "TimeFunction.h"
+
+#include "petscmat.h"
 
 
-extern DomainTree domain;
-extern MpapTime mpapTime;
+extern MpapTime           mpapTime;
+extern List<TimeFunction> timeFunction;
+extern double             globalMaxIncrement;
 
 
 int macro11(Macro &macro)
 {
-  if (!macro)
-  {
-    macro.name = "tang";
+  if (!macro) 
+  { 
+    macro.name = "time";
     macro.type = "anly";
-    macro.what = "calculate stiffness, residual, solve and update";
+    macro.what = "increment time";
 
     macro.sensitivity[INTER] = true;
     macro.sensitivity[BATCH] = true;
 
-    macro.db.selectDomain();
+    macro.db.stringList("*forw","back");
 
-    macro.db.addRadioBox("don't show residuals","show some residuals","*show all residuals");
-
-    return -1;
+    return 0;
   }
-//--------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
 
-  int type     = roundToInt(macro.p[0]),
-      id       = roundToInt(macro.p[1]) - 1,
-      printRes = roundToInt(macro.p[2]);
+  if (!mpapTime.dtOK)
+  {
+    COUT << "    use 'dt' to set the time step size first!\n\n";
+    return 0;
+  }
 
-  if (!domain(type,id).solverOK)
-  {  COUT << "use 'solv' to initialise a solver first!\n\n";  return -2;  }
+  globalMaxIncrement = 0.;
+ 
+  if (macro.strg == "forw")
+  {
+    //mpapTime.dtPrev  = mpapTime.dt;
 
-  if (!mpapTime.dtOK) 
-  {  COUT << "use 'dt' to set the time step size first!\n\n"; return -3;  }
+    mpapTime.prev2 = mpapTime.prev;
 
-  if (domain(type,id).calcStiffnessAndResidual(printRes) != 0) return -4;
+    mpapTime.prev  = mpapTime.cur;
 
-  if (domain(type,id).converged()) return 0;
+    mpapTime.cur  += mpapTime.dt;
+  }
+  else if (macro.strg == "back")
+  {
+    if (mpapTime.prev > mpapTime.prev2 + 1.e-12)
+    {
+      mpapTime.cur  = mpapTime.prev;
+      mpapTime.prev = mpapTime.prev2;
+    }
+    else
+    {
+      prgWarning(1,"macro13","'time,back' ignored (I can only do one step back!)");
+      return 0;
+    }
+  }
+  //essGrpWriteTime();
 
-  if (domain(type,id).factoriseSolveAndUpdate()  != 0) return -6;
+  for(int i=0; i<timeFunction.n; i++)
+    timeFunction[i].update();
 
-  domain(type,id).updateIterStep();
+  PetscPrintf(MPI_COMM_WORLD, "    time update, current time = %10.6f  \n\n", mpapTime.cur);
 
-//--------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
   return 0;  
 }
+
