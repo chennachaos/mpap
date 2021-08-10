@@ -21,7 +21,7 @@ set(CMAKE_CXX_COMPILER "/usr/bin/gcc")
 
 # -DPARDISO_SOLVER
 
-set(COPT "-std=c++11 -O3 -D BIT64  -Wno-uninitialized -Wno-sign-compare -Wno-write-strings  -Wno-deprecated  -Wno-unused  -Wno-format -Wno-narrowing  -Wno-ignored-attributes -Wno-reorder  -Wreturn-type -D_DOMAIN2D -fopenmp  -fpermissive -frounding-math")
+set(COPT "-std=c++14 -O3 -D BIT64  -Wno-uninitialized -Wno-sign-compare -Wno-write-strings  -Wno-deprecated  -Wno-unused  -Wno-format -Wno-narrowing  -Wno-ignored-attributes -Wno-reorder  -Wreturn-type -D_DOMAIN3D -fopenmp  -fpermissive -frounding-math")
 
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COPT}")
@@ -31,7 +31,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COPT}")
 # include directories
 ##################################
 include_directories(
-src/chenna 
 src/HBsplines 
 src/lib 
 src/myGeom 
@@ -39,11 +38,11 @@ src/mySolvers
 src/standardFEM 
 src/utilities 
 /home/chenna/Documents/myCode/mpap/eigen-devel 
-/home/chenna/Documents/myCode/mpap/eigen-devel/unsupported 
+/home/chenna/Documents/myCode/mpap/eigen-devel/unsupported
 /usr/include/vtk-7.1
-/usr/include/openmpi 
+/usr/include/x86_64-linux-gnu/openmpi
 /usr/include/petsc 
-/usr/include/x86_64-linux-gnu/CGAL
+/usr/include/
 /usr/include/superlu 
 #/usr/include/boost
 )
@@ -83,7 +82,7 @@ add_executable(mpap  src/program/main.cpp ${sources1} ${sources2} ${sources3})
 
 #pardiso600-GNU720-X86-64
 
-target_link_libraries(mpap stdc++  gmp  mpfr  stdc++ gfortran gomp pthread m  blas  lapack  metis parmetis  petsc  mpi  mpi_cxx  superlu    CGAL CGAL_Core CGAL_ImageIO  vtkCommonCore-7.1  vtkIOCore-7.1  vtkIOGeometry-7.1  vtkIOXML-7.1  vtkIOExport-7.1   vtkFiltersCore-7.1  vtkFiltersGeneral-7.1   vtkFiltersModeling-7.1  vtkFiltersSources-7.1  vtkCommonExecutionModel-7.1  vtkCommonDataModel-7.1  vtkIOParallel-7.1  vtkIOParallelXML-7.1)
+target_link_libraries(mpap stdc++  gmp  mpfr  stdc++ gfortran gomp pthread m  blas  lapack  metis parmetis  petsc  mpi  mpi_cxx  superlu  vtkCommonCore-7.1  vtkIOCore-7.1  vtkIOGeometry-7.1  vtkIOXML-7.1  vtkIOExport-7.1   vtkFiltersCore-7.1  vtkFiltersGeneral-7.1   vtkFiltersModeling-7.1  vtkFiltersSources-7.1  vtkCommonExecutionModel-7.1  vtkCommonDataModel-7.1  vtkIOParallel-7.1  vtkIOParallelXML-7.1)
 
 
 install(TARGETS mpap RUNTIME DESTINATION /home/chenna/Documents/myCode/mpap/bin)

@@ -6290,8 +6290,8 @@ BEGIN RUN_CONTROL
 
 BATCH
 anly,solv,,28,1,8,2,1,1,1
-!chen,data,,28,2,2,2,1
-dt,,0.2
+chen,data,,28,2,2,2,1
+dt,,0.5
 vtk,flow,,28,1,1,1,10,1,1,1,0,0,1
 wrnd
 !wait,mous

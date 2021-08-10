@@ -30,6 +30,9 @@ void HBSplineCutFEM::plotGeomAdapIntegration1D(int val1, bool flag2, int col, bo
 
 void HBSplineCutFEM::plotGeomAdapIntegration2D(int val1, bool flag2, int col, bool PLOT_KNOT_LINES, int* resln)
 {
+    if(this_mpi_proc != 0)
+        return;
+
     int  bb=0, ee=0, ll=0, kk=0, ii=0, totalNGP=0;
     double  volTotal=0.0;
 
@@ -220,6 +223,8 @@ void HBSplineCutFEM::plotGeomAdapIntegration2D(int val1, bool flag2, int col, bo
 void HBSplineCutFEM::plotGeomAdapIntegration3D(int val1, bool flag2, int col, bool PLOT_KNOT_LINES, int* resln)
 {
     double tstart = MPI_Wtime();
+
+    cout << "this_mpi_proc = " << this_mpi_proc << endl;
 
     //vtkSmartPointer<vtkMergePoints>   mergePoints  =  vtkSmartPointer<vtkMergePoints>::New();
 

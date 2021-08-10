@@ -70,8 +70,6 @@ void HBSplineCutFEM::plotGeom(int val1, bool flag2, int col, bool PLOT_KNOT_LINE
         plotGeomAdapIntegration3D(val1, flag2, col, PLOT_KNOT_LINES, resln);
     }
 
-    MPI_Barrier(MPI_COMM_WORLD);
-
     uGridVTK->SetPoints(pointsVTK);
 
     cellDataVTK->SetName("ElemType");
@@ -82,44 +80,43 @@ void HBSplineCutFEM::plotGeom(int val1, bool flag2, int col, bool PLOT_KNOT_LINE
 
     uGridVTK->Squeeze();
 
-    MPI_Barrier(MPI_COMM_WORLD);
-
-    /////////////////////
-    // write VTK files
-
     // write parallel vtu master (pvtu) file
 
-    if(DIM == 3)
+    if( (DIM == 3) && (this_mpi_proc == 0) )
     {
       char fnameMaster[500];
 
-      cout << "files.projDir = " << files.projDir << endl;
       //sprintf(fnameMaster,"%s%s", files.Ofile.asCharArray(),"-geom.pvtu");
       sprintf(fnameMaster,"%s%s%s%s", files.projDir.asCharArray(), "/", files.Ofile.asCharArray(),"-geom.pvtu");
 
       vtkSmartPointer<vtkXMLPUnstructuredGridWriter> writeruGridP  =  vtkSmartPointer<vtkXMLPUnstructuredGridWriter>::New();
 
       writeruGridP->SetFileName(fnameMaster);
-      writeruGridP->SetInputData(uGridVTK);
       writeruGridP->SetNumberOfPieces(n_mpi_procs);
       writeruGridP->SetStartPiece(0);
       writeruGridP->SetEndPiece(n_mpi_procs-1);
+      writeruGridP->SetInputData(uGridVTK);
       writeruGridP->Write();
-
-      MPI_Barrier(MPI_COMM_WORLD);
     }
+
+    // this barrier is important. Without it all the sub-files contain the mesh from processor 0.
+    MPI_Barrier(MPI_COMM_WORLD);
 
     // write individual vtu files
     char fnameLocal[500];
 
     //sprintf(fnameLocal,"%s%s%d%s", files.Ofile.asCharArray(),"-geom_",this_mpi_proc,".vtu");
-    //sprintf(fnameLocal,"%s%s%s%s%d%s", files.projDir.asCharArray(), "/", files.Ofile.asCharArray(),"-geom_",this_mpi_proc,".vtu");
-    sprintf(fnameLocal,"%s%s%s%s%s", files.projDir.asCharArray(), "/", files.Ofile.asCharArray(),"-geom",".vtu");
+    if(DIM == 3)
+      sprintf(fnameLocal,"%s%s%s%s%d%s", files.projDir.asCharArray(), "/", files.Ofile.asCharArray(),"-geom_",this_mpi_proc,".vtu");
+    else
+      sprintf(fnameLocal,"%s%s%s%s%s", files.projDir.asCharArray(), "/", files.Ofile.asCharArray(),"-geom",".vtu");
 
     writerUGridVTK->SetFileName(fnameLocal);
     writerUGridVTK->SetNumberOfPieces(1);
     writerUGridVTK->SetInputData(uGridVTK);
     writerUGridVTK->Write();
+
+    MPI_Barrier(MPI_COMM_WORLD);
 
     //plotGaussPointsElement();
     //plotGaussPointsDirichletBoundary();
@@ -135,6 +132,9 @@ void HBSplineCutFEM::plotGeom(int val1, bool flag2, int col, bool PLOT_KNOT_LINE
 
 void HBSplineCutFEM::plotGeomSubTrias1D(int val1, bool flag2, int col, bool PLOT_KNOT_LINES, int* resln)
 { 
+    if(this_mpi_proc != 0)
+        return;
+
     int  ii=0, jj=0, n1=0, n2=0, ind1=0, ind2=0, ll=0;
 
     vtkIdType pt0, pt1, pt2;
@@ -176,6 +176,9 @@ void HBSplineCutFEM::plotGeomSubTrias1D(int val1, bool flag2, int col, bool PLOT
 
 void HBSplineCutFEM::plotGeomSubTrias2D(int val1, bool flag2, int col, bool PLOT_KNOT_LINES, int* resln)
 { 
+    if(this_mpi_proc != 0)
+        return;
+
     int  ee=0, ii=0, kk=0, ll=0, typetemp=0, totalNGP=0;
 
     vtkIdType  ptIds[20],  ptId, cellId;
@@ -323,10 +326,6 @@ void  HBSplineCutFEM::postProcessFlow(int vartype, int vardir, int nCol, bool um
     if( (filecount % nCol) !=  0)
         return;
 
-    if(this_mpi_proc != 0)
-        return;
-
-
     double tstart = MPI_Wtime();
 
     uGridVTK->Reset();
@@ -368,14 +367,10 @@ void  HBSplineCutFEM::postProcessFlow(int vartype, int vardir, int nCol, bool um
 
     cellDataVTK2->SetName("SubdomId");
 
-    //MPI_Barrier(MPI_COMM_WORLD);
-
     /////////////////////
-    // write VTK files
-
     // write parallel vtu master (pvtu) file
 
-    if(DIM == 3)
+    if( (DIM == 3) && (this_mpi_proc == 0) )
     {
       char fnameMaster[500];
 
@@ -390,27 +385,33 @@ void  HBSplineCutFEM::postProcessFlow(int vartype, int vardir, int nCol, bool um
       writeruGridP->SetStartPiece(0);
       writeruGridP->SetEndPiece(n_mpi_procs-1);
       writeruGridP->Write();
-
-      MPI_Barrier(MPI_COMM_WORLD);
     }
+
+    // this barrier is important. Without it all the sub-files contain the mesh from processor 0.
+    MPI_Barrier(MPI_COMM_WORLD);
 
     // write individual vtu files
 
     char fnameLocal[500];
 
-    //sprintf(fnameLocal,"%s%s%06d%s", files.Ofile.asCharArray(),"-",filecount,".vtu");
-    sprintf(fnameLocal,"%s%s%s%s%06d%s", files.projDir.asCharArray(), "/", files.Ofile.asCharArray(),"-",filecount,".vtu"); 
-
-    //sprintf(fnameLocal,"%s%s%06d%s%d%s", files.Ofile.asCharArray(),"-",filecount,"_",this_mpi_proc,".vtu");
+    if(DIM == 3)
+      sprintf(fnameLocal,"%s%s%s%s%06d%s%d%s", files.projDir.asCharArray(), "/", files.Ofile.asCharArray(),"-",filecount,"_",this_mpi_proc,".vtu"); 
+    else
+      sprintf(fnameLocal,"%s%s%s%s%06d%s", files.projDir.asCharArray(), "/", files.Ofile.asCharArray(),"-",filecount,".vtu"); 
 
     writerUGridVTK->SetFileName(fnameLocal);
     writerUGridVTK->SetInputData(uGridVTK);
     writerUGridVTK->Write();
 
-    for(int bb=0;bb<ImmersedBodyObjects.size();bb++)
+    if(this_mpi_proc == 0)
     {
-      ImmersedBodyObjects[bb]->postProcess(filecount);
+      for(int bb=0;bb<ImmersedBodyObjects.size();bb++)
+      {
+        ImmersedBodyObjects[bb]->postProcess(filecount);
+      }
     }
+
+    MPI_Barrier(MPI_COMM_WORLD);
 
     double tend = MPI_Wtime(); 
     PetscPrintf(MPI_COMM_WORLD, "HBSplineCutFEM::postProcessFlow() took %f millisecond(s) \n ", (tend-tstart)*1000);
@@ -431,6 +432,9 @@ void  HBSplineCutFEM::postProcessSubTrias1D(int vartype, int vardir, int nCol, b
 
 void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, bool umnxflag, double umin, double umax, int* resln)
 {
+    if(this_mpi_proc != 0)
+        return;
+
     int  dd=0, ii=0, jj=0, kk=0, ll=0, count=0, index=0;
     int  ind1=0, ind2=0, e=0, ee=0, gcount=0, ind=0, domTemp=0;
     int nlocal = (degree[0]+1) * (degree[1] + 1);
