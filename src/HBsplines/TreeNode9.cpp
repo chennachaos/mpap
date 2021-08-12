@@ -1519,8 +1519,8 @@ void TreeNode<3>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
 {
   if(DirichletData.size() > 0)
   {
-    int ii, jj, aa, gp, nGauss, TI, TIp1, TIp2, TIp3, index, TJ, TJp1, TJp2, TJp3, dir, side;
-    double  theta, y0, y1, z0, z1, Ta, Tb, res, JacTemp, NitscheFact, pres;
+    int ii, jj, aa, gp, nGauss, TI, TIp1, TIp2, TIp3, index, TJ, TJp1, TJp2, TJp3, dir, side, profile_type;
+    double  theta, ll1, ul1, ll2, ul2, Ta, Tb, res, JacTemp, NitscheFact, pres;
     double  dvol, specVal, PENALTY, Jac, fact, bb1, bb2, bb3;
     double  xc, yc, zc, R;
     bool  isNitsche;
@@ -1536,8 +1536,6 @@ void TreeNode<3>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
     myPoint  param, geom, normal;
     double *gws;
     myPoint *gps;
-    
-    double H = 0.41;
 
     for(aa=0;aa<DirichletData.size();aa++)
     {
@@ -1546,15 +1544,23 @@ void TreeNode<3>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
         isNitsche   = false;
         side        = (int) (DirichletData[aa][0] - 1);
         dir         = (int) (DirichletData[aa][1] - 1);
-        specVal     = DirichletData[aa][2];
-        PENALTY     = DirichletData[aa][3];
-        isNitsche   = ( (int) DirichletData[aa][4] == 1 );
-        NitscheFact = DirichletData[aa][5];
 
-        //for symmetric Nitsche method -> NitscheFact = 1.0
+        PENALTY     = DirichletData[aa][2];
+        isNitsche   = ( (int) DirichletData[aa][3] == 1 );
+        NitscheFact = DirichletData[aa][4];
+
+        //PENALTY    = 1.0/max(hx, hy);                     // GeomData-> degree;
+
+        //for symmetric Nitsche method   -> NitscheFact =  1.0
         //for unsymmetric Nitsche method -> NitscheFact = -1.0
 
-        //cout << " PENALTY " << PENALTY << endl;
+        profile_type  = (int) DirichletData[aa][5];
+        specVal       = DirichletData[aa][6];
+        ll1           = DirichletData[aa][7];
+        ul1           = DirichletData[aa][8];
+        ll2           = DirichletData[aa][9];
+        ul2           = DirichletData[aa][10];
+
 
         normal = GeomData->boundaryNormals[side];
 
@@ -1613,38 +1619,28 @@ void TreeNode<3>::applyDirichletBCsCutFEMFluid(MatrixXd& Klocal, VectorXd& Floca
               dN_dz = SubDivMat*dNN_dz;
             }
 
-              specVal = DirichletData[aa][2];
+            // constant value
+            if(profile_type == 1 )
+            {
+                specVal = DirichletData[aa][6];
+            }
+            // parabolic profile
+            else
+            {
+                // faces perpendicular to X-axis
+                if(side == 0 || side == 1)
+                  specVal = DirichletData[aa][6]*(6.0/(ul1-ll1)/(ul1-ll1))*(ul1-geom[1])*(geom[1]-ll1)*(6.0/(ul2-ll2)/(ul2-ll2))*(ul2-geom[2])*(geom[2]-ll2);
+                // faces perpendicular to Y-axis
+                else if(side == 2 || side == 3)
+                  specVal = DirichletData[aa][6]*(6.0/(ul1-ll1)/(ul1-ll1))*(ul1-geom[0])*(geom[0]-ll1)*(6.0/(ul2-ll2)/(ul2-ll2))*(ul2-geom[2])*(geom[2]-ll2);
+                // faces perpendicular to Z-axis
+                else
+                  specVal = DirichletData[aa][6]*(6.0/(ul1-ll1)/(ul1-ll1))*(ul1-geom[0])*(geom[0]-ll1)*(6.0/(ul2-ll2)/(ul2-ll2))*(ul2-geom[1])*(geom[1]-ll2);
+            }
 
-              //
-              if(side == 0 )
-              {
-                if(dir == 0)
-                {
-                  //fact = 10000.0/324.0;
+            // multiply the velocity value with the time factor
+            specVal *= timeFunction[0].prop;
 
-                  y0 = 0.0;    y1 = 3.0;  z0 = -2.0;    z1 = 2.0;
-
-                  //fact = (36.0)*(1.0/(y1-y0)/(y1-y0))*(1.0/(z1-z0)/(z1-z0));
-                  // plate Wall
-                  //specVal = DirichletData[aa][2]*fact*(y1-geom[1])*(geom[1]-y0)*(z1-geom[2])*(geom[2]-z0);
-
-                  // Turek cylinder
-                  //y0 = 0.0;    y1 = 0.41;  z0 = 0.0;    z1 = 0.41;
-                  //specVal = DirichletData[aa][2]*(6.0/y1/y1)*(y1-geom[1])*(geom[1]-y0)*(6.0/z1/z1)*(z1-geom[2])*(geom[2]-z0);
-
-                  //Thin plate
-                  y0 = -0.4;    y1 = 0.4;  z0 = 0.0;    z1 = 1.0;
-                  fact = (36.0)*(1.0/(y1-y0)/(y1-y0))*(1.0/(z1-z0)/(z1-z0));
-                  specVal = DirichletData[aa][2]*fact*(y1-geom[1])*(geom[1]-y0)*(z1-geom[2])*(geom[2]-z0);
-
-                  //y0 = 0.0;    y1 = 0.41;  z0 = -0.35;    z1 = 0.35; // Turek beam 3D
-                  //fact = (4.0/(y1-y0)/(y1-y0))*(4.0/(z1-z0)/(z1-z0));
-                  //specVal = DirichletData[aa][2]*fact*(y1-geom[1])*(geom[1]-y0)*(z1-geom[2])*(geom[2]-z0);
-                }
-              }
-              //
-
-              specVal *= timeFunction[0].prop;
 
               res = specVal - computeValue(dir, N);
 
