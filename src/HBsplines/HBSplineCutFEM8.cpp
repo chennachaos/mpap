@@ -209,9 +209,6 @@ void HBSplineCutFEM::plotGeomAdapIntegration2D(int val1, bool flag2, int col, bo
 
     uGridVTK->SetPoints(pointsVTK);
 
-    //cellDataVTK->SetName("ElemType");
-    //cellDataVTK2->SetName("ElemLevel");
-
     uGridVTK->GetCellData()->SetScalars(cellDataVTK);
     uGridVTK->GetCellData()->AddArray(cellDataVTK2);
 
@@ -433,8 +430,6 @@ void HBSplineCutFEM::plotGeomAdapIntegration3D(int val1, bool flag2, int col, bo
     PetscPrintf(MPI_COMM_WORLD, "\n Total number of Gauss points in cut cells = %d \n\n", totalNGP);
 
     uGridVTK->SetPoints(pointsVTK);
-    uGridVTK->GetCellData()->SetScalars(cellDataVTK);
-    uGridVTK->GetCellData()->AddArray(cellDataVTK2); 
 
     double tend = MPI_Wtime(); 
     PetscPrintf(MPI_COMM_WORLD, "HBSplineCutFEM::plotGeomAdapIntegration3D() took %f millisecond(s) \n ", (tend-tstart)*1000);
@@ -1305,11 +1300,11 @@ void  HBSplineCutFEM::postProcessAdapIntegration3D(int vartype, int vardir, int 
 
       uGridVTK->GetPointData()->SetScalars(scaVTK);
       uGridVTK->GetPointData()->SetVectors(vecVTK);
-      //uGridVTK->GetPointData()->AddArray(vecVTK2);
+      uGridVTK->GetPointData()->AddArray(vecVTK2);
       //uGridVTK->GetPointData()->AddArray(scaVTK2);
 
-      //uGridVTK->GetCellData()->SetScalars(cellDataVTK);
-      //uGridVTK->GetCellData()->AddArray(cellDataVTK2);
+      uGridVTK->GetCellData()->SetScalars(cellDataVTK);
+      uGridVTK->GetCellData()->AddArray(cellDataVTK2);
     }
 
     return;
