@@ -33,7 +33,7 @@ void  HBSplineCutFEM::solveSolidProblem()
   // in the communicator
   if(this_mpi_proc == 0)
   {
-    cout << "HBSplineCutFEM::solveSolidProblem() " << endl;
+    //cout << "HBSplineCutFEM::solveSolidProblem() " << endl;
     for(bb=0; bb<nImmSolids; bb++)
     {
       ImmersedBodyObjects[bb]->solveTimeStep();
@@ -54,21 +54,9 @@ void  HBSplineCutFEM::solveSolidProblem()
     MPI_Bcast(&(ImmersedBodyObjects[bb]->SolnData.var1[0]), count, MPI_DOUBLE, rootProc, MPI_COMM_WORLD);
   }
 
+  MPI_Barrier(MPI_COMM_WORLD);
+
   //PetscPrintf(MPI_COMM_WORLD,"bbbbbbbbbb \n");
-
-  IB_MOVED = false;
-  //if(this_mpi_proc != 0)
-  //{
-    for(bb=0; bb<nImmSolids; bb++)
-    {
-      //cout << " lllllllllllllllllll " << this_mpi_proc << endl;
-      //printVector(ImmersedBodyObjects[bb]->SolnData.var1);
-
-      ImmersedBodyObjects[bb]->updateIterStep();
-
-      IB_MOVED = (IB_MOVED || ImmersedBodyObjects[bb]->updatePointPositions() );
-    }
-  //}
 
   return;
 }

@@ -21,7 +21,7 @@ class  SolutionData
 
     MatrixXd  solnCFM;
 
-    VectorXd  var1, var1Prev, var1Cur, var1Dot, var1DotPrev, var1DotCur, var1DotDot, var1DotDotPrev, var1DotDotCur;
+    VectorXd  var1, var1Prev, var1Cur, var1Dot, var1DotPrev, var1DotCur, var1DotDot, var1DotDotPrev, var1DotDotCur, var1PrevIteration;
     VectorXd  var2, var2Prev, var2Cur, var2Dot, var2DotPrev, var2DotCur, var2DotDot, var2DotDotPrev, var2DotDotCur;
     VectorXd  var3, var3Prev, var3Cur, var4, var4Prev, var4Cur;
     VectorXd  dDot, dDotPrev, var1PrevIter;
@@ -30,7 +30,7 @@ class  SolutionData
     vector<double>  FluidProps, stagParams;
 
     VectorXd  td, rhsVec, forcePred, forceCur, reac;
-    VectorXd  force, forcePrev, forcePrev2, forcePrev3, forcePrev4, forcePrev5, forcePrev6;
+    VectorXd  force, forcePrev, forcePrev2, forcePrev3, forcePrev4, forcePrev5, forcePrev6, forcePrevIteration;
     VectorXd  soln, solnInit, forceTemp, forceTempPrev;
     VectorXd  bodyForce, bodyForceCur, bodyForcePrev, bodyForcePrev2, bodyForcePred, bodyForcePredPrev, bodyForcePredPrev2;
 

@@ -330,7 +330,9 @@ int  HBSplineBase::fsi_monolithic_fixedpoint_dispPred(int max_iter, double tol_l
 
 int  HBSplineBase::fsi_staggered_force_predictor(int max_iter, double tol_local)
 {
-  cout << " HBSplineBase::fsi_staggered_force_predictor() " << endl;
+  PetscPrintf(MPI_COMM_WORLD, "\n ---------------------------------------------------- \n");
+  PetscPrintf(MPI_COMM_WORLD, "\n\n HBSplineBase::fsi_staggered_force_predictor()      \n");
+  PetscPrintf(MPI_COMM_WORLD, "\n ---------------------------------------------------- \n\n\n");
 
   //
   // Staggered scheme by Dettmer and Peric
@@ -348,32 +350,110 @@ int  HBSplineBase::fsi_staggered_force_predictor(int max_iter, double tol_local)
 
   VectorXd  resiIntf, resiIntfPrev, forceIntf, forceIntfPrev;
   VectorXd  vecTemp;
-  double  relaxPara=0.5, relaxParaPrev, normTemp, tolTemp=1.0e-4;
+  double  normTemp, tolTemp=1.0e-4;
 
   bool  converg=false;
   int  iter=0, bb, resln[]={1,1,1};
 
-  //while(iter < max_iter)
-  while(iter < 1)
+  int  predType = (int) ImmersedBodyObjects[0]->SolnData.stagParams[1];
+
+  double  q1, q2, q3, q4, fact;
+  double  knp1 = mpapTime.dt/mpapTime.dtPrev;
+
+  //double  z = (1.0+beta+beta*rho-2.0*sqrt(beta+beta*rho))/(1.0-beta);
+  //double  z=0.5;
+
+  switch(predType)
   {
-    //   1.) predict force on the solid ---> fSP
+      case 1:
+        q1 =  1.0;  q2 = 0.0;  q3 =  0.0;  q4 =  0.0;
+        break;
+
+      case 2:
+        //q1 =  2.0;  q2 = -1.0;  q3 =  0.0;  q4 =  0.0;
+        q1 = 1.0+knp1; q2 = -knp1;  q3 =  0.0;  q4 =  0.0;
+        break;
+
+      case 3:
+        q1 =  3.0;  q2 = -3.0;  q3 =  1.0;  q4 =  0.0;
+        //q1 =  2.0+z;  q2 = -1.0-2.0*z;  q3 =  z;  q4 =  0.0;
+        //q1 =  2.5;  q2 = -2.0;  q3 =  0.5;  q4 =  0.0;
+        break;
+
+      case 4:
+        q1 =  4.0;  q2 = -6.0;  q3 =  4.0;  q4 = -1.0;
+        //q1 =  104.0/35.0;  q2 = -114.0/35.0;  q3 =  56.0/35.0;  q4 = -11.0/35.0;
+        break;
+
+      default:
+        cout << " unknown value for 'predType' " << endl;
+        break;
+  }
+
+  double beta = ImmersedBodyObjects[0]->SolnData.stagParams[2];
+
+  PetscPrintf(MPI_COMM_WORLD, " Staggered scheme parameters: ... \n\n");
+  PetscPrintf(MPI_COMM_WORLD, " Predictor type              = %d \n", predType);
+  PetscPrintf(MPI_COMM_WORLD, " dt/dtPrev                   = %f \n", knp1);
+  PetscPrintf(MPI_COMM_WORLD, " Relaxation parameter (beta) = %f \n\n", beta);
+
+
+  PetscPrintf(MPI_COMM_WORLD, "\n timeUpdate   \n");
+  PetscPrintf(MPI_COMM_WORLD, " -------------  \n");
+
+  timeUpdate();
+
+
+  //   1.) predict force on the solid ---> fSP
+  for(bb=0; bb<nImmSolids; bb++)
+  {
+    ImmersedBodyObjects[bb]->SolnData.force = q1*ImmersedBodyObjects[bb]->SolnData.forcePrev + q2*ImmersedBodyObjects[bb]->SolnData.forcePrev2;
+  }
+
+
+  for(iter=0; iter<max_iter; iter++)
+  {
+    PetscPrintf(MPI_COMM_WORLD, " Global iteration = %d \n", iter);
+    PetscPrintf(MPI_COMM_WORLD, " ------------------------- \n");
 
     for(bb=0; bb<nImmSolids; bb++)
     {
-      ImmersedBodyObjects[bb]->SolnData.forceCur = 2.0*ImmersedBodyObjects[bb]->SolnData.force - ImmersedBodyObjects[bb]->SolnData.forcePrev;
+      double  af =  ImmersedBodyObjects[bb]->SolnData.td[2];
+
+      ImmersedBodyObjects[bb]->SolnData.forceCur = af*ImmersedBodyObjects[bb]->SolnData.force + (1.0-af)*ImmersedBodyObjects[bb]->SolnData.forcePrev;
+
+      ImmersedBodyObjects[bb]->SolnData.var1PrevIteration = ImmersedBodyObjects[bb]->SolnData.var1;
     }
 
     //   2.) solve solid problem to get structural displacement ---> dS
-    //   3.) Update the interface location
-    //   4.) Compute interface velocity
+
+    PetscPrintf(MPI_COMM_WORLD, "\n solveSolidProblem    \n");
+    PetscPrintf(MPI_COMM_WORLD, " ---------------------  \n");
 
     solveSolidProblem();
 
+    for(bb=0; bb<nImmSolids; bb++)
+    {
+      VectorXd  vecTemp = ImmersedBodyObjects[bb]->SolnData.var1PrevIteration - ImmersedBodyObjects[bb]->SolnData.var1;
+      normTemp = vecTemp.norm();
+
+      PetscPrintf(MPI_COMM_WORLD, " Displacement convergence ...  Iter = %5d \t \t %11.4E\n", iter, normTemp);
+    }
+
+    //   3.) Update the interface location
+    //   4.) Compute interface velocity
+
+    PetscPrintf(MPI_COMM_WORLD, "\n updateImmersedPointPositions  \n");
+    PetscPrintf(MPI_COMM_WORLD, " ------------------------------  \n");
     updateImmersedPointPositions();
 
+    PetscPrintf(MPI_COMM_WORLD, "\n updateIterStep       \n");
+    PetscPrintf(MPI_COMM_WORLD, " ---------------------  \n");
     updateIterStep();
 
     //   5.) Solve the fluid problem
+    PetscPrintf(MPI_COMM_WORLD, "\n solveFluidProblem    \n");
+    PetscPrintf(MPI_COMM_WORLD, " ---------------------  \n");
     solveFluidProblem();
 
     //   6.) Compute the interface force
@@ -381,23 +461,44 @@ int  HBSplineBase::fsi_staggered_force_predictor(int max_iter, double tol_local)
 
     //postProcessFlow(1, 1, 10, 1, 0.0, 1.0, resln);
 
+    PetscPrintf(MPI_COMM_WORLD, "\n relax force \n");
+    PetscPrintf(MPI_COMM_WORLD, " ---------------------  \n");
     for(bb=0; bb<nImmSolids; bb++)
     {
+      //cout << " computeTotalForce() " << endl;
+      // This is for CutFEM
       computeTotalForce(bb);
 
+      //PetscPrintf(MPI_COMM_WORLD, " update force \n");
+      // This is for CutFEM
       ImmersedBodyObjects[bb]->updateForce(&(totalForce(0)));
+      // This is for FDM
+      //ImmersedBodyObjects[bb]->updateForce();
 
-      //PetscPrintf(MPI_COMM_WORLD, " Force convergence ...  Iter = %5d \t \t %11.4E\n", iter, normTemp);
+      ImmersedBodyObjects[bb]->SolnData.forcePrevIteration  =  ImmersedBodyObjects[bb]->SolnData.force;
 
+      ImmersedBodyObjects[bb]->SolnData.force  =  beta*ImmersedBodyObjects[bb]->SolnData.forceTemp + (1.0-beta)*ImmersedBodyObjects[bb]->SolnData.force;
+
+      VectorXd  vecTemp = ImmersedBodyObjects[bb]->SolnData.force - ImmersedBodyObjects[bb]->SolnData.forcePrevIteration; 
+      normTemp = vecTemp.norm();
+
+      PetscPrintf(MPI_COMM_WORLD, " Force convergence ...  Iter = %5d \t \t %11.4E\n", iter, normTemp);
+    } // for(bb=0; bb<nImmSolids; bb++)
+    //PetscPrintf(MPI_COMM_WORLD, " relax force DONE \n");
+  }
+
+    //for(bb=0; bb<nImmSolids; bb++)
+    //{
       //ImmersedBodyObjects[bb]->SolnData.forcePrev3 = ImmersedBodyObjects[bb]->SolnData.forcePrev2;
       //ImmersedBodyObjects[bb]->SolnData.forcePrev2 = ImmersedBodyObjects[bb]->SolnData.forcePrev;
       //ImmersedBodyObjects[bb]->SolnData.forcePrev  = ImmersedBodyObjects[bb]->SolnData.force;
-    } // for(bb=0; bb<nImmSolids; bb++)
+    //}
 
-    iter++;
-  }
+    PetscPrintf(MPI_COMM_WORLD, "\n ---------------------------------------------------- \n");
+    PetscPrintf(MPI_COMM_WORLD, "\n ---------------------------------------------------- \n");
+    PetscPrintf(MPI_COMM_WORLD, "\n ---------------------------------------------------- \n\n");
 
-  return 1;
+    return 0;
 }
 
 
@@ -479,12 +580,10 @@ int  HBSplineBase::fsi_staggered_displacement_predictor(int max_iter, double tol
 
 int HBSplineBase::solveFluidProblem()
 {
-  printf("\n Solving HBSplineCutFEM::solveFluidProblem() \n");
+  //printf("\n Solving HBSplineCutFEM::solveFluidProblem() \n");
   //printf("\n External force norm = %12.6E \n", forceCur.norm());
 
-  int  ii;
-
-  for(ii=0;ii<10;ii++)
+  for(int ii=0;ii<10;ii++)
   {
     calcStiffnessAndResidual(1, 1, 1);
 

@@ -106,6 +106,14 @@ void ImmersedSolid::updateIterStep()
 }
 
 
+bool ImmersedSolid::hasSolidMoved()
+{
+  if( (totalDOF>0) || PRESC_MOTION )
+    return true;
+
+  return false;
+}
+
 
 void ImmersedSolid::reset()
 {

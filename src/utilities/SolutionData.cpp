@@ -213,61 +213,6 @@ void  SolutionData::timeUpdate()
 
   bodyForcePrev = bodyForce;
 
-  // initialise the variables
-
-  //if(!PHYSICS_TYPE)
-  //{
-    //var1.setZero();
-    //var2.setZero();
-    //var3.setZero();
-    //var4.setZero();
-  //}
-
-  if(STAGGERED)
-  {
-    double  q1, q2, q3, q4, fact;
-    double  knp1 = mpapTime.dt/mpapTime.dtPrev;
-
-    int  predType = (int) stagParams[1];
-
-    double  beta = stagParams[2];
-    //double  z = (1.0+beta+beta*rho-2.0*sqrt(beta+beta*rho))/(1.0-beta);
-    double  z=0.5;
-
-    switch(predType)
-    {
-      case 1:
-        q1 =  1.0;  q2 = 0.0;  q3 =  0.0;  q4 =  0.0;
-        break;
-
-      case 2:
-        q1 =  2.0;  q2 = -1.0;  q3 =  0.0;  q4 =  0.0;
-        //q1 =  1.5;  q2 = -0.5;  q3 =  0.0;  q4 =  0.0;
-        //q1 =  4.0/3.0;  q2 = -1.0/3.0;  q3 =  0.0;  q4 =  0.0;
-        //q1 = 1.0+knp1; q2 = -knp1;  q3 =  0.0;  q4 =  0.0;
-        //q1 = 1.0+z; q2 = -z;  q3 =  0.0;  q4 =  0.0;
-        break;
-
-      case 3:
-        //q1 =  3.0;  q2 = -3.0;  q3 =  1.0;  q4 =  0.0;
-        q1 =  2.0+z;  q2 = -1.0-2.0*z;  q3 =  z;  q4 =  0.0;
-        //q1 =  2.5;  q2 = -2.0;  q3 =  0.5;  q4 =  0.0;
-        break;
-
-      case 4:
-        q1 =  4.0;  q2 = -6.0;  q3 =  4.0;  q4 = -1.0;
-        //q1 =  104.0/35.0;  q2 = -114.0/35.0;  q3 =  56.0/35.0;  q4 = -11.0/35.0;
-        break;
-
-      default:
-        cout << " unknown value for 'predType' " << endl;
-        break;
-    }
-
-    forcePred = q1*force + q2*forcePrev + q3*forcePrev2 + q4*forcePrev3;
-
-    forceCur  = td[2]*forcePred + (1.0-td[2])*force;
-  }
 
   forcePrev5 = forcePrev4;
   forcePrev4 = forcePrev3;

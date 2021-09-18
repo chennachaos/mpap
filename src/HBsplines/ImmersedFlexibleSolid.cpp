@@ -664,7 +664,7 @@ int ImmersedFlexibleSolid::updatePointPositions()
   else if(DIM == 3)
     updatePointPositions3D();
 
-  return (totalDOF>0);
+  return 0;
 }
 
 
@@ -784,9 +784,7 @@ void ImmersedFlexibleSolid::updateForce(double* data)
 
     //printf("\n\n");    printVector(SolnData.forceTemp);
 
-    SolnData.interpolateForce();
-    //cout << " ndof = " << ndof << endl;
-    fluidAcceCur = SolnData.td[2]*fluidAcce + (1.0-SolnData.td[2])*fluidAccePrev;
+    //fluidAcceCur = SolnData.td[2]*fluidAcce + (1.0-SolnData.td[2])*fluidAccePrev;
     //cout << " ndof = " << ndof << endl;
     return;
 }

@@ -37,9 +37,16 @@ void  HBSplineBase::updateImmersedPointPositions()
   IB_MOVED = false;
   for(int bb=0; bb<nImmSolids; bb++)
   {
-    IB_MOVED = (IB_MOVED || ImmersedBodyObjects[bb]->updatePointPositions() );
+    ImmersedBodyObjects[bb]->updateIterStep();
+
+    if( ImmersedBodyObjects[bb]->hasSolidMoved() )
+    {
+      IB_MOVED = true;
+      break;
+    }
+
+    //IB_MOVED = (IB_MOVED || ImmersedBodyObjects[bb]->hasSolidMoved() );
   }
-  //cout << " HBSplineFEM::updateImmersedPointPositions() " << endl;
 
   return;
 }

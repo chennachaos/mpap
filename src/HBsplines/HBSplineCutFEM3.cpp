@@ -38,7 +38,7 @@ void HBSplineCutFEM::timeUpdate()
 {
   //PetscPrintf(MPI_COMM_WORLD, "   HBSplineCutFEM::timeUpdate() ... STARTED \n\n");
 
-  double tstart = MPI_Wtime();
+  //double tstart = MPI_Wtime();
 
   IB_MOVED = false;
 
@@ -54,15 +54,15 @@ void HBSplineCutFEM::timeUpdate()
 
   SolnData.timeUpdate();
 
-  if(STAGGERED)
-    solveSolidProblem();
+  //if(STAGGERED)
+    //solveSolidProblem();
 
   MPI_Barrier(MPI_COMM_WORLD);
 
-  updateIterStep();
+  //updateIterStep();
 
-  double tend = MPI_Wtime();
-  PetscPrintf(MPI_COMM_WORLD, " HBSplineCutFEM::timeUpdate() took %f  milliseconds \n", (tend-tstart)*1000);
+  //double tend = MPI_Wtime();
+  //PetscPrintf(MPI_COMM_WORLD, " HBSplineCutFEM::timeUpdate() took %f  milliseconds \n", (tend-tstart)*1000);
 
   //PetscPrintf(MPI_COMM_WORLD, "   HBSplineCutFEM::timeUpdate() ... FINISHED \n\n");
 
@@ -78,13 +78,13 @@ void HBSplineCutFEM::updateIterStep()
   PetscLogDouble mem1, mem2, mem3, mem4;
 
   //the current resident set size (memory used) for the program.
-  ierr = PetscMemoryGetCurrentUsage(&mem1);   //CHKERRQ(ierr);
+  //ierr = PetscMemoryGetCurrentUsage(&mem1);   //CHKERRQ(ierr);
   //the maximum resident set size (memory used) for the program.
-  ierr = PetscMemoryGetMaximumUsage(&mem2);   //CHKERRQ(ierr);
+  //ierr = PetscMemoryGetMaximumUsage(&mem2);   //CHKERRQ(ierr);
   //the current amount of memory used that was PetscMalloc()ed
-  ierr = PetscMallocGetCurrentUsage(&mem3);   //CHKERRQ(ierr);
+  //ierr = PetscMallocGetCurrentUsage(&mem3);   //CHKERRQ(ierr);
   //the maximum amount of memory used that was PetscMalloc()ed at any time during this run.
-  ierr = PetscMallocGetMaximumUsage(&mem4);   //CHKERRQ(ierr);
+  //ierr = PetscMallocGetMaximumUsage(&mem4);   //CHKERRQ(ierr);
 
   //PetscPrintf(MPI_COMM_WORLD, " Petsc memory allocation details ... %12.8f \t %12.8f \t%12.8f \t%12.8f \n\n", mem1, mem2, mem3, mem4);
 
@@ -92,11 +92,11 @@ void HBSplineCutFEM::updateIterStep()
 
   SolnData.updateIterStep();
 
-  for(bb=0;bb<ImmersedBodyObjects.size();bb++)
-  {
-    computeTotalForce(bb);
-    ImmersedBodyObjects[bb]->updateForce(&(totalForce(0)));
-  }
+  //for(bb=0;bb<ImmersedBodyObjects.size();bb++)
+  //{
+    //computeTotalForce(bb);
+    //ImmersedBodyObjects[bb]->updateForce(&(totalForce(0)));
+  //}
 
   if(!STAGGERED)
   {

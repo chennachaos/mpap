@@ -358,6 +358,8 @@ class ImmersedSolid
         virtual int  updatePointPositions()
         { cout << "   'updatePointPositions()' is not defined for this Solid!\n\n"; return 0; }
 
+        virtual bool  hasSolidMoved();
+
         virtual void  updateForce() // routine for rigid-bodies with FDM
         { cout << "   'updateForce()' is not defined for this Solid!\n\n"; return; }
 

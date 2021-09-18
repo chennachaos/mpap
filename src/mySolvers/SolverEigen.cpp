@@ -264,7 +264,7 @@ int  SolverEigen::solve()
     BiCGSTAB<SparseMatrixXd, IncompleteLUT<double> > solver;
 
     solver.preconditioner().setDroptol(1.0e-3);
-    solver.preconditioner().setFillfactor(3);
+    solver.preconditioner().setFillfactor(2);
     
     //BiCGSTAB<SparseMatrixXd> solver;
 

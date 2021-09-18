@@ -449,9 +449,6 @@ int  ImmersedRigidSolid::updatePointPositions()
   else if(DIM == 3)
     updatePointPositions3D();
 
-  if( (totalDOF>0) || PRESC_MOTION )
-    return 1;
-
   return 0;
 }
 
