@@ -587,8 +587,7 @@ int HBSplineBase::solveFluidProblem()
   {
     calcStiffnessAndResidual(1, 1, 1);
 
-    printf("\t %5d \t %12.6E\n", ii, rNorm);
-    //printf("\t %5d \t %5d \t %12.6E\n", ii, firstIter, rNorm);
+    PetscPrintf(MPI_COMM_WORLD, "\t %5d \t %12.6E\n", ii, rNorm);
 
     if(converged())
       break;
@@ -602,8 +601,8 @@ int HBSplineBase::solveFluidProblem()
     //cout << " Fluid ... updateIterStep " << endl;
   }
 
-  printf("\n Solving HBSplineCutFEM::solveFluidProblem() ..... DONE  \n\n");
-  
-  return 1;
+  PetscPrintf(MPI_COMM_WORLD, "\n Solving HBSplineCutFEM::solveFluidProblem() ..... DONE \n\n");
+
+  return 0;
 }
 
