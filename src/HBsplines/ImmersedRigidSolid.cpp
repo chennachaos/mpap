@@ -741,7 +741,7 @@ void ImmersedRigidSolid::updateForce()
     SolnData.forceTemp[5] = totalForce[5];                  // Mz
   }
 
-  SolnData.interpolateForce();
+  //SolnData.interpolateForce();
 
   return;
 }
@@ -779,7 +779,7 @@ void ImmersedRigidSolid::updateForce(double* data)
     SolnData.forceTemp[5] = totalForce[5];                  // Mz
   }
 
-  SolnData.interpolateForce();
+  //SolnData.interpolateForce();
 
   return;
 }

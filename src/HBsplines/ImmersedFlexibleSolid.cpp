@@ -755,7 +755,7 @@ void ImmersedFlexibleSolid::updateForce()
 
    //printf("\n\n");    printVector(SolnData.forceTemp);
 
-   SolnData.interpolateForce();
+   //SolnData.interpolateForce();
 
    return;
 }
