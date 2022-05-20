@@ -308,7 +308,7 @@ BEGIN RUN_CONTROL
 BATCH
 anly,solv,,28,1,8,1,1,1,1            ! this sets the solver
 chen,data,,28,2,2,2,1                ! this generates the grid file, without any solution field.
-vtk,flow,,28,1,1,1,1,1,1,1,0,0,1     ! this generates the grid file, with the solution field. Since we have not solved anything, all the values are zero.
+!vtk,flow,,28,1,1,1,1,1,1,1,0,0,1     ! this generates the grid file, with the solution field. Since we have not solved anything, all the values are zero.
 dt,,0.5                              ! time step size
 wrnd                                 ! write nodal data to the output file starting with T
 !wait,mous                           ! useful to stop the program before running the time loop if we want to check if the input geometries are correct.

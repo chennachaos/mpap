@@ -24,6 +24,9 @@ void HBSplineCutFEM::plotGeom(int val1, bool flag2, int col, bool PLOT_KNOT_LINE
 {
     PetscPrintf(MPI_COMM_WORLD, "     HBSplineCutFEM: plotgeometry ...\n\n");
 
+    if( (DIM == 2) && (this_mpi_proc != 0) )
+        return;
+
     double tstart = MPI_Wtime();
 
     uGridVTK->Reset();
@@ -100,7 +103,8 @@ void HBSplineCutFEM::plotGeom(int val1, bool flag2, int col, bool PLOT_KNOT_LINE
     }
 
     // this barrier is important. Without it all the sub-files contain the mesh from processor 0.
-    MPI_Barrier(MPI_COMM_WORLD);
+    if(DIM == 3)
+      MPI_Barrier(MPI_COMM_WORLD);
 
     // write individual vtu files
     char fnameLocal[500];
@@ -116,7 +120,8 @@ void HBSplineCutFEM::plotGeom(int val1, bool flag2, int col, bool PLOT_KNOT_LINE
     writerUGridVTK->SetInputData(uGridVTK);
     writerUGridVTK->Write();
 
-    MPI_Barrier(MPI_COMM_WORLD);
+    if(DIM == 3)
+      MPI_Barrier(MPI_COMM_WORLD);
 
     //plotGaussPointsElement();
     //plotGaussPointsDirichletBoundary();
@@ -326,6 +331,9 @@ void  HBSplineCutFEM::postProcessFlow(int vartype, int vardir, int nCol, bool um
     if( (filecount % nCol) !=  0)
         return;
 
+    if( (DIM == 2) && (this_mpi_proc != 0) )
+        return;
+
     double tstart = MPI_Wtime();
 
     uGridVTK->Reset();
@@ -388,7 +396,8 @@ void  HBSplineCutFEM::postProcessFlow(int vartype, int vardir, int nCol, bool um
     }
 
     // this barrier is important. Without it all the sub-files contain the mesh from processor 0.
-    MPI_Barrier(MPI_COMM_WORLD);
+    if(DIM == 3)
+      MPI_Barrier(MPI_COMM_WORLD);
 
     // write individual vtu files
 
@@ -411,7 +420,8 @@ void  HBSplineCutFEM::postProcessFlow(int vartype, int vardir, int nCol, bool um
       }
     }
 
-    MPI_Barrier(MPI_COMM_WORLD);
+    if(DIM == 3)
+      MPI_Barrier(MPI_COMM_WORLD);
 
     double tend = MPI_Wtime(); 
     PetscPrintf(MPI_COMM_WORLD, "HBSplineCutFEM::postProcessFlow() took %f millisecond(s) \n ", (tend-tstart)*1000);
