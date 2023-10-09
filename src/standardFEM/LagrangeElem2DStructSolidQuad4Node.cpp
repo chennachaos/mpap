@@ -75,8 +75,12 @@ int LagrangeElem2DStructSolidQuad4Node::calcStiffnessAndResidual(MatrixXd& Kloca
 
     double rho  = elmDat[5] ;
     double rho0 = rho ;
-    bforce[0]   = elmDat[6]*timeFunction[0].prop ;
-    bforce[1]   = elmDat[7]*timeFunction[0].prop ;
+    //bforce[0]   = elmDat[6]*timeFunction[0].prop ;
+    //bforce[1]   = elmDat[7]*timeFunction[0].prop ;
+    bforce[0]   = rho0*elmDat[6]*timeFunction[0].prop ;
+    bforce[1]   = rho0*elmDat[7]*timeFunction[0].prop ;
+    //bforce[0]   = rho0*elmDat[6] ;
+    //bforce[1]   = rho0*elmDat[7] ;
     double af = SolnData->td(2);
     double d1 = SolnData->td(5);
     double acceFact = SolnData->td(10);
@@ -216,8 +220,6 @@ int LagrangeElem2DStructSolidQuad4Node::calcStiffnessAndResidual(MatrixXd& Kloca
 
         //   part 1. -- material part (not necessarily symmetric!!)
 
-        bforce[0] *= rho0;
-        bforce[1] *= rho0;
 
         for(ii=0;ii<nlbf;ii++)
         {

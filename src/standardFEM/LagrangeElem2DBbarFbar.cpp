@@ -328,8 +328,8 @@ int LagrangeElem2DBbarFbar::calcStiffnessAndResidualFS(MatrixXd& Klocal, VectorX
 
     double rho0 = elmDat[5] ;
     double rho  = rho0;
-    bforce[0]   = elmDat[6]*timeFunction[0].prop ;
-    bforce[1]   = elmDat[7]*timeFunction[0].prop ;
+    bforce[0]   = rho0*elmDat[6] ;
+    bforce[1]   = rho0*elmDat[7] ;
 
     double af = SolnData->td(2);
     double d1 = SolnData->td(5);

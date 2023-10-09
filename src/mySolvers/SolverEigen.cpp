@@ -217,7 +217,7 @@ int  SolverEigen::solve()
   if (currentStatus != FACTORISE_OK) { prgWarning(1,fct,"factorise matrix first!"); return 1; }
   
 
-  //algoType = 1;
+  algoType = 1;
   
   //cout << mtx << endl;
 

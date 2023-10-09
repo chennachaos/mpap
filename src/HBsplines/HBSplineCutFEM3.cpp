@@ -413,7 +413,7 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
     PetscPrintf(MPI_COMM_WORLD, " preparing cut elements took %f  milliseconds \n", (tend-tstart)*1000);
 
-    //setCoveringUncovering();
+    setCoveringUncovering();
 
     tstart = MPI_Wtime();
 
