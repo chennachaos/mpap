@@ -17,11 +17,12 @@ enable_language(CXX Fortran)
 
 # C++ compiler
 
-set(CMAKE_CXX_COMPILER "/usr/bin/gcc")
+#set(CMAKE_CXX_COMPILER "/usr/bin/gcc")
+#set(CMAKE_CXX_COMPILER "/usr/bin/g++-10")
 
 # -DPARDISO_SOLVER
 
-set(COPT "-std=c++14 -O3 -D BIT64  -Wno-uninitialized -Wno-sign-compare -Wno-write-strings  -Wno-deprecated  -Wno-unused  -Wno-format -Wno-narrowing  -Wno-ignored-attributes -Wno-reorder  -Wreturn-type -D_DOMAIN2D -fopenmp  -fpermissive -frounding-math")
+set(COPT "-std=c++17 -O3 -D BIT64  -Wno-uninitialized -Wno-sign-compare -Wno-write-strings  -Wno-deprecated  -Wno-unused  -Wno-format -Wno-narrowing  -Wno-ignored-attributes -Wno-reorder  -Wreturn-type -D_DOMAIN2D -fopenmp  -fpermissive -frounding-math")
 
 #set(COPT "-w -std=c++17 -O3 -mavx2 -ftree-vectorize -ftree-vectorizer-verbose=1  -Wno-uninitialized -Wno-sign-compare -Wno-write-strings  -Wno-deprecated  -Wno-unused  -Wno-format -Wno-narrowing  -Wno-reorder  -Wreturn-type -Wno-unused-parameter -fopenmp  -fpermissive -frounding-math -D_DOMAIN2D ")
 
@@ -33,14 +34,14 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COPT}")
 # include directories
 ##################################
 include_directories(
+/usr/include/eigen3
+/usr/include/eigen3/unsupported
 src/HBsplines 
 src/lib 
 src/myGeom 
 src/mySolvers 
 src/standardFEM 
 src/utilities 
-/usr/include/eigen3
-/usr/include/eigen3/unsupported
 /usr/include/vtk-7.1
 /usr/include/x86_64-linux-gnu/openmpi
 /usr/include/petsc 

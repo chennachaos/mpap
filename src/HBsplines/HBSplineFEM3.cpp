@@ -346,7 +346,7 @@ void  HBSplineFEM::writeReadResult(int index, string& filename, int stride)
       MyStringList  names;
       names.addNew("Model", "Time", "Result-Fluid", "Result-Solid", "End");
 
-      List<Vector<double> > lvdTmp;
+      List<myVector<double> > lvdTmp;
 
       Ifile.open(fileName.asCharArray());
 

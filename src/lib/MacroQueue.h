@@ -27,7 +27,7 @@ class MacroQueue
     
     List<MacroCommand> macCmd;
 
-    Vector<double> p;      // double parameters of the last macro to be called
+    myVector<double> p;      // double parameters of the last macro to be called
     MyString       strg;   // string parameter  of the last macro to be called
                            // (to be set in the macro and picked up in grpDrawingAreaMouseInput)
                               

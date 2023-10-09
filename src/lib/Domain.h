@@ -175,10 +175,10 @@ class Domain: public ListItem
     virtual void transferForces(void)
       { cout << "  'transferForces' is not available for this domain type!\n\n"; return; }
 
-    virtual void whichSurfaces(Vector<int>&, Vector<int>&)
+    virtual void whichSurfaces(myVector<int>&, myVector<int>&)
       { cout << "  'whichSurfaces' is not available for this domain type!\n\n"; return; }
 
-    virtual void whichSplines(Vector<int>&, Vector<int>&)
+    virtual void whichSplines(myVector<int>&, myVector<int>&)
       { cout << "  'whichSplines' is not available for this domain type!\n\n"; return; }
 
     virtual void remeshElemGroups(bool showFlg = false)

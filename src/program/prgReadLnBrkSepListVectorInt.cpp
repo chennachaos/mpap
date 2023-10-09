@@ -9,7 +9,7 @@
 // read colon separated list of integer arrays
 
 
-bool prgReadLnBrkSepListVectorInt(std::ifstream &Ifile, MyString &line, List< Vector<int> > &list)
+bool prgReadLnBrkSepListVectorInt(std::ifstream &Ifile, MyString &line, List< myVector<int> > &list)
 {
   int i, j, val, nw = 0, n = 0;
 
@@ -19,7 +19,7 @@ bool prgReadLnBrkSepListVectorInt(std::ifstream &Ifile, MyString &line, List< Ve
 
   while (1)
   {
-    list.add(new Vector<int>);
+    list.add(new myVector<int>);
 
     line.getNextLine(Ifile);
 

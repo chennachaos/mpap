@@ -14,7 +14,7 @@ class myMesh
 
     vector<myPoint>  verts;
     
-    Vector<myGeomBase>  
+    myVector<myGeomBase>  
     
 
 };

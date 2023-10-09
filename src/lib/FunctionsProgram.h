@@ -93,9 +93,9 @@ inline  bool  prgNAN(double *x, int n)
 
 
 void       prgMacroTest                  (double, double);
-bool       prgReadColonSepListVectorInt  (std::ifstream &, MyString &, List< Vector<int> > &);
-bool       prgReadLnBrkSepListVectorInt  (std::ifstream &, MyString &, List< Vector<int> > &);
-bool       prgReadLnBrkSepListVectorDbl  (std::ifstream &, MyString &, List< Vector<double> > &);
+bool       prgReadColonSepListVectorInt  (std::ifstream &, MyString &, List< myVector<int> > &);
+bool       prgReadLnBrkSepListVectorInt  (std::ifstream &, MyString &, List< myVector<int> > &);
+bool       prgReadLnBrkSepListVectorDbl  (std::ifstream &, MyString &, List< myVector<double> > &);
 //void       prgTest                       (void);
 void       prgCheckCompressedMatrix      (int, int, VectorArray<double> &, VectorArray<int> &, VectorArray<int> &, VectorArray<int> &);
 void       prgPlotMatrixPattern          (int, int, VectorBase<int> &, VectorBase<int> &, char* fileName = NULL);

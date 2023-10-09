@@ -32,7 +32,7 @@ class ComputerTime
 
     MyStringList name;
 
-    Vector<unsigned int> t0;
+    myVector<unsigned int> t0;
 
     double clocksPerSec, secPerClock;
 };

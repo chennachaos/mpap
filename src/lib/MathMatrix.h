@@ -118,9 +118,9 @@ namespace MatricesWulf
 
 		virtual ~MatrixSparse();
 
-		Vector<Type> x;
+		myVector<Type> x;
 
-		Vector<int> row, col;
+		myVector<int> row, col;
 
 		virtual Type &operator()(int, int, bool doubleEntries = false);
 
@@ -724,7 +724,7 @@ namespace MatricesWulf
 
 	int c, i, j, k, n, m = row.n;
 
-	ListArray< Vector<int> > tmpCol, tmpRow, tmpRowP;
+	ListArray< myVector<int> > tmpCol, tmpRow, tmpRowP;
 
 	tmpCol.setDim(this->nCol);
 	tmpRow.setDim(this->nRow);

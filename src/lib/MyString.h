@@ -84,7 +84,7 @@ class MyString: public ListItem
     bool toInt(int *, bool errMsg = true);
     bool toDbl(double *, bool errMsg = true);
 
-    bool toInt(Vector<int> &, bool errMsg = true);
+    bool toInt(myVector<int> &, bool errMsg = true);
 
   private:
 

@@ -23,7 +23,7 @@ template<class Type> class ProfileListArray: public ListItem
 
     inline int m(int i) { return ptr[i] - ptr[i-1]; };
 
-    template<typename Type2> void generate(List< Vector<Type2> > &);
+    template<typename Type2> void generate(List< myVector<Type2> > &);
 
     void print(std::ostream &os = std::cout);
 
@@ -65,7 +65,7 @@ template<class Type> ProfileListArray<Type>::~ProfileListArray()
 
 
 template<class Type> template<typename Type2> 
-  void ProfileListArray<Type>::generate(List< Vector<Type2> > &tmp)
+  void ProfileListArray<Type>::generate(List< myVector<Type2> > &tmp)
 {
   int i, j;
 

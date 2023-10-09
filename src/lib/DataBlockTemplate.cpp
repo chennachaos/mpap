@@ -288,10 +288,10 @@ void DataBlockTemplate::append(int n, int tp)
 
 
 bool DataBlockTemplate::readLine(ifstream &Ifile, MyString &line, 
-		                 Vector<int> &iTmp, 
-                                 Vector<double> &dTmp, 
+		                 myVector<int> &iTmp, 
+                                 myVector<double> &dTmp, 
                                  MyStringList &sTmp, 
-                                 Vector<int> &lTmp)
+                                 myVector<int> &lTmp)
 {
   int i, j, l, cw, nw, cl = 0;
 
@@ -408,10 +408,10 @@ bool DataBlockTemplate::readLine(ifstream &Ifile, MyString &line,
 
 
 bool DataBlockTemplate::readBlock(ifstream &Ifile, MyString &line, 
-		                  Vector<int> &iTmp, 
-                                  Vector<double> &fTmp, 
+		                  myVector<int> &iTmp, 
+                                  myVector<double> &fTmp, 
                                   MyStringList &sTmp, 
-                                  Vector<int> &lTmp)
+                                  myVector<int> &lTmp)
 {
   int i, j,
       iDim, fDim, sDim, lDim,

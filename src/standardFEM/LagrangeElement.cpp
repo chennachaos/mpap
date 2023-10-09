@@ -733,7 +733,7 @@ void LagrangeElement::printStiffnessMatrix()
 
 void LagrangeElement::printForceVector()
 {
-   printf(" Residue Vector for element : %5d\n\n",elenum);
+   printf(" Residue myVector for element : %5d\n\n",elenum);
    for(int ii=0;ii<nsize;ii++)
    {
      printf("\t%5d\t%12.8f\n",ii,resi[ii]);
