@@ -9,7 +9,7 @@
       integer          matId, nivGp, finite, sss, isw, gp, err,
      *                 iter, ndm, matDim, i, j
 
-      double precision matData, F(2,*), F33, stre(*), cc(4,*), iv1, 
+      double precision matData(*), F(2,*), F33, stre(*), cc(4,*), iv1, 
      *                 iv2, dt,
      *                 F3D(3,3), stre3D(6), cc3D(6,6), stre0, K, C(4,4),
      *                 invF(2,2), invF33, fact, dmy(5), cc1(4,4), r0
