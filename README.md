@@ -10,16 +10,20 @@ Animations of some of the simulations performed using this code are available on
 
 
 * Programming languages: **C++** and **Fortran**
-* C++ standard: **C++11** (or above)
+* C++ standard: **C++14** (or above)
 * Required third-party libraries:
-  1. Blas
-  2. Lapack
-  3. MPI (OpenMPI, MPICH or Intel MPI. Your choice!)
-  4. [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page)
-  5. [METIS](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview)
-  6. [PETSc](https://www.mcs.anl.gov/petsc/)
-  7. [VTK](https://vtk.org/)
-  8. [CGAL](https://www.cgal.org/)
+  1. CMake
+  2. Blas
+  3. Lapack
+  4. Boost
+  5. MPI (OpenMPI, MPICH or Intel MPI. Your choice!)
+  6. [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page)
+  7. [METIS](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview)
+  8. [PETSc](https://www.mcs.anl.gov/petsc/)
+  9. [VTK](https://vtk.org/)
+  10. [CGAL](https://www.cgal.org/)
+  11. Metis and ParMetis
+  12. SuperLU
 
 
 ## Compilation and building
