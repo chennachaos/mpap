@@ -17,17 +17,23 @@ enable_language(CXX Fortran)
 
 # C++ compiler
 
-#set(CMAKE_CXX_COMPILER "/usr/bin/gcc")
-#set(CMAKE_CXX_COMPILER "/usr/bin/g++-10")
+set(CMAKE_C_COMPILER "/usr/bin/gcc")
+set(CMAKE_CXX_COMPILER "/usr/bin/g++")
+set(CMAKE_Fortran_COMPILER "/usr/bin/gfortran")
 
 # -DPARDISO_SOLVER
 
-set(COPT "-std=c++17 -O3 -D BIT64  -Wno-uninitialized -Wno-sign-compare -Wno-write-strings  -Wno-deprecated  -Wno-unused  -Wno-format -Wno-narrowing  -Wno-ignored-attributes -Wno-reorder  -Wreturn-type -D_DOMAIN2D -fopenmp  -fpermissive -frounding-math")
+set(COPT "-std=c++17 -O3 -D BIT64  -Wno-uninitialized -Wno-sign-compare -Wno-write-strings  -Wno-unused  -Wno-format -Wno-narrowing  -Wno-ignored-attributes -Wno-reorder  -Wreturn-type -D_DOMAIN2D -fopenmp  -fpermissive -frounding-math")
 
 #set(COPT "-w -std=c++17 -O3 -mavx2 -ftree-vectorize -ftree-vectorizer-verbose=1  -Wno-uninitialized -Wno-sign-compare -Wno-write-strings  -Wno-deprecated  -Wno-unused  -Wno-format -Wno-narrowing  -Wno-reorder  -Wreturn-type -Wno-unused-parameter -fopenmp  -fpermissive -frounding-math -D_DOMAIN2D ")
 
-
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COPT}")
+
+
+set(FOPT "-O3  -Wargument-mismatch")
+#set(FOPT "-O3 -fallow-argument-mismatch")
+
+set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${FOPT}")
 
 
 ##################################

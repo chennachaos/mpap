@@ -10,7 +10,7 @@
      *                 err,
      *                 iter, ndm, matDim
 
-      double precision matDat, lam(*), stre(*), cc(2,*), dlam(*), 
+      double precision matDat(*), lam(*), stre(*), cc(2,*), dlam(*), 
      *                 iv1, iv2, dt,
      *                 F3D(3,3), stre3D(6), stre0, cc3D(6,6), K, dmy(10)
 

@@ -48,16 +48,17 @@ mesh refinement limits
 
 
 dirichlet boundary conditions
- 1  1  0.2  100.0  1 -1.0
- 1  2  0.0  100.0  1 -1.0
- 3  1  0.0  100.0  1 -1.0
- 3  2  0.0  100.0  1 -1.0
- 4  1  0.0  100.0  1 -1.0
- 4  2  0.0  100.0  1 -1.0
+! side  dir  PEN   Flag Factor proftype  val   ll   ul
+   1    1   100.0   1   -1.0       2      0.2  0.0  0.6
+   1    2   100.0   1   -1.0       1      0.0  0.0  0.0
+   3    1   100.0   1   -1.0       1      0.0  0.0  0.0
+   3    2   100.0   1   -1.0       1      0.0  0.0  0.0
+   4    1   100.0   1   -1.0       1      0.0  0.0  0.0
+   4    2   100.0   1   -1.0       1      0.0  0.0  0.0
 
 
 staggered or monolithic
-0  2  0.05  0.0  0.0
+0  1  0.05  0.0  0.0
 
 
 cutfem parameters
@@ -895,42 +896,20 @@ BEGIN RUN_CONTROL
 
 
 BATCH
-!anly,solv,,27,1,6,3,1,1,1
-anly,solv,,27,1,8,1,1,1,1
-!anly,solv,,27,1,8,3,1,1,1
-chen,data,,27,2,2,2,1
-dt,,0.01
+anly,solv,,28,1,8,3,1,1,1
+chen,data,,28,2,2,2,1
+dt,,0.02
 wrnd
-vtk,flow,,27,1,1,1,10,1,1,1,0,0,1
-wait,mous
+!wait,mous
 loop,,4.99999999,2
-  if,mous
-    wait,mous
-  ndif
   time
-  updt
-  loop,,10
-    !wait,mous
-    anly,tang,,27,1,1
-    if,conv
-      prnt,CONVERGED
-      xlop
-    ndif
-    if,divg,,,1000
-      xlop
-    ndif
-  next
+  !chen,fsi,,28,1,1,2,1
+  chen,fsi,,28,1,1,1,1
   prnt
-  !if,conv
-    !vtk,flow,,27,1,1,1,10,1,1,1,0,0,1
-    vtk,flow,,27,1,1,1,1,1,1,1,0,0,1
+    !vtk,flow,,28,1,1,1,10,1,1,1,0,0,1
+    vtk,flow,,28,1,1,1,1,1,1,1,0,0,1
     wrnd
-    !dt,stck
-  !else
-    !time,back
-    !dt,cut
-    !rset
-  !ndif
+    dt,stck
 next
 end
 

@@ -5567,21 +5567,14 @@ wrnd
 !wait,mous
 !loop,,10
 loop,,19.99999999,2
-  !wait,mous
   time
   !chen,fsi,,28,1,1,2,1
   chen,fsi,,28,1,1,1,1
   prnt
-  !if,conv
     !vtk,flow,,28,1,1,1,10,1,1,1,0,0,1
     vtk,flow,,28,1,1,1,1,1,1,1,0,0,1
     wrnd
     dt,stck
-  !else
-    !time,back
-    !dt,cut
-    !rset
-  !ndif
 next
 end
 
