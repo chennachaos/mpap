@@ -34,7 +34,7 @@ number of elements
 
 fluid properties
 ! nGP flag  axsy     rho      mu    fx    fy    fz    tauSUPG      tauPSPG  tauLSIC     eps     gamm
-   2    0    0       1.0     0.05   0.0   0.0  0.0      1.0         1.0       1.0       0.0    0.0
+   2    0    0       1.0     0.01   0.0   0.0  0.0      1.0         1.0       0.0       0.0    0.0
 
 
 refinement type
@@ -51,8 +51,7 @@ mesh refinement limits
 
 
 dirichlet boundary conditions
-! side  dir  PEN   Flag Factor  proftype  val   ll   ul
-   1    1   1.0e2   1   -1.0       1      1.0  0.0  0.0
+   1    1   1.0e2   1   -1.0       1      2.5  0.0  0.0
    1    2   1.0e2   1   -1.0       1      0.0  0.0  0.0
    3    2   1.0e2   1   -1.0       1      0.0  0.0  0.0
    4    2   1.0e2   1   -1.0       1      0.0  0.0  0.0
@@ -261,18 +260,27 @@ rigid body degree of freedom
   -1   -1   -1  
 
 
+rigid body prescribed motion
+! f(t) = p1 + p2*t + p3*sin(p4*t+p5) + p6*cos(p7*t+p8)
+! dof  t0     t1     p1    p2    p3                 p4    p5    p6    p7    p8
+  3    0.0  1000.0   0.0   0.0   0.52360   1.13097335529233   0.0   0.0   0.0   0.0  
+
+
 immersed body output
 ! type  nodenum  dof
    1       1      1 
    1       1      2 
    3       1      1 
+   3       1      2
    4       1      1 
+   4       1      2 
    5       1      1 
+   5       1      2
 
 
 control parameters
 !  tol     tis   tis_param
- 1.0e-6     0      0.0
+ 1.0e-6     4      0.0
 
 
 
@@ -287,10 +295,10 @@ BEGIN TIME_FUNCTIONS
 !
 ! id  t0    t1      p1    p2    p3    p4    p5     p6   p7    p8
 
-!  1  0.0  10000.0   1.0   0.0   0.0   0.0   0.0   0.0   0.0   0.0
+  1  0.0  10000.0   1.0   0.0   0.0   0.0   0.0   0.0   0.0   0.0
 
-  1  0.0      1.0   0.0   1.0   0.0   0.0   0.0   0.0   0.0   0.0
-  1  1.0  10000.0   1.0   0.0   0.0   0.0   0.0   0.0   0.0   0.0
+!  1  0.0      1000.0   0.0   1.0   0.0   0.0   0.0   0.0   0.0   0.0
+!  1  1.0  10000.0   1.0   0.0   0.0   0.0   0.0   0.0   0.0   0.0
 
 
 
@@ -304,26 +312,31 @@ BEGIN RUN_CONTROL
 
 
 
+
 BATCH
-anly,solv,,28,1,8,3,1,1,1                    ! this sets the solver
-chen,data,,28,2,2,2,1                        ! this generates the grid file, without any solution field.
-!vtk,flow,,28,1,1,1,1,1,1,1,0,0,1            ! this generates the grid file, with the solution field. Since we have not solved anything, all the values are zero.
-dt,,0.2                                      ! time step size
-wrnd                                         ! write nodal data to the output file starting with T
-!wait,mous                                   ! useful to stop the program before running the time loop if we want to check if the input geometries are correct.
-loop,,9.99999999,2                           ! Time loop; this particular one runs up to a final time of 10 seconds. Set 9.999999999 to avoid floating point issues.
-  time                                       ! update time functions
-  !chen,fsi,,28,1,1,2,1                      ! FSI coupling loop with two coupling iterations
-  chen,fsi,,28,1,1,1,1                       ! FSI coupling loop with one coupling iteration
-  prnt                                       
-    !vtk,flow,,28,1,1,1,10,1,1,1,0,0,1       ! generates output in the VTK format. One for each time step. To generate one file for every 10th step use vtk,flow,,28,1,1,1,10,1,1,1,0,0,1
+anly,solv,,28,1,8,3,1,1,1
+chen,data,,28,2,2,2,1
+dt,,0.05
+wrnd
+!wait,mous
+loop,,19.99999999,2
+  !wait,mous
+  time
+  !chen,fsi,,28,1,1,2,1
+  chen,fsi,,28,1,1,1,1
+  prnt
+  !if,conv
+    !vtk,flow,,28,1,1,1,10,1,1,1,0,0,1
     vtk,flow,,28,1,1,1,1,1,1,1,0,0,1
     wrnd
-    dt,stck                                  ! time step control if not converged
-next                                         ! go to next
-end                                          ! end of loop
-
-
+    dt,stck
+  !else
+    !time,back
+    !dt,cut
+    !rset
+  !ndif
+next
+end
 
 
 
