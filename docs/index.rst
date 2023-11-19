@@ -1,36 +1,49 @@
-.. MPAP documentation master file, created by
-   sphinx-quickstart on Mon Mar 23 10:59:14 2020.
+.. MPAP FSI CutFEM documentation master file, created by
+   sphinx-quickstart on Sun Nov 12 22:55:59 2023.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-MPAP documentation
-====================
+Welcome to MPAP FSI CutFEM's documentation!
+===========================================
 
-**MPAP** is a parallel solver for Fluid-Structure Interaction (FSI) problems.
+Hello! Welcome to the FSI solver based on CutFEM.
 
-It is based on CutFEM for the fluid problem and uses a staggered or partitioned approach
- for resolving the coupling between fluid and solid problems.
+The finite element formulation is published in 3 papers in `CMAME <https://www.sciencedirect.com/journal/computer-methods-in-applied-mechanics-and-engineering>`_ journal.
+
+* `Paper 1 <https://www.sciencedirect.com/science/article/pii/S0045782516304893>`_
+* `Paper 2 <https://www.sciencedirect.com/science/article/pii/S0045782516313706>`_
+* `Paper 3 <https://www.sciencedirect.com/science/article/pii/S0045782518301026>`_
 
 
-  
-Table of content
-++++++++++++++++
+Animations of some of the simulations performed using this code are available on my `YouTube <https://www.youtube.com/playlist?list=PL9IBrbGcgPbK2frCdXdOvCH4YwHRhiVts>`_ channel.
+
 
 .. toctree::
    :maxdepth: 2
-     
-   modules
-   examples
+   :hidden:
+   :caption: installation:
 
+   installation/installation
 
-Issues and bug reports
-++++++++++++++++++++++
-For issues and bug reports, please use the `Issue feature on GitHub <https://github.com/chennachaos/mpap/issues>`_. 
-In case this is inconvenient or not possible, write an email to `thechenna123@gmail.com`.
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :caption: formulation:
 
-License
-+++++++
+   formulation/formulation
 
-MPAP is licensed according to the MIT license.
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :caption: inputformat:
 
+   inputformat/template
+   inputformat/FluidProblem
 
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :caption: examples:
+
+   examples/example1
+   examples/example2
