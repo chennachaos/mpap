@@ -357,6 +357,40 @@ void  ImmersedFlexibleSolid::setBoundaryConditions(vector<vector<double> >& data
 
 
 
+
+
+int ImmersedFlexibleSolid::setBoundaryConditions()
+{
+    int  aa, timeFuncNum, nn, dof, index;
+    double specVal, timeFactor;
+
+    for(aa=0;aa<DirichletBCs.size();aa++)
+    {
+      nn      = (int) (DirichletBCs[aa][0] - 1);
+      dof     = (int) (DirichletBCs[aa][1] - 1);
+      specVal = DirichletBCs[aa][2];
+
+      index = nn*ndof+dof;
+
+      if(DirichletBCs[aa].size() > 3)
+      {
+        timeFuncNum = (int) (DirichletBCs[aa][3] - 1);
+
+        if(timeFuncNum >= 0)
+          specVal = timeFunction[timeFuncNum].prop;
+      }
+
+      SolnData.var1applied[index] = specVal - SolnData.var1[index];        
+    }
+
+    return 0;
+}
+
+
+
+
+
+
 void ImmersedFlexibleSolid::computeInitialAcceleration()
 {
     // compute initial accelerations

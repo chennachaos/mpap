@@ -90,7 +90,8 @@ HBSplineCutFEM::HBSplineCutFEM()
                           "immersed body output", //35
                           "contact elements", //36
                           "element type", //37
-                          "material type");
+                          "material type", //38
+                          "node sets");
 
 }
 

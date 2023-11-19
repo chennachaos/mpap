@@ -86,6 +86,7 @@ int LagrangeElem2DStructSolidQuad4Node::calcStiffnessAndResidual(MatrixXd& Kloca
     double acceFact = SolnData->td(10);
     double dt = mpapTime.dt;
 
+    //cout << "finite = " << finite << '\t' << af << '\t' << d1 << '\t' << acceFact << endl;
     //cout << "timeFunction[0].prop=" << timeFunction[0].prop << endl;
     //printf(" %14.12f \t %14.12f \t %14.12f \t %14.12f \n ", BULK, mu, bforce[0], bforce[1]);
     //printf(" %14.12f \t %14.12f \t %14.12f \t %14.12f \n ", rho, af, d1, aa);

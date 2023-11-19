@@ -438,14 +438,14 @@ int  LagrangeElement::applyDirichletBCs(MatrixXd& Klocal, VectorXd& Flocal)
 
   int aa, bb, ii, jj;
 
-  double loadFact = timeFunction[0].prop;
+  //double loadFact = timeFunction[0].prop;
   double fact=0.0;
   for(ii=0; ii<nsize; ii++)
   {
     aa = forAssyVec[ii];
     if(aa == -1) // this DOF has a prescibed value
     {
-      fact = loadFact * SolnData->var1applied[globalDOFnums[ii]];
+      fact = SolnData->var1applied[globalDOFnums[ii]];
 
       for(jj=0; jj<nsize; jj++)
       {

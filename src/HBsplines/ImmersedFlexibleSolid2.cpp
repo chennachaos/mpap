@@ -423,6 +423,8 @@ void ImmersedFlexibleSolid::solveTimeStep()
     printf("\n Solving Immersed Flexible Solid \n");
     //printf("\n External force norm = %12.6E \n", forceCur.norm());
 
+    setBoundaryConditions();
+
     int  ii=0, ee=0;
 
     //printVector(SolnData.forceCur);
@@ -475,6 +477,9 @@ int ImmersedFlexibleSolid::calcStiffnessAndResidual(int printRes, bool zeroMtx, 
 
       elems[ee]->calcStiffnessAndResidual(Klocal, Flocal, firstIter);
 
+      if(firstIter)
+        elems[ee]->applyDirichletBCs(Klocal, Flocal);
+
       //cout << " MMMMMMMMMMM " << endl;
       //elems[ee]->assembleElementMatrixAndVector(0, solver->mtx, &(solver->rhsVec(0)));
 
@@ -490,6 +495,22 @@ int ImmersedFlexibleSolid::calcStiffnessAndResidual(int printRes, bool zeroMtx, 
     //printf("\n rhsVec norm = %12.6E \n", solver->rhsVec.norm());
 
     //applyBoundaryConditions(0, 0, solver->mtx, &(solver->rhsVec(0)));
+
+    // add the specified DOFs
+    if(firstIter)
+    {
+      int  aa, nn, dof, index;
+
+      for(aa=0;aa<DirichletBCs.size();aa++)
+      {
+        nn      = (int) (DirichletBCs[aa][0] - 1);
+        dof     = (int) (DirichletBCs[aa][1] - 1);
+
+        index = nn*ndof+dof;
+
+        SolnData.var1[index] += SolnData.var1applied[index];
+      }
+    }
 
     applyExternalForces();
 

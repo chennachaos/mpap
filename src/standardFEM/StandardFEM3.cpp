@@ -135,7 +135,7 @@ void StandardFEM::plotGeom(int a1, bool b1, int c1, bool d1, int* ffff)
 
 void  StandardFEM::postProcess(int vartype, int vardir, int nCol, bool umnxflag, double umin, double umax, int* resln)
 {
-    //cout << " StandardFEM::postProcess " << endl;
+    cout << " StandardFEM::postProcess " << endl;
 
     if(this_mpi_proc != 0)
       return;

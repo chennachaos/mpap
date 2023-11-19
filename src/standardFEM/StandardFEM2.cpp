@@ -434,12 +434,6 @@ int StandardFEM::prepareMatrixPattern()
     }
 
     int nn, dof;
-    for(ii=0;ii<DirichletBCs.size();ii++)
-    {
-      nn  = DirichletBCs[ii][0];
-      dof = DirichletBCs[ii][1];
-      SolnData.var1applied[nn*ndof+dof] =  DirichletBCs[ii][2];
-    }
 
     //cout << " BBBBBBBBBBBBBBBBB " << endl;
 
@@ -894,6 +888,9 @@ int StandardFEM::calcStiffnessAndResidual(int printRes, bool zeroMtx, bool zeroR
           //cout << " MMMMMMMMMMM " << endl;
           elems[ee]->calcStiffnessAndResidual(Klocal, Flocal);
 
+          if(firstIter)
+            elems[ee]->applyDirichletBCs(Klocal, Flocal);
+
           //elems[ee]->assembleElementMatrix(0, solver2->mtx);
           //cout << " ooooooooooooooo " << endl;
           //elems[ee]->assembleElementVector(0, 0, solverPetsc->rhsVec, solver2->reac, 0, 0);
@@ -944,32 +941,20 @@ int StandardFEM::calcStiffnessAndResidual(int printRes, bool zeroMtx, bool zeroR
     //cout << " rhsVec " << endl;        printVector(&(rhsVec[0]), totalDOF);
     //printf("\n rhsVec norm = %12.6E \n", solver->rhsVec.norm());
 
-  if(firstIter)
-  {
-    //double fact1=1.0;
-    double fact1 = timeFunction[0].prop;
-
-//    SolnData.var1 = fact1*SolnData.var1applied;
-
-    /*
-    int ii, jj, nn, dof, aa, ind;
-    double specVal;
-    vector<int>::iterator itint;
-    for(aa=0;aa<DirichletBCs.size();aa++)
+    if(firstIter)
     {
-      nn  = (int) (DirichletBCs[aa][0]);
-      dof = (int) (DirichletBCs[aa][1]);
-      specVal = DirichletBCs[aa][2];
+      int  aa, nn, dof, index;
 
-      //itint = find(GlobalPointNumbers.begin(), GlobalPointNumbers.end(), nn);
-      //nn   = distance(GlobalPointNumbers.begin(), itint);
-      ind = nn*ndof+dof;
+      for(aa=0;aa<DirichletBCs.size();aa++)
+      {
+        nn      = (int) (DirichletBCs[aa][0]);
+        dof     = (int) (DirichletBCs[aa][1]);
 
-      //SolnData.var1[ind] = fact1*SolnData.var1applied[ind];
-      SolnData.var1[ind] = fact1*specVal ;
+        index = nn*ndof+dof;
+
+        SolnData.var1[index] += SolnData.var1applied[index];
+      }
     }
-    */
-  }
 
     firstIter = false;
     rNormPrev = rNorm;

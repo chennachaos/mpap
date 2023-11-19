@@ -33,6 +33,8 @@ class ImmersedFlexibleSolid : public ImmersedSolid
 
         void  prepareElemProp();
         void  prepareMatlProp();
+        
+        int   setBoundaryConditions();
 
         virtual void  printInfo();
 

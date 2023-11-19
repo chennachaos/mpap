@@ -211,12 +211,16 @@ void  StandardFEM::readInputData(std::ifstream &Ifile, MyString &line)
             {
               if(lvdTmp[i].n < 1)
                 prgError(2, fct, "invalid number of 'prescribed boundary conditions' !");
+              
+              cout << i << '\t' << lvdTmp[i].n << endl;
 
               DirichletBCs[i].resize(lvdTmp[i].n);
 
               DirichletBCs[i][0] = lvdTmp[i][0]-1;
               DirichletBCs[i][1] = lvdTmp[i][1]-1;
               DirichletBCs[i][2] = lvdTmp[i][2];
+              if(lvdTmp[i].n > 3)
+                DirichletBCs[i][3] = lvdTmp[i][3]-1;
             }
 
             break;
@@ -761,7 +765,31 @@ void  StandardFEM::computeGeometry(const myPoint& param, myPoint& geom)
 
 void StandardFEM::assignBoundaryConditions()
 {
+    int  aa, timeFuncNum=-1, nn, dof, index;
+    double specVal, timeFactor;
 
+    for(aa=0;aa<DirichletBCs.size();aa++)
+    {
+      nn      = (int) (DirichletBCs[aa][0]);
+      dof     = (int) (DirichletBCs[aa][1]);
+      specVal = DirichletBCs[aa][2];
+
+      index = nn*ndof+dof;
+
+      if(DirichletBCs[aa].size() > 3)
+      {
+        timeFuncNum = (int) (DirichletBCs[aa][3]);
+
+        if(timeFuncNum >= 0)
+          specVal = timeFunction[timeFuncNum].prop;
+      }
+      //cout << nn << '\t' << aa << '\t' << timeFuncNum << '\t' << specVal << endl;
+
+      SolnData.var1applied[index] = specVal - SolnData.var1[index];        
+    }
+    //printVector(SolnData.var1applied);
+    
+    return;
 }
 
 
@@ -893,55 +921,7 @@ void StandardFEM::timeUpdate()
 
   SolnData.timeUpdate();
 
-  //
-  int ii, jj, nn, dof, aa, ind;
-
-  double fact1=1.0, specVal;
-         //if(mpapTime.cur <= 5.0e-3)
-         //{
-           //fact1 = 0.5*( 1.0-cos(628.3185*mpapTime.cur));
-           //fact1 = 0.01*0.5*( 1.0-cos(20.0*mpapTime.cur)) ;
-           //fact = sin(628.3185*mpapTime.cur);
-           //fact1 = 1.0;
-           //fact = sin(20.0*mpapTime.cur);
-         //}
-         //else
-           //fact1 = 0.0;
-    //fact1 = mpapTime.dt;
-    //fact1 = mpapTime.cur - mpapTime.dt;
-
-    fact1 = timeFunction[0].prop;
-    fact1 = 1.0;
-
-  if(firstIter)
-  {
-    int ii, jj, nn, dof, aa, ind;
-
-    KimMoinFlow  analy(SolnData.ElemProp[0].data[4], SolnData.ElemProp[0].data[5], 1.0);
-    double  xx, yy;
-
-    for(aa=0;aa<DirichletBCs.size();aa++)
-    {
-      nn  = (int) (DirichletBCs[aa][0]);
-      dof = (int) (DirichletBCs[aa][1]);
-      specVal = DirichletBCs[aa][2];
-
-      //itint = find(GlobalPointNumbers.begin(), GlobalPointNumbers.end(), nn);
-      //nn   = distance(GlobalPointNumbers.begin(), itint);
-
-      xx = GeomData.NodePosOrig[nn][0];
-      yy = GeomData.NodePosOrig[nn][1];
-
-      ind = nn*ndof+dof;
-
-      //SolnData.var1[ind] = analy.computeValue(dof, xx, yy, mpapTime.cur);
-
-      //SolnData.var1[ind] = fact1*SolnData.var1applied[ind];
-
-      //SolnData.var1[ind] = fact1*specVal ;
-    }
-  }
-  //
+  assignBoundaryConditions();
 
   //cout << " aaaaaaaaaaaaaaa " << endl;
 
