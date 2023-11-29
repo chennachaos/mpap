@@ -213,13 +213,16 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
 
             refinementData.resize(lvdTmp.n);
 
-            //cout << lvdTmp[0] << endl;
-            refinementData.resize(lvdTmp[0].n);
-            if(lvdTmp[0].n < 1)
-              prgError(2, fct, "invalid number of 'refinement type' !");
+            for(i=0;i<lvdTmp.n;i++)
+            {
+              if(lvdTmp[i].n < 1)
+                prgError(2, fct, "invalid number of 'refinement type' !");
 
-            for(j=0;j<lvdTmp[0].n;j++)
-              refinementData[j] = lvdTmp[0][j];
+              refinementData[i].resize(lvdTmp[i].n);
+
+              for(j=0;j<lvdTmp[i].n;j++)
+                refinementData[i][j] = lvdTmp[i][j];
+            }
 
             //printVector(refinementData);
 
@@ -234,7 +237,6 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
 
             for(i=0;i<lvdTmp.n;i++)
             {
-                //cout << lvdTmp[i] << endl;
                 refineLimitVals[i].resize(lvdTmp[i].n);
                 if(lvdTmp[i].n < 1)
                    prgError(2, fct, "invalid number of 'mesh refinement limits' !");

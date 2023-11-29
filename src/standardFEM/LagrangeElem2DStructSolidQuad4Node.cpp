@@ -367,7 +367,7 @@ void LagrangeElem2DStructSolidQuad4Node::toPostprocess(int vartype, int varindex
 
 void  LagrangeElem2DStructSolidQuad4Node::computeEnergy(int index1, int index2, VectorXd& energy)
 {
-    // compute total energy for structural dynamic problems
+    // compute strain energy
     ///////////////////////////////////////////////////////////
 
     double  F[4], detF=0.0, F33, fact, dvol, dvol0, Jac;
@@ -386,10 +386,16 @@ void  LagrangeElem2DStructSolidQuad4Node::computeEnergy(int index1, int index2, 
 
 
     vector<double>  gausspoints1, gausspoints2, gaussweights;
-
     getGaussPointsQuad(nGP, gausspoints1, gausspoints2, gaussweights);
 
     energy.setZero();
+
+    MatrixXd  FF(3,3), Finv(3,3), sigma(3,3), LagTens(3,3), Iden(3,3), PK2(3,3);
+    FF.setZero();
+    PK2.setZero();
+    sigma.setZero();
+    Iden.setZero();
+    Iden(0,0) = 1.0;  Iden(1,1) = 1.0;  Iden(2,2) = 1.0;
 
     for(gp=0; gp<nGP; gp++)
     {
@@ -413,8 +419,6 @@ void  LagrangeElem2DStructSolidQuad4Node::computeEnergy(int index1, int index2, 
         F[3] = computeValue(1, dN_dy) + 1.0;
 
         detF =  F[0]*F[3] - F[1]*F[2];
-
-        //if(detF < 0.0)   return 1;
 
         //if(finite)
         //{
@@ -445,16 +449,36 @@ void  LagrangeElem2DStructSolidQuad4Node::computeEnergy(int index1, int index2, 
         strain[2] = F33  - 1.0;
         strain[3] = 0.5 * (F[1] + F[2]);
 
+        //velo[0] = computeValueDot(0, N);
+        //velo[1] = computeValueDot(1, N);
+
+        // kinetic energy
+        //energy[0] += (0.5*dvol0*rho*(velo[0]*velo[0]+velo[1]*velo[1]));
+        //energy[1] += (0.5*dvol*(strain[0]*stress[0]+strain[1]*stress[1]+strain[2]*stress[2]+strain[3]*stress[3]));
+        
+        FF(0,0) = F[0];
+        FF(0,1) = F[2];
+        FF(1,0) = F[1];
+        FF(1,1) = F[3];
+        FF(2,2) = 1.0;
+        Finv = FF.inverse();
+        
+        LagTens = 0.5*(FF.transpose()*FF - Iden);
+
+        sigma(0,0) = stress[0];
+        sigma(1,1) = stress[1];
+        sigma(2,2) = stress[2];
+        
+        sigma(0,1) = stress[3];  sigma(1,0) = stress[3];
+
+        PK2 = detF*Finv*sigma*Finv.transpose();
+
+        // strain energy        
+        energy[0] += (0.5*dvol* ( PK2(0,0)*LagTens(0,0) + PK2(1,1)*LagTens(1,1) + PK2(2,2)*LagTens(2,2) + 2.0*PK2(0,1)*LagTens(0,1) ) );
+        
         //printf(" %14.12f \t %14.12f \t %14.12f \t %14.12f \n ", strain[0], strain[1], strain[2], strain[3]);
         //printf(" %14.12f \t %14.12f \t %14.12f \t %14.12f \n ", stress[0], stress[1], stress[2], stress[3]);
         //printf("  dvol =  %14.12f \n\n ", dvol);
-
-        velo[0] = computeValueDot(0, N);
-        velo[1] = computeValueDot(1, N);
-
-        // kinetic energy
-        energy[0] += (0.5*dvol0*rho*(velo[0]*velo[0]+velo[1]*velo[1]));
-        energy[1] += (0.5*dvol*(strain[0]*stress[0]+strain[1]*stress[1]+strain[2]*stress[2]+strain[3]*stress[3]));
     }//gp
 
     //printf("\n\n");

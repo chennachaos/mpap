@@ -412,6 +412,7 @@ void ImmersedFlexibleSolid::writeOutput()
 
     int  bb=0, type=0, nn2=0, dof=0, ii=0, kk=0;
     double  val_out=0.0;
+    VectorXd energy(9);
 
     for(bb=0; bb<OutputData.size(); bb++)
     {
@@ -470,9 +471,21 @@ void ImmersedFlexibleSolid::writeOutput()
              sprintf(tmp," \t %12.6E", val_out);
         break;
 
+        case  100 : // strain energy
+
+             val_out=0.0;
+             for(int ee=0; ee<nElem; ee++)
+             {
+               elems[ee]->computeEnergy(0, 0, energy);
+
+               val_out += energy[0];
+             }
+             sprintf(tmp," \t %12.6E", val_out);
+        break;
+
         default : 
 
-             prgError(1,"HBSplineFEM::writeImmersedSolidOutput()","invalid value of 'type'!");
+             prgError(1,"ImmersedFlexibleSolid::writeOutput()","invalid value of 'type'!");
 
         break;
       }
@@ -507,6 +520,7 @@ void ImmersedFlexibleSolid::postProcess(int index)
     vtkSmartPointer<vtkFloatArray>          vecVTK2  =  vtkSmartPointer<vtkFloatArray>::New();
     vtkSmartPointer<vtkFloatArray>          vecVTK3  =  vtkSmartPointer<vtkFloatArray>::New();
     vtkSmartPointer<vtkFloatArray>          vecVTK4  =  vtkSmartPointer<vtkFloatArray>::New();
+    vtkSmartPointer<vtkFloatArray>          cellVTK  =  vtkSmartPointer<vtkFloatArray>::New();
 
     vtkSmartPointer<vtkXMLUnstructuredGridWriter> writerUGridVTK =  vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
 
@@ -517,6 +531,7 @@ void ImmersedFlexibleSolid::postProcess(int index)
     vecVTK2->SetName("velo");
     vecVTK3->SetName("acce");
     vecVTK4->SetName("force");
+    cellVTK->SetName("StrEngy");
 
     vecVTK->SetNumberOfComponents(3);
     vecVTK->SetNumberOfTuples(nNode);
@@ -526,6 +541,8 @@ void ImmersedFlexibleSolid::postProcess(int index)
     vecVTK3->SetNumberOfTuples(nNode);
     vecVTK4->SetNumberOfComponents(3);
     vecVTK4->SetNumberOfTuples(nNode);
+
+    cellVTK->SetNumberOfTuples(nElem);
 
     vtkIdType   pt[2];
 
@@ -671,11 +688,25 @@ void ImmersedFlexibleSolid::postProcess(int index)
       }
     }
 
+    // compute strain energy
+    VectorXd energy(9);
+    double val;
+    for(ee=0; ee<nElem; ee++)
+    {
+      elems[ee]->computeEnergy(0, 0, energy);
+
+      val = energy[0];
+      
+      cellVTK->SetTuple1(ee, val);
+    }
+
+
     uGridVTK->SetPoints(pointsVTK);
     uGridVTK->GetPointData()->SetVectors(vecVTK);
     uGridVTK->GetPointData()->AddArray(vecVTK2);
     uGridVTK->GetPointData()->AddArray(vecVTK3);
     uGridVTK->GetPointData()->AddArray(vecVTK4);
+    uGridVTK->GetCellData()->AddArray(cellVTK);
 
     char fname[500];
 

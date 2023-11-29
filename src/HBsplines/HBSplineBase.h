@@ -66,13 +66,14 @@ class HBSplineBase: public Domain
 
         vector<int>  VacantBFs, nodes2divide, elemsToRefine, elemsToUnRefine, activeElements;
 
-        vector<double>  refinementData, fluidProps, stagParams;
+        //vector<double>  refinementData;
+        vector<double>  fluidProps, stagParams;
         vector<vector<int> >  boundaryNodes, contElemData;
         vector<vector<int> >  NodeNumsAtLevel;
         vector<vector<int> >  DDconn;
 
         vector<vector<double> >  DirichletBCs, NeumannBCs, DerivativeBCs, pointBCs, Iconds;
-        vector<vector<double> >  refineLimitVals, FluidOutputData;
+        vector<vector<double> >  refineLimitVals, FluidOutputData, refinementData;
 
         vector<node*>  elems;
         //typedef boost::ptr_vector<base> container;

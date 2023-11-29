@@ -314,7 +314,7 @@ void HBSplineBase::prepareInputData()
     param.setZero();
 
     // Refine the underlying grid if specified
-
+/*
     if(refinementData.size() > 0)
     {
       //printf("\n HBSplineBase : Refinement process ...... STARTED \n \n ");
@@ -348,12 +348,53 @@ void HBSplineBase::prepareInputData()
 
         findUnique(elemsToRefine);
 
-        /*
-        printf(" elemsToRefine  \n");
-        for(ii=0;ii<elemsToRefine.size();ii++)
-          printf("%5d \t", elemsToRefine[ii] );
-        printf("\n\n\n");
-        */
+        MAX_LEVEL += 1;
+        applyRefinementProcess();
+        CURRENT_LEVEL += 1;
+        processBoundaryConditionsRefinedLevels();
+
+        //for(ii=0;ii<elemsToRefine.size();ii++)
+        //elems[elemsToRefine[ii]]->printSelf();
+      }
+      //printf("\n HBSplineBase : Refinement process ...... FINISHED \n \n ");
+    }
+*/
+
+
+    if(refinementData.size() > 0)
+    {
+      //printf("\n HBSplineBase : Refinement process ...... STARTED \n \n ");
+
+    for(kk=0; kk<refinementData.size(); kk++)
+    {
+      for(int rr=0;rr<refinementData[kk][1];rr++)
+      {
+        elemsToRefine.clear();
+
+        switch( int (refinementData[kk][0]) )
+        {
+           default :
+           case 0:
+              refine(refinementData[kk][2]);
+              break;
+           case 1:
+              refinementforHemkerProblem();
+              break;
+           case 2:
+              refinementforAdvDiff1D();
+              break;
+           case 3:
+              refinementforAdvDiff2D();
+              break;
+           case 4:
+              pointBasedRefinement(refinementData[kk][2]);
+              break;
+           case 5:
+              limitBasedRefinement(rr);
+              break;
+        }
+
+        findUnique(elemsToRefine);
 
         MAX_LEVEL += 1;
         applyRefinementProcess();
@@ -364,6 +405,7 @@ void HBSplineBase::prepareInputData()
         //elems[elemsToRefine[ii]]->printSelf();
       }
       //printf("\n HBSplineBase : Refinement process ...... FINISHED \n \n ");
+    }
     }
 
     /////////////////////////////////
@@ -620,7 +662,7 @@ void HBSplineBase::limitBasedRefinement(int kk)
     double  val[6];
     myPoint  knotBegin, knotIncr;
 
-    assert(refinementData[1] <= refineLimitVals.size());
+    //assert(refinementData[1] <= refineLimitVals.size());
 
       if(DIM == 1)
       {

@@ -699,7 +699,7 @@ void LagrangeElem2DBbarFbar::toPostprocess(int vartype, int varindex, int type, 
 
 void  LagrangeElem2DBbarFbar::computeEnergy(int index1, int index2, VectorXd& energy)
 {
-    // compute total energy for structural dynamic problems
+    // compute strain energy
     ///////////////////////////////////////////////////////////
 
     elmDat = &(SolnData->ElemProp[elmType].data[0]);
@@ -711,16 +711,15 @@ void  LagrangeElem2DBbarFbar::computeEnergy(int index1, int index2, VectorXd& en
 
   VectorXd  N(nlbf), dN_dx(nlbf), dN_dy(nlbf);
 
-  int   err,  isw,  count,  count1, index, ll = 0, ii, jj, gp1, gp2, TI, TIp1, TJ, TJp1;
+  int   err,  isw,  count,  count1, index, ll = 0, ii, jj, gp, TI, TIp1, TJ, TJp1;
   int   ind1, ind2, kk;
   
   double  rho  = elmDat[5] ;
 
-  vector<double>  gausspoints1, gaussweights1;
-
+  vector<double>  gausspoints1, gausspoints2, gaussweights;
   //  compute determinant detF (tr(F)) in element centre 
 
-  getGaussPoints1D(1, gausspoints1, gaussweights1);
+  getGaussPoints1D(1, gausspoints1, gaussweights);
 
   param[0] = GeomData->gausspoints1[0];
   param[1] = GeomData->gausspoints1[0];
@@ -742,28 +741,29 @@ void  LagrangeElem2DBbarFbar::computeEnergy(int index1, int index2, VectorXd& en
 
   //cout << " finite = " << finite << endl;
 
-  int nGP = (int) elmDat[0] ;
+    int nGP = 4 ;
+    getGaussPointsQuad(nGP, gausspoints1, gausspoints2, gaussweights);
 
-  getGaussPoints1D(nGP, gausspoints1, gaussweights1);
+    energy.setZero();
 
-  energy.setZero();
+    MatrixXd  FF(3,3), Finv(3,3), sigma(3,3), LagTens(3,3), Iden(3,3), PK2(3,3);
+    FF.setZero();
+    PK2.setZero();
+    sigma.setZero();
+    Iden.setZero();
+    Iden(0,0) = 1.0;  Iden(1,1) = 1.0;  Iden(2,2) = 1.0;
 
-  for(gp2=0;gp2<nGP;gp2++)
-  {
-    JacMult = gaussweights1[gp2] * thick;
 
-    param[1] = gausspoints1[gp2];
-
-  for(gp1=0;gp1<nGP;gp1++)
-  {
-        param[0] = gausspoints1[gp1];
+    for(gp=0; gp<nGP; gp++)
+    {
+        param[0] = gausspoints1[gp];
+        param[1] = gausspoints2[gp];
 
         GeomData->computeBasisFunctions2D(0, 2, degree, param, nodeNums, &N(0), &dN_dx(0), &dN_dy(0), Jac);
 
-        fact = gaussweights1[gp1] * JacMult;
-
+        fact  = gaussweights[gp] * thick;
         dvol0 = Jac * fact;
-        dvol = dvol0;
+        dvol  = dvol0;
 
         //if(axsy)
           //dvol *= 2.0*PI*yy;
@@ -822,21 +822,38 @@ void  LagrangeElem2DBbarFbar::computeEnergy(int index1, int index2, VectorXd& en
         strain[2] = F33  - 1.0;
         strain[3] = 0.5 * (F[1] + F[2]);
 
+        //velo[0] = computeValueDot(0, N);
+        //velo[1] = computeValueDot(1, N);
+
+        // kinetic energy
+        //energy[0] += (0.5*dvol0*rho*(velo[0]*velo[0]+velo[1]*velo[1]));
+        //energy[1] += (0.5*dvol*(strain[0]*stress[0]+strain[1]*stress[1]+strain[2]*stress[2]+strain[3]*stress[3]));
+        
+        FF(0,0) = F[0];
+        FF(0,1) = F[2];
+        FF(1,0) = F[1];
+        FF(1,1) = F[3];
+        FF(2,2) = 1.0;
+        Finv = FF.inverse();
+        
+        LagTens = 0.5*(FF.transpose()*FF - Iden);
+
+        sigma(0,0) = stress[0];
+        sigma(1,1) = stress[1];
+        sigma(2,2) = stress[2];
+        
+        sigma(0,1) = stress[3];  sigma(1,0) = stress[3];
+
+        PK2 = detF*Finv*sigma*Finv.transpose();
+
+        // strain energy        
+        energy[0] += (0.5*dvol* ( PK2(0,0)*LagTens(0,0) + PK2(1,1)*LagTens(1,1) + PK2(2,2)*LagTens(2,2) + 2.0*PK2(0,1)*LagTens(0,1) ) );
+        
         //printf(" %14.12f \t %14.12f \t %14.12f \t %14.12f \n ", strain[0], strain[1], strain[2], strain[3]);
         //printf(" %14.12f \t %14.12f \t %14.12f \t %14.12f \n ", stress[0], stress[1], stress[2], stress[3]);
         //printf("  dvol =  %14.12f \n\n ", dvol);
-
-        velo[0] = computeValueDot(0, N);
-        velo[1] = computeValueDot(1, N);
-
-        // kinetic energy
-        energy[0] += (0.5*dvol0*rho*(velo[0]*velo[0]+velo[1]*velo[1]));
-        energy[1] += (0.5*dvol*(strain[0]*stress[0]+strain[1]*stress[1]+strain[2]*stress[2]+strain[3]*stress[3]));
-
-  }//gp1
-  }//gp2
-
-  //printf("\n\n");
+    }//gp
+    //printf("\n\n");
 
   return;
 }
