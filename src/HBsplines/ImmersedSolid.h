@@ -268,6 +268,9 @@ class ImmersedSolid
         virtual void  setPrescribedMotion(vector<vector<double> >& vectemp)
         { cout << "   'SetPrescribedMotion' is not defined for this Solid!\n\n"; return; }
 
+        virtual void  setNonlinearSpringCoefficients(vector<vector<double> >&)
+        { cout << "   'setNonlinearSpringCoefficients' is not defined for this Solid!\n\n"; return; }
+
         virtual void  setPivotpoint(vector<double>&)
         { cout << "   'setPivotpoint' is not defined for this Solid!\n\n"; return; }
 

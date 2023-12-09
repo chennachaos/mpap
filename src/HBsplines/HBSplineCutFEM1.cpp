@@ -91,7 +91,7 @@ HBSplineCutFEM::HBSplineCutFEM()
                           "contact elements", //36
                           "element type", //37
                           "material type", //38
-                          "node sets");
+                          "rigid body nonlinear spring");
 
 }
 
@@ -875,6 +875,31 @@ void  HBSplineCutFEM::readInputData(std::ifstream &Ifile, MyString &line)
 
             ImmersedBodyObjects[bb]->SolnData.MatlProp.add(new PropertyItem(ELEMENTTYPE));
             ImmersedBodyObjects[bb]->SolnData.MatlProp[ImmersedBodyObjects[bb]->SolnData.MatlProp.n-1].readInputData(Ifile,line,"input error in 'element type'!");
+
+            break;
+
+    case  39: //cout << "     HBSplineCutFEM: reading 'rigid body nonlinear spring' ...\n\n";
+
+            if (!prgReadLnBrkSepListVectorDbl(Ifile,line,lvdTmp))
+              prgError(1,fct,"invalid input in 'rigid body nonlinear spring'!");
+
+            vecvecDbl.resize(lvdTmp.n);
+
+            for(i=0;i<lvdTmp.n;i++)
+            {
+                vecvecDbl[i].resize(lvdTmp[i].n);
+                if(lvdTmp[i].n < 3)
+                   prgError(2, fct, "invalid number of 'rigid body nonlinear spring' !");
+
+                for(j=0;j<lvdTmp[i].n;j++)
+                  vecvecDbl[i][j] = lvdTmp[i][j];
+            }
+
+            assert(ImmersedBodyObjects.size() > 0);
+
+            bb = ImmersedBodyObjects.size() - 1;
+
+            ImmersedBodyObjects[bb]->setNonlinearSpringCoefficients(vecvecDbl);
 
             break;
 

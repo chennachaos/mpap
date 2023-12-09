@@ -127,8 +127,8 @@ inline void  evaluateStabParams_algo2(double* u, double h, double rho, double mu
  */
 inline void  evaluateStabParams_algo3(VectorXd& u, MatrixXd& G, double dt, double rho, double mu, double CI, double* tau)
 {
-  tau[0] = 4.0/dt/dt + u.dot(G*u) + CI*(mu*mu/rho/rho)*G.cwiseAbs2().sum();
-  //tau[0] =             u.dot(G*u) + CI*(mu*mu/rho/rho)*G.cwiseAbs2().sum();
+  //tau[0] = 4.0/dt/dt + u.dot(G*u) + CI*(mu*mu/rho/rho)*G.cwiseAbs2().sum();
+  tau[0] =             u.dot(G*u) + CI*(mu*mu/rho/rho)*G.cwiseAbs2().sum();
 
   tau[0] = 1.0/sqrt(tau[0]); // tau_M
 

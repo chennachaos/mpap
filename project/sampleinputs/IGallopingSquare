@@ -255,6 +255,11 @@ rigid body stiffness
   0.0  0.0  0.0  0.0  3.08425  0.0  0.0  0.0  0.0
 
 
+!rigid body nonlinear spring
+! dof   exponent(ke)   coefficient(kn)    e.g., kn*y^(ke)
+!   2        3          9.25275
+
+
 rigid body degree of freedom
 ! d1   d2   d3
   -1   1   -1  

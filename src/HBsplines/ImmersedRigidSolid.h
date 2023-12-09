@@ -22,6 +22,7 @@ class ImmersedRigidSolid : public ImmersedSolid
         VectorXd  Flocal, rhsVec;
 
         vector<int>  forAssyVec, dofData;
+        vector<vector<double> >  nonlinearSpringCoeffs;
 
         ImmersedRigidSolid();
 
@@ -51,6 +52,8 @@ class ImmersedRigidSolid : public ImmersedSolid
         virtual void  setInitialForcePredictor(vector<double>&);
 
         virtual void  setRigidBodyMotionLimits(vector<vector<double> >&);
+
+        virtual void  setNonlinearSpringCoefficients(vector<vector<double> >&);
 
         virtual void  printSelf();
 

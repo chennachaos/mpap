@@ -219,6 +219,25 @@ void ImmersedRigidSolid::setPrescribedMotion(vector<vector<double> >& vectemp)
 }
 
 
+
+
+void  ImmersedRigidSolid::setNonlinearSpringCoefficients(vector<vector<double> >&  vectemp)
+{
+  assert(vectemp.size() > 0);
+
+  nonlinearSpringCoeffs.resize(vectemp.size());
+
+  for(int ii=0;ii<vectemp.size();ii++)
+  {
+    nonlinearSpringCoeffs[ii] = vectemp[ii];
+  }
+
+  return;
+}
+
+
+
+
 void ImmersedRigidSolid::setPivotpoint(vector<double>& tempVec)
 {
   assert( tempVec.size() >= 3 );
@@ -856,19 +875,9 @@ int ImmersedRigidSolid::calcStiffnessAndResidual(int solver_type, bool zeroMtx, 
   if(firstIter)
     rNorm = -1.0;
 
-  int ii, jj, ind;
-  double  y1, y2, fact, tol=1.e-12, lamn, gn, af, cn, g0, disp, beta=1.0;
+  int ii, jj, ind, dof;
+  double tol=1.e-12, kn, ke, disp;
 
-  double  area = 0.49;
-  //double  area = 0.5;
-  double Rt = 1.0, tCur =mpapTime.cur;
-
-  //if(tCur <=  1.0)
-    //Rt = (35.0+(-84.0+(70.0-20.0*tCur)*tCur)*tCur)*tCur*tCur*tCur*tCur;
-
-  double F0 = area*Rt;
-
-  //cout << mpapTime.cur << '\t' << tCur << '\t' << F0 << endl;
 
   Kglobal.setZero();
   rhsVec.setZero();
@@ -888,7 +897,6 @@ int ImmersedRigidSolid::calcStiffnessAndResidual(int solver_type, bool zeroMtx, 
   //printVector(SolnData.var1DotDotCur);
   //printf("\n\n");
 
-  //double  k1 = preLoad[0], k3 = preLoad[1];
 
   if(STAGGERED)
   {
@@ -896,14 +904,29 @@ int ImmersedRigidSolid::calcStiffnessAndResidual(int solver_type, bool zeroMtx, 
     VectorXd  Ftemp;
 
     Ktemp  = SolnData.td[5]*matM + SolnData.td[6]*matC + SolnData.td[7]*matK;
-    //Ktemp(1, 1) += (SolnData.td[6]*(k1+3.0*k3*SolnData.var1DotCur(1)*SolnData.var1DotCur(1)));
 
-    Ftemp    = SolnData.forceCur - matM*SolnData.var1DotDotCur - matC*SolnData.var1DotCur - matK*SolnData.var1Cur;
-    //Ftemp(1) -= (SolnData.var1DotCur(1)*(k1+k3*SolnData.var1DotCur(1)*SolnData.var1DotCur(1)));
+    Ftemp  = SolnData.forceCur - matM*SolnData.var1DotDotCur - matC*SolnData.var1DotCur - matK*SolnData.var1Cur;
 
     Ftemp(0) += preLoad[0];
     Ftemp(1) += preLoad[1];
     Ftemp(2) += preLoad[2];
+
+    if(nonlinearSpringCoeffs.size() > 0)
+    {
+      for(ii=0; ii<nonlinearSpringCoeffs.size(); ii++)
+      {
+        dof = (int) ( nonlinearSpringCoeffs[ii][0]-1 ) ;
+        ke  = nonlinearSpringCoeffs[ii][1];
+        kn  = nonlinearSpringCoeffs[ii][2];
+        
+        disp = SolnData.var1Cur(dof);
+
+        Ktemp(dof, dof) += (SolnData.td[7]*( ke*kn*pow(disp,ke-1) ));
+
+        Ftemp(dof)      -= ( kn*pow(disp,ke));
+      }
+    }
+
 
     Kglobal.resize(totalDOF, totalDOF);
     rhsVec.resize(totalDOF);
