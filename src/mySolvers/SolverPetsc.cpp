@@ -234,7 +234,7 @@ int SolverPetsc::solve()
   ierr = MatAssemblyBegin(mtx,MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
   ierr = MatAssemblyEnd(mtx,MAT_FINAL_ASSEMBLY); CHKERRQ(ierr);
 
-  //PetscPrintf(MPI_COMM_WORLD, "  SolverPetsc::solve() ... Matrix Assembly ...  \n\n");
+  PetscPrintf(MPI_COMM_WORLD, "  SolverPetsc::solve() ... Matrix Assembly ...  \n\n");
 
   //PetscViewerCreate(PETSC_COMM_WORLD, &viewer_matx);
   //PetscViewerDrawOpen();
@@ -364,7 +364,7 @@ int SolverPetsc::assembleMatrixAndVector(int start1, int start2, vector<int>& ro
 
 int SolverPetsc::assembleMatrixAndVectorCutFEM(int start, int c1, vector<int>& forAssyElem, vector<int>& map_to_cutfem, MatrixXd& Klocal, VectorXd& Flocal)
 {
-  int ii, jj, r, kk=0;
+  int ii, jj, r, c, kk=0;
 
   int  size1 = forAssyElem.size();
   int  size2 = size1*size1;
@@ -382,11 +382,13 @@ int SolverPetsc::assembleMatrixAndVectorCutFEM(int start, int c1, vector<int>& f
 
     for(jj=0;jj<size1;jj++)
     {
-      array[kk++] = Klocal(ii,jj);
+      c = map_to_cutfem[forAssyElem[jj]];
+      //array[kk++] = Klocal(ii,jj);
+      MatSetValue(mtx, r, c, Klocal(ii,jj), ADD_VALUES);
     }
   }
 
-  MatSetValues(mtx, size1, row1, size1, row1, array, ADD_VALUES);
+  //MatSetValues(mtx, size1, row1, size1, row1, array, ADD_VALUES);
 
   return 0;
 }

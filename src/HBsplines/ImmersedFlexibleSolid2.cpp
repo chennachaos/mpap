@@ -107,21 +107,10 @@ void ImmersedFlexibleSolid::prepareMatrixPattern()
     node_map_new_to_old.resize(nNode, 0);
     node_map_old_to_new.resize(nNode, 0);
 
-    dof_map_new_to_old.resize(totalDOF, 0);
-    dof_map_old_to_new.resize(totalDOF, 0);
-
-    kk=0;
     for(ii=0; ii<nNode; ii++)
     {
       node_map_new_to_old[ii] = ii;
       node_map_old_to_new[ii] = ii;
-
-      for(jj=0; jj<ndof; jj++)
-      {
-        dof_map_new_to_old[kk] = kk;
-        dof_map_old_to_new[kk] = kk;
-        kk++;
-      }
     }
 
     SolnData.node_map_new_to_old = node_map_new_to_old;

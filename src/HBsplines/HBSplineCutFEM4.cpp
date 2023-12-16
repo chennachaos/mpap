@@ -113,7 +113,6 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
 
     int  ii=0, ee=0, nr=0, nc=0, dd=0, start=0, pp=0;
     int  dof=0, dir=0, domTemp=0, bb=0, kk=0;
-    double  PENALTY=0.0;
 
     IterNum   = (iterCount == 1);
 
@@ -148,10 +147,6 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
 
           MatrixXd  Klocal = MatrixXd::Zero(nr, nr);
           VectorXd  Flocal = VectorXd::Zero(nr);
-          //Klocal = MatrixXd::Zero(nr, nr);
-          //Flocal = VectorXd::Zero(nr);
-          //Klocal.setZero();
-          //Flocal.setZero();
 
           nd->calcStiffnessAndResidualCutFEMFluid(Klocal, Flocal, domTemp);
 
@@ -166,71 +161,11 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
       }
     }
 
-    myDataIntegrateCutFEM  myData;
-
-    if(pointBCs.size() > 0)
-    {
-      for(pp=0;pp<pointBCs.size();pp++)
-      {
-        geom[0] = pointBCs[pp][0];
-        geom[1] = pointBCs[pp][1];
-        geom[2] = pointBCs[pp][2];
-
-        dof = int (pointBCs[pp][3] - 1);
-
-        myData.dir = dof;
-        myData.specVal[0] = pointBCs[pp][4];
-
-        PENALTY  = pointBCs[pp][5];
-        //printVector(pointBCs[0]);
-
-        myData.PENALTY = PENALTY;
-        myData.dvol = 1.0*PENALTY;
-
-        ee = findCellNumber(geom);
-
-        geometryToParametric(geom, param);
-
-        myData.param = param;
-        myData.geom  = geom;
-
-        node *nd;
-        nd = elems[ee];
-
-        nr = nd->forAssyVec.size();
-
-        myData.K1 = MatrixXd::Zero(nr, nr);
-        myData.F1 = VectorXd::Zero(nr);
-
-        //dof, param, spec_val, PENALTY, Klocal, Flocal
-        nd->applyBoundaryConditionsAtApoint(myData);
-        solverPetsc->assembleMatrixAndVector(0, 0, nd->forAssyVec, nd->forAssyVec, myData.K1, myData.F1);
-      }
-    }
-
-    //cout << " rhsVec " << endl;
-    //printVector(&(solver->rhsVec(0)), totalDOF);
-    //printf("\n rhsVec norm = %12.6E \n", solverEigen->rhsVec.norm());
-
     if(DIM == 2)
       applyInterfaceTerms2D();
 
     if(DIM == 3)
       applyInterfaceTerms3D();
-
-    //printf("\n rhsVec norm = %12.6E \n", solverEigen->rhsVec.norm());
-
-    if(!STAGGERED)
-    {
-      kk = fluidDOF;
-      for(bb=0; bb<ImmersedBodyObjects.size(); bb++)
-      {
-        //cout << " ppppppppppp " << kk << endl;
-        ImmersedBodyObjects[bb]->assembleGlobalMatrixAndVectorCutFEM(kk, kk, solverPetsc);
-        //cout << " ppppppppppp " << endl;
-        kk += ImmersedBodyObjects[bb]->getTotalDOF();
-      }
-    }
 
     //printVector(&(solver->rhsVec(0)), totalDOF);
     //printf("\n rhsVec norm = %12.6E \n", solverPetsc->rhsVec.norm());
@@ -291,14 +226,7 @@ int HBSplineCutFEM::factoriseSolveAndUpdate()
 
     double tstart = MPI_Wtime();
 
-    if( solverPetsc->factoriseAndSolve() )
-    {
-        int  resln[] = {1, 1, 1};
-
-        postProcessFlow(1, 1, 1, 1, 0.0, 1.0, resln);
-
-        return 1;
-    }
+    solverPetsc->factoriseAndSolve();
 
     double tend = MPI_Wtime();
     PetscPrintf(MPI_COMM_WORLD, " PETSC solver took %f  milliseconds \n", (tend-tstart)*1000);
