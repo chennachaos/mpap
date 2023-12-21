@@ -46,7 +46,7 @@ class HBSplineBase: public Domain
         int  nImmSolids, SOLVER_TYPE, slv_type, SOLID_SOLVED;
 
         PetscInt  nElem, nNode, nElem_local, nNode_local;
-        PetscInt  n_mpi_procs, this_mpi_proc;
+        PetscInt  n_mpi_procs, this_mpi_proc, rootproc=0;
         PetscInt  bfs_start, bfs_end, bfs_local;
         PetscInt  row_start, row_end, ndofs_local;
         PetscInt  elem_start, elem_end;
@@ -81,8 +81,8 @@ class HBSplineBase: public Domain
         //std::vector<std::unique_ptr<node> > elems;
         //vector< std::tr1::shared_ptr<node> > elems;
 
-        vector<int>  node_map_new_to_old, node_map_old_to_new;
-        vector<int>  dof_map_new_to_old, dof_map_old_to_new;
+        vector<int>  node_map_get_old, node_map_get_new;
+        vector<int>  dof_map_get_old, dof_map_get_new;
 
         MyString   anlySolnType;
 

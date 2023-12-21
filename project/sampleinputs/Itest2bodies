@@ -34,7 +34,7 @@ number of elements
 
 fluid properties
 ! nGP flag  axsy     rho      mu1   mu2   fx   fy   tauSUPG  tauPSPG  tauLSIC     eps     gamm
-   2    5    0       1.0      0.1   0.0   0.0  0.0    0.0      1.0       0.0       0.0    0.0
+   2    5    0       1.0      0.1   0.0   0.0  0.0    1.0      1.0       0.0       0.0    0.0
 
 
 refinement type
@@ -69,7 +69,7 @@ staggered or monolithic
 
 cutfem parameters
 ! gp_type  nGPbound  nGPcell  refLev1   refLev2  tmp2  gammU   gammP
-    1         5         7        5          0     1     0.00   0.00
+    1         5         7        5          0     1     0.1    0.1
 
 
 immersed body data
@@ -344,11 +344,12 @@ BEGIN RUN_CONTROL
 BATCH
 anly,solv,,28,1,8,3,1,1,1                    ! this sets the solver
 chen,data,,28,2,2,2,1                        ! this generates the grid file, without any solution field.
-!vtk,flow,,28,1,1,1,1,1,1,1,0,0,1            ! this generates the grid file, with the solution field. Since we have not solved anything, all the values are zero.
+vtk,flow,,28,1,1,1,1,1,1,1,0,0,1            ! this generates the grid file, with the solution field. Since we have not solved anything, all the values are zero.
 dt,,0.1                                      ! time step size
 wrnd                                         ! write nodal data to the output file starting with T
 !wait,mous                                   ! useful to stop the program before running the time loop if we want to check if the input geometries are correct.
-loop,,1.99999999,2                           ! Time loop; this particular one runs up to a final time of 10 seconds. Set 9.999999999 to avoid floating point issues.
+loop,,10
+!loop,,1.99999999,2                           ! Time loop; this particular one runs up to a final time of 10 seconds. Set 9.999999999 to avoid floating point issues.
   time                                       ! update time functions
   !chen,fsi,,28,1,1,2,1                      ! FSI coupling loop with two coupling iterations
   chen,fsi,,28,1,1,1,1                       ! FSI coupling loop with one coupling iteration

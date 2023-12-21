@@ -730,7 +730,8 @@ void  HBSplineCutFEM::postProcessSubTrias2D(int vartype, int vardir, int nCol, b
                 }
 
                 cellDataVTK->InsertNextValue(poly->getDomainNumber());
-                cellDataVTK2->InsertNextValue(0);
+                //cellDataVTK2->InsertNextValue(0);
+                cellDataVTK2->InsertNextValue(ndTemp->getSubdomainId());
 
                 uGridVTK->InsertNextCell(triaVTK->GetCellType(), triaVTK->GetPointIds());
               } // if( domainInclYesNo[domTemp] )

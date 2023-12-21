@@ -151,8 +151,8 @@ int LagrangeElem2DPoissonTria3Node::calcStiffnessAndResidual(MatrixXd& Klocal, V
 
   for(ii=0;ii<npElem;ii++)
   {
-    xNode[ii] = GeomData->NodePosOrig[SolnData->node_map_new_to_old[nodeNums[ii]]][0];
-    yNode[ii] = GeomData->NodePosOrig[SolnData->node_map_new_to_old[nodeNums[ii]]][1];
+    xNode[ii] = GeomData->NodePosOrig[SolnData->node_map_get_old[nodeNums[ii]]][0];
+    yNode[ii] = GeomData->NodePosOrig[SolnData->node_map_get_old[nodeNums[ii]]][1];
   }
 
   double totVolume = 0.5*(xNode[0]*(yNode[1]-yNode[2]) + xNode[1]*(yNode[2]-yNode[0]) + xNode[2]*(yNode[0]-yNode[1]));

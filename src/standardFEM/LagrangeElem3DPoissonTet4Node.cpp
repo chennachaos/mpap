@@ -66,9 +66,9 @@ int LagrangeElem3DPoissonTet4Node::calcStiffnessAndResidual(MatrixXd& Klocal, Ve
 
   for(ii=0;ii<npElem;ii++)
   {
-    xNode[ii] = GeomData->NodePosOrig[SolnData->node_map_new_to_old[nodeNums[ii]]][0];
-    yNode[ii] = GeomData->NodePosOrig[SolnData->node_map_new_to_old[nodeNums[ii]]][1];
-    zNode[ii] = GeomData->NodePosOrig[SolnData->node_map_new_to_old[nodeNums[ii]]][2];
+    xNode[ii] = GeomData->NodePosOrig[SolnData->node_map_get_old[nodeNums[ii]]][0];
+    yNode[ii] = GeomData->NodePosOrig[SolnData->node_map_get_old[nodeNums[ii]]][1];
+    zNode[ii] = GeomData->NodePosOrig[SolnData->node_map_get_old[nodeNums[ii]]][2];
   }
 
 

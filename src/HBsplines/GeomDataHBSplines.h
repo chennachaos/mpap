@@ -41,8 +41,7 @@ class  GeomDataHBSplines
     MatrixXd  coeffSW_Front, coeffNW_Front, coeffSE_Front, coeffNE_Front;
     MatrixXd  coeffSW_Back, coeffNW_Back, coeffSE_Back, coeffNE_Back;
 
-    vector<int>  node_map_new_to_old;
-    vector<int>  node_map_old_to_new;
+    vector<int>  node_map_get_old, node_map_get_new;
 
 
     vector<vector<ShapeFunctions> >  shpfns;

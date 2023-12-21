@@ -59,7 +59,7 @@ class HBSplineCutFEM: public HBSplineBase
 {
     private:
 
-        int  numDomains, fluidDOF, solidDOF, CUTCELL_INTEGRATION_TYPE;
+        int  numDomains, fluidDOF, solidDOF, CUTCELL_INTEGRATION_TYPE, numCutcells;
 
         vector<int>  domainTotalDOF, domainStartDOF, cutCellIds, fluidElementIds;
 
@@ -67,7 +67,7 @@ class HBSplineCutFEM: public HBSplineBase
 
         vector<int>  grid_to_cutfem_BF, grid_to_cutfem_BFprev, grid_to_cutfem_DOF, grid_to_cutfem_DOFprev;
         vector<int>  cutfem_to_grid_BF, cutfem_to_grid_DOF;
-        vector<int>  grid_to_proc_BF, grid_to_proc_DOF, proc_to_grid_BF, proc_to_grid_DOF;
+        vector<int>  grid_to_proc_BF, grid_to_proc_DOF, proc_to_grid_DOF;
 
         vector<double>  cutFEMparams;
 
@@ -164,6 +164,7 @@ class HBSplineCutFEM: public HBSplineBase
         virtual  void  computeTotalBodyForce(int );
 
         void  prepareCutElements();
+        void  prepareCutElements2();
 
         void  prepareCutElementsSubTrias1D();
         void  prepareCutElementsSubTrias2D();

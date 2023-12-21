@@ -583,7 +583,7 @@ int HBSplineBase::solveFluidProblem()
   //printf("\n Solving HBSplineCutFEM::solveFluidProblem() \n");
   //printf("\n External force norm = %12.6E \n", forceCur.norm());
 
-  for(int ii=0;ii<10;ii++)
+  for(int ii=0;ii<1;ii++)
   {
     calcStiffnessAndResidual(1, 1, 1);
 

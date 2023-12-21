@@ -211,8 +211,8 @@ void  GeomDataLagrange::computeBasisFunctions2D(bool flag, int type, int degree,
     {
        for(ii=0; ii<nlbf; ii++)
        {
-          xx = NodePosCur[node_map_new_to_old[nodeNums[ii]]][0];
-          yy = NodePosCur[node_map_new_to_old[nodeNums[ii]]][1];
+          xx = NodePosCur[node_map_get_old[nodeNums[ii]]][0];
+          yy = NodePosCur[node_map_get_old[nodeNums[ii]]][1];
           //cout << " coords ... " << xx << '\t' << yy << '\t' << dN_du1[ii] << '\t' << dN_du2[ii] << endl;
 
           B[0][0] +=  (xx * dN_du1[ii]) ;
@@ -225,8 +225,8 @@ void  GeomDataLagrange::computeBasisFunctions2D(bool flag, int type, int degree,
     {
        for(ii=0; ii<nlbf; ii++)
        {
-          xx = NodePosOrig[node_map_new_to_old[nodeNums[ii]]][0];
-          yy = NodePosOrig[node_map_new_to_old[nodeNums[ii]]][1];
+          xx = NodePosOrig[node_map_get_old[nodeNums[ii]]][0];
+          yy = NodePosOrig[node_map_get_old[nodeNums[ii]]][1];
 
           //cout << " coords ... " << xx << '\t' << yy << '\t' << dN_du1[ii] << '\t' << dN_du2[ii] << endl;
 
@@ -282,8 +282,8 @@ void  GeomDataLagrange::computeDeformationGradient2D(bool flag, vector<int>& nod
 
     for(int ii=0; ii<nodeNums.size(); ii++)
     {
-      xx = NodePosCur[node_map_new_to_old[nodeNums[ii]]][0];
-      yy = NodePosCur[node_map_new_to_old[nodeNums[ii]]][1];
+      xx = NodePosCur[node_map_get_old[nodeNums[ii]]][0];
+      yy = NodePosCur[node_map_get_old[nodeNums[ii]]][1];
 
       //xx = NodePosCur[nodeNums[ii]][0];
       //yy = NodePosCur[nodeNums[ii]][1];
@@ -384,9 +384,9 @@ void  GeomDataLagrange::computeBasisFunctions3D(bool flag, int type, int degree,
     {
        for(ii=0; ii<nlbf; ii++)
        {
-          xx = NodePosCur[node_map_new_to_old[nodeNums[ii]]][0];
-          yy = NodePosCur[node_map_new_to_old[nodeNums[ii]]][1];
-          zz = NodePosCur[node_map_new_to_old[nodeNums[ii]]][2];
+          xx = NodePosCur[node_map_get_old[nodeNums[ii]]][0];
+          yy = NodePosCur[node_map_get_old[nodeNums[ii]]][1];
+          zz = NodePosCur[node_map_get_old[nodeNums[ii]]][2];
 
           //xx = NodePosCur[nodeNums[ii]][0];
           //yy = NodePosCur[nodeNums[ii]][1];
@@ -410,9 +410,9 @@ void  GeomDataLagrange::computeBasisFunctions3D(bool flag, int type, int degree,
     {
       for(ii=0; ii<nlbf; ii++)
       {
-          xx = NodePosOrig[node_map_new_to_old[nodeNums[ii]]][0];
-          yy = NodePosOrig[node_map_new_to_old[nodeNums[ii]]][1];
-          zz = NodePosOrig[node_map_new_to_old[nodeNums[ii]]][2];
+          xx = NodePosOrig[node_map_get_old[nodeNums[ii]]][0];
+          yy = NodePosOrig[node_map_get_old[nodeNums[ii]]][1];
+          zz = NodePosOrig[node_map_get_old[nodeNums[ii]]][2];
 
           //cout << " coords ... " << xx << '\t' << yy << '\t' << dN_du1[ii] << '\t' << dN_du2[ii] << endl;
 
@@ -457,9 +457,9 @@ void  GeomDataLagrange::computeDeformationGradient3D(bool flag, vector<int>& nod
 
     for(int ii=0; ii<nodeNums.size(); ii++)
     {
-        xx = NodePosCur[node_map_new_to_old[nodeNums[ii]]][0];
-        yy = NodePosCur[node_map_new_to_old[nodeNums[ii]]][1];
-        zz = NodePosCur[node_map_new_to_old[nodeNums[ii]]][2];
+        xx = NodePosCur[node_map_get_old[nodeNums[ii]]][0];
+        yy = NodePosCur[node_map_get_old[nodeNums[ii]]][1];
+        zz = NodePosCur[node_map_get_old[nodeNums[ii]]][2];
 
         //cout << xx << '\t' << yy << endl;
 

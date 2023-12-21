@@ -22,7 +22,7 @@ class  GeomDataLagrange
     vector<myPoint>  NodePosOrig, NodePosNew, NodePosCur, NodePosPrev, NodePosPrevCur;
     vector<myPoint>  specValNew, specValCur, acceNew, acceCur;
 
-    vector<int>  node_map_new_to_old, node_map_old_to_new;
+    vector<int>  node_map_get_old, node_map_get_new;
     vector<int>  assy4r;
 
     GeomDataLagrange()  {}

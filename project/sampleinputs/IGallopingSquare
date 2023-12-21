@@ -318,8 +318,8 @@ chen,data,,28,2,2,2,1
 dt,,0.1
 wrnd
 !wait,mous
-!loop,,100
-loop,,999.99999999,2
+loop,,10
+!loop,,999.99999999,2
   !wait,mous
   time
   !chen,fsi,,28,1,1,2,1

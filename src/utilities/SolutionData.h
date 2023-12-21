@@ -37,8 +37,8 @@ class  SolutionData
     //PropertyItem  ElemProp, MatlProp;
     List<PropertyItem>  ElemProp, MatlProp;
 
-    vector<int>  node_map_new_to_old;
-    vector<int>  node_map_old_to_new;
+    vector<int>  node_map_get_old;
+    vector<int>  node_map_get_new;
 
 
     SolutionData();

@@ -209,7 +209,7 @@ void  StandardFEM::postProcess(int vartype, int vardir, int nCol, bool umnxflag,
 
         pt[0] = pointsVTK->InsertNextPoint(xx, yy, 0.0);
 
-        kk = node_map_old_to_new[ii]*ndof;
+        kk = node_map_get_new[ii]*ndof;
 
         vec[0] = SolnData.force[kk];
         vec[1] = SolnData.force[kk+1];
@@ -273,7 +273,7 @@ void  StandardFEM::postProcess(int vartype, int vardir, int nCol, bool umnxflag,
 
         pt[0] = pointsVTK->InsertNextPoint(xx, yy, zz);
 
-        kk = node_map_old_to_new[ii]*ndof;
+        kk = node_map_get_new[ii]*ndof;
 
         //vec[0] = SolnData.force[kk];
         //vec[1] = SolnData.force[kk+1];
@@ -378,12 +378,12 @@ else
 
         if(ndof == 1)
         {
-          scaVTK->SetTuple1(ii, SolnData.var1Cur[node_map_old_to_new[ii]]);
+          scaVTK->SetTuple1(ii, SolnData.var1Cur[node_map_get_new[ii]]);
           //scaVTK2->SetTuple1(ii, 0.0);
         }
         else
         {
-          kk = node_map_old_to_new[ii]*ndof;
+          kk = node_map_get_new[ii]*ndof;
           vec[0] = analy.computeValue(0, xx, yy, mpapTime.cur) - SolnData.var1Cur[kk];
           vec[1] = analy.computeValue(1, xx, yy, mpapTime.cur) - SolnData.var1Cur[kk+1];
 
@@ -403,7 +403,7 @@ else
         for(ee=0;ee<nElem;ee++)
         {
           for(ll=0;ll<3;ll++)
-            triaVTK->GetPointIds()->SetId(ll, SolnData.node_map_new_to_old[elems[ee]->nodeNums[ll]]);
+            triaVTK->GetPointIds()->SetId(ll, SolnData.node_map_get_old[elems[ee]->nodeNums[ll]]);
 
           uGridVTK->InsertNextCell(triaVTK->GetCellType(), triaVTK->GetPointIds());
           
@@ -414,10 +414,10 @@ else
       {
         for(ee=0;ee<nElem;ee++)
         {
-          quadVTK->GetPointIds()->SetId(0, SolnData.node_map_new_to_old[elems[ee]->nodeNums[0]]);
-          quadVTK->GetPointIds()->SetId(1, SolnData.node_map_new_to_old[elems[ee]->nodeNums[1]]);
-          quadVTK->GetPointIds()->SetId(2, SolnData.node_map_new_to_old[elems[ee]->nodeNums[3]]);
-          quadVTK->GetPointIds()->SetId(3, SolnData.node_map_new_to_old[elems[ee]->nodeNums[2]]);
+          quadVTK->GetPointIds()->SetId(0, SolnData.node_map_get_old[elems[ee]->nodeNums[0]]);
+          quadVTK->GetPointIds()->SetId(1, SolnData.node_map_get_old[elems[ee]->nodeNums[1]]);
+          quadVTK->GetPointIds()->SetId(2, SolnData.node_map_get_old[elems[ee]->nodeNums[3]]);
+          quadVTK->GetPointIds()->SetId(3, SolnData.node_map_get_old[elems[ee]->nodeNums[2]]);
 
           uGridVTK->InsertNextCell(quadVTK->GetCellType(), quadVTK->GetPointIds());
           
@@ -441,11 +441,11 @@ else
 
         if(ndof == 1)
         {
-          scaVTK->SetTuple1(ii, SolnData.var1[node_map_old_to_new[ii]]);
+          scaVTK->SetTuple1(ii, SolnData.var1[node_map_get_new[ii]]);
         }
         else
         {
-          kk = node_map_old_to_new[ii]*ndof;
+          kk = node_map_get_new[ii]*ndof;
           scaVTK->SetTuple1(ii, SolnData.var1[kk+3]);
 
           //vec[0] = SolnData.force[kk];
@@ -486,7 +486,7 @@ else
         for(ee=0;ee<nElem;ee++)
         {
           for(ll=0;ll<4;ll++)
-            tetraVTK->GetPointIds()->SetId(ll, SolnData.node_map_new_to_old[elems[ee]->nodeNums[ll]]);
+            tetraVTK->GetPointIds()->SetId(ll, SolnData.node_map_get_old[elems[ee]->nodeNums[ll]]);
 
           uGridVTK->InsertNextCell(tetraVTK->GetCellType(), tetraVTK->GetPointIds());
 
@@ -497,15 +497,15 @@ else
       {
         for(ee=0;ee<nElem;ee++)
         {
-          hexVTK->GetPointIds()->SetId(0, SolnData.node_map_new_to_old[elems[ee]->nodeNums[0]]);
-          hexVTK->GetPointIds()->SetId(1, SolnData.node_map_new_to_old[elems[ee]->nodeNums[1]]);
-          hexVTK->GetPointIds()->SetId(2, SolnData.node_map_new_to_old[elems[ee]->nodeNums[3]]);
-          hexVTK->GetPointIds()->SetId(3, SolnData.node_map_new_to_old[elems[ee]->nodeNums[2]]);
+          hexVTK->GetPointIds()->SetId(0, SolnData.node_map_get_old[elems[ee]->nodeNums[0]]);
+          hexVTK->GetPointIds()->SetId(1, SolnData.node_map_get_old[elems[ee]->nodeNums[1]]);
+          hexVTK->GetPointIds()->SetId(2, SolnData.node_map_get_old[elems[ee]->nodeNums[3]]);
+          hexVTK->GetPointIds()->SetId(3, SolnData.node_map_get_old[elems[ee]->nodeNums[2]]);
 
-          hexVTK->GetPointIds()->SetId(4, SolnData.node_map_new_to_old[elems[ee]->nodeNums[4]]);
-          hexVTK->GetPointIds()->SetId(5, SolnData.node_map_new_to_old[elems[ee]->nodeNums[5]]);
-          hexVTK->GetPointIds()->SetId(6, SolnData.node_map_new_to_old[elems[ee]->nodeNums[7]]);
-          hexVTK->GetPointIds()->SetId(7, SolnData.node_map_new_to_old[elems[ee]->nodeNums[6]]);
+          hexVTK->GetPointIds()->SetId(4, SolnData.node_map_get_old[elems[ee]->nodeNums[4]]);
+          hexVTK->GetPointIds()->SetId(5, SolnData.node_map_get_old[elems[ee]->nodeNums[5]]);
+          hexVTK->GetPointIds()->SetId(6, SolnData.node_map_get_old[elems[ee]->nodeNums[7]]);
+          hexVTK->GetPointIds()->SetId(7, SolnData.node_map_get_old[elems[ee]->nodeNums[6]]);
 
           uGridVTK->InsertNextCell(hexVTK->GetCellType(), hexVTK->GetPointIds());
 

@@ -19,10 +19,10 @@ extern "C"
   void ma41ad_(int*, int*, int*, int*, int*, double*, double*, double*, double*, int*, 
 	       int*, int*, double*, int*, double*, int*, int*, double*);
 
-  void pardisoinit_(void*, int*, int*, int*, double*, int*);
+  //void pardisoinit_(void*, int*, int*, int*, double*, int*);
 
-  void pardiso_(void*, int*, int*, int*, int*, int*, double*,
-                int*, int*, int*, int*, int*, int*, double*, double*, int*, double*);
+  //void pardiso_(void*, int*, int*, int*, int*, int*, double*,
+  //              int*, int*, int*, int*, int*, int*, double*, double*, int*, double*);
 
 }
 

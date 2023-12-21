@@ -171,22 +171,22 @@ int StandardFEM::prepareMatrixPattern()
 
       ndofs_local = totalDOF;
 
-      node_map_new_to_old.resize(nNode, 0);
-      node_map_old_to_new.resize(nNode, 0);
+      node_map_get_old.resize(nNode, 0);
+      node_map_get_new.resize(nNode, 0);
 
-      dof_map_new_to_old.resize(totalDOF, 0);
-      dof_map_old_to_new.resize(totalDOF, 0);
+      dof_map_get_old.resize(totalDOF, 0);
+      dof_map_get_new.resize(totalDOF, 0);
 
       kk=0;
       for(ii=0; ii<nNode; ii++)
       {
-        node_map_new_to_old[ii] = ii;
-        node_map_old_to_new[ii] = ii;
+        node_map_get_old[ii] = ii;
+        node_map_get_new[ii] = ii;
 
         for(jj=0; jj<ndof; jj++)
         {
-          dof_map_new_to_old[kk] = kk;
-          dof_map_old_to_new[kk] = kk;
+          dof_map_get_old[kk] = kk;
+          dof_map_get_new[kk] = kk;
           kk++;
         }
       }
@@ -344,37 +344,37 @@ int StandardFEM::prepareMatrixPattern()
 
       cout << " nNode_local = " << nNode_local << '\t' << this_mpi_proc << endl;
 
-      node_map_new_to_old.resize(nNode, 0);
-      node_map_old_to_new.resize(nNode, 0);
+      node_map_get_old.resize(nNode, 0);
+      node_map_get_new.resize(nNode, 0);
 
       ii=0;
       for(subdomain=0; subdomain<n_subdomains; subdomain++)
       {
         for(kk=0; kk<locally_owned_nodes_total[subdomain].size(); kk++)
         {
-          node_map_new_to_old[ii++] = locally_owned_nodes_total[subdomain][kk];
+          node_map_get_old[ii++] = locally_owned_nodes_total[subdomain][kk];
         }
       }
 
       for(ii=0; ii<nNode; ii++)
-        node_map_old_to_new[node_map_new_to_old[ii]] = ii;
+        node_map_get_new[node_map_get_old[ii]] = ii;
 
       totalDOF = nNode*ndof;
 
-      dof_map_new_to_old.resize(totalDOF, 0);
-      dof_map_old_to_new.resize(totalDOF, 0);
+      dof_map_get_old.resize(totalDOF, 0);
+      dof_map_get_new.resize(totalDOF, 0);
 
 
       kk = 0;
       for(ii=0; ii<nNode; ii++)
       {
-        ind1 = node_map_new_to_old[ii]*ndof;
-        ind2 = node_map_old_to_new[ii]*ndof;
+        ind1 = node_map_get_old[ii]*ndof;
+        ind2 = node_map_get_new[ii]*ndof;
 
         for(jj=0; jj<ndof; jj++)
         {
-          dof_map_new_to_old[kk] = ind1 + jj;
-          dof_map_old_to_new[kk] = ind2 + jj;
+          dof_map_get_old[kk] = ind1 + jj;
+          dof_map_get_new[kk] = ind2 + jj;
           kk++;
         }
       }
@@ -404,14 +404,14 @@ int StandardFEM::prepareMatrixPattern()
         //{
           for(ii=0; ii<elems[ee]->nodeNums.size(); ii++)
           {
-            elems[ee]->nodeNums[ii] = node_map_old_to_new[elems[ee]->nodeNums[ii]];
+            elems[ee]->nodeNums[ii] = node_map_get_new[elems[ee]->nodeNums[ii]];
           }
         //}
       }
 
       for(ii=0;ii<DirichletBCs.size();ii++)
       {
-        DirichletBCs[ii][0] = node_map_old_to_new[DirichletBCs[ii][0]] ;
+        DirichletBCs[ii][0] = node_map_get_new[DirichletBCs[ii][0]] ;
       }
   } // if(n_mpi_procs > 1)
 
@@ -685,11 +685,11 @@ int StandardFEM::prepareMatrixPattern()
 
     //cout << " AAAAAAAAAA " << endl;
 
-    SolnData.node_map_new_to_old = node_map_new_to_old;
-    SolnData.node_map_old_to_new = node_map_old_to_new;
+    SolnData.node_map_get_old = node_map_get_old;
+    SolnData.node_map_get_new = node_map_get_new;
 
-    GeomData.node_map_new_to_old = node_map_new_to_old;
-    GeomData.node_map_old_to_new = node_map_old_to_new;
+    GeomData.node_map_get_old = node_map_get_old;
+    GeomData.node_map_get_new = node_map_get_new;
 
 
     if(SOLVER_TYPE == SOLVER_TYPE_PETSC)

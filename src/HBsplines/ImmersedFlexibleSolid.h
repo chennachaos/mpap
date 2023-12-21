@@ -16,7 +16,7 @@ class ImmersedFlexibleSolid : public ImmersedSolid
 
         vector<vector<int> >  NodeType, IEN, ID, LM;
 
-        vector<int>  node_map_new_to_old, node_map_old_to_new;
+        vector<int>  node_map_get_old, node_map_get_new;
 
 
         LagrangeElement  **elems;

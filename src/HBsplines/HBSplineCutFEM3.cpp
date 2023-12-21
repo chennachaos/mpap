@@ -351,7 +351,7 @@ int  HBSplineCutFEM::prepareMatrixPattern()
     int  tempDOF, domTemp, npElem, ind, size1;
     int  r, c, r1, c1, count=0, count1=0, count2=0, ii, jj, ee, dd, ind1, ind2;
     int  *tt1, *tt2, val1, val2, nnz, nnz_max_row, n1, n2, kk, e1, e2, ll, pp, aa, bb;
-    int  side, NUM_NEIGHBOURS=2*DIM, start1, start2, nr1, nr2, rootproc=0;
+    int  side, NUM_NEIGHBOURS=2*DIM, start1, start2, nr1, nr2;
 
     node  *nd1, *nd2;
 
@@ -371,23 +371,28 @@ int  HBSplineCutFEM::prepareMatrixPattern()
     // to which processor.
     ///////////////////////////////////////////////////////////////////////////
 
-    prepareCutElements();
+    //prepareCutElements();
+    prepareCutElements2();
+
+    MPI_Barrier(MPI_COMM_WORLD);
 
     double  tend = MPI_Wtime();
 
     PetscPrintf(MPI_COMM_WORLD, " preparing cut elements took %f  milliseconds \n", (tend-tstart)*1000);
 
+    fluidDOF = nNode*ndof;
+
+    PetscSynchronizedPrintf(MPI_COMM_WORLD, " nElem    = %8d \n", nElem);
+    PetscSynchronizedPrintf(MPI_COMM_WORLD, " gridBF1  = %8d \n", gridBF1);
+    PetscSynchronizedPrintf(MPI_COMM_WORLD, " nNode    = %8d \n", nNode);
+    PetscSynchronizedPrintf(MPI_COMM_WORLD, " ndof     = %8d \n", ndof);
+    PetscSynchronizedPrintf(MPI_COMM_WORLD, " fluidDOF = %8d \n", fluidDOF);
+    PetscSynchronizedFlush(MPI_COMM_WORLD, PETSC_STDOUT);
+
     //setCoveringUncovering();
 
     tstart = MPI_Wtime();
 
-    //cout << " activeElements.size () = "  << activeElements.size() << endl;
-    //cout << " fluidElementIds.size () = "  << fluidElementIds.size() << endl;
-
-    //PetscSynchronizedPrintf(MPI_COMM_WORLD, " nElem = %8d \n", nElem);
-    //PetscSynchronizedPrintf(MPI_COMM_WORLD, " nNode = %8d \n", nNode);
-
-    fluidDOF = nNode*ndof;
 
     // for monolithic scheme add the DOF of the solids to the global DOF
     solidDOF = 0;
@@ -401,11 +406,11 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
     totalDOF = fluidDOF + solidDOF;
 
-    //PetscPrintf(MPI_COMM_WORLD, "\n \t   Fluid DOF in the model   =  %8d\n\n", fluidDOF);
-    //PetscPrintf(MPI_COMM_WORLD, "\n \t   Solid DOF in the model   =  %8d\n\n", solidDOF);
+    PetscPrintf(MPI_COMM_WORLD, "\n \t   Number of processors     =  %8d\n\n", n_mpi_procs);
+    PetscPrintf(MPI_COMM_WORLD, "\n \t   Fluid DOF in the model   =  %8d\n\n", fluidDOF);
+    PetscPrintf(MPI_COMM_WORLD, "\n \t   Solid DOF in the model   =  %8d\n\n", solidDOF);
     PetscPrintf(MPI_COMM_WORLD, "\n \t   Total DOF in the model   =  %8d\n\n", totalDOF);
 
-    proc_to_grid_BF.resize(nNode);
     proc_to_grid_DOF.resize(totalDOF);
 
     if(n_mpi_procs == 1)
@@ -423,22 +428,22 @@ int  HBSplineCutFEM::prepareMatrixPattern()
       bfs_end   = nNode-1;
       bfs_local = nNode;
 
-      node_map_new_to_old.resize(nNode, 0);
-      node_map_old_to_new.resize(nNode, 0);
+      node_map_get_old.resize(nNode, 0);
+      node_map_get_new.resize(nNode, 0);
 
-      dof_map_new_to_old.resize(totalDOF, 0);
-      dof_map_old_to_new.resize(totalDOF, 0);
+      dof_map_get_old.resize(totalDOF, 0);
+      dof_map_get_new.resize(totalDOF, 0);
 
       kk=0;
       for(ii=0; ii<nNode; ii++)
       {
-        node_map_new_to_old[ii] = ii;
-        node_map_old_to_new[ii] = ii;
+        node_map_get_old[ii] = ii;
+        node_map_get_new[ii] = ii;
 
         for(jj=0; jj<ndof; jj++)
         {
-          dof_map_new_to_old[kk] = kk;
-          dof_map_old_to_new[kk] = kk;
+          dof_map_get_old[kk] = kk;
+          dof_map_get_new[kk] = kk;
           kk++;
         }
       }
@@ -453,6 +458,9 @@ int  HBSplineCutFEM::prepareMatrixPattern()
       // 
       /////////////////////////////////////////////////////////////////////////////
 
+      PetscSynchronizedPrintf(MPI_COMM_WORLD, " this_mpi_proc = %d \n", this_mpi_proc);
+      PetscSynchronizedFlush(MPI_COMM_WORLD, PETSC_STDOUT);
+
       n2 = ceil(nElem/n_mpi_procs);
 
       elem_start = n2*this_mpi_proc;
@@ -462,8 +470,6 @@ int  HBSplineCutFEM::prepareMatrixPattern()
         elem_end = nElem-1;
 
       nElem_local = elem_end - elem_start + 1;
-
-      //cout << " elem_start = " << elem_start << '\t' << elem_end << '\t' << nElem_local << endl;
 
       PetscInt  *elem_proc_id, *node_proc_id;
 
@@ -477,7 +483,7 @@ int  HBSplineCutFEM::prepareMatrixPattern()
         PetscInt  *eptr, *eind, *vwgtElem;
 
         ierr  = PetscMalloc1(nElem+1,  &eptr);  CHKERRQ(ierr);
-        ierr  = PetscMalloc1(nElem,    &vwgtElem); CHKERRQ(ierr);
+        //ierr  = PetscMalloc1(nElem,    &vwgtElem); CHKERRQ(ierr);
 
         eptr[0] = 0;
 
@@ -489,7 +495,7 @@ int  HBSplineCutFEM::prepareMatrixPattern()
           eptr[ee+1] = npElem_total;
 
           //vwgtElem[ee] = elems[fluidElementIds[ee]]->getComputationalEffort();
-          vwgtElem[ee] = elems[fluidElementIds[ee]]->getNumberOfQuadraturePoints();
+          //vwgtElem[ee] = elems[fluidElementIds[ee]]->getNumberOfQuadraturePoints();
         }
 
         ierr  = PetscMalloc1(npElem_total,  &eind); CHKERRQ(ierr);
@@ -556,22 +562,30 @@ int  HBSplineCutFEM::prepareMatrixPattern()
         ierr  = PetscFree(vwgtElem); CHKERRQ(ierr);
       }  //if(this_mpi_proc == 0)
 
+      ierr = PetscPrintf(MPI_COMM_WORLD, " After Metis \n\n\n");
+      //PetscSynchronizedPrintf(MPI_COMM_WORLD, " this_mpi_proc = %d \n", this_mpi_proc);
+      //PetscSynchronizedFlush(MPI_COMM_WORLD, PETSC_STDOUT);
+      //ierr = MPI_Barrier(MPI_COMM_WORLD);
 
+
+      MPI_Request request;
+      ierr = MPI_Bcast(node_proc_id, nNode, MPI_INT, rootproc, MPI_COMM_WORLD);
+      ierr = PetscSynchronizedPrintf(MPI_COMM_WORLD, " After broadcasting node array on processor %d \n", this_mpi_proc);
+      cout << "ierr = " << ierr << endl;
+      PetscSynchronizedFlush(MPI_COMM_WORLD, PETSC_STDOUT);
       ierr = MPI_Barrier(MPI_COMM_WORLD);
-
-      ierr = PetscPrintf(MPI_COMM_WORLD, " After Metis \n");
 
       ierr = MPI_Bcast(elem_proc_id, nElem, MPI_INT, rootproc, MPI_COMM_WORLD);
-      ierr = PetscPrintf(MPI_COMM_WORLD, " After broadcasting element array \n");
-      ierr = MPI_Barrier(MPI_COMM_WORLD);
-
-      ierr = MPI_Bcast(node_proc_id, nNode, MPI_INT, rootproc, MPI_COMM_WORLD);
-      ierr = PetscPrintf(MPI_COMM_WORLD, " After broadcasting node array \n");
+      ierr = PetscSynchronizedPrintf(MPI_COMM_WORLD, " After broadcasting element array on processor %d \n", this_mpi_proc);
+      PetscSynchronizedFlush(MPI_COMM_WORLD, PETSC_STDOUT);
       ierr = MPI_Barrier(MPI_COMM_WORLD);
 
 
       for(e1=0; e1<nElem; e1++)
         elems[fluidElementIds[e1]]->setSubdomainId(elem_proc_id[e1]);
+      MPI_Barrier(MPI_COMM_WORLD);
+
+      ierr = PetscPrintf(MPI_COMM_WORLD, " Finding local elements and nodes \n");
 
       // find nodes local to each processor
 
@@ -581,7 +595,9 @@ int  HBSplineCutFEM::prepareMatrixPattern()
         if(elem_proc_id[ii] == this_mpi_proc)
           nElem_local++;
       }
-      cout << " nElem_local =  " << nElem_local << '\t' << this_mpi_proc << endl;
+      PetscSynchronizedPrintf(MPI_COMM_WORLD, "\t   nElem_local   =  %8d ... Processor = %d\n", nElem_local, this_mpi_proc);
+      PetscSynchronizedFlush(MPI_COMM_WORLD, PETSC_STDOUT);
+      //MPI_Barrier(MPI_COMM_WORLD);
 
 
       std::vector<int>  nodelist_owned;
@@ -592,9 +608,9 @@ int  HBSplineCutFEM::prepareMatrixPattern()
           nodelist_owned.push_back(ii);
       }
       nNode_local = nodelist_owned.size();
-      cout << " nNode_local = " << nNode_local << '\t' << this_mpi_proc << endl;
-
-      MPI_Barrier(MPI_COMM_WORLD);
+      PetscSynchronizedPrintf(MPI_COMM_WORLD, "\t   nNode_local   =  %8d ... Processor = %d\n", nNode_local, this_mpi_proc);
+      PetscSynchronizedFlush(MPI_COMM_WORLD, PETSC_STDOUT);
+      //MPI_Barrier(MPI_COMM_WORLD);
 
       // create the vector (of size n_mpi_procs)
       // consisting of nNode_owned from all the processors in the communication
@@ -616,7 +632,8 @@ int  HBSplineCutFEM::prepareMatrixPattern()
         bfs_start = nNode_owned_sum[this_mpi_proc-1];
       bfs_end = nNode_owned_sum[this_mpi_proc]-1;
 
-      cout << "bfs_start =" << bfs_start << '\t' << bfs_end << endl;
+      PetscSynchronizedPrintf(MPI_COMM_WORLD, "\n    bfs_start = %d \t bfs_end = %d \n", bfs_start, bfs_end);
+      PetscSynchronizedFlush(MPI_COMM_WORLD, PETSC_STDOUT);
 
       row_start = bfs_start*ndof;
       row_end   = (bfs_end+1)*ndof-1;
@@ -624,7 +641,9 @@ int  HBSplineCutFEM::prepareMatrixPattern()
       bfs_local   = bfs_end - bfs_start + 1;
       ndofs_local = row_end - row_start + 1;
 
-      cout << "row_start =" << row_start << '\t' << row_end << endl;
+      //cout << "row_start =" << row_start << '\t' << row_end << endl;
+      PetscSynchronizedPrintf(MPI_COMM_WORLD, "\n    row_start = %d \t row_end = %d \n", row_start, row_end);
+      PetscSynchronizedFlush(MPI_COMM_WORLD, PETSC_STDOUT);
 
       MPI_Barrier(MPI_COMM_WORLD);
 
@@ -634,38 +653,36 @@ int  HBSplineCutFEM::prepareMatrixPattern()
       for(ii=0; ii<n_mpi_procs-1; ii++)
         displs[ii+1] = displs[ii] + nNode_owned_vector[ii];
 
-      node_map_new_to_old.resize(nNode, 0);
-      node_map_old_to_new.resize(nNode, 0);
+      node_map_get_old.resize(nNode, -1);
+      node_map_get_new.resize(nNode, -1);
 
       // create a global list of nodelist_owned
       // which will serve as a mapping from NEW node numbers to OLD node numbers
-      ierr = MPI_Allgatherv(&nodelist_owned[0], nNode_local, MPI_INT, &node_map_new_to_old[0], &nNode_owned_vector[0], &displs[0], MPI_INT, MPI_COMM_WORLD);
+      ierr = MPI_Allgatherv(&nodelist_owned[0], nNode_local, MPI_INT, &node_map_get_old[0], &nNode_owned_vector[0], &displs[0], MPI_INT, MPI_COMM_WORLD);
 
 
       // create an array for mapping from OLD node numbers to NEW node numbers
       // Also, generate NodeTypeNew array for computing the local and global DOF size
       // as well as creating the element-wise array for element matrix/vector assembly
       for(ii=0; ii<nNode; ii++)
-        node_map_old_to_new[node_map_new_to_old[ii]] = ii;
+        node_map_get_new[node_map_get_old[ii]] = ii;
 
 
       ierr = PetscPrintf(MPI_COMM_WORLD, " Preparing DOF maps \n");
 
       tempDOF = nNode*ndof;
 
-      dof_map_new_to_old.resize(tempDOF, 0);
-      dof_map_old_to_new.resize(tempDOF, 0);
+      dof_map_get_old.resize(tempDOF, 0);
 
       kk = 0;
       for(ii=0; ii<nNode; ii++)
       {
-        ind1 = node_map_new_to_old[ii]*ndof;
-        ind2 = node_map_old_to_new[ii]*ndof;
+        ind1 = node_map_get_old[ii]*ndof;
+        ind2 = node_map_get_new[ii]*ndof;
 
         for(jj=0; jj<ndof; jj++)
         {
-          dof_map_new_to_old[kk] = ind1 + jj;
-          dof_map_old_to_new[kk] = ind2 + jj;
+          dof_map_get_old[kk] = ind1 + jj;
           kk++;
         }
       }
@@ -679,15 +696,6 @@ int  HBSplineCutFEM::prepareMatrixPattern()
       // the the associated DOFs
       /////////////////////////////////////////////////////////////
 
-      //if(this_mpi_proc==0)
-      //{
-        //for(ii=0; ii<node_map_new_to_old.size(); ii++)
-          //cout << ii << '\t' << node_map_new_to_old[ii] << '\t' << node_map_old_to_new[ii] << endl;
-        //cout << " \n\n\n\n " << endl;
-      //}
-
-      //MPI_Barrier(MPI_COMM_WORLD);
-
       //for(e1=0; e1<nElem; e1++)
       //{
         //ee = fluidElementIds[e1];
@@ -695,7 +703,7 @@ int  HBSplineCutFEM::prepareMatrixPattern()
         ////{
           //for(ii=0; ii<elems[ee]->GlobalBasisFuncs.size(); ii++)
           //{
-            //elems[ee]->GlobalBasisFuncs[ii] = node_map_old_to_new[grid_to_cutfem_BF[elems[ee]->GlobalBasisFuncs[ii]]];
+            //elems[ee]->GlobalBasisFuncs[ii] = node_map_get_new[grid_to_cutfem_BF[elems[ee]->GlobalBasisFuncs[ii]]];
           //}
         ////}
       //}
@@ -715,28 +723,34 @@ int  HBSplineCutFEM::prepareMatrixPattern()
     PetscPrintf(MPI_COMM_WORLD, "\n element DOF values initialised \n\n");
     //printf("\n Finding Global positions \n\n");
 
+    grid_to_proc_BF.assign(gridBF1, -1);
+
     for(ii=0; ii<gridBF1; ii++)
-      grid_to_proc_BF[ii]   =  node_map_old_to_new[grid_to_cutfem_BF[ii]];
+    {
+      //cout << ii << '\t' << grid_to_cutfem_BF[ii] << endl;
+      if(grid_to_cutfem_BF[ii] != -1)
+      {
+        grid_to_proc_BF[ii]   =  node_map_get_new[grid_to_cutfem_BF[ii]];
 
-    for(ii=0; ii<nNode; ii++)
-      proc_to_grid_BF[ii]   =  cutfem_to_grid_BF[node_map_new_to_old[ii]];
+        ind1 = ii*ndof;
+        ind2 = grid_to_proc_BF[ii]*ndof;
 
-    kk = gridBF1*ndof;
-    for(ii=0; ii<kk; ii++)
-      grid_to_proc_DOF[ii]  =  dof_map_old_to_new[grid_to_cutfem_DOF[ii]];
+        for(jj=0; jj<ndof; jj++)
+          grid_to_proc_DOF[ind1+jj]  =  ind2+jj;
+      }
+    }
 
     for(ii=0; ii<totalDOF; ii++)
-      proc_to_grid_DOF[ii]  =  cutfem_to_grid_DOF[dof_map_new_to_old[ii]];
+      proc_to_grid_DOF[ii]  =  cutfem_to_grid_DOF[dof_map_get_old[ii]];
 
     MPI_Barrier(MPI_COMM_WORLD);
 
     PetscSynchronizedPrintf(MPI_COMM_WORLD, "\n    preparing matrix pattern    \n");
+    PetscSynchronizedFlush(MPI_COMM_WORLD, PETSC_STDOUT);
 
     //vector<vector<int> > DDconn;
     vector<set<int> > DDconnLoc;
     set<int>::iterator it;
-    //vector<unordered_set<int> > DDconn;
-    //unordered_set<int>::iterator it;
 
     DDconnLoc.resize(nNode);
 
@@ -745,15 +759,36 @@ int  HBSplineCutFEM::prepareMatrixPattern()
     //for(ii=row_start; ii<=row_end; ii++)
       //DDconn[ii].reserve(jj);
 
+    if(this_mpi_proc >= 90)
+    {
+        cout << "this_mpi_proc = " << this_mpi_proc << endl;
+        cout << "grid_to_proc_BF : " << endl;
+        printVector(grid_to_proc_BF);
+        cout << endl;cout << endl;cout << endl;
+    }
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    if(this_mpi_proc == 90)
+    {
+        cout << "this_mpi_proc = " << this_mpi_proc << endl;
+        cout << "grid_to_proc_DOF : " << endl;
+        printVector(grid_to_proc_DOF);
+        cout << endl;cout << endl;cout << endl;
+    }
+    MPI_Barrier(MPI_COMM_WORLD);
 
     vector<int>  vecIntTemp;
 
     for(ee=0; ee<nElem; ee++)
     {
-      nd1 = elems[fluidElementIds[ee]];
+        nd1 = elems[fluidElementIds[ee]];
 
         val1 =  nd1->getNumberOfBasisFunctions();
         vecIntTemp  =  nd1->GlobalBasisFuncs;
+
+        //cout << " aa = " << ee << '\t' << this_mpi_proc << '\t' << nd1->domNums[0] << endl;
+        //PetscSynchronizedPrintf(MPI_COMM_WORLD, " aa = %d \t %d \t %d \t %d \n", ee, fluidElementIds[ee], this_mpi_proc, nd1->domNums[0]);
+        //if(this_mpi_proc==1) printVector(vecIntTemp);
 
         if( nd1->domNums[0] == 0 )
         {
@@ -766,11 +801,13 @@ int  HBSplineCutFEM::prepareMatrixPattern()
             if( r >= bfs_start && r <= bfs_end )
             {
               for(jj=0; jj<val1; jj++)
-                //DDconnLoc[r].push_back(grid_to_proc_BF[vecIntTemp[jj]]);
                 DDconnLoc[r].insert(grid_to_proc_BF[vecIntTemp[jj]]);
             }
           }
         }
+
+        //PetscSynchronizedPrintf(MPI_COMM_WORLD, " bb = %d \t %d \n", ee, fluidElementIds[ee]);
+        //cout << " bb = " << ee << '\t' << this_mpi_proc << endl;
 
         // connectivity for ghost-penalty terms
         if( nd1->isCutElement() )
@@ -788,20 +825,27 @@ int  HBSplineCutFEM::prepareMatrixPattern()
               {
                 r = grid_to_proc_BF[nd1->GlobalBasisFuncs[ii]];
 
-                for(jj=0; jj<nr2; jj++)
+                if(r != -1)
                 {
-                  c = grid_to_proc_BF[nd2->GlobalBasisFuncs[jj]];
+                  for(jj=0; jj<nr2; jj++)
+                  {
+                    c = grid_to_proc_BF[nd2->GlobalBasisFuncs[jj]];
 
-                  //DDconnLoc[r].push_back(c);
-                  //DDconnLoc[c].push_back(r);
-
-                  DDconnLoc[r].insert(c);
-                  DDconnLoc[c].insert(r);
+                    if(c != -1)
+                    {
+                      DDconnLoc[r].insert(c);
+                      DDconnLoc[c].insert(r);
+                    }
+                  }
                 } // for(jj=0; jj<nr2; jj++)
               } // for(ii=0; ii<nr1; ii++)
             }
           } //for(side=0; side<NUM_NEIGHBOURS; side++)
         } //if( nd1->isCutElement() )
+
+        //cout << " cc = " << ee << '\t' << this_mpi_proc << endl;
+        //PetscSynchronizedPrintf(MPI_COMM_WORLD, " cc = %d \t %d \n", ee, fluidElementIds[ee]);
+        //PetscSynchronizedFlush(MPI_COMM_WORLD, PETSC_STDOUT);
       //} //if( nd1->getSubdomainId() == this_mpi_proc )
     } // for(e=0;e<fluidElementIds.size();e++)
 
@@ -817,11 +861,11 @@ int  HBSplineCutFEM::prepareMatrixPattern()
     //////////////////////////////////////////////
     tstart = MPI_Wtime();
 
-    SolnData.node_map_new_to_old = node_map_new_to_old;
-    SolnData.node_map_old_to_new = node_map_old_to_new;
+    SolnData.node_map_get_old = node_map_get_old;
+    SolnData.node_map_get_new = node_map_get_new;
 
-    GeomData.node_map_new_to_old = node_map_new_to_old;
-    GeomData.node_map_old_to_new = node_map_old_to_new;
+    GeomData.node_map_get_old = node_map_get_old;
+    GeomData.node_map_get_new = node_map_get_new;
 
     ////////////////////////////////////////////////////////////////////////////////////////////
     // find the number of nonzeroes in the diagonal and off-diagonal portions of each processor
@@ -898,11 +942,8 @@ int  HBSplineCutFEM::prepareMatrixPattern()
     ierr = MatSeqAIJSetPreallocation(solverPetsc->mtx, 20, d_nnz);CHKERRQ(ierr);
     */
 
-    ierr = MatCreateAIJ(MPI_COMM_WORLD, ndofs_local, ndofs_local, totalDOF, totalDOF, 20, d_nnz, 20, o_nnz, &(solverPetsc->mtx));
-
+    ierr = MatCreateAIJ(MPI_COMM_WORLD, ndofs_local, ndofs_local, totalDOF, totalDOF, 50, d_nnz, 50, o_nnz, &(solverPetsc->mtx));
     MPI_Barrier(MPI_COMM_WORLD);
-
-    //cout << " jjjjjjjjjjjjjjjj " << this_mpi_proc << endl;
 
     //colTemp and arrayTemp are defined in HBSplineBase.h
     // and initially allocated of size 5000
@@ -943,12 +984,11 @@ int  HBSplineCutFEM::prepareMatrixPattern()
 
     MPI_Barrier(MPI_COMM_WORLD);
 
-    //ierr = MatSetOption(solverPetsc->mtx, MAT_NEW_NONZERO_LOCATIONS, PETSC_FALSE);
+    ierr = MatSetOption(solverPetsc->mtx, MAT_NEW_NONZERO_LOCATIONS, PETSC_FALSE);
 
     //VecCreate(MPI_COMM_WORLD, &solverPetsc->soln);
-    //ierr = VecSetSizes(solverPetsc->soln, ndofs_local, totalDOF); CHKERRQ(ierr);
     ierr = VecCreateMPI(MPI_COMM_WORLD, ndofs_local, totalDOF, &solverPetsc->soln); CHKERRQ(ierr);
-    //cout << " bbbbbbbb " << this_mpi_proc << endl;
+    ierr = VecSetOption(solverPetsc->soln, VEC_IGNORE_NEGATIVE_INDICES, PETSC_TRUE);
     ierr = VecSetFromOptions(solverPetsc->soln);CHKERRQ(ierr);
     ierr = VecDuplicate(solverPetsc->soln, &solverPetsc->rhsVec);CHKERRQ(ierr);
     ierr = VecDuplicate(solverPetsc->soln, &solverPetsc->solnPrev);CHKERRQ(ierr);

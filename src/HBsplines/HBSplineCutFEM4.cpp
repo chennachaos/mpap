@@ -150,11 +150,14 @@ int HBSplineCutFEM::calcStiffnessAndResidual(int solver_type, bool zeroMtx, bool
 
           nd->calcStiffnessAndResidualCutFEMFluid(Klocal, Flocal, domTemp);
 
-          nd->applyDirichletBCsCutFEMFluid(Klocal, Flocal, domTemp);
+          if(nd->isBoundary())
+          {
+            nd->applyDirichletBCsCutFEMFluid(Klocal, Flocal, domTemp);
 
-          nd->applyNeumannBCsCutFEMFluid(Klocal, Flocal, domTemp);
+            nd->applyNeumannBCsCutFEMFluid(Klocal, Flocal, domTemp);
 
-          nd->applyDerivativeBCsCutFEMFluid(Klocal, Flocal, domTemp);
+            nd->applyDerivativeBCsCutFEMFluid(Klocal, Flocal, domTemp);
+          }
 
           solverPetsc->assembleMatrixAndVectorCutFEM(start, start, nd->forAssyVec, grid_to_proc_DOF, Klocal, Flocal);
         }

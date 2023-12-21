@@ -2,7 +2,7 @@
 #include <iostream>
 
 #include "SolverPardisoEigen.h"
-#include "FunctionsSolver.h"
+#include "pardiso.h"
 #include "FunctionsProgram.h"
 #include "SolverTime.h"
 #include "ComputerTime.h"
@@ -50,7 +50,7 @@ SolverPardisoEigen::~SolverPardisoEigen()
   phase = -1; error = 0;
 
 #ifdef PARDISO_SOLVER
-  pardiso_(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
+  pardiso(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
            &nRow, array, &csr[0], &col[0], &perm[0], &NRHS,
            IPARM, &MSGLVL, &ddum, &ddum, &error, DPARM);
 #endif
@@ -116,20 +116,19 @@ int SolverPardisoEigen::initialise(int numProc, int matrixType, int nr)
   //IPARM[0] = 1;     // user input values to IPARM
   //IPARM[1] = 2;
 
-  IPARM[2] = max(1,numProc);  // number of processors (no default value available)
-/*
   tmp = getenv("OMP_NUM_THREADS");
 
   if (tmp != NULL) 
   {
     sscanf(tmp,"%d", &idum);
-    if (idum != IPARM[2]) prgError(1,fct,"set environment variable OMP_NUM_THREADS to numProc!");
+    //if (idum != IPARM[2]) prgError(1,fct,"set environment variable OMP_NUM_THREADS to numProc!");
   }
   else prgError(2,fct,"set environment variable OMP_NUM_THREADS!");
-*/
+
+  IPARM[2] = max(1,idum);  // number of processors (no default value available)
 
 #ifdef PARDISO_SOLVER
-  pardisoinit_(PT, &MTYPE, &SOLVER, IPARM, DPARM, &error);
+  pardisoinit(PT, &MTYPE, &SOLVER, IPARM, DPARM, &error);
 #endif
 
   if (error != 0)
@@ -159,7 +158,7 @@ int SolverPardisoEigen::initialise(int numProc, int matrixType, int nr)
   perm.resize(nRow);
 
 #ifdef PARDISO_SOLVER
-  pardiso_(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
+  pardiso(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
            &nRow, array, &csr[0], &col[0], &perm[0], &NRHS,
            IPARM, &MSGLVL, &ddum, &ddum, &error, DPARM);
 #endif
@@ -196,7 +195,7 @@ int SolverPardisoEigen::factorise()
   computerTime.go(fct);
 
 #ifdef PARDISO_SOLVER
-  pardiso_(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
+  pardiso(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
            &nRow, array, &csr[0], &col[0], &perm[0], &NRHS,
            IPARM, &MSGLVL, &ddum, &ddum, &error, DPARM);
 #endif
@@ -227,7 +226,7 @@ int SolverPardisoEigen::solve()
   soln.setZero();
 
 #ifdef PARDISO_SOLVER
-  pardiso_(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
+  pardiso(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
            &nRow, array, &csr[0], &col[0], &perm[0], &NRHS,
            IPARM, &MSGLVL, &rhsVec[0], &soln[0], &error, DPARM);
 #endif
@@ -254,7 +253,7 @@ int SolverPardisoEigen::factoriseAndSolve()
   soln.setZero();
 
 #ifdef PARDISO_SOLVER
-  pardiso_(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
+  pardiso(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
            &nRow, array, &csr[0], &col[0], &perm[0], &NRHS,
            IPARM, &MSGLVL, &rhsVec[0], &soln[0], &error, DPARM);
 #endif
@@ -281,7 +280,7 @@ int SolverPardisoEigen::free()
   phase = -1; error = 0;
 
 #ifdef PARDISO_SOLVER
-  pardiso_(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
+  pardiso(PT, &MAXFCT, &MNUM, &MTYPE, &phase,
            &nRow, array, &csr[0], &col[0], &perm[0], &NRHS,
            IPARM, &MSGLVL, &ddum, &ddum, &error, DPARM);
 #endif

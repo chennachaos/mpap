@@ -104,20 +104,20 @@ void ImmersedFlexibleSolid::prepareMatrixPattern()
 
     //totalDOF = nNode*ndof;     totalDOF += nElem_Constraint;
 
-    node_map_new_to_old.resize(nNode, 0);
-    node_map_old_to_new.resize(nNode, 0);
+    node_map_get_old.resize(nNode, 0);
+    node_map_get_new.resize(nNode, 0);
 
     for(ii=0; ii<nNode; ii++)
     {
-      node_map_new_to_old[ii] = ii;
-      node_map_old_to_new[ii] = ii;
+      node_map_get_old[ii] = ii;
+      node_map_get_new[ii] = ii;
     }
 
-    SolnData.node_map_new_to_old = node_map_new_to_old;
-    SolnData.node_map_old_to_new = node_map_old_to_new;
+    SolnData.node_map_get_old = node_map_get_old;
+    SolnData.node_map_get_new = node_map_get_new;
 
-    GeomData.node_map_new_to_old = node_map_new_to_old;
-    GeomData.node_map_old_to_new = node_map_old_to_new;
+    GeomData.node_map_get_old = node_map_get_old;
+    GeomData.node_map_get_new = node_map_get_new;
 
     //cout << " nelem and  ndof " << nElem << '\t' << ndof << '\t' << npElem << endl;
     cout << " ImmersedFlexibleSolid.... nNode and  ndof " << nNode << '\t' << ndof << endl;

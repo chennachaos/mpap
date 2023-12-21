@@ -102,9 +102,9 @@ int LagrangeElem3DNavierStokesTet4Node::calcStiffnessAndResidual(MatrixXd& Kloca
 
   for(ii=0;ii<npElem;ii++)
   {
-    xNode[ii] = GeomData->NodePosOrig[SolnData->node_map_new_to_old[nodeNums[ii]]][0];
-    yNode[ii] = GeomData->NodePosOrig[SolnData->node_map_new_to_old[nodeNums[ii]]][1];
-    zNode[ii] = GeomData->NodePosOrig[SolnData->node_map_new_to_old[nodeNums[ii]]][2];
+    xNode[ii] = GeomData->NodePosOrig[SolnData->node_map_get_old[nodeNums[ii]]][0];
+    yNode[ii] = GeomData->NodePosOrig[SolnData->node_map_get_old[nodeNums[ii]]][1];
+    zNode[ii] = GeomData->NodePosOrig[SolnData->node_map_get_old[nodeNums[ii]]][2];
   }
 
   forVolume(0,0) = 1.0;      forVolume(0,1) = 1.0;      forVolume(0,2) = 1.0;      forVolume(0,3) = 1.0;

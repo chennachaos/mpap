@@ -94,11 +94,11 @@ class StandardFEM: public Domain
 
         vector<vector<int> >  elemConn, DDconn, DDconnE, DDconnEt, DDconnG, DDconnH, DDconnHt;
 
-        vector<int>  node_map_new_to_old;
-        vector<int>  node_map_old_to_new;
+        vector<int>  node_map_get_old;
+        vector<int>  node_map_get_new;
 
-        vector<int>  dof_map_new_to_old;
-        vector<int>  dof_map_old_to_new;
+        vector<int>  dof_map_get_old;
+        vector<int>  dof_map_get_new;
 
         LagrangeElement  **elems;
 
