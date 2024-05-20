@@ -418,7 +418,7 @@ void ImmersedFlexibleSolid::solveTimeStep()
 
     //printVector(SolnData.forceCur);
 
-    for(ii=0;ii<10;ii++)
+    for(ii=0;ii<20;ii++)
     {
       calcStiffnessAndResidual(1, 1, 1);
 
