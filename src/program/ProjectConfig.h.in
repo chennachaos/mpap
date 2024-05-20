@@ -1,0 +1,7 @@
+// the configured options and settings for Project
+
+#define mpap_VERSION_MAJOR @mpap_VERSION_MAJOR@
+
+#define mpap_VERSION_MINOR @mpap_VERSION_MINOR@
+
+
