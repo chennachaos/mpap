@@ -1,7 +1,14 @@
-cmake_minimum_required(VERSION 2.6)
-project(igampap)
+cmake_minimum_required(VERSION 3.10)
+
+project(mpap VERSION 1.0)
+
+message("\n CMAKE_PROJECT_NAME = ${CMAKE_PROJECT_NAME} \n")
 
 enable_language(CXX Fortran)
+
+
+configure_file(./src/program/ProjectConfig.h.in TutorialConfig.h)
+
 
 ##################################
 # project directories
@@ -21,9 +28,20 @@ set(CMAKE_C_COMPILER "/usr/bin/gcc")
 set(CMAKE_CXX_COMPILER "/usr/bin/g++")
 set(CMAKE_Fortran_COMPILER "/usr/bin/gfortran")
 
-# -DPARDISO_SOLVER
 
-set(COPT "-std=c++17 -O3 -D BIT64  -Wno-uninitialized -Wno-sign-compare -Wno-write-strings  -Wno-unused  -Wno-format -Wno-narrowing  -Wno-ignored-attributes -Wno-reorder  -Wreturn-type -D_DOMAIN2D -fopenmp  -fpermissive -frounding-math -DPARDISO_SOLVER")
+#option(PARDISO_SOLVER "Build with PARDISO solver" ON)
+
+#option(_DOMAIN2D "Build the code for 2D problems"  ON)
+
+#message("PARDISO_SOLVER =  " ${PARDISO_SOLVER})
+#message("_DOMAIN2D      =  " ${_DOMAIN2D})
+
+#target_compile_definitions(mpap PRIVATE "PARDISO_SOLVER")
+
+
+#set(COPT "-std=c++17 -O3  -Wno-uninitialized -Wno-sign-compare -Wno-write-strings  -Wno-unused  -Wno-format -Wno-narrowing  -Wno-ignored-attributes -Wno-reorder  -Wreturn-type -fopenmp  -fpermissive -frounding-math")
+
+set(COPT "-std=c++17 -O3  -Wno-uninitialized -Wno-sign-compare -Wno-write-strings  -Wno-unused  -Wno-format -Wno-narrowing  -Wno-ignored-attributes -Wno-reorder  -Wreturn-type -D_DOMAIN2D -fopenmp  -fpermissive -frounding-math -DPARDISO_SOLVER ")
 
 #set(COPT "-w -std=c++17 -O3 -mavx2 -ftree-vectorize -ftree-vectorizer-verbose=1  -Wno-uninitialized -Wno-sign-compare -Wno-write-strings  -Wno-deprecated  -Wno-unused  -Wno-format -Wno-narrowing  -Wno-reorder  -Wreturn-type -Wno-unused-parameter -fopenmp  -fpermissive -frounding-math -D_DOMAIN2D ")
 
@@ -31,7 +49,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COPT}")
 
 
 set(FOPT "-O3  -Wargument-mismatch")
-#set(FOPT "-O3 -fallow-argument-mismatch")
 
 set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${FOPT}")
 
@@ -48,12 +65,13 @@ src/myGeom
 src/mySolvers 
 src/standardFEM 
 src/utilities 
-/usr/include/vtk-7.1
+/usr/include/vtk-9.1
 /usr/include/x86_64-linux-gnu/openmpi
-/usr/include/petsc 
+/usr/include/petsc
 /usr/include/
-/usr/include/superlu 
-#/usr/include/boost
+/usr/include/superlu
+/usr/include/boost
+/usr/include/vtk-9.1
 /home/chenna/Documents/myCode/pardiso/panua-pardiso-20230908-linux/include
 )
 
@@ -89,14 +107,13 @@ file(GLOB sources3 src/*/*for)
 ##################################
 ##################################
 
-add_executable(mpap  src/program/main.cpp ${sources1} ${sources2} ${sources3})
-
-#pardiso600-GNU720-X86-64
-
-target_link_libraries(mpap stdc++  gmp  mpfr  stdc++ gfortran gomp pthread m  blas  lapack pardiso metis parmetis  petsc  mpi  mpi_cxx  superlu  vtkCommonCore-7.1  vtkIOCore-7.1  vtkIOGeometry-7.1  vtkIOXML-7.1  vtkIOExport-7.1   vtkFiltersCore-7.1  vtkFiltersGeneral-7.1   vtkFiltersModeling-7.1  vtkFiltersSources-7.1  vtkCommonExecutionModel-7.1  vtkCommonDataModel-7.1  vtkIOParallel-7.1  vtkIOParallelXML-7.1)
+add_executable(${CMAKE_PROJECT_NAME}  src/program/main.cpp ${sources1} ${sources2} ${sources3})
 
 
-install(TARGETS mpap RUNTIME DESTINATION /home/chenna/Documents/myCode/mpap/bin)
+target_link_libraries(${CMAKE_PROJECT_NAME}  stdc++  gmp  mpfr  stdc++ gfortran gomp pthread m  blas  lapack pardiso metis parmetis  petsc  mpi  mpi_cxx  superlu  vtkCommonCore-9.1  vtkIOCore-9.1  vtkIOGeometry-9.1  vtkIOXML-9.1  vtkIOExport-9.1   vtkFiltersCore-9.1  vtkFiltersGeneral-9.1   vtkFiltersModeling-9.1  vtkFiltersSources-9.1  vtkCommonExecutionModel-9.1  vtkCommonDataModel-9.1  vtkIOParallel-9.1  vtkIOParallelXML-9.1)
+
+
+install(TARGETS ${CMAKE_PROJECT_NAME} RUNTIME DESTINATION /home/chenna/Documents/myCode/mpap/bin)
 
 
 
