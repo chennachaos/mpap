@@ -16,6 +16,18 @@ extern DomainTree domain;
 
 int main(int argc, char **argv)
 {
+    string petscoptionsfile = "petsc_options.dat";
+
+    ifstream fin(petscoptionsfile);
+
+    if(fin.fail())
+    {
+      cout << "\n\n ERROR: Could not open the petsc_options.dat file \n\n" << endl;
+      exit(1);
+    }
+    fin.close();
+
+
     PetscInitialize(NULL, NULL, "petsc_options.dat", NULL);
     PetscMemorySetGetMaximumUsage();
 
