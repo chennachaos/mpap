@@ -62,3 +62,19 @@ For each simulation the output contains two items:
     * One **.vtu** file for each solid, if the solids are allowed to move. Only done for flexible solids.
 
 2. A file with the letter prefixed `T` to the name of the input file containing the data for forces and displacements. (This will be created in the same directory as the input file.)
+
+
+## Citing MPAP
+If you use MPAP in your research, please cite it as:
+
+```
+@misc{mpap,
+  author = {Chennakesava Kadapa},
+  title = {{MPAP}: A Fluid-Structure Interaction simulation framework based on CutFEM},
+  year = {2024},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/chennachaos/mpap}},
+}
+```
+
